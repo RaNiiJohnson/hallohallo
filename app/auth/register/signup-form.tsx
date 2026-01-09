@@ -26,11 +26,11 @@ const SignupFormSchema = z
     name: z.string().min(2, {
       message: "Le nom doit contenir au moins 2 caractères.",
     }),
-    ville: z.string().min(2, {
-      message: "Le nom doit contenir au moins 2 caractères.",
-    }),
     email: z.email({
       message: "Adresse email invalide.",
+    }),
+    adresse: z.string().min(2, {
+      message: "L'adresse doit contenir au moins 2 caractères.",
     }),
     password: z.string().min(8, {
       message: "Le mot de passe doit contenir au moins 8 caractères.",
@@ -51,8 +51,8 @@ export function SignupForm() {
     resolver: zodResolver(SignupFormSchema),
     defaultValues: {
       name: "",
-      ville: "",
       email: "",
+      adresse: "",
       password: "",
       passwordConfirmation: "",
     },
@@ -67,7 +67,7 @@ export function SignupForm() {
         email: values.email,
         password: values.password,
         name: values.name,
-        ville: values.ville,
+        adresse: values.adresse,
         fetchOptions: {
           onSuccess: () => {
             toast.success("Inscription réussie.");
@@ -123,10 +123,10 @@ export function SignupForm() {
           />
           <FormField
             control={form.control}
-            name="ville"
+            name="adresse"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Ville</FormLabel>
+                <FormLabel>Adresse</FormLabel>
                 <FormControl>
                   <Input
                     type="text"
