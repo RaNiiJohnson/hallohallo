@@ -64,21 +64,21 @@ export declare const components: {
           input:
             | {
                 data: {
-                  arrivalDate?: number;
-                  bio?: string;
-                  city?: string;
-                  company?: string;
+                  arrivalDate?: null | number;
+                  bio?: null | string;
+                  city?: null | string;
+                  company?: null | string;
                   createdAt: number;
                   email: string;
                   emailVerified: boolean;
-                  field?: string;
+                  field?: null | string;
                   image?: null | string;
-                  isServiceProvider?: boolean;
-                  journey?: Array<string>;
+                  isServiceProvider?: null | boolean;
+                  journey?: null | Array<string>;
                   name: string;
-                  photo?: string;
-                  roles?: Array<string>;
-                  status?: string;
+                  photo?: null | string;
+                  roles?: null | string;
+                  status?: null | string;
                   updatedAt: number;
                   userId?: null | string;
                 };
@@ -157,13 +157,13 @@ export declare const components: {
                     | "photo"
                     | "bio"
                     | "city"
+                    | "roles"
+                    | "company"
                     | "arrivalDate"
                     | "status"
-                    | "journey"
-                    | "roles"
-                    | "isServiceProvider"
                     | "field"
-                    | "company"
+                    | "journey"
+                    | "isServiceProvider"
                     | "_id";
                   operator?:
                     | "lt"
@@ -354,13 +354,13 @@ export declare const components: {
                     | "photo"
                     | "bio"
                     | "city"
+                    | "roles"
+                    | "company"
                     | "arrivalDate"
                     | "status"
-                    | "journey"
-                    | "roles"
-                    | "isServiceProvider"
                     | "field"
-                    | "company"
+                    | "journey"
+                    | "isServiceProvider"
                     | "_id";
                   operator?:
                     | "lt"
@@ -607,21 +607,21 @@ export declare const components: {
             | {
                 model: "user";
                 update: {
-                  arrivalDate?: number;
-                  bio?: string;
-                  city?: string;
-                  company?: string;
+                  arrivalDate?: null | number;
+                  bio?: null | string;
+                  city?: null | string;
+                  company?: null | string;
                   createdAt?: number;
                   email?: string;
                   emailVerified?: boolean;
-                  field?: string;
+                  field?: null | string;
                   image?: null | string;
-                  isServiceProvider?: boolean;
-                  journey?: Array<string>;
+                  isServiceProvider?: null | boolean;
+                  journey?: null | Array<string>;
                   name?: string;
-                  photo?: string;
-                  roles?: Array<string>;
-                  status?: string;
+                  photo?: null | string;
+                  roles?: null | string;
+                  status?: null | string;
                   updatedAt?: number;
                   userId?: null | string;
                 };
@@ -638,13 +638,13 @@ export declare const components: {
                     | "photo"
                     | "bio"
                     | "city"
+                    | "roles"
+                    | "company"
                     | "arrivalDate"
                     | "status"
-                    | "journey"
-                    | "roles"
-                    | "isServiceProvider"
                     | "field"
-                    | "company"
+                    | "journey"
+                    | "isServiceProvider"
                     | "_id";
                   operator?:
                     | "lt"
@@ -859,21 +859,21 @@ export declare const components: {
             | {
                 model: "user";
                 update: {
-                  arrivalDate?: number;
-                  bio?: string;
-                  city?: string;
-                  company?: string;
+                  arrivalDate?: null | number;
+                  bio?: null | string;
+                  city?: null | string;
+                  company?: null | string;
                   createdAt?: number;
                   email?: string;
                   emailVerified?: boolean;
-                  field?: string;
+                  field?: null | string;
                   image?: null | string;
-                  isServiceProvider?: boolean;
-                  journey?: Array<string>;
+                  isServiceProvider?: null | boolean;
+                  journey?: null | Array<string>;
                   name?: string;
-                  photo?: string;
-                  roles?: Array<string>;
-                  status?: string;
+                  photo?: null | string;
+                  roles?: null | string;
+                  status?: null | string;
                   updatedAt?: number;
                   userId?: null | string;
                 };
@@ -890,13 +890,13 @@ export declare const components: {
                     | "photo"
                     | "bio"
                     | "city"
+                    | "roles"
+                    | "company"
                     | "arrivalDate"
                     | "status"
-                    | "journey"
-                    | "roles"
-                    | "isServiceProvider"
                     | "field"
-                    | "company"
+                    | "journey"
+                    | "isServiceProvider"
                     | "_id";
                   operator?:
                     | "lt"
