@@ -41,7 +41,7 @@ export default function RootLayout({
               {children}
             </main>
           </ConvexClientProvider>
-          <Toaster />
+          <Toaster closeButton />
         </ThemeProvider>
       </body>
     </html>

@@ -67,7 +67,6 @@ export function SignupForm() {
         email: values.email,
         password: values.password,
         name: values.name,
-        adresse: values.adresse,
         fetchOptions: {
           onSuccess: () => {
             toast.success("Inscription réussie.");
@@ -77,8 +76,7 @@ export function SignupForm() {
             toast.error("Inscription échouée.");
           },
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any);
+      });
     });
   }
 
