@@ -31,13 +31,21 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           input:
             | {
                 data: {
-                  adresse?: string;
+                  arrivalDate?: number;
                   bio?: string;
+                  city?: string;
+                  company?: string;
                   createdAt: number;
                   email: string;
                   emailVerified: boolean;
+                  field?: string;
                   image?: null | string;
+                  isServiceProvider?: boolean;
+                  journey?: Array<string>;
                   name: string;
+                  photo?: string;
+                  roles?: Array<string>;
+                  status?: string;
                   updatedAt: number;
                   userId?: null | string;
                 };
@@ -114,8 +122,16 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "photo"
                     | "bio"
-                    | "adresse"
+                    | "city"
+                    | "arrivalDate"
+                    | "status"
+                    | "journey"
+                    | "roles"
+                    | "isServiceProvider"
+                    | "field"
+                    | "company"
                     | "_id";
                   operator?:
                     | "lt"
@@ -304,8 +320,16 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "photo"
                     | "bio"
-                    | "adresse"
+                    | "city"
+                    | "arrivalDate"
+                    | "status"
+                    | "journey"
+                    | "roles"
+                    | "isServiceProvider"
+                    | "field"
+                    | "company"
                     | "_id";
                   operator?:
                     | "lt"
@@ -555,13 +579,21 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
             | {
                 model: "user";
                 update: {
-                  adresse?: string;
+                  arrivalDate?: number;
                   bio?: string;
+                  city?: string;
+                  company?: string;
                   createdAt?: number;
                   email?: string;
                   emailVerified?: boolean;
+                  field?: string;
                   image?: null | string;
+                  isServiceProvider?: boolean;
+                  journey?: Array<string>;
                   name?: string;
+                  photo?: string;
+                  roles?: Array<string>;
+                  status?: string;
                   updatedAt?: number;
                   userId?: null | string;
                 };
@@ -575,8 +607,16 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "photo"
                     | "bio"
-                    | "adresse"
+                    | "city"
+                    | "arrivalDate"
+                    | "status"
+                    | "journey"
+                    | "roles"
+                    | "isServiceProvider"
+                    | "field"
+                    | "company"
                     | "_id";
                   operator?:
                     | "lt"
@@ -792,13 +832,21 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
             | {
                 model: "user";
                 update: {
-                  adresse?: string;
+                  arrivalDate?: number;
                   bio?: string;
+                  city?: string;
+                  company?: string;
                   createdAt?: number;
                   email?: string;
                   emailVerified?: boolean;
+                  field?: string;
                   image?: null | string;
+                  isServiceProvider?: boolean;
+                  journey?: Array<string>;
                   name?: string;
+                  photo?: string;
+                  roles?: Array<string>;
+                  status?: string;
                   updatedAt?: number;
                   userId?: null | string;
                 };
@@ -812,8 +860,16 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "photo"
                     | "bio"
-                    | "adresse"
+                    | "city"
+                    | "arrivalDate"
+                    | "status"
+                    | "journey"
+                    | "roles"
+                    | "isServiceProvider"
+                    | "field"
+                    | "company"
                     | "_id";
                   operator?:
                     | "lt"

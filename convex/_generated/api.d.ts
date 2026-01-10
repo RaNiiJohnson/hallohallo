@@ -9,7 +9,10 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as bookmarks from "../bookmarks.js";
 import type * as http from "../http.js";
+import type * as job from "../job.js";
+import type * as listings from "../listings.js";
 
 import type {
   ApiFromModules,
@@ -19,7 +22,10 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  bookmarks: typeof bookmarks;
   http: typeof http;
+  job: typeof job;
+  listings: typeof listings;
 }>;
 
 /**
@@ -58,13 +64,21 @@ export declare const components: {
           input:
             | {
                 data: {
-                  adresse?: string;
+                  arrivalDate?: number;
                   bio?: string;
+                  city?: string;
+                  company?: string;
                   createdAt: number;
                   email: string;
                   emailVerified: boolean;
+                  field?: string;
                   image?: null | string;
+                  isServiceProvider?: boolean;
+                  journey?: Array<string>;
                   name: string;
+                  photo?: string;
+                  roles?: Array<string>;
+                  status?: string;
                   updatedAt: number;
                   userId?: null | string;
                 };
@@ -140,8 +154,16 @@ export declare const components: {
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "photo"
                     | "bio"
-                    | "adresse"
+                    | "city"
+                    | "arrivalDate"
+                    | "status"
+                    | "journey"
+                    | "roles"
+                    | "isServiceProvider"
+                    | "field"
+                    | "company"
                     | "_id";
                   operator?:
                     | "lt"
@@ -329,8 +351,16 @@ export declare const components: {
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "photo"
                     | "bio"
-                    | "adresse"
+                    | "city"
+                    | "arrivalDate"
+                    | "status"
+                    | "journey"
+                    | "roles"
+                    | "isServiceProvider"
+                    | "field"
+                    | "company"
                     | "_id";
                   operator?:
                     | "lt"
@@ -577,13 +607,21 @@ export declare const components: {
             | {
                 model: "user";
                 update: {
-                  adresse?: string;
+                  arrivalDate?: number;
                   bio?: string;
+                  city?: string;
+                  company?: string;
                   createdAt?: number;
                   email?: string;
                   emailVerified?: boolean;
+                  field?: string;
                   image?: null | string;
+                  isServiceProvider?: boolean;
+                  journey?: Array<string>;
                   name?: string;
+                  photo?: string;
+                  roles?: Array<string>;
+                  status?: string;
                   updatedAt?: number;
                   userId?: null | string;
                 };
@@ -597,8 +635,16 @@ export declare const components: {
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "photo"
                     | "bio"
-                    | "adresse"
+                    | "city"
+                    | "arrivalDate"
+                    | "status"
+                    | "journey"
+                    | "roles"
+                    | "isServiceProvider"
+                    | "field"
+                    | "company"
                     | "_id";
                   operator?:
                     | "lt"
@@ -813,13 +859,21 @@ export declare const components: {
             | {
                 model: "user";
                 update: {
-                  adresse?: string;
+                  arrivalDate?: number;
                   bio?: string;
+                  city?: string;
+                  company?: string;
                   createdAt?: number;
                   email?: string;
                   emailVerified?: boolean;
+                  field?: string;
                   image?: null | string;
+                  isServiceProvider?: boolean;
+                  journey?: Array<string>;
                   name?: string;
+                  photo?: string;
+                  roles?: Array<string>;
+                  status?: string;
                   updatedAt?: number;
                   userId?: null | string;
                 };
@@ -833,8 +887,16 @@ export declare const components: {
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "photo"
                     | "bio"
-                    | "adresse"
+                    | "city"
+                    | "arrivalDate"
+                    | "status"
+                    | "journey"
+                    | "roles"
+                    | "isServiceProvider"
+                    | "field"
+                    | "company"
                     | "_id";
                   operator?:
                     | "lt"

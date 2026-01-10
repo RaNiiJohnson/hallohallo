@@ -31,21 +31,23 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     },
     user: {
       additionalFields: {
-        adresse: {
-          type: "string",
-          required: false,
-        },
-        bio: {
-          type: "string",
-          required: false,
-        },
+        photo: { type: "string", required: false },
+        bio: { type: "string", required: false },
+        city: { type: "string", required: false },
+        roles: { type: "string[]", required: false },
+        company: { type: "string", required: false },
+        arrivalDate: { type: "number", required: false },
+        status: { type: "string", required: false },
+        field: { type: "string", required: false },
+        journey: { type: "string[]", required: false },
+        isServiceProvider: { type: "boolean", required: false },
       },
     },
     plugins: [
       // The Convex plugin is required for Convex compatibility
       convex({ authConfig }),
     ],
-  } as const satisfies BetterAuthOptions;
+  } satisfies BetterAuthOptions;
 };
 
 export const createAuth = (ctx: GenericCtx<DataModel>) => {
