@@ -1,0 +1,22 @@
+<svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Circle outline (dark gray) -->
+  <circle cx="100" cy="100" r="90" stroke="#3d4f5d" stroke-width="12" fill="none"/>
+  
+  <!-- Left person (teal) - head -->
+  <circle cx="70" cy="70" r="20" fill="#4a9d9d"/>
+  
+  <!-- Left person (teal) - body -->
+  <ellipse cx="70" cy="115" rx="25" ry="35" fill="#4a9d9d"/>
+  
+  <!-- Right person (coral) - head -->
+  <circle cx="130" cy="70" r="20" fill="#e8604d"/>
+  
+  <!-- Right person (coral) - body -->
+  <ellipse cx="130" cy="115" rx="25" ry="35" fill="#e8604d"/>
+  
+  <!-- Handshake - white connecting element -->
+  <path d="M 85 120 Q 100 135 115 120" fill="white" stroke="none"/>
+  
+  <!-- Yellow accent at bottom right -->
+  <path d="M 140 150 Q 150 155 160 150 L 160 170 Q 150 165 140 170 Z" fill="#f4b942"/>
+</svg>
