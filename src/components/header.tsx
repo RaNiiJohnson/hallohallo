@@ -8,7 +8,7 @@ import { useConvexAuth } from "convex/react";
 import { authClient } from "@/lib/auth-client";
 
 export const Header = () => {
-  const { isAuthenticated } = useConvexAuth();
+  const { isAuthenticated, isLoading } = useConvexAuth();
   return (
     <nav className="w-full py-5 flex items-center justify-between">
       <div className="flex items-center gap-8">
@@ -23,7 +23,9 @@ export const Header = () => {
       </div>
 
       <div className="flex items-center gap-2">
-        {isAuthenticated ? (
+        {isLoading ? (
+          <div></div>
+        ) : isAuthenticated ? (
           <div>
             <Link href="/dashboard">
               <Button onClick={() => authClient.signOut()}>Log out</Button>
