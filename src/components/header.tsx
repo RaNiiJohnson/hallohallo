@@ -35,13 +35,13 @@ export const Header = () => {
           <ButtonGroup>
             <Link
               className={buttonVariants({ variant: "default" })}
-              href="/auth/login"
+              href="/login"
             >
               Login
             </Link>
             <Link
               className={buttonVariants({ variant: "outline" })}
-              href="/auth/register"
+              href="/register"
             >
               Register
             </Link>

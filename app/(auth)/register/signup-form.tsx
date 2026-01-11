@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -19,28 +19,21 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import {
-  SelectContent,
-  Select,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
-const roleOptions = [
-  {
-    value: "CANDIDATE",
-    label: "Candidat à l'emploi ou à la recherche d'un logement",
-  },
-  {
-    value: "RECRUITER",
-    label: "Responsable du recrutement",
-  },
-  {
-    value: "OWNER",
-    label: "Propriétaire de biens immobiliers",
-  },
-];
+// const roleOptions = [
+//   {
+//     value: "CANDIDATE",
+//     label: "Candidat à l'emploi ou à la recherche d'un logement",
+//   },
+//   {
+//     value: "RECRUITER",
+//     label: "Responsable du recrutement",
+//   },
+//   {
+//     value: "OWNER",
+//     label: "Propriétaire de biens immobiliers",
+//   },
+// ];
 
 const SignupFormSchema = z
   .object({
@@ -50,8 +43,8 @@ const SignupFormSchema = z
     email: z.email({
       message: "Adresse email invalide.",
     }),
-    company: z.optional(z.string()),
-    roles: z.string(),
+    // company: z.optional(z.string()),
+    // roles: z.string(),
     password: z.string().min(8, {
       message: "Le mot de passe doit contenir au moins 8 caractères.",
     }),
@@ -72,8 +65,6 @@ export function SignupForm() {
     defaultValues: {
       name: "",
       email: "",
-      company: "",
-      roles: "",
       password: "",
       passwordConfirmation: "",
     },
@@ -82,26 +73,21 @@ export function SignupForm() {
     formState: { isSubmitting },
   } = form;
 
-  const roles = useWatch({ control: form.control, name: "roles" });
-
   async function onSubmit(values: z.infer<typeof SignupFormSchema>) {
     await authClient.signUp.email({
       email: values.email,
       password: values.password,
       name: values.name,
-      roles: values.roles,
-      company: values.company,
       fetchOptions: {
         onSuccess: () => {
           toast.success("Inscription réussie.");
           router.push("/");
         },
-        onError: () => {
-          toast.error("Une erreur est survenue.");
+        onError: (error) => {
+          toast.error(error.error.message);
         },
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any);
+    });
   }
 
   return (
@@ -144,50 +130,7 @@ export function SignupForm() {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="roles"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Votre rôle</FormLabel>
-                <FormControl>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger id="job-type">
-                      <SelectValue placeholder="Sélectionnez votre rôle" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {roleOptions.map((role) => (
-                        <SelectItem key={role.value} value={role.value}>
-                          {role.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {roles === "RECRUITER" && (
-            <FormField
-              control={form.control}
-              name="company"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Entreprise</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="entreprise"
-                      className="h-11"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
+
           <FormField
             control={form.control}
             name="password"
