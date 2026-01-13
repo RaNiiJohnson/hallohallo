@@ -1,4 +1,3 @@
-// convex/jobs.ts
 import { query } from "./_generated/server";
 import { v } from "convex/values";
 
@@ -15,6 +14,14 @@ export const getJobWithContact = query({
       .unique();
 
     return { ...job, contact };
+  },
+});
+
+export const getJobs = query({
+  args: {},
+  handler: async (ctx) => {
+    const job = await ctx.db.query("JobOffer").order("desc").collect();
+    return job;
   },
 });
 
