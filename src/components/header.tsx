@@ -10,8 +10,8 @@ import { ThemeToggle } from "./theme-toggle";
 import { righteous } from "@/web/fonts";
 import { Logo } from "@/web/logo";
 import { AuthNavClient } from "./auth-nav-client";
-import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
 
 export function Header() {
   const user = useQuery(api.auth.getCurrentUser);
@@ -21,7 +21,7 @@ export function Header() {
   // Header transparent et fixe sur la page d'accueil, sticky sur les autres
   const isFixedHeaderPage =
     pathname === "/" ||
-    pathname === "/opportunites" ||
+    pathname === "/jobs" ||
     pathname === "/communaute" ||
     pathname === "/immobilier";
   const headerClasses = isFixedHeaderPage
@@ -112,7 +112,7 @@ export function Header() {
             >
               Opportunités
             </Link>
-            {pathname === "/opportunites" && (
+            {pathname === "/jobs" && (
               <motion.div
                 className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                 layoutId="activeTab"
@@ -240,7 +240,7 @@ export function Header() {
               {[
                 { href: "/", label: "Accueil" },
                 { href: "/communaute", label: "Communauté" },
-                { href: "/opportunites", label: "Opportunités" },
+                { href: "/jobs", label: "Opportunités" },
                 { href: "/immobilier", label: "Immobilier" },
                 ...(user
                   ? [{ href: "/pricing", label: "Passer au Premium" }]
