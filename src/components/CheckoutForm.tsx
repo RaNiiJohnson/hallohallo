@@ -8,8 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { CreditCard, TrendingUp, DollarSign, Loader2 } from "lucide-react";
+import { motion } from "motion/react";
 
-const CURRENCY = 'usd';
+const CURRENCY = 'euro';
 const MIN_AMOUNT = 1.0;
 const MAX_AMOUNT = 5000.0;
 const STRIPE_FEE_PERCENTAGE = 0.029; // 2.9%
@@ -45,7 +47,7 @@ export default function CheckoutForm() {
 
         // Validate amount
         if (input.customDonation < MIN_AMOUNT || input.customDonation > MAX_AMOUNT) {
-            alert(`Please enter an amount between $${MIN_AMOUNT} and $${MAX_AMOUNT}`);
+            alert(`Veuillez entrer une somme entre €${MIN_AMOUNT} et €${MAX_AMOUNT}`);
             setLoading(false);
             return;
         }
@@ -67,7 +69,7 @@ export default function CheckoutForm() {
             // Redirect to Checkout using Stripe
             const stripe = await getStripe();
             if (!stripe) {
-                toast.error('Stripe failed to load');
+                toast.error('Impossible de charger Stripe. Veuillez réessayer plus tard.');
                 setLoading(false);
                 return;
             }
@@ -81,57 +83,139 @@ export default function CheckoutForm() {
                 description:
                     String(error)
             });
-            console.error('Error', error)
+            console.error('Erreur', error)
             setLoading(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-                <Label htmlFor="customDonation">
-                    Your Amount ({CURRENCY.toUpperCase()})
+        <form onSubmit={handleSubmit} className="space-y-6">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-2"
+            >
+                <Label htmlFor="customDonation" className="flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 text-muted-foreground" />
+                    Montant à envoyer ({CURRENCY.toUpperCase()})
                 </Label>
-                <Input
-                    id="customDonation"
-                    name="customDonation"
-                    type="number"
-                    placeholder="Enter amount"
-                    step="0.01"
-                    min={MIN_AMOUNT}
-                    max={MAX_AMOUNT}
-                    value={input.customDonation}
-                    onChange={handleInputChange}
-                    required
-                />
-            </div>
+                <div className="relative">
+                    <Input
+                        id="customDonation"
+                        name="customDonation"
+                        type="number"
+                        placeholder="Enter amount"
+                        step="0.01"
+                        min={MIN_AMOUNT}
+                        max={MAX_AMOUNT}
+                        value={input.customDonation}
+                        onChange={handleInputChange}
+                        required
+                        className="text-lg font-semibold"
+                    />
+                    {input.customDonation > 0 && (
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="absolute right-3 top-1/2 -translate-y-1/2"
+                        >
+                            <TrendingUp className="w-4 h-4 text-green-600" />
+                        </motion.div>
+                    )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                    Min: €{MIN_AMOUNT} - Max: €{MAX_AMOUNT}
+                </p>
+            </motion.div>
 
             {/* Stripe Fee Breakdown */}
             {input.customDonation > 0 && !isNaN(input.customDonation) && (
-                <div className="rounded-lg border bg-muted/50 p-4 space-y-2 text-sm">
-                    <div className="flex justify-between">
-                        <span className="text-muted-foreground">Amount you receive:</span>
-                        <span className="font-medium">${input.customDonation.toFixed(2)}</span>
+                <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="rounded-lg border bg-linear-to-br from-muted/50 to-muted/30 p-5 space-y-3 text-sm overflow-hidden"
+                >
+                    <div className="flex items-center gap-2 mb-3">
+                        <CreditCard className="w-4 h-4 text-primary" />
+                        <h3 className="font-semibold text-sm">Détails du paiement</h3>
                     </div>
-                    <div className="flex justify-between">
+                    
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="flex justify-between items-center p-2 rounded bg-background/50"
+                    >
+                        <span className="text-muted-foreground">Somme reçue:</span>
+                        <span className="font-medium">€{input.customDonation.toFixed(2)}</span>
+                    </motion.div>
+                    
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="flex justify-between items-center p-2 rounded bg-background/50"
+                    >
                         <span className="text-muted-foreground">
-                            Stripe processing fee:
+                            Frais de traitement Stripe:
                         </span>
-                        <span className="font-medium">${stripeFee.toFixed(2)}</span>
-                    </div>
-                    <div className="border-t pt-2 flex justify-between font-semibold">
-                        <span>Total customer pays:</span>
-                        <span>${totalAmount.toFixed(2)}</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                        * Calculated so you receive exactly ${input.customDonation.toFixed(2)} after Stripe's 2.9% + $0.30 fee
-                    </p>
-                </div>
+                        <span className="font-medium text-amber-600">€{stripeFee.toFixed(2)}</span>
+                    </motion.div>
+                    
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="border-t pt-3 flex justify-between font-semibold text-base"
+                    >
+                        <span>Montant total à payer:</span>
+                        <span className="text-primary">€{totalAmount.toFixed(2)}</span>
+                    </motion.div>
+                    
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.4 }}
+                        className="text-xs text-muted-foreground mt-2 italic bg-primary/5 p-2 rounded"
+                    >
+                        ℹ️ Calculé pour que vous receviez exactement €{input.customDonation.toFixed(2)} après les frais de Stripe de 2,9 % + 0,30 $
+                    </motion.p>
+                </motion.div>
             )}
 
-            <Button type="submit" disabled={loading} className="w-full">
-                {loading ? 'Processing...' : `Pay $${totalAmount.toFixed(2)}`}
-            </Button>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+            >
+                <Button 
+                    type="submit" 
+                    disabled={loading} 
+                    className="w-full relative overflow-hidden group"
+                    size="lg"
+                >
+                    {loading ? (
+                        <span className="flex items-center gap-2">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Traitement...
+                        </span>
+                    ) : (
+                        <>
+                            <span className="flex items-center gap-2">
+                                <CreditCard className="w-4 h-4" />
+                                Payer €{totalAmount.toFixed(2)}
+                            </span>
+                            <motion.div
+                                className="absolute inset-0 bg-white/20"
+                                initial={{ x: "-100%" }}
+                                whileHover={{ x: "100%" }}
+                                transition={{ duration: 0.5 }}
+                            />
+                        </>
+                    )}
+                </Button>
+            </motion.div>
         </form>
     );
 }

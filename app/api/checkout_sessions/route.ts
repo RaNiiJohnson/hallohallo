@@ -24,9 +24,9 @@ export async function POST(req: NextRequest) {
       line_items: [
         {
           price_data: {
-            currency: 'usd',
+            currency: 'EUR',
             product_data: {
-              name: 'Custom amount',
+              name: 'Montant personnalisé',
             },
             unit_amount: amount, // Amount in cents
           },
