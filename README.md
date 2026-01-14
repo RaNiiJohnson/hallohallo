@@ -1,36 +1,128 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MG-Connect 🇲🇬🇩🇪
 
-## Getting Started
+> La plateforme communautaire des Malagasy en Allemagne
 
-First, run the development server:
+MG-Connect est une application web dédiée au réseautage et à l'entraide entre les natifs et la diaspora Malagasy vivant en Allemagne. Notre mission est de créer un pont entre les communautés pour faciliter l'intégration et le partage d'expériences.
+
+## ✨ Fonctionnalités
+
+### 🤝 Communauté
+
+- Connectez-vous avec d'autres Malagasy en Allemagne
+- Créez des liens durables au sein de notre communauté
+- Partagez vos expériences d'expatriation
+
+### 💼 Opportunités
+
+- Trouvez des offres d'emploi adaptées à votre profil
+- Découvrez des formations et stages
+- Publiez vos propres opportunités professionnelles
+
+### 🏠 Immobilier
+
+- Partagez et trouvez des logements facilement
+- Réseau de confiance au sein de la communauté
+- Annonces vérifiées par les membres
+
+## 🚀 Technologies
+
+- **Framework**: Next.js 16 avec App Router
+- **Base de données**: Convex (Backend-as-a-Service)
+- **Authentification**: Better Auth (via Convex)
+- **UI**: shadCn UI + Tailwind CSS
+- **Validation**: Zod + React Hook Form
+
+## 🛠️ Installation
+
+### Prérequis
+
+- Node.js 20+
+- pnpm (recommandé)
+
+### Configuration
+
+1. **Cloner le projet**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd hallohallo
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **Installer les dépendances**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Lancer le serveur de développement**
 
-## Learn More
+```bash
+pnpm dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+En parallèle, assurez-vous que le serveur Convex tourne (souvent lancé automatiquement ou via `npx convex dev`).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+L'application sera accessible sur [http://localhost:3000](http://localhost:3000)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📝 Scripts disponibles
 
-## Deploy on Vercel
+```bash
+# Développement
+pnpm dev              # Lance Next.js et Convex
+npx convex dev        # Lance le serveur de développement Convex seul
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Build de production
+pnpm build
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Démarrer en production
+pnpm start
+```
+
+## 🏗️ Structure du projet
+
+```text
+hallohallo/
+├── app/                    # App Router (Next.js)
+│   ├── api/               # Routes API
+│   ├── (main)/            # Layout principal
+│   │   ├── community/     # Section communauté
+│   │   ├── jobs/          # Gestion des offres d'emploi (Opportunités)
+│   │   ├── realestates/   # Annonces immobilières
+│   │   └── ...
+│   └── ...
+├── convex/                 # Backend Convex (Schema, Fonctions, Auth)
+│   ├── betterAuth/        # Configuration Better Auth
+│   ├── schema.ts          # Schéma de la base de données
+│   └── ...
+├── src/
+│   ├── components/        # Composants réutilisables
+│   ├── lib/              # Utilitaires et configurations
+│   └── ...
+├── public/                 # Assets statiques
+└── ...
+```
+
+## 🎯 Notre Mission
+
+**Créer un pont entre les Malagasy vivant en Allemagne et ceux restés au pays, facilitant l'intégration et le partage d'expériences.**
+
+### Nos Valeurs
+
+- **Solidarité** : La force de la communauté pour surmonter ensemble les défis
+- **Partage** : Échanger expériences et connaissances
+- **Entraide** : S'entraider dans les démarches d'expatriation
+- **Identité** : Préserver la culture Malagasy tout en embrassant la diversité allemande
+
+<!-- ## 🤝 Contribution
+
+Les contributions sont les bienvenues ! N'hésitez pas à :
+
+1. Fork le projet
+2. Créer une branche pour votre fonctionnalité (`git checkout -b feature/nouvelle-fonctionnalite`)
+3. Commiter vos changements (`git commit -m 'Ajout: nouvelle fonctionnalité'`)
+4. Push vers la branche (`git push origin feature/nouvelle-fonctionnalite`)
+5. Ouvrir une Pull Request -->
+
+---
+
+**Hallo Hallo** - Ensemble, construisons une communauté forte ! 🇲🇬❤️🇩🇪
