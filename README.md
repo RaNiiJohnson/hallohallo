@@ -54,6 +54,31 @@ cd hallohallo
 pnpm install
 ```
 
+1. **Configuration de l'environnement**
+
+```bash
+cp .env.example .env.local
+```
+
+Configurez les variables suivantes dans `.env.local` :
+
+```env
+# Convex
+CONVEX_DEPLOYMENT="votre-deployment-convex"
+NEXT_PUBLIC_CONVEX_URL="votre-url-publique-convex"
+
+```
+
+1. **Authentification (Better Auth)**
+
+```bash
+npx convex env set BETTER_AUTH_SECRET=$(openssl rand -base64 32)
+```
+
+```bash
+npx convex env set SITE_URL http://localhost:3000
+```
+
 1. **Lancer le serveur de développement**
 
 ```bash
@@ -76,6 +101,7 @@ pnpm build
 
 # Démarrer en production
 pnpm start
+
 ```
 
 ## 🏗️ Structure du projet
