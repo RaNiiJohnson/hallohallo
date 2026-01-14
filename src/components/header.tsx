@@ -103,9 +103,9 @@ export function Header() {
             className="relative"
           >
             <Link
-              href="/opportunites"
+              href="/jobs"
               className={`text-accent-foreground/60 font-medium transition-colors relative z-10 ${
-                pathname === "/opportunites"
+                pathname === "/jobs"
                   ? "text-foreground"
                   : "hover:text-foreground"
               }`}

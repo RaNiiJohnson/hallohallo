@@ -1,12 +1,23 @@
-import { api } from "@convex/_generated/api";
-import { preloadQuery } from "convex/nextjs";
-import { JobsClient } from "./_component/JobClient";
+"use client";
 
-export default async function JobsPage() {
-  const preloadedJobs = await preloadQuery(api.jobs.getJobs, {});
+import { api } from "@convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
+
+export default function JobsPage() {
+  const jobs = useQuery(api.jobs.getJobs, {});
+
+  if (jobs === undefined) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div>
-      <JobsClient preloadedJobs={preloadedJobs} />
+      <h1>Jobs</h1>
+      <ul>
+        {jobs.map((job) => (
+          <li key={job._id}>{job.title}</li>
+        ))}
+      </ul>
     </div>
   );
 }
