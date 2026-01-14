@@ -183,10 +183,7 @@ function HomePageContent() {
                   variant="ghost"
                   className="w-full justify-start pl-0 hover:bg-transparent hover:text-primary group"
                 >
-                  <Link
-                    href="/opportunites"
-                    className="inline-flex items-center gap-2"
-                  >
+                  <Link href="/jobs" className="inline-flex items-center gap-2">
                     Explorer
                     <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
