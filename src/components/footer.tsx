@@ -48,7 +48,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/opportunites"
+                  href="/jobs"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   Opportunités
