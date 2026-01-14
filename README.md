@@ -64,9 +64,10 @@ Configurez les variables suivantes dans `.env.local` :
 
 ```env
 # Convex
-CONVEX_DEPLOYMENT="votre-deployment-convex"
-NEXT_PUBLIC_CONVEX_URL="votre-url-publique-convex"
-
+CONVEX_DEPLOYMENT="dev:impartial-rabbit-961"
+NEXT_PUBLIC_CONVEX_URL="https://impartial-rabbit-961.convex.cloud"
+NEXT_PUBLIC_CONVEX_SITE_URL="https://impartial-rabbit-961.convex.site"
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
 1. **Authentification (Better Auth)**
