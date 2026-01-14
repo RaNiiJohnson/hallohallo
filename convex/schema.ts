@@ -18,6 +18,12 @@ export default defineSchema({
   JobOffer: defineTable({
     title: v.string(),
     type: v.string(),
+    location: v.optional(
+      v.object({
+        lat: v.number(),
+        lng: v.number(),
+      })
+    ),
     contractType: v.string(),
     city: v.string(),
     duration: v.string(),
