@@ -54,6 +54,7 @@ cd hallohallo
 pnpm install
 ```
 
+<!--
 1. **Configuration de l'environnement**
 
 ```bash
@@ -68,7 +69,7 @@ CONVEX_DEPLOYMENT="dev:impartial-rabbit-961"
 NEXT_PUBLIC_CONVEX_URL="https://impartial-rabbit-961.convex.cloud"
 NEXT_PUBLIC_CONVEX_SITE_URL="https://impartial-rabbit-961.convex.site"
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
-```
+``` -->
 
 1. **Authentification (Better Auth)**
 
