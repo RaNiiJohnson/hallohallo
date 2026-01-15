@@ -3,10 +3,11 @@
 import { HeroSection } from "@/components/hero-section";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { EmploisFilters } from "./_component/jobFilters";
 import { PublishJobDialog } from "./_component/dialogs/publishJobDialog";
 import { JobList } from "./_component/jobList";
+import Link from "next/link";
 
 export default function JobsPage() {
   const user = useQuery(api.auth.getCurrentUser);
@@ -31,7 +32,7 @@ export default function JobsPage() {
           <div className="flex items-center gap-2">
             <h2 className="text-2xl font-bold">Opportunités</h2>
           </div>
-          <PublishJobDialog />
+          {user && <PublishJobDialog />}
         </div>
         <div className="min-h-screen bg-background pb-12">
           <JobList jobs={jobs} user={user} />
@@ -49,7 +50,9 @@ export default function JobsPage() {
                 trigger={<Button size="lg">Publier une offre</Button>}
               />
             ) : (
-              <Button size="lg">S&apos;inscrire pour publier</Button>
+              <Link href="/register" className={buttonVariants({ size: "lg" })}>
+                S&apos;inscrire pour publier
+              </Link>
             )}
           </div>
         </div>

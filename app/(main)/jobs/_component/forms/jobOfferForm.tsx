@@ -38,6 +38,8 @@ import {
 import { ChevronLeft, ChevronRight, XIcon } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import { useMutation } from "convex/react";
+import { api } from "@convex/_generated/api";
 
 const jobTypes = [
   "Au pair",
@@ -80,7 +82,6 @@ const formSchema = z.object({
     .min(1, "Ajoutez au moins un certificat.")
     .max(5, "Vous pouvez ajouter jusqu'à 5 certificats."),
   salary: z.string().min(1, "Le salaire est requis"),
-  contact: z.string().min(1, "Les informations de contact sont requises"),
 });
 
 interface JobOfferFormProps {
@@ -88,6 +89,7 @@ interface JobOfferFormProps {
 }
 
 export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
+  const createJob = useMutation(api.jobs.createJob);
   const [currentStep, setCurrentStep] = useState(1);
   const router = useRouter();
 
@@ -102,9 +104,8 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
       startDate: "",
       company: "",
       description: "",
-      certificates: [{ certificate: "" }],
+      certificates: [],
       salary: "",
-      contact: "",
     },
   });
 
@@ -140,7 +141,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
         ];
         break;
       case 3:
-        fieldsToValidate = ["description", "contact"];
+        fieldsToValidate = ["description"];
         break;
       case 4:
         fieldsToValidate = ["certificates"];
@@ -159,16 +160,23 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
     }
   };
 
-  async function onSubmit(data: z.infer<typeof formSchema>) {
+  function onSubmit(data: z.infer<typeof formSchema>) {
     try {
-      // await client.jobOffer.createJobOffer({
-      //   ...data,
-      //   certificates:
-      //     data.certificates
-      //       ?.map((cert) => cert.certificate)
-      //       .filter((cert) => cert.trim() !== "") || [],
-      // });
-
+      createJob({
+        title: data.title,
+        type: data.type,
+        contractType: data.contractType,
+        city: data.city,
+        duration: data.duration,
+        startDate: data.startDate,
+        company: data.company,
+        description: data.description,
+        certificates:
+          data.certificates
+            ?.map((cert) => cert.certificate)
+            .filter((cert) => cert.trim() !== "") || [],
+        salary: data.salary,
+      });
       toast.success("Offre créée avec succès");
       form.reset();
       router.refresh();
@@ -518,32 +526,6 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
                 </InputGroup>
                 <FieldDescription>
                   Décrivez le poste, les missions et les compétences requises
-                </FieldDescription>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-
-          <Controller
-            name="contact"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="job-contact">Contact *</FieldLabel>
-                <InputGroup>
-                  <InputGroupTextarea
-                    {...field}
-                    id="job-contact"
-                    placeholder="Email, téléphone, ou autres informations de contact..."
-                    rows={3}
-                    className="min-h-20 resize-none"
-                    aria-invalid={fieldState.invalid}
-                  />
-                </InputGroup>
-                <FieldDescription>
-                  Indiquez comment les candidats peuvent vous contacter
                 </FieldDescription>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />

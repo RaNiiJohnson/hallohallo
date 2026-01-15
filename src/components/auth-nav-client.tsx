@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useTransition } from "react";
+import { Suspense } from "react";
 import { ButtonGroup } from "./ui/button-group";
 import { Button } from "./ui/button";
 import Link from "next/link";
@@ -15,6 +15,7 @@ import {
 import { LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useConvexAuth } from "convex/react";
+import { authClient } from "@/lib/auth-client";
 
 export type UserShape =
   | {
@@ -27,11 +28,14 @@ export type UserShape =
 
 export function AuthNavClient({ user }: { user: UserShape }) {
   const { isAuthenticated, isLoading } = useConvexAuth();
-  const [isPending, startTransition] = useTransition();
 
-  const handleLogOut = () => {
-    startTransition(async () => {
-      window.location.href = "/";
+  const handleLogOut = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          location.reload();
+        },
+      },
     });
   };
 
@@ -92,7 +96,7 @@ export function AuthNavClient({ user }: { user: UserShape }) {
             </div>
           </div>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogOut} disabled={isPending}>
+          <DropdownMenuItem onClick={handleLogOut}>
             <LogOut className="mr-2 h-4 w-4" />
             <span>Se déconnecter</span>
           </DropdownMenuItem>
