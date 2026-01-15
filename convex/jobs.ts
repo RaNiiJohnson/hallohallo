@@ -44,9 +44,6 @@ export const createJob = mutation({
     description: v.string(),
     certificates: v.array(v.string()),
     salary: v.string(),
-    authorId: v.string(),
-    createdAt: v.number(),
-    updatedAt: v.number(),
   },
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);
