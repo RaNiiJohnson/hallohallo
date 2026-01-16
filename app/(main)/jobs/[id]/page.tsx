@@ -25,6 +25,7 @@ import { useQuery } from "convex-helpers/react/cache";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 import { EditJobDialog } from "./_component/editJobDialog";
+import { JobDetailsSkeleton } from "../_component/skeleton";
 
 export default function JobDetailsPage() {
   const user = useQuery(api.auth.getCurrentUser);
@@ -34,8 +35,12 @@ export default function JobDetailsPage() {
     id: params.id,
   });
 
+  if (jobOffer === undefined) {
+    return <JobDetailsSkeleton />;
+  }
+
   if (!jobOffer) {
-    return <div>loading...</div>;
+    return notFound();
   }
 
   const isAuthor = user?._id === jobOffer.authorId;

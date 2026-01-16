@@ -30,6 +30,7 @@
     "convex-helpers": "^0.1.109",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.562.0",
+    "maplibre-gl": "^5.16.0",
     "micro-cors": "^0.1.1",
     "motion": "^12.25.0",
     "next": "16.1.1",

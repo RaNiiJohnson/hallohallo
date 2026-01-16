@@ -42,7 +42,7 @@ const CONTRACT_TYPES = [
   { value: "Aprentissage", label: "Aprentissage" },
 ];
 
-export function EmploisFilters({
+export function JobFilters({
   user,
 }: {
   user: AuthUser | null | undefined;

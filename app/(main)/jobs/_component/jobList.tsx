@@ -6,15 +6,22 @@ import { PublishJobDialog } from "./dialogs/publishJobDialog";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { SalaryDisplay } from "./salary";
-import type { AuthUser, JobOfferListItem } from "@/lib/convexTypes";
+import type { AuthUser } from "@/lib/convexTypes";
 import { getRelativeTime } from "@/lib/date";
+import { JobPageSkeleton } from "./skeleton";
+import { api } from "@convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
 
 interface JobListProps {
-  jobs: JobOfferListItem[];
   user: AuthUser | null | undefined;
 }
 
-export function JobList({ jobs, user }: JobListProps) {
+export function JobList({ user }: JobListProps) {
+  const jobs = useQuery(api.jobs.getJobs, {});
+
+  if (jobs === undefined) {
+    return <JobPageSkeleton />;
+  }
   if (jobs.length === 0) {
     return (
       <div className="text-center px-4">

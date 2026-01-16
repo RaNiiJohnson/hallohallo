@@ -4,18 +4,13 @@ import { HeroSection } from "@/components/hero-section";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { EmploisFilters } from "./_component/jobFilters";
+import { JobFilters } from "./_component/jobFilters";
 import { PublishJobDialog } from "./_component/dialogs/publishJobDialog";
 import { JobList } from "./_component/jobList";
 import Link from "next/link";
 
 export default function JobsPage() {
   const user = useQuery(api.auth.getCurrentUser);
-  const jobs = useQuery(api.jobs.getJobs, {});
-
-  if (jobs === undefined) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="min-h-screen bg-background pb-12">
@@ -26,7 +21,7 @@ export default function JobsPage() {
       ></HeroSection>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <EmploisFilters user={user} />
+        <JobFilters user={user} />
 
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 my-8">
           <div className="flex items-center gap-2">
@@ -35,7 +30,7 @@ export default function JobsPage() {
           {user && <PublishJobDialog />}
         </div>
         <div className="min-h-screen bg-background pb-12">
-          <JobList jobs={jobs} user={user} />
+          <JobList user={user} />
           {/* Call to action */}
           <div className="text-center mt-16 p-8 bg-card border rounded-xl shadow-sm">
             <h3 className="text-2xl font-bold mb-4">
