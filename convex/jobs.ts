@@ -34,7 +34,7 @@ export const createJob = mutation({
       v.object({
         lat: v.number(),
         lng: v.number(),
-      })
+      }),
     ),
     contractType: v.string(),
     city: v.string(),
@@ -55,12 +55,72 @@ export const createJob = mutation({
     const job = await ctx.db.insert("JobOffer", {
       ...args,
       authorId: user._id,
+      authorName: user.name,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
     return job;
   },
 });
+
+export const updateJob = mutation({
+  args: {
+    id: v.id("JobOffer"),
+    title: v.string(),
+    type: v.string(),
+    location: v.optional(
+      v.object({
+        lat: v.number(),
+        lng: v.number(),
+      }),
+    ),
+    contractType: v.string(),
+    city: v.string(),
+    duration: v.string(),
+    startDate: v.string(),
+    company: v.string(),
+    description: v.string(),
+    certificates: v.array(v.string()),
+    salary: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+
+    if (!user) {
+      throw new Error("Not authenticated");
+    }
+
+    const existing = await ctx.db.get("JobOffer", args.id);
+    if (!existing) throw new Error("Job not found");
+
+    // Remove id from args before updating because it's not a field of the document
+    const { id, ...updateData } = args;
+
+    await ctx.db.patch("JobOffer", id, {
+      ...updateData,
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+export const deleteJob = mutation({
+  args: {
+    id: v.id("JobOffer"),
+  },
+  handler: async (ctx, args) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+
+    if (!user) {
+      throw new Error("Not authenticated");
+    }
+
+    const existing = await ctx.db.get("JobOffer", args.id);
+    if (!existing) throw new Error("Job not found");
+
+    await ctx.db.delete("JobOffer", args.id);
+  },
+});
+
 // const existing = await ctx.db
 //   .query("JobBookmark")
 //   .withIndex("by_user_job", (q) =>

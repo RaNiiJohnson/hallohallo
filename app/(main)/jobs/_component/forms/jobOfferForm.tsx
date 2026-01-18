@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import * as z from "zod";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 import {
   Field,
@@ -77,7 +76,7 @@ const formSchema = z.object({
     .array(
       z.object({
         certificate: z.string(),
-      })
+      }),
     )
     .min(1, "Ajoutez au moins un certificat.")
     .max(5, "Vous pouvez ajouter jusqu'à 5 certificats."),
@@ -91,7 +90,6 @@ interface JobOfferFormProps {
 export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
   const createJob = useMutation(api.jobs.createJob);
   const [currentStep, setCurrentStep] = useState(1);
-  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -179,10 +177,8 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
       });
       toast.success("Offre créée avec succès");
       form.reset();
-      router.refresh();
       onSuccess?.();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+    } catch {
       toast.success("Erreur lors de la création de l'offre");
     }
   }
@@ -366,7 +362,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             render={({ field, fieldState }) => {
               // Parse existing salary value with better null handling
               const parseExistingSalary = (
-                value: string | null | undefined
+                value: string | null | undefined,
               ) => {
                 if (!value || typeof value !== "string") {
                   return { amount: "", period: "" };

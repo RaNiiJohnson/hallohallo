@@ -22,7 +22,7 @@ export default defineSchema({
       v.object({
         lat: v.number(),
         lng: v.number(),
-      })
+      }),
     ),
     contractType: v.string(),
     city: v.string(),
@@ -33,6 +33,7 @@ export default defineSchema({
     certificates: v.array(v.string()),
     salary: v.string(),
     authorId: v.string(),
+    authorName: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -49,7 +50,7 @@ export default defineSchema({
       v.object({
         lat: v.number(),
         lng: v.number(),
-      })
+      }),
     ),
     city: v.string(),
     district: v.string(),
@@ -67,6 +68,7 @@ export default defineSchema({
     extras: v.array(v.string()),
     available: v.optional(v.number()),
     authorId: v.string(),
+    authorName: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })

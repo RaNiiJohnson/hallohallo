@@ -6,4 +6,6 @@ type JobsReturn = typeof api.jobs.getJobs._returnType;
 
 export type JobOfferListItem = JobsReturn[number];
 
-export type JobOfferDetails = typeof api.jobs.getJobWithContact._returnType;
+export type JobOfferDetails = NonNullable<
+  typeof api.jobs.getJobWithContact._returnType
+>;

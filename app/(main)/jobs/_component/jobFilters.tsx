@@ -21,7 +21,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { AuthUser } from "@/lib/convexTypes";
+
 const JOB_TYPES = [
   { value: "Au pair", label: "Au pair" },
   { value: "Formation", label: "Formation" },
@@ -42,11 +42,7 @@ const CONTRACT_TYPES = [
   { value: "Aprentissage", label: "Aprentissage" },
 ];
 
-export function JobFilters({
-  user,
-}: {
-  user: AuthUser | null | undefined;
-}) {
+export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
   return (
     <div className="space-y-4 max-w-3xl mx-auto">
       {/* Barre de recherche principale */}
@@ -125,7 +121,7 @@ export function JobFilters({
             {type.label}
           </Badge>
         ))}
-        {user && (
+        {isAuthenticated && (
           <Badge
             variant="default"
             className="cursor-pointer hover:bg-primary hover:text-primary-foreground"

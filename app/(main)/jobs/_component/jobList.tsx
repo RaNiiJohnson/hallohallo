@@ -6,17 +6,16 @@ import { PublishJobDialog } from "./dialogs/publishJobDialog";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { SalaryDisplay } from "./salary";
-import type { AuthUser } from "@/lib/convexTypes";
 import { getRelativeTime } from "@/lib/date";
 import { JobPageSkeleton } from "./skeleton";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
 
 interface JobListProps {
-  user: AuthUser | null | undefined;
+  isAuthenticated: boolean;
 }
 
-export function JobList({ user }: JobListProps) {
+export function JobList({ isAuthenticated }: JobListProps) {
   const jobs = useQuery(api.jobs.getJobs, {});
 
   if (jobs === undefined) {
@@ -34,7 +33,7 @@ export function JobList({ user }: JobListProps) {
             Essayez de modifier vos critères de recherche ou supprimez certains
             filtres
           </p>
-          {user && (
+          {isAuthenticated && (
             <PublishJobDialog trigger={<Button>Publier une offre</Button>} />
           )}
         </div>
@@ -101,7 +100,7 @@ export function JobList({ user }: JobListProps) {
               {/* Date */}
               <div className="flex flex-col items-end gap-1">
                 <div className="text-xs text-muted-foreground whitespace-nowrap">
-                  {getRelativeTime(job.createdAt)}
+                  {getRelativeTime(job._creationTime)}
                 </div>
                 {/* {user && (
                   // <JobBookmarkButton

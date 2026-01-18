@@ -1,16 +1,15 @@
 "use client";
 
 import { HeroSection } from "@/components/hero-section";
-import { api } from "@convex/_generated/api";
-import { useQuery } from "convex-helpers/react/cache";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { JobFilters } from "./_component/jobFilters";
 import { PublishJobDialog } from "./_component/dialogs/publishJobDialog";
 import { JobList } from "./_component/jobList";
 import Link from "next/link";
+import { useConvexAuth } from "convex/react";
 
 export default function JobsPage() {
-  const user = useQuery(api.auth.getCurrentUser);
+  const { isAuthenticated } = useConvexAuth();
 
   return (
     <div className="min-h-screen bg-background pb-12">
@@ -21,16 +20,16 @@ export default function JobsPage() {
       ></HeroSection>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <JobFilters user={user} />
+        <JobFilters isAuthenticated={isAuthenticated} />
 
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 my-8">
           <div className="flex items-center gap-2">
             <h2 className="text-2xl font-bold">Opportunités</h2>
           </div>
-          {user && <PublishJobDialog />}
+          {isAuthenticated && <PublishJobDialog />}
         </div>
         <div className="min-h-screen bg-background pb-12">
-          <JobList user={user} />
+          <JobList isAuthenticated={isAuthenticated} />
           {/* Call to action */}
           <div className="text-center mt-16 p-8 bg-card border rounded-xl shadow-sm">
             <h3 className="text-2xl font-bold mb-4">
@@ -40,7 +39,7 @@ export default function JobsPage() {
               Rejoignez des centaines d&apos;entreprises et recruteurs qui font
               confiance à notre plateforme pour trouver leurs futurs talents.
             </p>
-            {user ? (
+            {isAuthenticated ? (
               <PublishJobDialog
                 trigger={<Button size="lg">Publier une offre</Button>}
               />

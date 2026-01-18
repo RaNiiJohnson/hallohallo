@@ -39,7 +39,7 @@ export default function JobDetailsPage() {
     return <JobDetailsSkeleton />;
   }
 
-  if (!jobOffer) {
+  if (jobOffer === null) {
     return notFound();
   }
 
@@ -82,10 +82,20 @@ export default function JobDetailsPage() {
 
             {/* Posted by */}
             <p className="text-sm sm:text-base text-muted-foreground mb-6">
-              <span className="font-semibold text-foreground">
-                {jobOffer.contact?.name || "Anonyme"}
-              </span>{" "}
-              a publié cette offre {getRelativeTime(jobOffer.createdAt)}
+              {isAuthor ? (
+                <>
+                  <span className="font-semibold text-foreground">Vous</span>{" "}
+                  avez
+                </>
+              ) : (
+                <>
+                  <span className="font-semibold text-foreground">
+                    {jobOffer.authorName || "Anonyme"}
+                  </span>{" "}
+                  a
+                </>
+              )}{" "}
+              publié cette offre {getRelativeTime(jobOffer._creationTime)}
             </p>
 
             {/* Divider */}
@@ -116,10 +126,10 @@ export default function JobDetailsPage() {
               {/* Company Links / Edit Button */}
               <div className="flex flex-wrap items-center justify-center gap-3">
                 {isAuthor ? (
-                  <>
+                  <ButtonGroup>
                     <DeleteJobDialog jobId={jobOffer._id} />
                     <EditJobDialog jobOffer={jobOffer} />
-                  </>
+                  </ButtonGroup>
                 ) : (
                   <ButtonGroup>
                     <Button

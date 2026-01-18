@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -36,9 +36,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight, XIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { JobOfferDetails } from "@/lib/convexTypes";
+import { useMutation } from "convex/react";
+import { api } from "@convex/_generated/api";
 
 const jobTypes = [
   "Au pair",
@@ -76,7 +77,7 @@ const formSchema = z.object({
     .array(
       z.object({
         certificate: z.string(),
-      })
+      }),
     )
     .min(0)
     .max(5, "Vous pouvez ajouter jusqu'à 5 certificats."),
@@ -92,9 +93,8 @@ export function EditJobOfferForm({
   jobOffer,
   onSuccess,
 }: EditJobOfferFormProps) {
+  const uptdateJob = useMutation(api.jobs.updateJob);
   const [currentStep, setCurrentStep] = useState(1);
-  const [, startTransition] = useTransition();
-  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -166,29 +166,29 @@ export function EditJobOfferForm({
     }
   };
 
-  async function onSubmit(data: z.infer<typeof formSchema>) {
-    const updatedData = {
-      ...data,
-      certificates:
-        data.certificates
-          ?.map((cert) => cert.certificate)
-          .filter((cert) => cert.trim() !== "") || [],
-    };
-
-    startTransition(async () => {
-      // Call server action with optimistic update
-      // try {
-      //   await client.jobOffer.updateJobOffer({
-      //     jobId: jobOffer.id,
-      //     ...updatedData,
-      //   });
-      //   toast.success("Offre mise à jour avec succès");
-      //   router.refresh();
-      //   onSuccess?.();
-      // } catch {
-      //   toast.error("Erreur lors de la mise à jour");
-      // }
-    });
+  function onSubmit(data: z.infer<typeof formSchema>) {
+    try {
+      uptdateJob({
+        id: jobOffer._id,
+        title: data.title,
+        type: data.type,
+        contractType: data.contractType,
+        city: data.city,
+        duration: data.duration,
+        startDate: data.startDate,
+        company: data.company,
+        description: data.description,
+        certificates:
+          data.certificates
+            ?.map((cert) => cert.certificate)
+            .filter((cert) => cert.trim() !== "") || [],
+        salary: data.salary,
+      });
+      toast.success("Offre mise à jour avec succès");
+      onSuccess?.();
+    } catch {
+      toast.error("Erreur lors de la mise à jour");
+    }
   }
 
   return (
@@ -207,6 +207,7 @@ export function EditJobOfferForm({
 
       <form
         id="edit-job-offer-form"
+        onSubmit={form.handleSubmit(onSubmit)}
         onKeyDown={(e) => {
           if (e.key === "Enter" && e.target instanceof HTMLInputElement) {
             e.preventDefault();
@@ -368,7 +369,7 @@ export function EditJobOfferForm({
             control={form.control}
             render={({ field, fieldState }) => {
               const parseExistingSalary = (
-                value: string | null | undefined
+                value: string | null | undefined,
               ) => {
                 if (!value || typeof value !== "string") {
                   return { amount: "", period: "" };
@@ -608,7 +609,18 @@ export function EditJobOfferForm({
           Précédent
         </Button>
 
-        {currentStep < totalSteps ? (
+        <Button
+          type="button"
+          onClick={form.handleSubmit(onSubmit)}
+          disabled={form.formState.isSubmitting}
+          className="flex items-center gap-2"
+        >
+          {form.formState.isSubmitting
+            ? "Mise à jour..."
+            : "Mettre à jour l'offre"}
+        </Button>
+
+        {currentStep < totalSteps && (
           <Button
             type="button"
             onClick={nextStep}
@@ -616,17 +628,6 @@ export function EditJobOfferForm({
           >
             Suivant
             <ChevronRight className="h-4 w-4" />
-          </Button>
-        ) : (
-          <Button
-            type="button"
-            // onClick={form.handleSubmit(onSubmit)}
-            disabled={form.formState.isSubmitting}
-            className="flex items-center gap-2"
-          >
-            {form.formState.isSubmitting
-              ? "Mise à jour..."
-              : "Mettre à jour l'offre"}
           </Button>
         )}
       </Field>
