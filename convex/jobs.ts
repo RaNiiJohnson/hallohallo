@@ -1,6 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { authComponent } from "./auth";
+import { Id } from "./_generated/dataModel";
 
 export const getJobWithContact = query({
   args: { id: v.id("JobOffer") },
@@ -15,6 +16,14 @@ export const getJobWithContact = query({
       .unique();
 
     return { ...job, contact };
+  },
+});
+
+export const getJobMetadata = query({
+  args: { id: v.string() },
+  handler: async (ctx, args) => {
+    const job = await ctx.db.get("JobOffer", args.id as Id<"JobOffer">);
+    return job;
   },
 });
 

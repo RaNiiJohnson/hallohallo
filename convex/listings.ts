@@ -1,4 +1,5 @@
 // convex/listings.ts
+import { Id } from "./_generated/dataModel";
 import { query } from "./_generated/server";
 import { v } from "convex/values";
 
@@ -18,6 +19,18 @@ export const getListingWithContact = query({
       ...listing,
       contact,
     };
+  },
+});
+
+export const getListingMetadata = query({
+  args: { id: v.string() },
+  handler: async (ctx, args) => {
+    const listing = await ctx.db.get(
+      "RealestateListing",
+      args.id as Id<"RealestateListing">,
+    );
+
+    return listing;
   },
 });
 
