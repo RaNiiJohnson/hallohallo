@@ -19,6 +19,7 @@ import { ListingDetails, ListingDetailsContent } from "../ListingDetails";
 import { ListingListItem } from "@/lib/convexTypes";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
+import { ListingListSkeleton } from "../skeleton";
 
 export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
   const listings = useQuery(api.listings.getListing);
@@ -50,7 +51,7 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
   }, [selectedId]);
 
   if (!listings) {
-    return <div>Loading...</div>;
+    return <ListingListSkeleton />;
   }
 
   const selectedListing = listings.find((a) => a._id === selectedId);
