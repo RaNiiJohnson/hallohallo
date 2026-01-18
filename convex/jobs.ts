@@ -5,7 +5,7 @@ import { authComponent } from "./auth";
 export const getJobWithContact = query({
   args: { id: v.id("JobOffer") },
   handler: async (ctx, args) => {
-    const job = await ctx.db.get(args.id);
+    const job = await ctx.db.get("JobOffer", args.id);
     if (!job) return null;
 
     // Récupération rapide via l'index

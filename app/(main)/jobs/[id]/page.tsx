@@ -30,7 +30,7 @@ import { JobDetailsSkeleton } from "../_component/skeleton";
 export default function JobDetailsPage() {
   const user = useQuery(api.auth.getCurrentUser);
   const params = useParams<{ id: Id<"JobOffer"> }>();
-  console.log(params);
+
   const jobOffer = useQuery(api.jobs.getJobWithContact, {
     id: params.id,
   });
