@@ -115,7 +115,7 @@ hallohallo/
 │   ├── (main)/            # Layout principal
 │   │   ├── community/     # Section communauté
 │   │   ├── jobs/          # Gestion des offres d'emploi (Opportunités)
-│   │   ├── realestates/   # Annonces immobilières
+│   │   ├── listing/       # Annonces immobilières
 │   │   └── ...
 │   └── ...
 ├── convex/                 # Backend Convex (Schema, Fonctions, Auth)

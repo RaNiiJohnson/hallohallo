@@ -21,7 +21,7 @@ export function Header() {
   const isFixedHeaderPage =
     pathname === "/" ||
     pathname === "/jobs" ||
-    pathname === "/realestates" ||
+    pathname === "/listing" ||
     pathname === "/communities";
   const headerClasses = isFixedHeaderPage
     ? "fixed top-0 z-50 w-full bg-transparent backdrop-blur-lg"
@@ -130,16 +130,16 @@ export function Header() {
             className="relative"
           >
             <Link
-              href="/realestates"
+              href="/listing"
               className={`text-accent-foreground/60 font-medium transition-colors relative z-10 ${
-                pathname === "/realestates"
+                pathname === "/listing"
                   ? "text-foreground"
                   : "hover:text-foreground"
               }`}
             >
               Immobilier
             </Link>
-            {pathname === "/realestates" && (
+            {pathname === "/listing" && (
               <motion.div
                 className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                 layoutId="activeTab"
@@ -240,7 +240,7 @@ export function Header() {
                 { href: "/", label: "Accueil" },
                 { href: "/communaute", label: "Communauté" },
                 { href: "/jobs", label: "Opportunités" },
-                { href: "/immobilier", label: "Immobilier" },
+                { href: "/listing", label: "Immobilier" },
                 ...(isAuthenticated
                   ? [{ href: "/pricing", label: "Passer au Premium" }]
                   : []),

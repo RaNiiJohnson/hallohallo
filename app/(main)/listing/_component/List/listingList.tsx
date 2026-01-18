@@ -1,0 +1,198 @@
+"use client";
+
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+import { MapPin } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { PriceDisplay } from "../price";
+import { BookmarkButton } from "./bookmarkButton";
+import { ListingDetails, ListingDetailsContent } from "../ListingDetails";
+import { ListingListItem } from "@/lib/convexTypes";
+import { api } from "@convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
+
+export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
+  const listings = useQuery(api.listings.getListing);
+
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogListing, setDialogListing] = useState<ListingListItem | null>(
+    null,
+  );
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
+
+  // Hook pour détecter la taille d'écran
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const isLarge = window.innerWidth >= 1024; // lg breakpoint
+      setIsLargeScreen(isLarge);
+
+      // Si on passe d'un grand écran à un petit écran et qu'il y a une sélection
+      // on ferme la sélection et on ferme le dialog
+      if (!isLarge && selectedId) {
+        setSelectedId(null);
+        setIsDialogOpen(false);
+      }
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, [selectedId]);
+
+  if (!listings) {
+    return <div>Loading...</div>;
+  }
+
+  const selectedListing = listings.find((a) => a._id === selectedId);
+
+  const handleListingClick = (listingId: string) => {
+    const listing = listings.find((a) => a._id === listingId);
+
+    if (isLargeScreen) {
+      // Comportement pour grands écrans (panel)
+      if (selectedId === listingId) {
+        // Si déjà sélectionné, on ferme
+        setSelectedId(null);
+      } else {
+        // Nouvelle sélection
+        setSelectedId(listingId);
+      }
+    } else {
+      // Comportement pour petits écrans (dialog)
+      if (listing) {
+        setDialogListing(listing);
+        setIsDialogOpen(true);
+      }
+    }
+  };
+
+  // if (listing.length === 0) {
+  //   return (
+  //     <div className="text-center px-4">
+  //       <div className="max-w-md mx-auto">
+  //         <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+  //           <Briefcase className="h-8 w-8 text-muted-foreground" />
+  //         </div>
+  //         <h3 className="text-xl font-semibold mb-2">Aucune annonce trouvée</h3>
+  //         <p className="text-muted-foreground mb-6">
+  //           Essayez de modifier vos critères de recherche ou supprimez certains
+  //           filtres
+  //         </p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
+  return (
+    <div
+      className={cn(
+        "transition-all duration-300",
+        selectedId && "max-w-7xl mx-auto",
+      )}
+    >
+      <div
+        className={cn(
+          "grid gap-6 transition-all duration-300",
+          selectedId
+            ? "lg:grid-cols-[repeat(2,minmax(0,1fr))_450px]"
+            : "md:grid-cols-2 lg:grid-cols-3",
+        )}
+      >
+        {listings.map((list) => (
+          <Link
+            key={list._id}
+            href={`/listing/${list._id}`}
+            className={cn(
+              "relative group cursor-pointer transition-all duration-300 h-fit block",
+              selectedId === list._id &&
+                "ring-2 ring-primary rounded-xl shadow-primary",
+            )}
+            onClick={(e) => {
+              // Sur les grands écrans, empêcher la navigation et utiliser le panel
+              if (isLargeScreen) {
+                e.preventDefault();
+                handleListingClick(list._id);
+              }
+              // Sur les petits écrans, laisser la navigation normale se faire
+            }}
+          >
+            <div className="relative h-80 w-full rounded-xl overflow-hidden shadow-xl">
+              <Image
+                src={list.coverPhoto || "/placeholder-image.jpg"}
+                alt={list.title}
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              <Badge className="absolute top-2 left-2 z-10">{list.type}</Badge>
+
+              {isAuthenticated && (
+                <BookmarkButton
+                // listingId={list._id}
+                // initialBookmark={annonce.isBookmarked}
+                />
+              )}
+
+              <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+            <div className="absolute inset-x-3 bottom-3 p-3 bg-background/95 backdrop-blur-sm rounded-lg border">
+              <h3 className="font-semibold mb-1 line-clamp-1">{list.title}</h3>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
+                <MapPin className="size-3" />
+                {list.city} - {list.district}
+              </div>
+              <div className="font-bold">
+                <PriceDisplay price={list.price} className="text-primary" />
+              </div>
+            </div>
+          </Link>
+        ))}
+
+        {/* Panel de détails pour écrans lg */}
+        {selectedListing && isLargeScreen && (
+          <div
+            className={cn(
+              "lg:col-start-3 lg:row-start-1 sticky lg:row-span-10 top-24 h-fit max-h-[calc(100vh-3rem)] overflow-y-auto",
+            )}
+          >
+            <ListingDetails
+              listing={selectedListing}
+              onClose={() => setSelectedId(null)}
+              showCloseButton={true}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Dialog pour écrans md et sm */}
+      <Dialog
+        open={isDialogOpen}
+        onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) {
+            setDialogListing(null);
+          }
+        }}
+      >
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{dialogListing?.title}</DialogTitle>
+            <DialogDescription>
+              Détails de l&apos;annonce immobilière
+            </DialogDescription>
+          </DialogHeader>
+          {dialogListing && <ListingDetailsContent listing={dialogListing} />}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

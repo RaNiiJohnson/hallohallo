@@ -211,7 +211,7 @@ function HomePageContent() {
                   className="w-full justify-start pl-0 hover:bg-transparent hover:text-primary group"
                 >
                   <Link
-                    href="/immobilier"
+                    href="/listing"
                     className="inline-flex items-center gap-2"
                   >
                     Voir les annonces

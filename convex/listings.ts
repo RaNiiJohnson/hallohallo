@@ -3,21 +3,33 @@ import { query } from "./_generated/server";
 import { v } from "convex/values";
 
 export const getListingWithContact = query({
-  args: { listingId: v.id("RealestateListing") },
+  args: { id: v.id("RealestateListing") },
   handler: async (ctx, args) => {
-    const listing = await ctx.db.get(args.listingId);
+    const listing = await ctx.db.get("RealestateListing", args.id);
     if (!listing) return null;
 
     // Récupération des informations de contact via l'index
     const contact = await ctx.db
       .query("RealestateContactInfo")
-      .withIndex("by_listingId", (q) => q.eq("listingId", args.listingId))
+      .withIndex("by_listingId", (q) => q.eq("listingId", args.id))
       .unique(); // Utilise .unique() si une annonce n'a qu'un seul bloc de contact
 
     return {
       ...listing,
       contact,
     };
+  },
+});
+
+export const getListing = query({
+  args: {},
+  handler: async (ctx) => {
+    const listing = await ctx.db
+      .query("RealestateListing")
+      .order("desc")
+      .collect();
+
+    return listing;
   },
 });
 
@@ -36,7 +48,7 @@ export const listListingsByCity = query({
           .withIndex("by_listingId", (q) => q.eq("listingId", listing._id))
           .unique();
         return { ...listing, contact };
-      })
+      }),
     );
   },
 });

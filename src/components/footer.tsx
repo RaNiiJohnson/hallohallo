@@ -56,7 +56,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/immobilier"
+                  href="/listing"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   Immobilier
