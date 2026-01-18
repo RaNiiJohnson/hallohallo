@@ -26,6 +26,7 @@ import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 import { EditJobDialog } from "./_component/editJobDialog";
 import { JobDetailsSkeleton } from "../_component/skeleton";
+import { JobLocationMap } from "./_component/JobLocationMap";
 
 export default function JobDetailsPage() {
   const user = useQuery(api.auth.getCurrentUser);
@@ -323,6 +324,14 @@ export default function JobDetailsPage() {
                 </div>
               </div>
             </div>
+
+            {/* Location Map - Only show if coordinates exist */}
+            {jobOffer.location && (
+              <JobLocationMap
+                location={jobOffer.location}
+                city={jobOffer.city}
+              />
+            )}
 
             {/* Publisher Info */}
             <div className="bg-card border rounded-lg shadow-sm">
