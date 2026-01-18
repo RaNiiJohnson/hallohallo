@@ -99,7 +99,10 @@ export function AuthNavClient() {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogOut}>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={handleLogOut}
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Se déconnecter</span>
                 </DropdownMenuItem>

@@ -29,7 +29,7 @@ export function Header() {
 
   return (
     <header className={`${headerClasses} + h-16`}>
-      <div className="max-w-7xl mx-auto flex lg:gap-10 gap-2 items-center p-4 relative">
+      <div className="mx-auto flex lg:gap-10 gap-2 items-center p-4 relative">
         <Link
           href="/"
           className="flex items-center gap-2 text-lg text-primary font-bold hover:opacity-80 transition"
