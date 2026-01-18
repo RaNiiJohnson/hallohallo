@@ -52,3 +52,38 @@ export const listListingsByCity = query({
     );
   },
 });
+
+export const getSimilarRealEstateListings = query({
+  args: {
+    excludeId: v.id("RealestateListing"),
+    city: v.string(),
+    type: v.string(),
+    limit: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const byCity = await ctx.db
+      .query("RealestateListing")
+      .withIndex("by_city", (q) => q.eq("city", args.city))
+      .filter((q) => q.neq(q.field("_id"), args.excludeId))
+      .order("desc")
+      .take(args.limit);
+
+    if (byCity.length >= args.limit) return byCity;
+
+    const remaining = args.limit - byCity.length;
+
+    const byType = await ctx.db
+      .query("RealestateListing")
+      .withIndex("by_type", (q) => q.eq("type", args.type))
+      .filter((q) =>
+        q.and(
+          q.neq(q.field("_id"), args.excludeId),
+          q.neq(q.field("city"), args.city), // éviter les doublons ville déjà pris
+        ),
+      )
+      .order("desc")
+      .take(remaining);
+
+    return [...byCity, ...byType];
+  },
+});
