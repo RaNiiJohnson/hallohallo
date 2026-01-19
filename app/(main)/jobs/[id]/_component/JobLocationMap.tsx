@@ -23,7 +23,7 @@ export function JobLocationMap({ location, city }: JobLocationMapProps) {
 
   return (
     <div className="bg-card border rounded-lg shadow-sm overflow-hidden">
-      <div className="p-6 border-b">
+      <div className="p-4 border-b">
         <h2 className="text-xl font-semibold flex items-center gap-2">
           <MapPin className="w-5 h-5" />
           Localisation
@@ -32,9 +32,14 @@ export function JobLocationMap({ location, city }: JobLocationMapProps) {
       </div>
 
       {/* Map Container */}
-      <div className="relative h-[200px] w-full">
+      <div className="relative h-[300px] sm:h-[400px] w-full">
         <Map center={[location.lng, location.lat]} zoom={12}>
-          <MapControls position="top-right" showZoom />
+          <MapControls
+            showCompass
+            showFullscreen
+            position="top-right"
+            showZoom
+          />
           <MapMarker longitude={location.lng} latitude={location.lat}>
             <MarkerContent>
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-2 ring-background">
