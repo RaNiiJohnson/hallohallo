@@ -1,9 +1,15 @@
-'use client';
+"use client";
 
-import CheckoutForm from '@/components/CheckoutForm';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { motion } from 'motion/react';
-import { CreditCard, Shield, Zap, Info } from 'lucide-react';
+import CheckoutForm from "@/components/CheckoutForm";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { motion } from "motion/react";
+import { CreditCard, Shield, Zap, Info } from "lucide-react";
 
 export default function CheckoutPage() {
   return (
@@ -32,7 +38,8 @@ export default function CheckoutPage() {
                 <CardTitle>Payer avec Stripe Checkout</CardTitle>
               </div>
               <CardDescription>
-                Entrer une somme pour tester l'intégration de Stripe Checkout
+                Entrer une somme pour tester l&apos;intégration de Stripe
+                Checkout
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -51,7 +58,9 @@ export default function CheckoutPage() {
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <Info className="w-5 h-5 text-primary" />
-                  <CardTitle className="text-lg">Instructions de test</CardTitle>
+                  <CardTitle className="text-lg">
+                    Instructions de test
+                  </CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -62,13 +71,15 @@ export default function CheckoutPage() {
                   className="flex gap-3"
                 >
                   <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
-                    <span className="text-xs font-semibold text-primary">1</span>
+                    <span className="text-xs font-semibold text-primary">
+                      1
+                    </span>
                   </div>
                   <p className="text-sm text-muted-foreground">
                     Entrez un montant entre 1€ et 5000€
                   </p>
                 </motion.div>
-                
+
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -76,13 +87,16 @@ export default function CheckoutPage() {
                   className="flex gap-3"
                 >
                   <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
-                    <span className="text-xs font-semibold text-primary">2</span>
+                    <span className="text-xs font-semibold text-primary">
+                      2
+                    </span>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Cliquez sur "Payer" pour être redirigé vers Stripe Checkout
+                    Cliquez sur &quot;Payer&quot; pour être redirigé vers Stripe
+                    Checkout
                   </p>
                 </motion.div>
-                
+
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -90,16 +104,20 @@ export default function CheckoutPage() {
                   className="flex gap-3"
                 >
                   <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
-                    <span className="text-xs font-semibold text-primary">3</span>
+                    <span className="text-xs font-semibold text-primary">
+                      3
+                    </span>
                   </div>
                   <div className="text-sm space-y-1">
-                    <p className="text-muted-foreground">Utilisez la carte de test:</p>
+                    <p className="text-muted-foreground">
+                      Utilisez la carte de test:
+                    </p>
                     <code className="bg-background px-3 py-1.5 rounded font-mono text-xs border">
                       4242 4242 4242 4242
                     </code>
                   </div>
                 </motion.div>
-                
+
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -107,13 +125,16 @@ export default function CheckoutPage() {
                   className="flex gap-3"
                 >
                   <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
-                    <span className="text-xs font-semibold text-primary">4</span>
+                    <span className="text-xs font-semibold text-primary">
+                      4
+                    </span>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Utilisez n'importe quelle date d'expiration future et n'importe quel CVC à 3 chiffres
+                    Utilisez n&apos;importe quelle date d&apos;expiration future
+                    et n&apos;importe quel CVC à 3 chiffres
                   </p>
                 </motion.div>
-                
+
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -121,10 +142,13 @@ export default function CheckoutPage() {
                   className="flex gap-3"
                 >
                   <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
-                    <span className="text-xs font-semibold text-primary">5</span>
+                    <span className="text-xs font-semibold text-primary">
+                      5
+                    </span>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Après le paiement, vous serez redirigé vers la page de résultat
+                    Après le paiement, vous serez redirigé vers la page de
+                    résultat
                   </p>
                 </motion.div>
               </CardContent>

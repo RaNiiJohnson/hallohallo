@@ -1,18 +1,31 @@
-'use client';
+"use client";
 
-import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { fetchGetJSON } from '@/lib/api-helpers';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Stripe } from 'stripe';
-import { CheckCircle2, XCircle, AlertCircle, Clock, CreditCard, Receipt } from 'lucide-react';
-import { motion } from 'motion/react';
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { fetchGetJSON } from "@/lib/api-helpers";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Stripe } from "stripe";
+import {
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  Clock,
+  CreditCard,
+  Receipt,
+} from "lucide-react";
+import { motion } from "motion/react";
 
 function ResultContent() {
   const searchParams = useSearchParams();
-  const sessionId = searchParams.get('session_id');
+  const sessionId = searchParams.get("session_id");
 
   const [session, setSession] = useState<Stripe.Checkout.Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,6 +42,7 @@ function ResultContent() {
           setLoading(false);
         });
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false);
     }
   }, [sessionId]);
@@ -65,13 +79,16 @@ function ResultContent() {
               <AlertCircle className="w-8 h-8 text-amber-600" />
               <div>
                 <CardTitle>No Checkout Session Found</CardTitle>
-                <CardDescription>Unable to find payment information</CardDescription>
+                <CardDescription>
+                  Unable to find payment information
+                </CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              It seems you arrived here without a valid checkout session. Please start a new payment.
+              It seems you arrived here without a valid checkout session. Please
+              start a new payment.
             </p>
             <Button asChild className="w-full">
               <Link href="/checkout">Start New Payment</Link>
@@ -82,19 +99,19 @@ function ResultContent() {
     );
   }
 
-  if (session?.payment_status === 'paid') {
-    return <PaymentSucceeded session={session} sessionId={sessionId} />
+  if (session?.payment_status === "paid") {
+    return <PaymentSucceeded session={session} sessionId={sessionId} />;
   }
 
-  if (session?.payment_status === 'unpaid') {
-    return <UnpaidPayment session={session} sessionId={sessionId} />
+  if (session?.payment_status === "unpaid") {
+    return <UnpaidPayment session={session} sessionId={sessionId} />;
   }
 
-  if (session?.payment_status === 'no_payment_required') {
-    return <NoPaymentRequired session={session} sessionId={sessionId} />
+  if (session?.payment_status === "no_payment_required") {
+    return <NoPaymentRequired session={session} sessionId={sessionId} />;
   }
 
-  return <PendingPayment />
+  return <PendingPayment />;
 }
 
 function PendingPayment() {
@@ -122,8 +139,9 @@ function PendingPayment() {
         <CardContent className="space-y-4">
           <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
             <p className="text-sm text-amber-800 dark:text-amber-200">
-              Your payment is currently being verified. This usually takes a few moments.
-              Please check back in a few minutes or check your email for confirmation.
+              Your payment is currently being verified. This usually takes a few
+              moments. Please check back in a few minutes or check your email
+              for confirmation.
             </p>
           </div>
           <Button asChild className="w-full">
@@ -135,7 +153,13 @@ function PendingPayment() {
   );
 }
 
-function UnpaidPayment({ session, sessionId }: { session: Stripe.Checkout.Session, sessionId: string }) {
+function UnpaidPayment({
+  session,
+  sessionId,
+}: {
+  session: Stripe.Checkout.Session;
+  sessionId: string;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -153,14 +177,20 @@ function UnpaidPayment({ session, sessionId }: { session: Stripe.Checkout.Sessio
               <XCircle className="w-8 h-8 text-red-600" />
             </motion.div>
             <div>
-              <CardTitle className="text-red-600">Payment Unsuccessful</CardTitle>
-              <CardDescription>Your payment could not be processed</CardDescription>
+              <CardTitle className="text-red-600">
+                Payment Unsuccessful
+              </CardTitle>
+              <CardDescription>
+                Your payment could not be processed
+              </CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-            <h4 className="font-semibold text-red-900 dark:text-red-100 mb-2">What happened?</h4>
+            <h4 className="font-semibold text-red-900 dark:text-red-100 mb-2">
+              What happened?
+            </h4>
             <p className="text-sm text-red-800 dark:text-red-200 mb-2">
               Your payment was not completed. This could be due to:
             </p>
@@ -191,7 +221,13 @@ function UnpaidPayment({ session, sessionId }: { session: Stripe.Checkout.Sessio
   );
 }
 
-function PaymentSucceeded({ session, sessionId }: { session: Stripe.Checkout.Session, sessionId: string }) {
+function PaymentSucceeded({
+  session,
+  sessionId,
+}: {
+  session: Stripe.Checkout.Session;
+  sessionId: string;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -217,7 +253,9 @@ function PaymentSucceeded({ session, sessionId }: { session: Stripe.Checkout.Ses
               </div>
             </motion.div>
             <div>
-              <CardTitle className="text-green-600 text-2xl">Payment Successful!</CardTitle>
+              <CardTitle className="text-green-600 text-2xl">
+                Payment Successful!
+              </CardTitle>
               <CardDescription>Thank you for your payment</CardDescription>
             </div>
           </div>
@@ -236,7 +274,8 @@ function PaymentSucceeded({ session, sessionId }: { session: Stripe.Checkout.Ses
                   Payment Confirmed
                 </h4>
                 <p className="text-sm text-green-800 dark:text-green-200">
-                  Your payment has been successfully processed. You will receive a confirmation email shortly.
+                  Your payment has been successfully processed. You will receive
+                  a confirmation email shortly.
                 </p>
               </div>
             </div>
@@ -249,12 +288,16 @@ function PaymentSucceeded({ session, sessionId }: { session: Stripe.Checkout.Ses
             className="p-4 bg-muted rounded-lg space-y-3"
           >
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Transaction ID</p>
+              <p className="text-xs text-muted-foreground mb-1">
+                Transaction ID
+              </p>
               <p className="font-mono text-sm break-all">{sessionId}</p>
             </div>
             {session.amount_total && (
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Amount Paid</p>
+                <p className="text-xs text-muted-foreground mb-1">
+                  Amount Paid
+                </p>
                 <p className="text-3xl font-bold text-green-600">
                   ${(session.amount_total / 100).toFixed(2)}
                 </p>
@@ -262,7 +305,9 @@ function PaymentSucceeded({ session, sessionId }: { session: Stripe.Checkout.Ses
             )}
             {session.customer_email && (
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Receipt sent to</p>
+                <p className="text-xs text-muted-foreground mb-1">
+                  Receipt sent to
+                </p>
                 <p className="text-sm">{session.customer_email}</p>
               </div>
             )}
@@ -283,7 +328,13 @@ function PaymentSucceeded({ session, sessionId }: { session: Stripe.Checkout.Ses
   );
 }
 
-function NoPaymentRequired({ session, sessionId }: { session: Stripe.Checkout.Session, sessionId: string }) {
+function NoPaymentRequired({
+  session,
+  sessionId,
+}: {
+  session: Stripe.Checkout.Session;
+  sessionId: string;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -301,7 +352,9 @@ function NoPaymentRequired({ session, sessionId }: { session: Stripe.Checkout.Se
               <CheckCircle2 className="w-8 h-8 text-blue-600" />
             </motion.div>
             <div>
-              <CardTitle className="text-blue-600">No Payment Required</CardTitle>
+              <CardTitle className="text-blue-600">
+                No Payment Required
+              </CardTitle>
               <CardDescription>Session completed successfully</CardDescription>
             </div>
           </div>
@@ -309,8 +362,9 @@ function NoPaymentRequired({ session, sessionId }: { session: Stripe.Checkout.Se
         <CardContent className="space-y-4">
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
             <p className="text-sm text-blue-800 dark:text-blue-200">
-              This checkout session was completed successfully and did not require any payment.
-              This could be for a free trial, promotional offer, or zero-amount transaction.
+              This checkout session was completed successfully and did not
+              require any payment. This could be for a free trial, promotional
+              offer, or zero-amount transaction.
             </p>
           </div>
 
@@ -331,22 +385,26 @@ function NoPaymentRequired({ session, sessionId }: { session: Stripe.Checkout.Se
 export default function ResultPage() {
   return (
     <div className="container py-8">
-      <Suspense fallback={
-        <div className="flex items-center justify-center min-h-[400px]">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center space-y-4"
-          >
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center min-h-[400px]">
             <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full mx-auto"
-            />
-            <p className="text-muted-foreground">Loading payment details...</p>
-          </motion.div>
-        </div>
-      }>
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center space-y-4"
+            >
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full mx-auto"
+              />
+              <p className="text-muted-foreground">
+                Loading payment details...
+              </p>
+            </motion.div>
+          </div>
+        }
+      >
         <ResultContent />
       </Suspense>
     </div>
