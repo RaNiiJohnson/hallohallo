@@ -41,7 +41,11 @@ export default defineSchema({
     .index("by_city", ["city"])
     .index("by_type", ["type"])
     .index("by_contract", ["contractType"])
-    .index("by_salary", ["salary"]),
+    .index("by_salary", ["salary"])
+    .searchIndex("search_title", {
+      searchField: "title",
+      filterFields: ["city", "type", "contractType"],
+    }),
 
   RealestateListing: defineTable({
     title: v.string(),

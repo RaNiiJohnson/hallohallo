@@ -21,6 +21,9 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { useQueryStates, parseAsString } from "nuqs";
+import { useState, useEffect } from "react";
+import { useDebounce } from "@/hooks/use-debounce";
 
 const JOB_TYPES = [
   { value: "Au pair", label: "Au pair" },
@@ -43,6 +46,34 @@ const CONTRACT_TYPES = [
 ];
 
 export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
+  // 1. Définition de l'état URL avec nuqs
+  const [filters, setFilters] = useQueryStates(
+    {
+      search: parseAsString.withDefault(""),
+      type: parseAsString.withDefault("all"),
+      contract: parseAsString.withDefault("all"),
+    },
+    { shallow: false, history: "replace" },
+  );
+
+  const [searchQuery, setSearchQuery] = useState(filters.search);
+  const debouncedSearch = useDebounce(searchQuery, 1000);
+
+  useEffect(() => {
+    setFilters({ search: debouncedSearch });
+  }, [debouncedSearch, setFilters]);
+
+  // Sync local state when URL filters change (e.g. "Clear All" or back button)
+  useEffect(() => {
+    if (filters.search !== debouncedSearch) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSearchQuery(filters.search);
+    }
+  }, [debouncedSearch, filters.search]);
+
+  const clearAll = () =>
+    setFilters({ search: "", type: "all", contract: "all" });
+
   return (
     <div className="space-y-4 max-w-3xl mx-auto">
       {/* Barre de recherche principale */}
@@ -51,6 +82,8 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
           <InputGroupInput
             placeholder="Rechercher par titre, ville, type..."
             className="pl-10"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
           <InputGroupAddon>
             <Search />
@@ -68,6 +101,7 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
                   <div className="flex items-center justify-between">
                     <h3 className="font-medium">Filtres</h3>
                     <Button
+                      onClick={clearAll}
                       variant="ghost"
                       size="sm"
                       className="text-muted-foreground hover:text-foreground h-auto p-0"
@@ -82,7 +116,12 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
                       <label className="text-sm font-medium mb-2 block">
                         Type de contrat
                       </label>
-                      <Select>
+                      <Select
+                        value={filters.contract}
+                        onValueChange={(value) =>
+                          setFilters({ contract: value })
+                        }
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Tous les contrats" />
                         </SelectTrigger>
@@ -107,24 +146,27 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
       {/* Filtres rapides par type */}
       <div className="flex flex-wrap gap-2">
         <Badge
-          variant="default"
+          variant={filters.type === "all" ? "default" : "outline"}
           className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+          onClick={() => setFilters({ type: "all" })}
         >
-          Toutes
+          Tous
         </Badge>
         {JOB_TYPES.map((type) => (
           <Badge
             key={type.value}
-            variant="default"
+            variant={filters.type === type.value ? "default" : "outline"}
             className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+            onClick={() => setFilters({ type: type.value })}
           >
             {type.label}
           </Badge>
         ))}
         {isAuthenticated && (
           <Badge
-            variant="default"
+            variant={filters.type === "favorite" ? "default" : "outline"}
             className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+            // onClick={() => setFilters({ type: "favorite" })}
           >
             Favoris
           </Badge>

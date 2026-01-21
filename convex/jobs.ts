@@ -28,10 +28,53 @@ export const getJobMetadata = query({
 });
 
 export const getJobs = query({
-  args: {},
-  handler: async (ctx) => {
-    const job = await ctx.db.query("JobOffer").order("desc").collect();
-    return job;
+  args: {
+    searchTerm: v.optional(v.string()),
+    type: v.optional(v.string()),
+    contractType: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { searchTerm, type, contractType } = args;
+
+    // CAS 1 : Recherche textuelle active
+    if (searchTerm) {
+      const searchResult = ctx.db
+        .query("JobOffer")
+        .withSearchIndex("search_title", (q) => {
+          let search = q.search("title", searchTerm);
+          if (type && type !== "all") search = search.eq("type", type);
+          if (contractType && contractType !== "all")
+            search = search.eq("contractType", contractType);
+          return search;
+        });
+      return await searchResult.collect();
+    }
+
+    // CAS 2 : Pas de recherche textuelle -> Utilisation des index de filtrage
+    let results;
+
+    // On utilise les index définis dans schéma
+    if (type && type !== "all") {
+      results = await ctx.db
+        .query("JobOffer")
+        .withIndex("by_type", (q) => q.eq("type", type))
+        .collect();
+    } else if (contractType && contractType !== "all") {
+      results = await ctx.db
+        .query("JobOffer")
+        .withIndex("by_contract", (q) => q.eq("contractType", contractType))
+        .collect();
+    } else {
+      results = await ctx.db.query("JobOffer").collect();
+    }
+
+    // Filtre manuel si les deux (type ET contract) sont présents sans searchTerm
+    // (car Convex ne supporte qu'un seul index à la fois)
+    if (type && type !== "all" && contractType && contractType !== "all") {
+      return results.filter((job) => job.contractType === contractType);
+    }
+
+    return results;
   },
 });
 
@@ -130,9 +173,89 @@ export const deleteJob = mutation({
   },
 });
 
-// const existing = await ctx.db
-//   .query("JobBookmark")
-//   .withIndex("by_user_job", (q) =>
-//     q.eq("userId", userId).eq("jobId", args.jobId)
-//   )
-//   .unique();
+// export const getFilteredJobs = query({
+//   args: {
+//     searchQuery: v.optional(v.string()),
+//     type: v.optional(v.string()),
+//     contractType: v.optional(v.string()),
+//     city: v.optional(v.string()),
+//     page: v.optional(v.number()),
+//     limit: v.optional(v.number()),
+//   },
+//   handler: async (ctx, args) => {
+//     const page = args.page ?? 1;
+//     const limit = args.limit ?? 10;
+//     const offset = (page - 1) * limit;
+
+//     let q = ctx.db.query("JobOffer");
+
+//     // 1) Recherche texte sur le titre
+//     if (args.searchQuery && args.searchQuery.trim().length > 0) {
+//       q = q.withSearchIndex("search_title", (s) => {
+//         let search = s.search("title", args.searchQuery!);
+
+//         // filtres supportés par filterFields du search index
+//         if (args.type && args.type !== "all") {
+//           search = search.eq("type", args.type);
+//         }
+//         if (args.contractType && args.contractType !== "all") {
+//           search = search.eq("contractType", args.contractType);
+//         }
+//         if (args.city && args.city !== "all") {
+//           search = search.eq("city", args.city);
+//         }
+
+//         return search;
+//       });
+//     } else {
+//       // 2) Pas de recherche texte : on utilise les indexes normaux
+//       if (args.type && args.type !== "all") {
+//         q = q.withIndex("by_type", (i) => i.eq("type", args.type));
+//       } else if (args.contractType && args.contractType !== "all") {
+//         q = q.withIndex("by_contract", (i) =>
+//           i.eq("contractType", args.contractType),
+//         );
+//       } else if (args.city && args.city !== "all") {
+//         q = q.withIndex("by_city", (i) => i.eq("city", args.city));
+//       }
+//       // si plusieurs filtres sans searchQuery, on en pousse un dans l’index
+//       // et on complètera en JS si besoin (voir plus bas)
+//     }
+
+//     // 3) On récupère les résultats triés
+//     const allJobs = await q.order("desc").collect();
+
+//     // 4) Filtrage complémentaire en TypeScript si plusieurs filtres sans search
+//     let filtered = allJobs;
+
+//     if (!args.searchQuery) {
+//       if (args.type && args.type !== "all") {
+//         filtered = filtered.filter((job) => job.type === args.type);
+//       }
+//       if (args.contractType && args.contractType !== "all") {
+//         filtered = filtered.filter(
+//           (job) => job.contractType === args.contractType,
+//         );
+//       }
+//       if (args.city && args.city !== "all") {
+//         filtered = filtered.filter((job) => job.city === args.city);
+//       }
+//     }
+
+//     const total = filtered.length;
+//     const totalPages = Math.ceil(total / limit);
+//     const pageItems = filtered.slice(offset, offset + limit);
+
+//     return {
+//       jobs: pageItems,
+//       pagination: {
+//         page,
+//         limit,
+//         total,
+//         totalPages,
+//         hasNextPage: page < totalPages,
+//         hasPreviousPage: page > 1,
+//       },
+//     };
+//   },
+// });

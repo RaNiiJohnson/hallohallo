@@ -29,7 +29,7 @@ export default function JobsPage() {
           {isAuthenticated && <PublishJobDialog />}
         </div>
         <div className="min-h-screen bg-background">
-          <JobList isAuthenticated={isAuthenticated} />
+          <JobList />
           {/* Call to action */}
           <div className="text-center flex flex-col items-center  mt-16 p-8 bg-card border rounded-xl shadow-sm">
             <h3 className="text-2xl font-bold mb-4">

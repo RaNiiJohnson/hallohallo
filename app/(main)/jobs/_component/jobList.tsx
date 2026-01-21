@@ -1,8 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Briefcase, MapPin, Clock } from "lucide-react";
-import { PublishJobDialog } from "./dialogs/publishJobDialog";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { SalaryDisplay } from "./salary";
@@ -10,13 +8,19 @@ import { getRelativeTime } from "@/lib/date";
 import { JobPageSkeleton } from "./skeleton";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
+import { parseAsString, useQueryStates } from "nuqs";
 
-interface JobListProps {
-  isAuthenticated: boolean;
-}
-
-export function JobList({ isAuthenticated }: JobListProps) {
-  const jobs = useQuery(api.jobs.getJobs, {});
+export function JobList() {
+  const [filters] = useQueryStates({
+    search: parseAsString,
+    type: parseAsString,
+    contract: parseAsString,
+  });
+  const jobs = useQuery(api.jobs.getJobs, {
+    contractType: filters.contract || undefined,
+    searchTerm: filters.search || undefined,
+    type: filters.type || undefined,
+  });
 
   if (jobs === undefined) {
     return <JobPageSkeleton />;
@@ -33,9 +37,6 @@ export function JobList({ isAuthenticated }: JobListProps) {
             Essayez de modifier vos critères de recherche ou supprimez certains
             filtres
           </p>
-          {isAuthenticated && (
-            <PublishJobDialog trigger={<Button>Publier une offre</Button>} />
-          )}
         </div>
       </div>
     );
