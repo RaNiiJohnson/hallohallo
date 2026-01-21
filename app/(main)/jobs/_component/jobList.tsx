@@ -7,8 +7,11 @@ import { SalaryDisplay } from "./salary";
 import { getRelativeTime } from "@/lib/date";
 import { JobPageSkeleton } from "./skeleton";
 import { api } from "@convex/_generated/api";
-import { useQuery } from "convex-helpers/react/cache";
+import { usePaginatedQuery } from "convex-helpers/react/cache";
 import { parseAsString, useQueryStates } from "nuqs";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import clsx from "clsx";
 
 export function JobList() {
   const [filters] = useQueryStates({
@@ -16,13 +19,21 @@ export function JobList() {
     type: parseAsString,
     contract: parseAsString,
   });
-  const jobs = useQuery(api.jobs.getJobs, {
-    contractType: filters.contract || undefined,
-    searchTerm: filters.search || undefined,
-    type: filters.type || undefined,
-  });
+  const {
+    results: jobs,
+    status,
+    loadMore,
+  } = usePaginatedQuery(
+    api.jobs.getJobs,
+    {
+      contractType: filters.contract || undefined,
+      searchTerm: filters.search || undefined,
+      type: filters.type || undefined,
+    },
+    { initialNumItems: 5 },
+  );
 
-  if (jobs === undefined) {
+  if (status === "LoadingFirstPage") {
     return <JobPageSkeleton />;
   }
   if (jobs.length === 0) {
@@ -40,6 +51,14 @@ export function JobList() {
         </div>
       </div>
     );
+  }
+
+  function loadMoreJobs() {
+    if (status === "CanLoadMore") {
+      loadMore(1);
+    } else {
+      toast.info("Toutes les offres ont été chargées");
+    }
   }
 
   return (
@@ -114,6 +133,15 @@ export function JobList() {
           </div>
         </Link>
       ))}
+      <Button
+        variant="outline"
+        onClick={loadMoreJobs}
+        className={clsx("mx-auto flex items-center mt-5", {
+          "cursor-not-allowed opacity-50": status !== "CanLoadMore",
+        })}
+      >
+        {status === "LoadingMore" ? "Chargement..." : "Voir plus d'offres"}
+      </Button>
     </div>
   );
 }

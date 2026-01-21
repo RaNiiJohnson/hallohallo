@@ -1,6 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { authComponent } from "./auth";
+import { paginationOptsValidator } from "convex/server";
 import { Id } from "./_generated/dataModel";
 
 export const getJobWithContact = query({
@@ -29,6 +30,7 @@ export const getJobMetadata = query({
 
 export const getJobs = query({
   args: {
+    paginationOpts: paginationOptsValidator,
     searchTerm: v.optional(v.string()),
     type: v.optional(v.string()),
     contractType: v.optional(v.string()),
@@ -47,7 +49,9 @@ export const getJobs = query({
             search = search.eq("contractType", contractType);
           return search;
         });
-      return await searchResult.collect();
+
+      // avant: return await searchResult.collect();
+      return await searchResult.paginate(args.paginationOpts);
     }
 
     // CAS 2 : Pas de recherche textuelle -> Utilisation des index de filtrage
@@ -58,20 +62,28 @@ export const getJobs = query({
       results = await ctx.db
         .query("JobOffer")
         .withIndex("by_type", (q) => q.eq("type", type))
-        .collect();
+        .order("desc")
+        .paginate(args.paginationOpts);
     } else if (contractType && contractType !== "all") {
       results = await ctx.db
         .query("JobOffer")
         .withIndex("by_contract", (q) => q.eq("contractType", contractType))
-        .collect();
+        .order("desc")
+        .paginate(args.paginationOpts);
     } else {
-      results = await ctx.db.query("JobOffer").collect();
+      results = await ctx.db
+        .query("JobOffer")
+        .order("desc")
+        .paginate(args.paginationOpts);
     }
 
     // Filtre manuel si les deux (type ET contract) sont présents sans searchTerm
     // (car Convex ne supporte qu'un seul index à la fois)
     if (type && type !== "all" && contractType && contractType !== "all") {
-      return results.filter((job) => job.contractType === contractType);
+      return {
+        ...results,
+        page: results.page.filter((job) => job.contractType === contractType),
+      };
     }
 
     return results;

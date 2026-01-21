@@ -75,102 +75,106 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
     setFilters({ search: "", type: "all", contract: "all" });
 
   return (
-    <div className="space-y-4 max-w-3xl mx-auto">
-      {/* Barre de recherche principale */}
-      <div className="flex gap-4">
-        <InputGroup>
-          <InputGroupInput
-            placeholder="Rechercher par titre, ville, type..."
-            className="pl-10"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <InputGroupAddon>
-            <Search />
-          </InputGroupAddon>
-          <InputGroupAddon align="inline-end">
-            <Popover>
-              <PopoverTrigger asChild>
-                <InputGroupButton variant="outline">
-                  <Filter className="h-4 w-4" />
-                  <span className="hidden sm:inline">Filtres</span>
-                </InputGroupButton>
-              </PopoverTrigger>
-              <PopoverContent className="w-[400px] p-4" align="end">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-medium">Filtres</h3>
-                    <Button
-                      onClick={clearAll}
-                      variant="ghost"
-                      size="sm"
-                      className="text-muted-foreground hover:text-foreground h-auto p-0"
-                    >
-                      <X className="h-4 w-4 mr-1" />
-                      Effacer tout
-                    </Button>
-                  </div>
-
+    <div className="bg-background sticky top-0 p-6 pt-20 z-10 ">
+      <div className="space-y-4 max-w-3xl mx-auto">
+        {/* Barre de recherche principale */}
+        <div className="flex gap-4">
+          <InputGroup>
+            <InputGroupInput
+              placeholder="Rechercher ..."
+              className="pl-10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
+            <InputGroupAddon align="inline-end">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <InputGroupButton variant="outline">
+                    <Filter className="h-4 w-4" />
+                    <span className="hidden sm:inline">Filtres</span>
+                  </InputGroupButton>
+                </PopoverTrigger>
+                <PopoverContent className="w-[400px] p-4" align="end">
                   <div className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">
-                        Type de contrat
-                      </label>
-                      <Select
-                        value={filters.contract}
-                        onValueChange={(value) =>
-                          setFilters({ contract: value })
-                        }
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium">Filtres</h3>
+                      <Button
+                        onClick={clearAll}
+                        variant="ghost"
+                        size="sm"
+                        className="text-muted-foreground hover:text-foreground h-auto p-0"
                       >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Tous les contrats" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Tous les contrats</SelectItem>
-                          {CONTRACT_TYPES.map((type) => (
-                            <SelectItem key={type.value} value={type.value}>
-                              {type.label}
+                        <X className="h-4 w-4 mr-1" />
+                        Effacer tout
+                      </Button>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">
+                          Type de contrat
+                        </label>
+                        <Select
+                          value={filters.contract}
+                          onValueChange={(value) =>
+                            setFilters({ contract: value })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Tous les contrats" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">
+                              Tous les contrats
                             </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                            {CONTRACT_TYPES.map((type) => (
+                              <SelectItem key={type.value} value={type.value}>
+                                {type.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-          </InputGroupAddon>
-        </InputGroup>
-      </div>
+                </PopoverContent>
+              </Popover>
+            </InputGroupAddon>
+          </InputGroup>
+        </div>
 
-      {/* Filtres rapides par type */}
-      <div className="flex flex-wrap gap-2">
-        <Badge
-          variant={filters.type === "all" ? "default" : "outline"}
-          className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
-          onClick={() => setFilters({ type: "all" })}
-        >
-          Tous
-        </Badge>
-        {JOB_TYPES.map((type) => (
+        {/* Filtres rapides par type */}
+        <div className="flex flex-wrap gap-2">
           <Badge
-            key={type.value}
-            variant={filters.type === type.value ? "default" : "outline"}
+            variant={filters.type === "all" ? "default" : "outline"}
             className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
-            onClick={() => setFilters({ type: type.value })}
+            onClick={() => setFilters({ type: "all" })}
           >
-            {type.label}
+            Tous
           </Badge>
-        ))}
-        {isAuthenticated && (
-          <Badge
-            variant={filters.type === "favorite" ? "default" : "outline"}
-            className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
-            // onClick={() => setFilters({ type: "favorite" })}
-          >
-            Favoris
-          </Badge>
-        )}
+          {JOB_TYPES.map((type) => (
+            <Badge
+              key={type.value}
+              variant={filters.type === type.value ? "default" : "outline"}
+              className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+              onClick={() => setFilters({ type: type.value })}
+            >
+              {type.label}
+            </Badge>
+          ))}
+          {isAuthenticated && (
+            <Badge
+              variant={filters.type === "favorite" ? "default" : "outline"}
+              className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+              // onClick={() => setFilters({ type: "favorite" })}
+            >
+              Favoris
+            </Badge>
+          )}
+        </div>
       </div>
     </div>
   );
