@@ -22,8 +22,8 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { useQueryStates, parseAsString } from "nuqs";
-import { useState, useEffect } from "react";
-import { useDebounce } from "@/hooks/use-debounce";
+import { useEffect, useState, useTransition } from "react";
+import { useDebounce } from "use-debounce";
 
 const JOB_TYPES = [
   { value: "Au pair", label: "Au pair" },
@@ -46,33 +46,35 @@ const CONTRACT_TYPES = [
 ];
 
 export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
-  // 1. Définition de l'état URL avec nuqs
-  const [filters, setFilters] = useQueryStates(
-    {
-      search: parseAsString.withDefault(""),
-      type: parseAsString.withDefault("all"),
-      contract: parseAsString.withDefault("all"),
-    },
-    { shallow: false, history: "replace" },
-  );
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, startTransition] = useTransition();
 
-  const [searchQuery, setSearchQuery] = useState(filters.search);
-  const debouncedSearch = useDebounce(searchQuery, 1000);
+  const [filters, setFilters] = useQueryStates({
+    search: parseAsString.withDefault(""),
+    type: parseAsString.withDefault("all"),
+    contract: parseAsString.withDefault("all"),
+  });
 
+  // 1. L'unique source de vérité pour l'affichage de l'input
+  const [localSearch, setLocalSearch] = useState(filters.search);
+
+  // 2. On calcule la valeur debouncée
+  const [debouncedSearch] = useDebounce(localSearch, 600);
+
+  // 3. Un SEUL effet pour pousser vers l'URL
   useEffect(() => {
-    setFilters({ search: debouncedSearch });
-  }, [debouncedSearch, setFilters]);
-
-  // Sync local state when URL filters change (e.g. "Clear All" or back button)
-  useEffect(() => {
-    if (filters.search !== debouncedSearch) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSearchQuery(filters.search);
+    // On vérifie si la valeur a vraiment changé pour éviter les rendus inutiles
+    if (debouncedSearch !== filters.search) {
+      startTransition(() => {
+        setFilters({ search: debouncedSearch || null });
+      });
     }
-  }, [debouncedSearch, filters.search]);
+  }, [debouncedSearch, setFilters, filters.search]);
 
-  const clearAll = () =>
-    setFilters({ search: "", type: "all", contract: "all" });
+  const clearAll = () => {
+    setLocalSearch(""); 
+    setFilters({ search: null, type: "all", contract: "all" });
+  };
 
   return (
     <div className="bg-background sticky top-0 p-6 pt-20 z-10 ">
@@ -83,8 +85,8 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
             <InputGroupInput
               placeholder="Rechercher ..."
               className="pl-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={localSearch}
+              onChange={(e) => setLocalSearch(e.target.value)}
             />
             <InputGroupAddon>
               <Search />
