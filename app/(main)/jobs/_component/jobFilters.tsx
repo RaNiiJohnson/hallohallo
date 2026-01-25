@@ -72,13 +72,13 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
   }, [debouncedSearch, setFilters, filters.search]);
 
   const clearAll = () => {
-    setLocalSearch(""); 
+    setLocalSearch("");
     setFilters({ search: null, type: "all", contract: "all" });
   };
 
   return (
-    <div className="bg-background sticky top-0 p-6 pt-20 z-10 ">
-      <div className="space-y-4 max-w-3xl mx-auto">
+    <div className="bg-background sticky top-0 p-4 pt-20 z-10 ">
+      <div className="flex flex-col gap-4 max-w-3xl mx-auto">
         {/* Barre de recherche principale */}
         <div className="flex gap-4">
           <InputGroup>
@@ -140,6 +140,44 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
                           </SelectContent>
                         </Select>
                       </div>
+                      <div className=" flex-wrap gap-2 md:hidden flex pt-2">
+                        <Badge
+                          variant={
+                            filters.type === "all" ? "default" : "outline"
+                          }
+                          className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+                          onClick={() => setFilters({ type: "all" })}
+                        >
+                          Tous
+                        </Badge>
+                        {JOB_TYPES.map((type) => (
+                          <Badge
+                            key={type.value}
+                            variant={
+                              filters.type === type.value
+                                ? "default"
+                                : "outline"
+                            }
+                            className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+                            onClick={() => setFilters({ type: type.value })}
+                          >
+                            {type.label}
+                          </Badge>
+                        ))}
+                        {isAuthenticated && (
+                          <Badge
+                            variant={
+                              filters.type === "favorite"
+                                ? "default"
+                                : "outline"
+                            }
+                            className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+                            // onClick={() => setFilters({ type: "favorite" })}
+                          >
+                            Favoris
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </PopoverContent>
@@ -149,7 +187,7 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
         </div>
 
         {/* Filtres rapides par type */}
-        <div className="flex flex-wrap gap-2">
+        <div className="hidden md:flex md:flex-wrap md:gap-2">
           <Badge
             variant={filters.type === "all" ? "default" : "outline"}
             className="cursor-pointer hover:bg-primary hover:text-primary-foreground"

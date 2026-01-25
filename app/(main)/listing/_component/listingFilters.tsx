@@ -116,7 +116,7 @@ export function RealEstatesFilters({
 
   return (
     <div className="bg-background sticky top-0 p-6 pt-20 z-20 ">
-      <div className="space-y-4 max-w-3xl mx-auto">
+      <div className="flex flex-col gap-4 max-w-3xl mx-auto">
         {/* Barre de recherche principale */}
         <div className="flex gap-4">
           <InputGroup>
@@ -213,6 +213,35 @@ export function RealEstatesFilters({
                         />
                       </div>
                     </div>
+                    <div className=" flex-wrap pt-2 gap-2 md:hidden flex">
+                      <Badge
+                        variant={filters.type === "all" ? "default" : "outline"}
+                        className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+                        onClick={() => setFilters({ type: "all" })}
+                      >
+                        Tous
+                      </Badge>
+                      {LISTING_TYPES.map((type) => (
+                        <Badge
+                          key={type.value}
+                          variant={
+                            filters.type === type.value ? "default" : "outline"
+                          }
+                          className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+                          onClick={() => setFilters({ type: type.value })}
+                        >
+                          {type.label}
+                        </Badge>
+                      ))}
+                      {isAuthenticated && (
+                        <Badge
+                          variant="secondary"
+                          className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+                        >
+                          Favoris
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </PopoverContent>
               </Popover>
@@ -221,7 +250,7 @@ export function RealEstatesFilters({
         </div>
 
         {/* Filtres rapides par type */}
-        <div className="flex flex-wrap gap-2">
+        <div className="hidden md:flex md:flex-wrap md:gap-2">
           <Badge
             variant={filters.type === "all" ? "default" : "outline"}
             className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
