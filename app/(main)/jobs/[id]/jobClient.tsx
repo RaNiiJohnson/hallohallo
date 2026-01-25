@@ -44,7 +44,7 @@ export function JobDetailsPage(props: {
     <div className="min-h-screen bg-muted/30">
       {/* Hero Section without image */}
       <div className="relative w-full bg-background">
-        <div className="max-w-6xl mx-auto px-4 pt-8 sm:pt-12">
+        <div className="max-w-7xl mx-auto px-4 pt-8 sm:pt-12">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6 sm:mb-8">
             <Link
@@ -156,7 +156,7 @@ export function JobDetailsPage(props: {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto px-4 py-6">
         <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-6">

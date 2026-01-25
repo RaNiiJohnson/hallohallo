@@ -18,6 +18,7 @@ export default defineSchema({
   JobOffer: defineTable({
     title: v.string(),
     type: v.string(),
+    slug: v.optional(v.string()),
     location: v.optional(
       v.object({
         lat: v.number(),
@@ -43,6 +44,7 @@ export default defineSchema({
     .index("by_type", ["type"])
     .index("by_contract", ["contractType"])
     .index("by_salary", ["salary"])
+    .index("by_slug", ["slug"])
     .searchIndex("search_all_fields", {
       searchField: "searchAll",
       filterFields: ["city", "type", "contractType"],
@@ -51,6 +53,7 @@ export default defineSchema({
   RealestateListing: defineTable({
     title: v.string(),
     type: v.string(),
+    slug: v.optional(v.string()),
     location: v.optional(
       v.object({
         lat: v.number(),
@@ -84,6 +87,7 @@ export default defineSchema({
     .index("by_price", ["price"])
     .index("by_bedrooms", ["bedrooms"])
     .index("by_priceNumeric", ["priceNumeric"])
+    .index("by_slug", ["slug"])
     .searchIndex("search_all_fields", {
       searchField: "searchAll",
       filterFields: ["city", "type", "bedrooms", "priceNumeric"],

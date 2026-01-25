@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { ButtonGroup } from "./ui/button-group";
 import { Button } from "./ui/button";
 import Link from "next/link";
@@ -8,13 +8,12 @@ import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
+import { Authenticated, Unauthenticated } from "convex/react";
 import { authClient } from "@/lib/auth-client";
 import { useQuery } from "convex-helpers/react/cache";
 import { api } from "@convex/_generated/api";
@@ -24,12 +23,15 @@ export type UserShape =
       name?: string | null;
       email?: string | null;
       image?: string | null;
+      slug?: string | null;
     }
   | null
   | undefined;
 
 export function AuthNavClient() {
   const user = useQuery(api.auth.getCurrentUser);
+
+  const [open, setOpen] = useState(false);
 
   const handleLogOut = async () => {
     await authClient.signOut({
@@ -61,7 +63,7 @@ export function AuthNavClient() {
       <Authenticated>
         {user && (
           <div className="flex items-center gap-2">
-            <DropdownMenu>
+            <DropdownMenu open={open} onOpenChange={setOpen}>
               <DropdownMenuTrigger asChild>
                 <div className="flex items-center sm:space-x-2 hover:bg-accent rounded-lg sm:py-2 sm:px-4 transition-colors cursor-pointer">
                   <Suspense>
@@ -88,7 +90,11 @@ export function AuthNavClient() {
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
-                <div className="flex items-center justify-start gap-2 p-2">
+                <Link
+                  href={`/hl/${user.slug}`}
+                  className="flex items-center justify-start gap-2 p-2 cursor-pointer hover:bg-accent rounded-t-md"
+                  onClick={() => setOpen(false)}
+                >
                   <div className="flex flex-col space-y-1 leading-none">
                     {user.name && <p className="font-medium">{user.name}</p>}
                     {user.email && (
@@ -97,15 +103,15 @@ export function AuthNavClient() {
                       </p>
                     )}
                   </div>
-                </div>
+                </Link>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="cursor-pointer"
+                <div
                   onClick={handleLogOut}
+                  className="flex items-center justify-start gap-2 p-2 cursor-pointer text-destructive hover:text-destructive/80 bg-destructive/15 hover:bg-destructive/10 rounded-b-md w-full text-sm"
                 >
-                  <LogOut className="mr-2 h-4 w-4" />
+                  <LogOut className="size-4" />
                   <span>Se déconnecter</span>
-                </DropdownMenuItem>
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
