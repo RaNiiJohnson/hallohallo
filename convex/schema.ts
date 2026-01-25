@@ -36,14 +36,15 @@ export default defineSchema({
     authorName: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
+    searchAll: v.optional(v.string()),
   })
     .index("by_authorId", ["authorId"])
     .index("by_city", ["city"])
     .index("by_type", ["type"])
     .index("by_contract", ["contractType"])
     .index("by_salary", ["salary"])
-    .searchIndex("search_title", {
-      searchField: "title",
+    .searchIndex("search_all_fields", {
+      searchField: "searchAll",
       filterFields: ["city", "type", "contractType"],
     }),
 
@@ -75,11 +76,18 @@ export default defineSchema({
     authorName: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
+    searchAll: v.optional(v.string()),
   })
     .index("by_authorId", ["authorId"])
     .index("by_city", ["city"])
     .index("by_type", ["type"])
-    .index("by_price", ["price"]),
+    .index("by_price", ["price"])
+    .index("by_bedrooms", ["bedrooms"])
+    .index("by_priceNumeric", ["priceNumeric"])
+    .searchIndex("search_all_fields", {
+      searchField: "searchAll",
+      filterFields: ["city", "type", "bedrooms", "priceNumeric"],
+    }),
 
   JobContactInfo: defineTable({
     name: v.optional(v.string()),

@@ -1,5 +1,11 @@
 // convex/listings.ts
-import { Id } from "./_generated/dataModel";
+import {
+  OrderedQuery,
+  paginationOptsValidator,
+  Query,
+  QueryInitializer,
+} from "convex/server";
+import { DataModel, Id } from "./_generated/dataModel";
 import { query } from "./_generated/server";
 import { v } from "convex/values";
 
@@ -35,14 +41,63 @@ export const getListingMetadata = query({
 });
 
 export const getListing = query({
-  args: {},
-  handler: async (ctx) => {
-    const listing = await ctx.db
-      .query("RealestateListing")
-      .order("desc")
-      .collect();
+  args: {
+    paginationOpts: paginationOptsValidator,
+    searchTerm: v.optional(v.string()),
+    type: v.optional(v.string()),
+    bedrooms: v.optional(v.number()),
+    minPrice: v.optional(v.number()),
+    maxPrice: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { searchTerm, type, bedrooms, minPrice, maxPrice } = args;
 
-    return listing;
+    // Étape 1 : table
+    const tableQuery: QueryInitializer<DataModel["RealestateListing"]> =
+      ctx.db.query("RealestateListing");
+
+    let orderedQuery: OrderedQuery<DataModel["RealestateListing"]>;
+
+    if (searchTerm && searchTerm.trim() !== "") {
+      // Étape 2+3 : search index (inclut déjà l’ordre)
+      orderedQuery = tableQuery.withSearchIndex("search_all_fields", (q) => {
+        let search = q.search("searchAll", searchTerm);
+        if (type && type !== "all") search = search.eq("type", type);
+        if (bedrooms && bedrooms > 0) search = search.eq("bedrooms", bedrooms);
+        return search;
+      });
+    } else {
+      // Étape 2 : index normal ou pas d’index
+      let indexedQuery: Query<DataModel["RealestateListing"]> = tableQuery;
+      if (type && type !== "all") {
+        indexedQuery = tableQuery.withIndex("by_type", (q) =>
+          q.eq("type", type),
+        );
+      }
+
+      // Étape 3 : ordre
+      orderedQuery = indexedQuery.order("desc");
+    }
+
+    // Étape 4 : filtres supplémentaires
+    const filtered = orderedQuery.filter((q) => {
+      let expr = q.eq(q.field("_id"), q.field("_id")); // toujours vrai
+
+      if (minPrice !== undefined) {
+        expr = q.and(expr, q.gte(q.field("priceNumeric"), minPrice));
+      }
+      if (maxPrice !== undefined) {
+        expr = q.and(expr, q.lte(q.field("priceNumeric"), maxPrice));
+      }
+      if (!searchTerm && bedrooms && bedrooms > 0) {
+        expr = q.and(expr, q.eq(q.field("bedrooms"), bedrooms));
+      }
+
+      return expr;
+    });
+
+    // Étape 5 : pagination
+    return filtered.paginate(args.paginationOpts);
   },
 });
 

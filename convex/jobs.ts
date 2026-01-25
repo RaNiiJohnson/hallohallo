@@ -42,8 +42,8 @@ export const getJobs = query({
     if (searchTerm) {
       const searchResult = ctx.db
         .query("JobOffer")
-        .withSearchIndex("search_title", (q) => {
-          let search = q.search("title", searchTerm);
+        .withSearchIndex("search_all_fields", (q) => {
+          let search = q.search("searchAll", searchTerm);
           if (type && type !== "all") search = search.eq("type", type);
           if (contractType && contractType !== "all")
             search = search.eq("contractType", contractType);

@@ -18,12 +18,30 @@ import { BookmarkButton } from "./bookmarkButton";
 import { ListingDetails, ListingDetailsContent } from "../ListingDetails";
 import { ListingListItem } from "@/lib/convexTypes";
 import { api } from "@convex/_generated/api";
-import { useQuery } from "convex-helpers/react/cache";
+import { usePaginatedQuery } from "convex-helpers/react/cache";
 import { ListingListSkeleton } from "../skeleton";
+import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
 
 export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
-  const listings = useQuery(api.listings.getListing);
+  const [filters] = useQueryStates({
+    search: parseAsString.withDefault(""),
+    type: parseAsString.withDefault(""),
+    bedrooms: parseAsInteger.withDefault(0),
+    minPrice: parseAsInteger.withDefault(0),
+    maxPrice: parseAsInteger.withDefault(0),
+  });
 
+  const { results: listings, status } = usePaginatedQuery(
+    api.listings.getListing,
+    {
+      searchTerm: filters.search,
+      type: filters.type,
+      bedrooms: filters.bedrooms,
+      minPrice: filters.minPrice > 0 ? filters.minPrice : undefined,
+      maxPrice: filters.maxPrice > 0 ? filters.maxPrice : undefined,
+    },
+    { initialNumItems: 5 },
+  );
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogListing, setDialogListing] = useState<ListingListItem | null>(
@@ -50,7 +68,7 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, [selectedId]);
 
-  if (!listings) {
+  if (status === "LoadingFirstPage") {
     return <ListingListSkeleton />;
   }
 
@@ -162,7 +180,7 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
         {selectedListing && isLargeScreen && (
           <div
             className={cn(
-              "lg:col-start-3 lg:row-start-1 sticky lg:row-span-10 top-24 h-fit max-h-[calc(100vh-3rem)] overflow-y-auto",
+              "lg:col-start-3 lg:row-start-1 sticky lg:row-span-10 top-48 h-fit max-h-[calc(100vh-3rem)] overflow-y-auto",
             )}
           >
             <ListingDetails
