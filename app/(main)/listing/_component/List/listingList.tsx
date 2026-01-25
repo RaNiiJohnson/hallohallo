@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { MapPin } from "lucide-react";
+import { Briefcase, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -19,8 +19,11 @@ import { ListingDetails, ListingDetailsContent } from "../ListingDetails";
 import { ListingListItem } from "@/lib/convexTypes";
 import { api } from "@convex/_generated/api";
 import { usePaginatedQuery } from "convex-helpers/react/cache";
-import { ListingListSkeleton } from "../skeleton";
+import { ListingItemsSkeleton, ListingListSkeleton } from "../skeleton";
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import clsx from "clsx";
 
 export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
   const [filters] = useQueryStates({
@@ -31,7 +34,11 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
     maxPrice: parseAsInteger.withDefault(0),
   });
 
-  const { results: listings, status } = usePaginatedQuery(
+  const {
+    results: listings,
+    status,
+    loadMore,
+  } = usePaginatedQuery(
     api.listings.getListing,
     {
       searchTerm: filters.search,
@@ -40,7 +47,7 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
       minPrice: filters.minPrice > 0 ? filters.minPrice : undefined,
       maxPrice: filters.maxPrice > 0 ? filters.maxPrice : undefined,
     },
-    { initialNumItems: 5 },
+    { initialNumItems: 3 },
   );
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -95,22 +102,30 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
     }
   };
 
-  // if (listing.length === 0) {
-  //   return (
-  //     <div className="text-center px-4">
-  //       <div className="max-w-md mx-auto">
-  //         <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-  //           <Briefcase className="h-8 w-8 text-muted-foreground" />
-  //         </div>
-  //         <h3 className="text-xl font-semibold mb-2">Aucune annonce trouvée</h3>
-  //         <p className="text-muted-foreground mb-6">
-  //           Essayez de modifier vos critères de recherche ou supprimez certains
-  //           filtres
-  //         </p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  if (listings.length === 0) {
+    return (
+      <div className="text-center px-4">
+        <div className="max-w-md mx-auto">
+          <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+            <Briefcase className="h-8 w-8 text-muted-foreground" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">Aucune annonce trouvée</h3>
+          <p className="text-muted-foreground mb-6">
+            Essayez de modifier vos critères de recherche ou supprimez certains
+            filtres
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  function loadMoreListings() {
+    if (status === "CanLoadMore") {
+      loadMore(3);
+    } else {
+      toast.info("Toutes les offres ont été chargées");
+    }
+  }
 
   return (
     <div
@@ -176,6 +191,7 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
           </Link>
         ))}
 
+        {status === "LoadingMore" && <ListingItemsSkeleton count={3} />}
         {/* Panel de détails pour écrans lg */}
         {selectedListing && isLargeScreen && (
           <div
@@ -212,6 +228,15 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
           {dialogListing && <ListingDetailsContent listing={dialogListing} />}
         </DialogContent>
       </Dialog>
+      <Button
+        variant="outline"
+        onClick={loadMoreListings}
+        className={clsx("mx-auto flex items-center mt-5", {
+          "cursor-not-allowed opacity-50": status !== "CanLoadMore",
+        })}
+      >
+        {status === "LoadingMore" ? "Chargement..." : "Voir plus d'annonces"}
+      </Button>
     </div>
   );
 }
