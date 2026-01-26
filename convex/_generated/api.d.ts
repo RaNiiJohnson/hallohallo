@@ -1205,6 +1205,43 @@ export declare const components: {
           userId?: null | string;
         }
       >;
+      updateUser: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          id: string;
+          patch: {
+            arrivalDate?: null | number;
+            bio?: null | string;
+            city?: null | string;
+            company?: null | string;
+            country?: null | string;
+            coverImage?: null | string;
+            createdAt?: number;
+            email?: string;
+            emailVerified?: boolean;
+            experienceYears?: null | number;
+            field?: null | string;
+            headline?: null | string;
+            image?: null | string;
+            industry?: null | string;
+            isPublic?: null | boolean;
+            isServiceProvider?: null | boolean;
+            journey?: null | Array<string>;
+            lastActiveAt?: null | number;
+            name?: string;
+            roles?: null | Array<string>;
+            showEmail?: null | boolean;
+            showPhone?: null | boolean;
+            skills?: null | Array<string>;
+            slug?: null | string;
+            status?: null | string;
+            updatedAt?: number;
+            userId?: null | string;
+          };
+        },
+        any
+      >;
     };
   };
 };

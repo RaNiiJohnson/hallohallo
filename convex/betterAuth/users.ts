@@ -1,7 +1,7 @@
-import { query } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import schema from "./schema";
-import { doc } from "convex-helpers/validators";
+import { doc, partial } from "convex-helpers/validators";
 
 export const getUserBySlug = query({
   args: { slug: v.string() },
@@ -12,5 +12,17 @@ export const getUserBySlug = query({
       .query("user")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .unique();
+  },
+});
+
+export const userValidator = schema.tables.user.validator;
+
+export const updateUser = mutation({
+  args: {
+    id: v.id("user"),
+    patch: partial(userValidator),
+  },
+  handler: async (ctx, { id, patch }) => {
+    await ctx.db.patch(id, patch);
   },
 });
