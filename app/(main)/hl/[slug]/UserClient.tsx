@@ -1,6 +1,7 @@
 // app/(main)/hl/[slug]/UserClient.tsx
 "use client";
 
+import { useState } from "react";
 import { api } from "@convex/_generated/api";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { useQuery } from "convex-helpers/react/cache";
@@ -16,6 +17,7 @@ import {
   GraduationCap,
   Pencil,
 } from "lucide-react";
+import { ImageUploadModal } from "./component/ImageUploadModal";
 
 export default function UserClient({
   preloadedUser,
@@ -24,6 +26,10 @@ export default function UserClient({
 }) {
   const user = usePreloadedQuery(preloadedUser);
   const currentUser = useQuery(api.auth.getCurrentUser);
+
+  // Modal states for image uploads - must be before early return
+  const [profileImageModalOpen, setProfileImageModalOpen] = useState(false);
+  const [coverImageModalOpen, setCoverImageModalOpen] = useState(false);
 
   if (!user) {
     return (
@@ -46,21 +52,6 @@ export default function UserClient({
     });
   };
 
-  // Format relative time
-  // const getRelativeTime = (timestamp: number | null | undefined) => {
-  //   if (!timestamp) return null;
-  //   const now = Date.now();
-  //   const diff = now - timestamp;
-  //   const minutes = Math.floor(diff / 60000);
-  //   const hours = Math.floor(diff / 3600000);
-  //   const days = Math.floor(diff / 86400000);
-
-  //   if (minutes < 60) return `Actif il y a ${minutes} min`;
-  //   if (hours < 24) return `Actif il y a ${hours}h`;
-  //   if (days < 7) return `Actif il y a ${days}j`;
-  //   return null;
-  // };
-
   return (
     <div className="lg:max-w-4xl mx-auto my-4 lg:space-y-4 sm:space-y-2 space-y-1.5 lg:px-0">
       {/* === HEADER SECTION === */}
@@ -68,15 +59,18 @@ export default function UserClient({
         {/* Cover Image */}
         <div className="relative">
           <Image
-            src={user.coverImage || "/default-cover.jpg"}
+            src={user.coverImageUrl || "/default-cover.jpg"}
             alt="Photo de couverture"
             height={200}
             width={800}
             priority
             className="w-full h-32 sm:h-40 lg:h-48 object-cover"
+            unoptimized={!!user.coverImageUrl}
           />
           {isOwnProfile && (
             <button
+              type="button"
+              onClick={() => setCoverImageModalOpen(true)}
               className="absolute top-3 right-3 bg-card/80 backdrop-blur-sm p-2 rounded-full hover:bg-card transition-colors"
               title="Modifier la photo de couverture"
             >
@@ -84,21 +78,23 @@ export default function UserClient({
             </button>
           )}
         </div>
-
         {/* Profile Info */}
         <div className="relative px-6 pb-6">
           {/* Avatar */}
           <div className="relative -mt-16 sm:-mt-20 mb-4">
             <div className="relative inline-block">
               <Image
-                src={user.image || "/random-user.png"}
+                src={user.imageUrl || "/random-user.png"}
                 alt={user.name || "Photo de profil"}
                 height={140}
                 width={140}
                 className="size-28 sm:size-36 object-cover rounded-full border-4 border-card"
+                unoptimized={!!user.imageUrl}
               />
               {isOwnProfile && (
                 <button
+                  type="button"
+                  onClick={() => setProfileImageModalOpen(true)}
                   className="absolute bottom-1 right-1 bg-primary p-2 rounded-full hover:bg-primary/90 transition-colors"
                   title="Modifier la photo de profil"
                 >
@@ -236,7 +232,7 @@ export default function UserClient({
                 <div>
                   <h3 className="font-medium">Rôles</h3>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {user.roles.map((role, index) => (
+                    {user.roles?.map((role: string, index: number) => (
                       <span
                         key={index}
                         className="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm"
@@ -286,7 +282,7 @@ export default function UserClient({
             )}
           </div>
           <div className="flex flex-wrap gap-2">
-            {user.skills.map((skill, index) => (
+            {user.skills?.map((skill: string, index: number) => (
               <span
                 key={index}
                 className="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium hover:bg-primary/20 transition-colors"
@@ -313,7 +309,7 @@ export default function UserClient({
             )}
           </div>
           <div className="flex flex-wrap gap-3">
-            {user.journey.map((step, index) => (
+            {user.journey?.map((step: string, index: number) => (
               <div key={index} className="flex items-center gap-2">
                 <span className="px-4 py-2 bg-secondary text-secondary-foreground lg:rounded-lg text-sm">
                   {step}
@@ -417,6 +413,22 @@ export default function UserClient({
             </div>
           </section>
         )}
+
+      {/* Image Upload Modals */}
+      <ImageUploadModal
+        userId={user._id}
+        imageType="profile"
+        open={profileImageModalOpen}
+        onOpenChange={setProfileImageModalOpen}
+        currentImageUrl={user.imageUrl}
+      />
+      <ImageUploadModal
+        userId={user._id}
+        imageType="cover"
+        open={coverImageModalOpen}
+        onOpenChange={setCoverImageModalOpen}
+        currentImageUrl={user.coverImageUrl}
+      />
     </div>
   );
 }

@@ -36,14 +36,14 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   city?: null | string;
                   company?: null | string;
                   country?: null | string;
-                  coverImage?: null | string;
+                  coverImage?: string;
                   createdAt: number;
                   email: string;
                   emailVerified: boolean;
                   experienceYears?: null | number;
                   field?: null | string;
                   headline?: null | string;
-                  image?: null | string;
+                  image?: string;
                   industry?: null | string;
                   isPublic?: null | boolean;
                   isServiceProvider?: null | boolean;
@@ -129,10 +129,10 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "email"
                     | "emailVerified"
                     | "image"
+                    | "coverImage"
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
-                    | "coverImage"
                     | "slug"
                     | "headline"
                     | "bio"
@@ -337,10 +337,10 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "email"
                     | "emailVerified"
                     | "image"
+                    | "coverImage"
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
-                    | "coverImage"
                     | "slug"
                     | "headline"
                     | "bio"
@@ -614,14 +614,14 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   city?: null | string;
                   company?: null | string;
                   country?: null | string;
-                  coverImage?: null | string;
+                  coverImage?: string;
                   createdAt?: number;
                   email?: string;
                   emailVerified?: boolean;
                   experienceYears?: null | number;
                   field?: null | string;
                   headline?: null | string;
-                  image?: null | string;
+                  image?: string;
                   industry?: null | string;
                   isPublic?: null | boolean;
                   isServiceProvider?: null | boolean;
@@ -644,10 +644,10 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "email"
                     | "emailVerified"
                     | "image"
+                    | "coverImage"
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
-                    | "coverImage"
                     | "slug"
                     | "headline"
                     | "bio"
@@ -887,14 +887,14 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   city?: null | string;
                   company?: null | string;
                   country?: null | string;
-                  coverImage?: null | string;
+                  coverImage?: string;
                   createdAt?: number;
                   email?: string;
                   emailVerified?: boolean;
                   experienceYears?: null | number;
                   field?: null | string;
                   headline?: null | string;
-                  image?: null | string;
+                  image?: string;
                   industry?: null | string;
                   isPublic?: null | boolean;
                   isServiceProvider?: null | boolean;
@@ -917,10 +917,10 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "email"
                     | "emailVerified"
                     | "image"
+                    | "coverImage"
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
-                    | "coverImage"
                     | "slug"
                     | "headline"
                     | "bio"
@@ -1145,37 +1145,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         "query",
         "internal",
         { slug: string },
-        null | {
-          _creationTime: number;
-          _id: string;
-          arrivalDate?: null | number;
-          bio?: null | string;
-          city?: null | string;
-          company?: null | string;
-          country?: null | string;
-          coverImage?: null | string;
-          createdAt: number;
-          email: string;
-          emailVerified: boolean;
-          experienceYears?: null | number;
-          field?: null | string;
-          headline?: null | string;
-          image?: null | string;
-          industry?: null | string;
-          isPublic?: null | boolean;
-          isServiceProvider?: null | boolean;
-          journey?: null | Array<string>;
-          lastActiveAt?: null | number;
-          name: string;
-          roles?: null | Array<string>;
-          showEmail?: null | boolean;
-          showPhone?: null | boolean;
-          skills?: null | Array<string>;
-          slug?: null | string;
-          status?: null | string;
-          updatedAt: number;
-          userId?: null | string;
-        },
+        any,
         Name
       >;
       updateUser: FunctionReference<
@@ -1189,14 +1159,14 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
             city?: null | string;
             company?: null | string;
             country?: null | string;
-            coverImage?: null | string;
+            coverImage?: string;
             createdAt?: number;
             email?: string;
             emailVerified?: boolean;
             experienceYears?: null | number;
             field?: null | string;
             headline?: null | string;
-            image?: null | string;
+            image?: string;
             industry?: null | string;
             isPublic?: null | boolean;
             isServiceProvider?: null | boolean;

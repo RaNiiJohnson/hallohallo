@@ -1,25 +1,56 @@
 import { mutation, query } from "./_generated/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { components } from "./_generated/api";
 import { authComponent, createAuth } from "./auth";
 import { partial } from "convex-helpers/validators";
-import { userValidator } from "./betterAuth/users";
+import { User, userValidator } from "./betterAuth/users";
+
+export type UserWithUrls = Omit<User, "image" | "coverImage"> & {
+  imageUrl?: string | null;
+  coverImageUrl?: string | null;
+};
 
 export const getUserBySlug = query({
   args: { slug: v.string() },
-  handler: async (ctx, { slug }) => {
-    return await ctx.runQuery(components.betterAuth.users.getUserBySlug, {
-      slug,
-    });
+  handler: async (ctx, { slug }): Promise<UserWithUrls | null> => {
+    // 1. Récupérer l'utilisateur via le composant
+    const user: User = await ctx.runQuery(
+      components.betterAuth.users.getUserBySlug,
+      {
+        slug,
+      },
+    );
+
+    if (!user) return null;
+
+    // 2. Résoudre les URLs, dans le contexte parent
+    const [imageUrl, coverImageUrl] = await Promise.all([
+      user.image ? ctx.storage.getUrl(user.image) : Promise.resolve(null),
+      user.coverImage
+        ? ctx.storage.getUrl(user.coverImage)
+        : Promise.resolve(null),
+    ]);
+
+    return {
+      ...user,
+      imageUrl,
+      coverImageUrl,
+    };
   },
 });
 
 export const updateUser = mutation({
   args: {
-    id: v.id("user"),
+    id: v.string(),
     patch: partial(userValidator.omit("createdAt", "updatedAt")),
   },
   handler: async (ctx, args) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+
+    if (!user) {
+      throw new ConvexError("Not authenticated");
+    }
+
     await ctx.runMutation(components.betterAuth.users.updateUser, args);
   },
 });
