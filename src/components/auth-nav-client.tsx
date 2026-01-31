@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import { ButtonGroup } from "./ui/button-group";
 import { Button } from "./ui/button";
 import Link from "next/link";
@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { LogOut } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarImage } from "./ui/avatar";
 import { Authenticated, Unauthenticated } from "convex/react";
 import { authClient } from "@/lib/auth-client";
 import { useQuery } from "convex-helpers/react/cache";
@@ -71,17 +71,10 @@ export function AuthNavClient() {
                     className="relative h-8 w-8 rounded-full"
                   >
                     <Avatar className="h-8 w-8">
-                      {user.imageUrl && (
-                        <AvatarImage
-                          src={user.imageUrl || ""}
-                          alt={user.name || ""}
-                        />
-                      )}
-                      <AvatarFallback>
-                        {user.name?.charAt(0)?.toUpperCase() ||
-                          user.email?.charAt(0)?.toUpperCase() ||
-                          "U"}
-                      </AvatarFallback>
+                      <AvatarImage
+                        src={user.imageUrl || "/random-user.png"}
+                        alt={user.name || ""}
+                      />
                     </Avatar>
                   </Button>
                   <span className="hidden sm:block text-sm font-medium">

@@ -48,9 +48,15 @@ export const getAllUsers = query({
       {},
     );
 
+    const currentUser = await authComponent.safeGetAuthUser(ctx);
+
+    const filtered = currentUser
+      ? users.filter((u) => u._id !== currentUser._id)
+      : users;
+
     // 2. Résoudre les URLs d’images dans ce contexte
     return Promise.all(
-      users.map(async (user) => {
+      filtered.map(async (user) => {
         const [imageUrl, coverImageUrl] = await Promise.all([
           user.image ? ctx.storage.getUrl(user.image) : Promise.resolve(null),
           user.coverImage
