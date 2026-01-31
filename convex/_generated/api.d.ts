@@ -1171,6 +1171,7 @@ export declare const components: {
       >;
     };
     users: {
+      getAllUsers: FunctionReference<"query", "internal", {}, any>;
       getUserBySlug: FunctionReference<
         "query",
         "internal",

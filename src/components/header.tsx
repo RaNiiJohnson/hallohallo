@@ -19,10 +19,7 @@ export function Header() {
 
   // Header transparent et fixe sur la page d'accueil, sticky sur les autres
   const isFixedHeaderPage =
-    pathname === "/" ||
-    pathname === "/jobs" ||
-    pathname === "/listing" ||
-    pathname === "/communities";
+    pathname === "/" || pathname === "/jobs" || pathname === "/listing";
   const headerClasses = isFixedHeaderPage
     ? "fixed top-0 z-50 w-full bg-transparent backdrop-blur-lg"
     : "sticky top-0 z-50 w-full bg-transparent backdrop-blur-lg";
@@ -74,16 +71,16 @@ export function Header() {
             className="relative"
           >
             <Link
-              href="/communities"
+              href="/community"
               className={`text-accent-foreground/60 font-medium transition-colors relative z-10 ${
-                pathname === "/communities"
+                pathname === "/community"
                   ? "text-foreground"
                   : "hover:text-foreground"
               }`}
             >
               Communauté
             </Link>
-            {pathname === "/communities" && (
+            {pathname === "/community" && (
               <motion.div
                 className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                 layoutId="activeTab"

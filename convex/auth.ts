@@ -6,6 +6,7 @@ import { query } from "./_generated/server";
 import { betterAuth, type BetterAuthOptions } from "better-auth/minimal";
 import authConfig from "./auth.config";
 import authSchema from "./betterAuth/schema";
+import { UserWithUrls } from "./users";
 
 const siteUrl = process.env.SITE_URL!;
 
@@ -28,6 +29,31 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: false,
+    },
+    databaseHooks: {
+      user: {
+        create: {
+          before: async (user) => {
+            const baseSlug = user.name
+              .toLowerCase()
+              .trim()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .replace(/\s+/g, "_")
+              .replace(/[^\w-]+/g, "")
+              .replace(/--+/g, "-");
+
+            const uniqueSlug = `${baseSlug}_${Math.random().toString(36).substring(2, 6)}`;
+
+            return {
+              data: {
+                ...user,
+                slug: uniqueSlug,
+              },
+            };
+          },
+        },
+      },
     },
     user: {
       additionalFields: {
@@ -152,13 +178,22 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
   return betterAuth(createAuthOptions(ctx));
 };
 
-// Example function for getting the current user
-// Feel free to edit, omit, etc.
 export const getCurrentUser = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx): Promise<UserWithUrls | null> => {
     const user = await authComponent.safeGetAuthUser(ctx);
-    // user === null si non authentifié, pas d’exception
-    return user;
+
+    if (!user) return null;
+    const [imageUrl, coverImageUrl] = await Promise.all([
+      user.image ? ctx.storage.getUrl(user.image) : Promise.resolve(null),
+      user.coverImage
+        ? ctx.storage.getUrl(user.coverImage)
+        : Promise.resolve(null),
+    ]);
+    return {
+      ...user,
+      imageUrl,
+      coverImageUrl,
+    };
   },
 });

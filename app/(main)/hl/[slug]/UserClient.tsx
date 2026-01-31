@@ -1,4 +1,3 @@
-// app/(main)/hl/[slug]/UserClient.tsx
 "use client";
 
 import { useState } from "react";
@@ -18,6 +17,7 @@ import {
   Pencil,
 } from "lucide-react";
 import { ImageUploadModal } from "./component/ImageUploadModal";
+import { notFound } from "next/navigation";
 
 export default function UserClient({
   preloadedUser,
@@ -32,13 +32,7 @@ export default function UserClient({
   const [coverImageModalOpen, setCoverImageModalOpen] = useState(false);
 
   if (!user) {
-    return (
-      <div className="max-w-4xl mx-auto my-8 p-8 text-center">
-        <h1 className="text-2xl font-semibold text-muted-foreground">
-          Utilisateur non trouvé
-        </h1>
-      </div>
-    );
+    return notFound();
   }
 
   const isOwnProfile = currentUser?.email === user.email;

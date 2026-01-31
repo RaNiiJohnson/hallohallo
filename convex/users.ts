@@ -39,6 +39,35 @@ export const getUserBySlug = query({
   },
 });
 
+export const getAllUsers = query({
+  args: {},
+  handler: async (ctx) => {
+    // 1. Récupérer les users via la query du composant betterAuth
+    const users: User[] = await ctx.runQuery(
+      components.betterAuth.users.getAllUsers,
+      {},
+    );
+
+    // 2. Résoudre les URLs d’images dans ce contexte
+    return Promise.all(
+      users.map(async (user) => {
+        const [imageUrl, coverImageUrl] = await Promise.all([
+          user.image ? ctx.storage.getUrl(user.image) : Promise.resolve(null),
+          user.coverImage
+            ? ctx.storage.getUrl(user.coverImage)
+            : Promise.resolve(null),
+        ]);
+
+        return {
+          ...user,
+          imageUrl,
+          coverImageUrl,
+        };
+      }),
+    );
+  },
+});
+
 export const updateUser = mutation({
   args: {
     id: v.string(),

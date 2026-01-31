@@ -1141,6 +1141,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
       >;
     };
     users: {
+      getAllUsers: FunctionReference<"query", "internal", {}, any, Name>;
       getUserBySlug: FunctionReference<
         "query",
         "internal",

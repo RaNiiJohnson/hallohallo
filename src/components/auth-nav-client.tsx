@@ -66,24 +66,24 @@ export function AuthNavClient() {
             <DropdownMenu open={open} onOpenChange={setOpen}>
               <DropdownMenuTrigger asChild>
                 <div className="flex items-center sm:space-x-2 hover:bg-accent rounded-lg sm:py-2 sm:px-4 transition-colors cursor-pointer">
-                  <Suspense>
-                    <Button
-                      variant="outline"
-                      className="relative h-8 w-8 rounded-full"
-                    >
-                      <Avatar className="h-8 w-8">
+                  <Button
+                    variant="outline"
+                    className="relative h-8 w-8 rounded-full"
+                  >
+                    <Avatar className="h-8 w-8">
+                      {user.imageUrl && (
                         <AvatarImage
-                          src={user.image || ""}
+                          src={user.imageUrl || ""}
                           alt={user.name || ""}
                         />
-                        <AvatarFallback>
-                          {user.name?.charAt(0)?.toUpperCase() ||
-                            user.email?.charAt(0)?.toUpperCase() ||
-                            "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </Suspense>
+                      )}
+                      <AvatarFallback>
+                        {user.name?.charAt(0)?.toUpperCase() ||
+                          user.email?.charAt(0)?.toUpperCase() ||
+                          "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
                   <span className="hidden sm:block text-sm font-medium">
                     {user.name || user.email}
                   </span>
