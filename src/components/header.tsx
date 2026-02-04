@@ -10,27 +10,23 @@ import { ThemeToggle } from "./theme-toggle";
 import { righteous } from "@/web/fonts";
 import { Logo } from "@/web/logo";
 import { AuthNavClient } from "./auth-nav-client";
-import { api } from "../../convex/_generated/api";
-import { useQuery } from "convex-helpers/react/cache";
+import { useConvexAuth } from "convex/react";
 
 export function Header() {
-  const user = useQuery(api.auth.getCurrentUser);
+  const { isAuthenticated } = useConvexAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
   // Header transparent et fixe sur la page d'accueil, sticky sur les autres
   const isFixedHeaderPage =
-    pathname === "/" ||
-    pathname === "/jobs" ||
-    pathname === "/communaute" ||
-    pathname === "/immobilier";
+    pathname === "/" || pathname === "/jobs" || pathname === "/listing";
   const headerClasses = isFixedHeaderPage
     ? "fixed top-0 z-50 w-full bg-transparent backdrop-blur-lg"
     : "sticky top-0 z-50 w-full bg-transparent backdrop-blur-lg";
 
   return (
     <header className={`${headerClasses} + h-16`}>
-      <div className="max-w-7xl mx-auto flex lg:gap-10 gap-2 items-center p-4 relative">
+      <div className="mx-auto flex lg:gap-10 gap-2 items-center p-4 relative">
         <Link
           href="/"
           className="flex items-center gap-2 text-lg text-primary font-bold hover:opacity-80 transition"
@@ -75,16 +71,16 @@ export function Header() {
             className="relative"
           >
             <Link
-              href="/communaute"
+              href="/community"
               className={`text-accent-foreground/60 font-medium transition-colors relative z-10 ${
-                pathname === "/communaute"
+                pathname === "/community"
                   ? "text-foreground"
                   : "hover:text-foreground"
               }`}
             >
               Communauté
             </Link>
-            {pathname === "/communaute" && (
+            {pathname === "/community" && (
               <motion.div
                 className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                 layoutId="activeTab"
@@ -131,16 +127,16 @@ export function Header() {
             className="relative"
           >
             <Link
-              href="/immobilier"
+              href="/listing"
               className={`text-accent-foreground/60 font-medium transition-colors relative z-10 ${
-                pathname === "/immobilier"
+                pathname === "/listing"
                   ? "text-foreground"
                   : "hover:text-foreground"
               }`}
             >
               Immobilier
             </Link>
-            {pathname === "/immobilier" && (
+            {pathname === "/listing" && (
               <motion.div
                 className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                 layoutId="activeTab"
@@ -152,7 +148,7 @@ export function Header() {
           </motion.div>
 
           {/* Premium - Hidden when not logged in */}
-          {user && (
+          {isAuthenticated && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -214,7 +210,7 @@ export function Header() {
         <span className="flex-1" />
 
         <div className="flex items-center sm:gap-4 gap-2">
-          <AuthNavClient user={user} />
+          <AuthNavClient />
           <ThemeToggle />
         </div>
       </div>
@@ -241,8 +237,8 @@ export function Header() {
                 { href: "/", label: "Accueil" },
                 { href: "/communaute", label: "Communauté" },
                 { href: "/jobs", label: "Opportunités" },
-                { href: "/immobilier", label: "Immobilier" },
-                ...(user
+                { href: "/listing", label: "Immobilier" },
+                ...(isAuthenticated
                   ? [{ href: "/pricing", label: "Passer au Premium" }]
                   : []),
               ].map((item, index) => (

@@ -13,6 +13,8 @@ import type * as bookmarks from "../bookmarks.js";
 import type * as http from "../http.js";
 import type * as jobs from "../jobs.js";
 import type * as listings from "../listings.js";
+import type * as upload from "../upload.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -26,6 +28,8 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   jobs: typeof jobs;
   listings: typeof listings;
+  upload: typeof upload;
+  users: typeof users;
 }>;
 
 /**
@@ -68,16 +72,26 @@ export declare const components: {
                   bio?: null | string;
                   city?: null | string;
                   company?: null | string;
+                  country?: null | string;
+                  coverImage?: string;
                   createdAt: number;
                   email: string;
                   emailVerified: boolean;
+                  experienceYears?: null | number;
                   field?: null | string;
-                  image?: null | string;
+                  headline?: null | string;
+                  image?: string;
+                  industry?: null | string;
+                  isPublic?: null | boolean;
                   isServiceProvider?: null | boolean;
                   journey?: null | Array<string>;
+                  lastActiveAt?: null | number;
                   name: string;
-                  photo?: null | string;
-                  roles?: null | string;
+                  roles?: null | Array<string>;
+                  showEmail?: null | boolean;
+                  showPhone?: null | boolean;
+                  skills?: null | Array<string>;
+                  slug?: null | string;
                   status?: null | string;
                   updatedAt: number;
                   userId?: null | string;
@@ -151,19 +165,29 @@ export declare const components: {
                     | "email"
                     | "emailVerified"
                     | "image"
+                    | "coverImage"
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
-                    | "photo"
+                    | "slug"
+                    | "headline"
                     | "bio"
                     | "city"
+                    | "country"
+                    | "industry"
                     | "roles"
                     | "company"
-                    | "arrivalDate"
-                    | "status"
                     | "field"
+                    | "skills"
+                    | "experienceYears"
+                    | "arrivalDate"
                     | "journey"
+                    | "status"
                     | "isServiceProvider"
+                    | "isPublic"
+                    | "showEmail"
+                    | "showPhone"
+                    | "lastActiveAt"
                     | "_id";
                   operator?:
                     | "lt"
@@ -348,19 +372,29 @@ export declare const components: {
                     | "email"
                     | "emailVerified"
                     | "image"
+                    | "coverImage"
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
-                    | "photo"
+                    | "slug"
+                    | "headline"
                     | "bio"
                     | "city"
+                    | "country"
+                    | "industry"
                     | "roles"
                     | "company"
-                    | "arrivalDate"
-                    | "status"
                     | "field"
+                    | "skills"
+                    | "experienceYears"
+                    | "arrivalDate"
                     | "journey"
+                    | "status"
                     | "isServiceProvider"
+                    | "isPublic"
+                    | "showEmail"
+                    | "showPhone"
+                    | "lastActiveAt"
                     | "_id";
                   operator?:
                     | "lt"
@@ -611,16 +645,26 @@ export declare const components: {
                   bio?: null | string;
                   city?: null | string;
                   company?: null | string;
+                  country?: null | string;
+                  coverImage?: string;
                   createdAt?: number;
                   email?: string;
                   emailVerified?: boolean;
+                  experienceYears?: null | number;
                   field?: null | string;
-                  image?: null | string;
+                  headline?: null | string;
+                  image?: string;
+                  industry?: null | string;
+                  isPublic?: null | boolean;
                   isServiceProvider?: null | boolean;
                   journey?: null | Array<string>;
+                  lastActiveAt?: null | number;
                   name?: string;
-                  photo?: null | string;
-                  roles?: null | string;
+                  roles?: null | Array<string>;
+                  showEmail?: null | boolean;
+                  showPhone?: null | boolean;
+                  skills?: null | Array<string>;
+                  slug?: null | string;
                   status?: null | string;
                   updatedAt?: number;
                   userId?: null | string;
@@ -632,19 +676,29 @@ export declare const components: {
                     | "email"
                     | "emailVerified"
                     | "image"
+                    | "coverImage"
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
-                    | "photo"
+                    | "slug"
+                    | "headline"
                     | "bio"
                     | "city"
+                    | "country"
+                    | "industry"
                     | "roles"
                     | "company"
-                    | "arrivalDate"
-                    | "status"
                     | "field"
+                    | "skills"
+                    | "experienceYears"
+                    | "arrivalDate"
                     | "journey"
+                    | "status"
                     | "isServiceProvider"
+                    | "isPublic"
+                    | "showEmail"
+                    | "showPhone"
+                    | "lastActiveAt"
                     | "_id";
                   operator?:
                     | "lt"
@@ -863,16 +917,26 @@ export declare const components: {
                   bio?: null | string;
                   city?: null | string;
                   company?: null | string;
+                  country?: null | string;
+                  coverImage?: string;
                   createdAt?: number;
                   email?: string;
                   emailVerified?: boolean;
+                  experienceYears?: null | number;
                   field?: null | string;
-                  image?: null | string;
+                  headline?: null | string;
+                  image?: string;
+                  industry?: null | string;
+                  isPublic?: null | boolean;
                   isServiceProvider?: null | boolean;
                   journey?: null | Array<string>;
+                  lastActiveAt?: null | number;
                   name?: string;
-                  photo?: null | string;
-                  roles?: null | string;
+                  roles?: null | Array<string>;
+                  showEmail?: null | boolean;
+                  showPhone?: null | boolean;
+                  skills?: null | Array<string>;
+                  slug?: null | string;
                   status?: null | string;
                   updatedAt?: number;
                   userId?: null | string;
@@ -884,19 +948,29 @@ export declare const components: {
                     | "email"
                     | "emailVerified"
                     | "image"
+                    | "coverImage"
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
-                    | "photo"
+                    | "slug"
+                    | "headline"
                     | "bio"
                     | "city"
+                    | "country"
+                    | "industry"
                     | "roles"
                     | "company"
-                    | "arrivalDate"
-                    | "status"
                     | "field"
+                    | "skills"
+                    | "experienceYears"
+                    | "arrivalDate"
                     | "journey"
+                    | "status"
                     | "isServiceProvider"
+                    | "isPublic"
+                    | "showEmail"
+                    | "showPhone"
+                    | "lastActiveAt"
                     | "_id";
                   operator?:
                     | "lt"
@@ -1092,6 +1166,52 @@ export declare const components: {
                 }>;
               };
           onUpdateHandle?: string;
+        },
+        any
+      >;
+    };
+    users: {
+      getAllUsers: FunctionReference<"query", "internal", {}, any>;
+      getUserBySlug: FunctionReference<
+        "query",
+        "internal",
+        { slug: string },
+        any
+      >;
+      updateUser: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          id: string;
+          patch: {
+            arrivalDate?: null | number;
+            bio?: null | string;
+            city?: null | string;
+            company?: null | string;
+            country?: null | string;
+            coverImage?: string;
+            createdAt?: number;
+            email?: string;
+            emailVerified?: boolean;
+            experienceYears?: null | number;
+            field?: null | string;
+            headline?: null | string;
+            image?: string;
+            industry?: null | string;
+            isPublic?: null | boolean;
+            isServiceProvider?: null | boolean;
+            journey?: null | Array<string>;
+            lastActiveAt?: null | number;
+            name?: string;
+            roles?: null | Array<string>;
+            showEmail?: null | boolean;
+            showPhone?: null | boolean;
+            skills?: null | Array<string>;
+            slug?: null | string;
+            status?: null | string;
+            updatedAt?: number;
+            userId?: null | string;
+          };
         },
         any
       >;

@@ -18,11 +18,12 @@ export default defineSchema({
   JobOffer: defineTable({
     title: v.string(),
     type: v.string(),
+    slug: v.optional(v.string()),
     location: v.optional(
       v.object({
         lat: v.number(),
         lng: v.number(),
-      })
+      }),
     ),
     contractType: v.string(),
     city: v.string(),
@@ -33,23 +34,31 @@ export default defineSchema({
     certificates: v.array(v.string()),
     salary: v.string(),
     authorId: v.string(),
+    authorName: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
+    searchAll: v.optional(v.string()),
   })
     .index("by_authorId", ["authorId"])
     .index("by_city", ["city"])
     .index("by_type", ["type"])
     .index("by_contract", ["contractType"])
-    .index("by_salary", ["salary"]),
+    .index("by_salary", ["salary"])
+    .index("by_slug", ["slug"])
+    .searchIndex("search_all_fields", {
+      searchField: "searchAll",
+      filterFields: ["city", "type", "contractType"],
+    }),
 
   RealestateListing: defineTable({
     title: v.string(),
     type: v.string(),
+    slug: v.optional(v.string()),
     location: v.optional(
       v.object({
         lat: v.number(),
         lng: v.number(),
-      })
+      }),
     ),
     city: v.string(),
     district: v.string(),
@@ -67,13 +76,22 @@ export default defineSchema({
     extras: v.array(v.string()),
     available: v.optional(v.number()),
     authorId: v.string(),
+    authorName: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
+    searchAll: v.optional(v.string()),
   })
     .index("by_authorId", ["authorId"])
     .index("by_city", ["city"])
     .index("by_type", ["type"])
-    .index("by_price", ["price"]),
+    .index("by_price", ["price"])
+    .index("by_bedrooms", ["bedrooms"])
+    .index("by_priceNumeric", ["priceNumeric"])
+    .index("by_slug", ["slug"])
+    .searchIndex("search_all_fields", {
+      searchField: "searchAll",
+      filterFields: ["city", "type", "bedrooms", "priceNumeric"],
+    }),
 
   JobContactInfo: defineTable({
     name: v.optional(v.string()),

@@ -26,12 +26,10 @@ import {
 } from "lucide-react";
 import { Suspense } from "react";
 import { cn } from "@/lib/utils";
-
 import { Highlighter } from "@/components/ui/highlighter";
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { useConvexAuth } from "convex/react";
-import clsx from "clsx";
 import PricingPage from "@/components/pricing";
 
 const reviews = [
@@ -61,7 +59,7 @@ const reviews = [
     title: "Engagement",
     titleAccordion: "Notre Engagement",
     description:
-      "Offrir une solution pratique pour faciliter l’épanouissement de chaque membre, en simplifiant son quotidien et en ouvrant des opportunités.",
+      "Offrir une solution pratique pour faciliter l'épanouissement de chaque membre, en simplifiant son quotidien et en ouvrant des opportunités.",
   },
   {
     icon: "Sparkles",
@@ -90,13 +88,17 @@ function HomePageContent() {
             Madagascar.
           </p>
 
-          {isAuthenticated ? (
-            <div
-              className={clsx(
-                "space-y-4",
-                isLoading ? "opacity-0" : "opacity-100"
-              )}
+          {isLoading ? (
+            <Link
+              href="/"
+              className="z-10 opacity-0 flex items-center justify-center"
             >
+              <InteractiveHoverButton className="bg-card/90 shadow-sm hover:shadow-xl">
+                ...
+              </InteractiveHoverButton>
+            </Link>
+          ) : isAuthenticated ? (
+            <div className="space-y-4 opacity-100">
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   href="/communaute"
@@ -104,7 +106,7 @@ function HomePageContent() {
                 >
                   <div
                     className={cn(
-                      "group rounded-full border border-border bg-card/90 text-base text-card-foreground transition-all ease-in hover:cursor-pointer hover:bg-accent/80 backdrop-blur-sm shadow-sm hover:shadow-xl"
+                      "group rounded-full border border-border bg-card/90 text-base text-card-foreground transition-all ease-in hover:cursor-pointer hover:bg-accent/80 backdrop-blur-sm shadow-sm hover:shadow-xl",
                     )}
                   >
                     <AnimatedShinyText className="inline-flex items-center justify-center px-6 py-3 transition ease-out hover:text-accent-foreground hover:duration-300">
@@ -118,7 +120,7 @@ function HomePageContent() {
             </div>
           ) : (
             <Link
-              href="/signin"
+              href="/login"
               className="z-10 flex items-center justify-center"
             >
               <InteractiveHoverButton className="bg-card/90 shadow-sm hover:shadow-xl">
@@ -209,7 +211,7 @@ function HomePageContent() {
                   className="w-full justify-start pl-0 hover:bg-transparent hover:text-primary group"
                 >
                   <Link
-                    href="/immobilier"
+                    href="/listing"
                     className="inline-flex items-center gap-2"
                   >
                     Voir les annonces

@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import * as z from "zod";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 import {
   Field,
@@ -28,6 +27,12 @@ import {
 } from "@/components/ui/input-group";
 
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -35,9 +40,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChevronLeft, ChevronRight, XIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, XIcon, CalendarIcon } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import { useMutation } from "convex/react";
+import { api } from "@convex/_generated/api";
+import { LocationPicker } from "./LocationPicker";
 
 const jobTypes = [
   "Au pair",
@@ -59,10 +67,15 @@ const contractTypes = [
   "Freelance",
   "Apprentissage",
 ];
-
 const formSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
   type: z.string().min(1, "Le type d'offre est requis"),
+  location: z
+    .object({
+      lat: z.number(),
+      lng: z.number(),
+    })
+    .optional(),
   contractType: z.string().min(1, "Le type de contrat est requis"),
   city: z.string().min(1, "La ville est requise"),
   duration: z.string().min(1, "La durée est requise"),
@@ -75,12 +88,11 @@ const formSchema = z.object({
     .array(
       z.object({
         certificate: z.string(),
-      })
+      }),
     )
     .min(1, "Ajoutez au moins un certificat.")
     .max(5, "Vous pouvez ajouter jusqu'à 5 certificats."),
   salary: z.string().min(1, "Le salaire est requis"),
-  contact: z.string().min(1, "Les informations de contact sont requises"),
 });
 
 interface JobOfferFormProps {
@@ -88,8 +100,9 @@ interface JobOfferFormProps {
 }
 
 export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
+  const createJob = useMutation(api.jobs.createJob);
   const [currentStep, setCurrentStep] = useState(1);
-  const router = useRouter();
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -102,9 +115,8 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
       startDate: "",
       company: "",
       description: "",
-      certificates: [{ certificate: "" }],
+      certificates: [],
       salary: "",
-      contact: "",
     },
   });
 
@@ -140,7 +152,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
         ];
         break;
       case 3:
-        fieldsToValidate = ["description", "contact"];
+        fieldsToValidate = ["description"];
         break;
       case 4:
         fieldsToValidate = ["certificates"];
@@ -159,22 +171,28 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
     }
   };
 
-  async function onSubmit(data: z.infer<typeof formSchema>) {
+  function onSubmit(data: z.infer<typeof formSchema>) {
     try {
-      // await client.jobOffer.createJobOffer({
-      //   ...data,
-      //   certificates:
-      //     data.certificates
-      //       ?.map((cert) => cert.certificate)
-      //       .filter((cert) => cert.trim() !== "") || [],
-      // });
-
+      createJob({
+        title: data.title,
+        type: data.type,
+        location: data.location,
+        contractType: data.contractType,
+        city: data.city,
+        duration: data.duration,
+        startDate: data.startDate,
+        company: data.company,
+        description: data.description,
+        certificates:
+          data.certificates
+            ?.map((cert) => cert.certificate)
+            .filter((cert) => cert.trim() !== "") || [],
+        salary: data.salary,
+      });
       toast.success("Offre créée avec succès");
       form.reset();
-      router.refresh();
       onSuccess?.();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+    } catch {
       toast.success("Erreur lors de la création de l'offre");
     }
   }
@@ -316,12 +334,12 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="job-city">Ville *</FieldLabel>
+                <FieldLabel htmlFor="job-city">Ville / Localité *</FieldLabel>
                 <Input
                   {...field}
                   id="job-city"
                   aria-invalid={fieldState.invalid}
-                  placeholder="Berlin, Munich, Hamburg..."
+                  placeholder="Ex: Königstein im Taunus, Hesse"
                   autoComplete="off"
                 />
                 {fieldState.invalid && (
@@ -331,25 +349,81 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             )}
           />
 
+          {/* Location Map Picker */}
+          <Controller
+            name="location"
+            control={form.control}
+            render={({ field }) => (
+              <Field>
+                <FieldLabel>Position sur la carte (optionnel)</FieldLabel>
+                <FieldDescription>
+                  Cliquez sur la carte pour indiquer la position exacte du
+                  poste. La ville sera mise à jour automatiquement.
+                </FieldDescription>
+                <LocationPicker
+                  value={field.value}
+                  onChange={field.onChange}
+                  onCityChange={(city) => form.setValue("city", city)}
+                />
+              </Field>
+            )}
+          />
           <Controller
             name="startDate"
             control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="job-start-date">
-                  Date de début *
-                </FieldLabel>
-                <Input
-                  {...field}
-                  id="job-start-date"
-                  type="date"
-                  aria-invalid={fieldState.invalid}
-                />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
+            render={({ field, fieldState }) => {
+              // Parse the string date to Date object for calendar
+              const selectedDate = field.value
+                ? new Date(field.value)
+                : undefined;
+
+              return (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="job-start-date">
+                    Date de début *
+                  </FieldLabel>
+                  <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        id="job-start-date"
+                        className="w-full justify-between font-normal"
+                        aria-invalid={fieldState.invalid}
+                      >
+                        {selectedDate
+                          ? selectedDate.toLocaleDateString("fr-FR", {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                            })
+                          : "Sélectionner une date"}
+                        <CalendarIcon className="h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="w-auto overflow-hidden p-0"
+                      align="start"
+                    >
+                      <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        captionLayout="dropdown"
+                        onSelect={(date) => {
+                          if (date) {
+                            // Store as ISO string for the form
+                            field.onChange(date.toISOString().split("T")[0]);
+                          }
+                          setCalendarOpen(false);
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              );
+            }}
           />
 
           <Controller
@@ -358,7 +432,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             render={({ field, fieldState }) => {
               // Parse existing salary value with better null handling
               const parseExistingSalary = (
-                value: string | null | undefined
+                value: string | null | undefined,
               ) => {
                 if (!value || typeof value !== "string") {
                   return { amount: "", period: "" };
@@ -518,32 +592,6 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
                 </InputGroup>
                 <FieldDescription>
                   Décrivez le poste, les missions et les compétences requises
-                </FieldDescription>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-
-          <Controller
-            name="contact"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="job-contact">Contact *</FieldLabel>
-                <InputGroup>
-                  <InputGroupTextarea
-                    {...field}
-                    id="job-contact"
-                    placeholder="Email, téléphone, ou autres informations de contact..."
-                    rows={3}
-                    className="min-h-20 resize-none"
-                    aria-invalid={fieldState.invalid}
-                  />
-                </InputGroup>
-                <FieldDescription>
-                  Indiquez comment les candidats peuvent vous contacter
                 </FieldDescription>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />

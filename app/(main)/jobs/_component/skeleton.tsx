@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function EmploisFiltersSkeleton() {
+export function JobFiltersSkeleton() {
   return (
     <div className="space-y-4 max-w-3xl mx-auto">
       {/* Barre de recherche skeleton */}
@@ -23,15 +23,15 @@ export function EmploisFiltersSkeleton() {
   );
 }
 
-export function EmploisPageSkeleton() {
+export function JobPageSkeleton() {
   return (
     <>
-      <EmploisFiltersSkeleton />
+      {/* <JobFiltersSkeleton />
 
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 my-8">
         <Skeleton className="h-8 w-32" />
         <Skeleton className="h-10 w-40" />
-      </div>
+      </div> */}
 
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (

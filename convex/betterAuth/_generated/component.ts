@@ -35,16 +35,26 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   bio?: null | string;
                   city?: null | string;
                   company?: null | string;
+                  country?: null | string;
+                  coverImage?: string;
                   createdAt: number;
                   email: string;
                   emailVerified: boolean;
+                  experienceYears?: null | number;
                   field?: null | string;
-                  image?: null | string;
+                  headline?: null | string;
+                  image?: string;
+                  industry?: null | string;
+                  isPublic?: null | boolean;
                   isServiceProvider?: null | boolean;
                   journey?: null | Array<string>;
+                  lastActiveAt?: null | number;
                   name: string;
-                  photo?: null | string;
-                  roles?: null | string;
+                  roles?: null | Array<string>;
+                  showEmail?: null | boolean;
+                  showPhone?: null | boolean;
+                  skills?: null | Array<string>;
+                  slug?: null | string;
                   status?: null | string;
                   updatedAt: number;
                   userId?: null | string;
@@ -119,19 +129,29 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "email"
                     | "emailVerified"
                     | "image"
+                    | "coverImage"
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
-                    | "photo"
+                    | "slug"
+                    | "headline"
                     | "bio"
                     | "city"
+                    | "country"
+                    | "industry"
                     | "roles"
                     | "company"
-                    | "arrivalDate"
-                    | "status"
                     | "field"
+                    | "skills"
+                    | "experienceYears"
+                    | "arrivalDate"
                     | "journey"
+                    | "status"
                     | "isServiceProvider"
+                    | "isPublic"
+                    | "showEmail"
+                    | "showPhone"
+                    | "lastActiveAt"
                     | "_id";
                   operator?:
                     | "lt"
@@ -317,19 +337,29 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "email"
                     | "emailVerified"
                     | "image"
+                    | "coverImage"
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
-                    | "photo"
+                    | "slug"
+                    | "headline"
                     | "bio"
                     | "city"
+                    | "country"
+                    | "industry"
                     | "roles"
                     | "company"
-                    | "arrivalDate"
-                    | "status"
                     | "field"
+                    | "skills"
+                    | "experienceYears"
+                    | "arrivalDate"
                     | "journey"
+                    | "status"
                     | "isServiceProvider"
+                    | "isPublic"
+                    | "showEmail"
+                    | "showPhone"
+                    | "lastActiveAt"
                     | "_id";
                   operator?:
                     | "lt"
@@ -583,16 +613,26 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   bio?: null | string;
                   city?: null | string;
                   company?: null | string;
+                  country?: null | string;
+                  coverImage?: string;
                   createdAt?: number;
                   email?: string;
                   emailVerified?: boolean;
+                  experienceYears?: null | number;
                   field?: null | string;
-                  image?: null | string;
+                  headline?: null | string;
+                  image?: string;
+                  industry?: null | string;
+                  isPublic?: null | boolean;
                   isServiceProvider?: null | boolean;
                   journey?: null | Array<string>;
+                  lastActiveAt?: null | number;
                   name?: string;
-                  photo?: null | string;
-                  roles?: null | string;
+                  roles?: null | Array<string>;
+                  showEmail?: null | boolean;
+                  showPhone?: null | boolean;
+                  skills?: null | Array<string>;
+                  slug?: null | string;
                   status?: null | string;
                   updatedAt?: number;
                   userId?: null | string;
@@ -604,19 +644,29 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "email"
                     | "emailVerified"
                     | "image"
+                    | "coverImage"
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
-                    | "photo"
+                    | "slug"
+                    | "headline"
                     | "bio"
                     | "city"
+                    | "country"
+                    | "industry"
                     | "roles"
                     | "company"
-                    | "arrivalDate"
-                    | "status"
                     | "field"
+                    | "skills"
+                    | "experienceYears"
+                    | "arrivalDate"
                     | "journey"
+                    | "status"
                     | "isServiceProvider"
+                    | "isPublic"
+                    | "showEmail"
+                    | "showPhone"
+                    | "lastActiveAt"
                     | "_id";
                   operator?:
                     | "lt"
@@ -836,16 +886,26 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   bio?: null | string;
                   city?: null | string;
                   company?: null | string;
+                  country?: null | string;
+                  coverImage?: string;
                   createdAt?: number;
                   email?: string;
                   emailVerified?: boolean;
+                  experienceYears?: null | number;
                   field?: null | string;
-                  image?: null | string;
+                  headline?: null | string;
+                  image?: string;
+                  industry?: null | string;
+                  isPublic?: null | boolean;
                   isServiceProvider?: null | boolean;
                   journey?: null | Array<string>;
+                  lastActiveAt?: null | number;
                   name?: string;
-                  photo?: null | string;
-                  roles?: null | string;
+                  roles?: null | Array<string>;
+                  showEmail?: null | boolean;
+                  showPhone?: null | boolean;
+                  skills?: null | Array<string>;
+                  slug?: null | string;
                   status?: null | string;
                   updatedAt?: number;
                   userId?: null | string;
@@ -857,19 +917,29 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "email"
                     | "emailVerified"
                     | "image"
+                    | "coverImage"
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
-                    | "photo"
+                    | "slug"
+                    | "headline"
                     | "bio"
                     | "city"
+                    | "country"
+                    | "industry"
                     | "roles"
                     | "company"
-                    | "arrivalDate"
-                    | "status"
                     | "field"
+                    | "skills"
+                    | "experienceYears"
+                    | "arrivalDate"
                     | "journey"
+                    | "status"
                     | "isServiceProvider"
+                    | "isPublic"
+                    | "showEmail"
+                    | "showPhone"
+                    | "lastActiveAt"
                     | "_id";
                   operator?:
                     | "lt"
@@ -1065,6 +1135,54 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                 }>;
               };
           onUpdateHandle?: string;
+        },
+        any,
+        Name
+      >;
+    };
+    users: {
+      getAllUsers: FunctionReference<"query", "internal", {}, any, Name>;
+      getUserBySlug: FunctionReference<
+        "query",
+        "internal",
+        { slug: string },
+        any,
+        Name
+      >;
+      updateUser: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          id: string;
+          patch: {
+            arrivalDate?: null | number;
+            bio?: null | string;
+            city?: null | string;
+            company?: null | string;
+            country?: null | string;
+            coverImage?: string;
+            createdAt?: number;
+            email?: string;
+            emailVerified?: boolean;
+            experienceYears?: null | number;
+            field?: null | string;
+            headline?: null | string;
+            image?: string;
+            industry?: null | string;
+            isPublic?: null | boolean;
+            isServiceProvider?: null | boolean;
+            journey?: null | Array<string>;
+            lastActiveAt?: null | number;
+            name?: string;
+            roles?: null | Array<string>;
+            showEmail?: null | boolean;
+            showPhone?: null | boolean;
+            skills?: null | Array<string>;
+            slug?: null | string;
+            status?: null | string;
+            updatedAt?: number;
+            userId?: null | string;
+          };
         },
         any,
         Name

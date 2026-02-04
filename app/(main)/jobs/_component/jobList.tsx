@@ -1,20 +1,41 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Briefcase, MapPin, Clock } from "lucide-react";
-import { PublishJobDialog } from "./dialogs/publishJobDialog";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { SalaryDisplay } from "./salary";
-import type { AuthUser, JobOfferListItem } from "@/lib/convexTypes";
 import { getRelativeTime } from "@/lib/date";
+import { JobPageSkeleton } from "./skeleton";
+import { api } from "@convex/_generated/api";
+import { usePaginatedQuery } from "convex-helpers/react/cache";
+import { parseAsString, useQueryStates } from "nuqs";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import clsx from "clsx";
 
-interface JobListProps {
-  jobs: JobOfferListItem[];
-  user: AuthUser | null | undefined;
-}
+export function JobList() {
+  const [filters] = useQueryStates({
+    search: parseAsString,
+    type: parseAsString,
+    contract: parseAsString,
+  });
+  const {
+    results: jobs,
+    status,
+    loadMore,
+  } = usePaginatedQuery(
+    api.jobs.getJobs,
+    {
+      contractType: filters.contract || undefined,
+      searchTerm: filters.search || undefined,
+      type: filters.type || undefined,
+    },
+    { initialNumItems: 5 },
+  );
 
-export function JobList({ jobs, user }: JobListProps) {
+  if (status === "LoadingFirstPage") {
+    return <JobPageSkeleton />;
+  }
   if (jobs.length === 0) {
     return (
       <div className="text-center px-4">
@@ -27,12 +48,17 @@ export function JobList({ jobs, user }: JobListProps) {
             Essayez de modifier vos critères de recherche ou supprimez certains
             filtres
           </p>
-          {user && (
-            <PublishJobDialog trigger={<Button>Publier une offre</Button>} />
-          )}
         </div>
       </div>
     );
+  }
+
+  function loadMoreJobs() {
+    if (status === "CanLoadMore") {
+      loadMore(1);
+    } else {
+      toast.info("Toutes les offres ont été chargées");
+    }
   }
 
   return (
@@ -94,7 +120,7 @@ export function JobList({ jobs, user }: JobListProps) {
               {/* Date */}
               <div className="flex flex-col items-end gap-1">
                 <div className="text-xs text-muted-foreground whitespace-nowrap">
-                  {getRelativeTime(job.createdAt)}
+                  {getRelativeTime(job._creationTime)}
                 </div>
                 {/* {user && (
                   // <JobBookmarkButton
@@ -107,6 +133,15 @@ export function JobList({ jobs, user }: JobListProps) {
           </div>
         </Link>
       ))}
+      <Button
+        variant="outline"
+        onClick={loadMoreJobs}
+        className={clsx("mx-auto flex items-center mt-5", {
+          "cursor-not-allowed opacity-50": status !== "CanLoadMore",
+        })}
+      >
+        {status === "LoadingMore" ? "Chargement..." : "Voir plus d'offres"}
+      </Button>
     </div>
   );
 }
