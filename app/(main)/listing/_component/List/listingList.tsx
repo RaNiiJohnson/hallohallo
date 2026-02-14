@@ -182,7 +182,7 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
               <h3 className="font-semibold mb-1 line-clamp-1">{list.title}</h3>
               <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
                 <MapPin className="size-3" />
-                {list.city} - {list.district}
+                {list.city}
               </div>
               <div className="font-bold">
                 <PriceDisplay price={list.price} className="text-primary" />

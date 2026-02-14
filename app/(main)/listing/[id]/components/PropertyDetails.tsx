@@ -55,9 +55,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
             <h1 className="text-2xl sm:text-3xl font-bold">{property.title}</h1>
             <div className="flex items-center gap-2 text-muted-foreground mt-2">
               <MapPin className="h-4 w-4 hrink-0" />
-              <span className="text-sm sm:text-base">
-                {property.city} - {property.district}
-              </span>
+              <span className="text-sm sm:text-base">{property.city}</span>
             </div>
             <Badge variant="secondary" className="mt-2">
               {property.type}

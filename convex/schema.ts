@@ -52,7 +52,15 @@ export default defineSchema({
 
   RealestateListing: defineTable({
     title: v.string(),
-    type: v.string(),
+    propertyType: v.union(
+      v.literal("room"),
+      v.literal("apartment"),
+      v.literal("house"),
+      v.literal("studio"),
+      v.literal("shared"),
+      v.literal("all"),
+    ),
+    listingMode: v.union(v.literal("rent"), v.literal("sale")),
     slug: v.optional(v.string()),
     location: v.optional(
       v.object({
@@ -61,36 +69,53 @@ export default defineSchema({
       }),
     ),
     city: v.string(),
-    district: v.string(),
-    price: v.string(),
-    priceNumeric: v.optional(v.number()),
-    deposit: v.string(),
+
+    price: v.number(),
+    charges: v.optional(v.number()),
+    deposit: v.optional(v.number()),
+    currency: v.literal("EUR"),
+    period: v.optional(v.literal("month")),
+
     area: v.number(),
     bedrooms: v.number(),
     bathrooms: v.number(),
     floor: v.number(),
     pets: v.boolean(),
-    photos: v.array(v.string()),
-    coverPhoto: v.string(),
+
+    images: v.optional(
+      v.array(
+        v.object({
+          publicId: v.string(),
+          secureUrl: v.string(),
+        }),
+      ),
+    ),
     description: v.string(),
     extras: v.array(v.string()),
-    available: v.optional(v.number()),
+
+    availableFrom: v.optional(v.number()),
+
     authorId: v.string(),
     authorName: v.optional(v.string()),
-    createdAt: v.number(),
     updatedAt: v.number(),
     searchAll: v.optional(v.string()),
   })
     .index("by_authorId", ["authorId"])
     .index("by_city", ["city"])
-    .index("by_type", ["type"])
+    .index("by_propertyType", ["propertyType"])
+    .index("by_listingMode", ["listingMode"])
     .index("by_price", ["price"])
     .index("by_bedrooms", ["bedrooms"])
-    .index("by_priceNumeric", ["priceNumeric"])
     .index("by_slug", ["slug"])
     .searchIndex("search_all_fields", {
       searchField: "searchAll",
-      filterFields: ["city", "type", "bedrooms", "priceNumeric"],
+      filterFields: [
+        "city",
+        "propertyType",
+        "listingMode",
+        "bedrooms",
+        "price",
+      ],
     }),
 
   JobContactInfo: defineTable({

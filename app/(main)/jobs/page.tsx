@@ -17,7 +17,7 @@ export default function JobsPage() {
         title="Votre avenir en Allemagne commence ici"
         subtitle="Au pair, Formation, Emploi, Volontariat. Trouvez l'opportunité idéale pour votre projet de vie."
         backgroundImage="/images/jobs-bg.png"
-      ></HeroSection>
+      />
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="relative">

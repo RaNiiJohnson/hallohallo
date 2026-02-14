@@ -45,7 +45,7 @@ import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
-import { LocationPicker } from "./LocationPicker";
+import { LocationPicker } from "../../../../../src/lib/LocationPicker";
 
 const jobTypes = [
   "Au pair",

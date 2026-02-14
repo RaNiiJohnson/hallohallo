@@ -83,9 +83,7 @@ export function ListingDetailsContent({
       {/* Localisation */}
       <div className="flex items-center gap-2 text-muted-foreground">
         <MapPin className="size-4" />
-        <span>
-          {listing.city} - {listing.district}
-        </span>
+        <span>{listing.city}</span>
       </div>
 
       {/* Bouton vers les détails complets */}

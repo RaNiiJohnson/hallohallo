@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { authComponent } from "./auth";
 import { paginationOptsValidator } from "convex/server";
 import { Id } from "./_generated/dataModel";
+import { generatedSlug } from "../src/lib/utils";
 
 export const getJobWithContact = query({
   args: { id: v.id("JobOffer") },
@@ -116,12 +117,16 @@ export const createJob = mutation({
       throw new Error("Not authenticated");
     }
 
+    const searchAllContent = `${args.title} ${args.type} ${args.city} ${args.contractType} ${args.description}`;
+
     const job = await ctx.db.insert("JobOffer", {
       ...args,
+      slug: generatedSlug(args.title),
       authorId: user._id,
       authorName: user.name,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      searchAll: searchAllContent,
     });
     return job;
   },

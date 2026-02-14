@@ -1,0 +1,10 @@
+{
+  "projectId": "9a739d05-9626-4c58-8651-eaf038432097",
+  "createdAt": 1770974771108,
+  "version": "1.0",
+  "startupCommands": [
+    "pnpm install && pnpm next dev --turbopack -p 3000",
+    "npx convex dev"
+  ],
+  "templateId": "any"
+}

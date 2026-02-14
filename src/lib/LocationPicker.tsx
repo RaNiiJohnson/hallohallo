@@ -52,16 +52,23 @@ async function reverseGeocode(
       "";
 
     // Get region/state
-    const region = address.state || address.county || address.region || "";
+    const region = address.state || address.region || "";
 
-    // Format as "City, Region" (e.g., "Berlin, Berlin" or "Antananarivo, Analamanga")
+    // Get local area
+    const local =
+      address.suburb || address.city_district || address.county || "";
+
     let location = "";
-    if (city && region) {
+    if (city && region && local) {
+      location = `${city}, ${region}, ${local}`;
+    } else if (city && region) {
       location = `${city}, ${region}`;
     } else if (city) {
       location = city;
     } else if (region) {
       location = region;
+    } else if (local) {
+      location = local;
     }
 
     return {
