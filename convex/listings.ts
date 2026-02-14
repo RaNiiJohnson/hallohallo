@@ -46,13 +46,14 @@ export const getListing = query({
   args: {
     paginationOpts: paginationOptsValidator,
     searchTerm: v.optional(v.string()),
-    propertyType: v.union(
-      v.literal("room"),
-      v.literal("apartment"),
-      v.literal("house"),
-      v.literal("studio"),
-      v.literal("shared"),
-      v.literal("all"),
+    propertyType: v.optional(
+      v.union(
+        v.literal("room"),
+        v.literal("apartment"),
+        v.literal("house"),
+        v.literal("studio"),
+        v.literal("shared"),
+      ),
     ),
     bedrooms: v.optional(v.number()),
     minPrice: v.optional(v.number()),
@@ -71,15 +72,14 @@ export const getListing = query({
       // Étape 2+3 : search index (inclut déjà l’ordre)
       orderedQuery = tableQuery.withSearchIndex("search_all_fields", (q) => {
         let search = q.search("searchAll", searchTerm);
-        if (propertyType && propertyType !== "all")
-          search = search.eq("propertyType", propertyType);
+        if (propertyType) search = search.eq("propertyType", propertyType);
         if (bedrooms && bedrooms > 0) search = search.eq("bedrooms", bedrooms);
         return search;
       });
     } else {
       // Étape 2 : index normal ou pas d’index
       let indexedQuery: Query<DataModel["RealestateListing"]> = tableQuery;
-      if (propertyType && propertyType !== "all") {
+      if (propertyType) {
         indexedQuery = tableQuery.withIndex("by_propertyType", (q) =>
           q.eq("propertyType", propertyType),
         );
@@ -141,7 +141,6 @@ export const getSimilarRealEstateListings = query({
       v.literal("house"),
       v.literal("studio"),
       v.literal("shared"),
-      v.literal("all"),
     ),
     limit: v.number(),
   },
@@ -184,7 +183,6 @@ export const createListing = mutation({
       v.literal("house"),
       v.literal("studio"),
       v.literal("shared"),
-      v.literal("all"),
     ),
     listingMode: v.union(v.literal("rent"), v.literal("sale")),
     location: v.optional(

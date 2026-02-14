@@ -42,7 +42,15 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
     api.listings.getListing,
     {
       searchTerm: filters.search,
-      type: filters.type,
+      propertyType:
+        filters.type && filters.type !== "all"
+          ? (filters.type as
+              | "room"
+              | "apartment"
+              | "house"
+              | "studio"
+              | "shared")
+          : undefined,
       bedrooms: filters.bedrooms,
       minPrice: filters.minPrice > 0 ? filters.minPrice : undefined,
       maxPrice: filters.maxPrice > 0 ? filters.maxPrice : undefined,
@@ -162,12 +170,14 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
           >
             <div className="relative h-80 w-full rounded-xl overflow-hidden shadow-xl">
               <Image
-                src={list.coverPhoto || "/placeholder-image.jpg"}
+                src={list.images?.[0]?.secureUrl || "/default-cover.jpg"}
                 alt={list.title}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
-              <Badge className="absolute top-2 left-2 z-10">{list.type}</Badge>
+              <Badge className="absolute top-2 left-2 z-10">
+                {list.propertyType}
+              </Badge>
 
               {isAuthenticated && (
                 <BookmarkButton
@@ -185,7 +195,11 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
                 {list.city}
               </div>
               <div className="font-bold">
-                <PriceDisplay price={list.price} className="text-primary" />
+                <PriceDisplay
+                  price={list.price}
+                  listingMode={list.listingMode}
+                  className="text-primary"
+                />
               </div>
             </div>
           </Link>

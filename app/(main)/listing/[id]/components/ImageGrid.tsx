@@ -14,19 +14,22 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import type { CarouselApi } from "@/components/ui/carousel";
 
+interface CloudinaryImage {
+  publicId: string;
+  secureUrl: string;
+}
+
 interface ImageGridProps {
-  images: string[];
-  coverPhoto: string;
+  images?: CloudinaryImage[];
   title: string;
 }
 
-export function ImageGrid({ images, coverPhoto, title }: ImageGridProps) {
+export function ImageGrid({ images, title }: ImageGridProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [fullscreenIndex, setFullscreenIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
 
-  // Combiner la photo de couverture avec les autres photos
-  const allImages = [coverPhoto, ...images];
+  const allImages = images && images.length > 0 ? images : [];
   const visibleImages = allImages.slice(0, 3);
   const remainingCount = Math.max(0, allImages.length - 3);
 
@@ -47,9 +50,8 @@ export function ImageGrid({ images, coverPhoto, title }: ImageGridProps) {
   // Aller à l'index spécifique quand on ouvre le fullscreen
   useEffect(() => {
     if (api && isFullscreen) {
-      // Utiliser un petit délai pour s'assurer que le carousel est monté
       setTimeout(() => {
-        api.scrollTo(fullscreenIndex, false); // false pour une transition fluide
+        api.scrollTo(fullscreenIndex, false);
       }, 50);
     }
   }, [api, isFullscreen, fullscreenIndex]);
@@ -74,6 +76,19 @@ export function ImageGrid({ images, coverPhoto, title }: ImageGridProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isFullscreen, api]);
 
+  if (allImages.length === 0) {
+    return (
+      <div className="relative h-96 w-full rounded-xl overflow-hidden bg-muted">
+        <Image
+          src="/default-cover.jpg"
+          alt={title}
+          fill
+          className="object-cover"
+        />
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Grille d'images */}
@@ -84,7 +99,7 @@ export function ImageGrid({ images, coverPhoto, title }: ImageGridProps) {
           onClick={() => openFullscreen(0)}
         >
           <Image
-            src={coverPhoto}
+            src={allImages[0].secureUrl}
             alt={`${title} - Image principale`}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105 group-hover:z-10"
@@ -96,12 +111,12 @@ export function ImageGrid({ images, coverPhoto, title }: ImageGridProps) {
         {/* Images secondaires */}
         {visibleImages.slice(1, 3).map((image, index) => (
           <div
-            key={index + 1}
+            key={image.publicId}
             className="relative cursor-pointer group"
             onClick={() => openFullscreen(index + 1)}
           >
             <Image
-              src={image}
+              src={image.secureUrl}
               alt={`${title} - Image ${index + 2}`}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -150,9 +165,9 @@ export function ImageGrid({ images, coverPhoto, title }: ImageGridProps) {
               align: "center",
               skipSnaps: false,
               dragFree: false,
-              duration: 30, // Durée de la transition en frames
+              duration: 30,
               containScroll: "trimSnaps",
-              inViewThreshold: 0.7, // Seuil pour déclencher le snap
+              inViewThreshold: 0.7,
             }}
           >
             <CarouselContent
@@ -164,12 +179,12 @@ export function ImageGrid({ images, coverPhoto, title }: ImageGridProps) {
             >
               {allImages.map((image, index) => (
                 <CarouselItem
-                  key={index}
+                  key={image.publicId}
                   className="flex items-center justify-center pl-0"
                 >
                   <div className="relative w-full h-[90vh]">
                     <Image
-                      src={image}
+                      src={image.secureUrl}
                       alt={`${title} - Image ${index + 1}`}
                       fill
                       className="object-contain"
@@ -202,14 +217,14 @@ export function ImageGrid({ images, coverPhoto, title }: ImageGridProps) {
             {/* Indicateurs */}
             {allImages.length > 1 && (
               <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-                {allImages.map((_, index) => (
+                {allImages.map((image, index) => (
                   <button
-                    key={index}
+                    key={image.publicId}
                     className={cn(
                       "w-3 h-3 rounded-full transition-all duration-200",
                       index === fullscreenIndex
                         ? "bg-white scale-125"
-                        : "bg-white/50 hover:bg-white/75"
+                        : "bg-white/50 hover:bg-white/75",
                     )}
                     onClick={() => api?.scrollTo(index)}
                   />

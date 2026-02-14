@@ -58,7 +58,6 @@ export default defineSchema({
       v.literal("house"),
       v.literal("studio"),
       v.literal("shared"),
-      v.literal("all"),
     ),
     listingMode: v.union(v.literal("rent"), v.literal("sale")),
     slug: v.optional(v.string()),

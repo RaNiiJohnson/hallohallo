@@ -12,22 +12,21 @@ import {
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 
+interface CloudinaryImage {
+  publicId: string;
+  secureUrl: string;
+}
+
 interface ImageCarouselProps {
-  images: string[];
-  coverPhoto: string;
+  images?: CloudinaryImage[];
   title: string;
 }
 
-export function ImageCarousel({
-  images,
-  coverPhoto,
-  title,
-}: ImageCarouselProps) {
+export function ImageCarousel({ images, title }: ImageCarouselProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
 
-  // Combiner la photo de couverture avec les autres photos
-  const allImages = [coverPhoto, ...images];
+  const allImages = images && images.length > 0 ? images : null;
 
   // Écouter les changements du carousel pour mettre à jour l'index actuel
   useEffect(() => {
@@ -51,6 +50,19 @@ export function ImageCarousel({
     };
   }, [api]);
 
+  if (!allImages) {
+    return (
+      <div className="relative h-80 w-full rounded-xl overflow-hidden bg-muted mb-6 flex items-center justify-center">
+        <Image
+          src="/default-cover.jpg"
+          alt={title}
+          fill
+          className="object-cover"
+        />
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Carrousel principal avec shadcn/ui */}
@@ -58,10 +70,10 @@ export function ImageCarousel({
         <Carousel setApi={setApi} className="w-full">
           <CarouselContent>
             {allImages.map((image, index) => (
-              <CarouselItem key={index}>
+              <CarouselItem key={image.publicId}>
                 <div className="relative h-80 w-full rounded-xl overflow-hidden bg-muted">
                   <Image
-                    src={image}
+                    src={image.secureUrl}
                     alt={`${title} - Image ${index + 1}`}
                     fill
                     className="object-cover transition-transform duration-300 hover:scale-105"
@@ -69,7 +81,6 @@ export function ImageCarousel({
                   />
                   {/* Overlay gradient */}
                   <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent" />
-                  {/* Bouton plein écran */}
 
                   {/* Compteur d'images */}
                   <div className="absolute top-3 left-3 bg-black/50 text-white text-xs px-2 py-1 rounded-md">
@@ -90,17 +101,17 @@ export function ImageCarousel({
           <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
             {allImages.map((image, index) => (
               <button
-                key={index}
+                key={image.publicId}
                 className={cn(
                   "relative shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 cursor-pointer",
                   index === current
                     ? "border-primary scale-105"
-                    : "border-transparent hover:border-muted-foreground/50"
+                    : "border-transparent hover:border-muted-foreground/50",
                 )}
                 onClick={() => api?.scrollTo(index)}
               >
                 <Image
-                  src={image}
+                  src={image.secureUrl}
                   alt={`Miniature ${index + 1}`}
                   fill
                   className="object-cover"

@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { ExternalLink, MapPin, X } from "lucide-react";
 import Link from "next/link";
-import { PriceDisplay, parsePrice } from "./price";
+import { PriceDisplay } from "./price";
 import { ImageCarousel } from "./ImageCarousel";
 import { ListingListItem } from "@/lib/convexTypes";
 
@@ -36,11 +36,7 @@ export function ListingDetails({
       )}
 
       {/* Carrousel d'images */}
-      <ImageCarousel
-        images={listing.photos}
-        coverPhoto={listing.coverPhoto}
-        title={listing.title}
-      />
+      <ImageCarousel images={listing.images} title={listing.title} />
 
       <div className="space-y-4">
         {/* Bouton vers les détails complets */}
@@ -64,16 +60,16 @@ export function ListingDetailsContent({
   return (
     <div className="space-y-4">
       {/* Carrousel d'images */}
-      <ImageCarousel
-        images={listing.photos}
-        coverPhoto={listing.coverPhoto}
-        title={listing.title}
-      />
+      <ImageCarousel images={listing.images} title={listing.title} />
 
       {/* Prix */}
       <div className="space-y-2">
-        <PriceDisplay price={listing.price} className="text-3xl" />
-        {parsePrice(listing.deposit).amount && (
+        <PriceDisplay
+          price={listing.price}
+          listingMode={listing.listingMode}
+          className="text-3xl"
+        />
+        {listing.deposit !== undefined && listing.listingMode === "rent" && (
           <div className="text-sm text-muted-foreground">
             Caution : <PriceDisplay price={listing.deposit} />
           </div>

@@ -11,6 +11,14 @@ import { useQuery } from "convex-helpers/react/cache";
 import { api } from "@convex/_generated/api";
 import { ListingListDetails } from "@/lib/convexTypes";
 
+const propertyTypeLabels: Record<string, string> = {
+  room: "Chambre",
+  apartment: "Appartement",
+  house: "Maison",
+  studio: "Studio",
+  shared: "Colocation",
+};
+
 export function SimilarListings({
   id,
   property,
@@ -21,7 +29,7 @@ export function SimilarListings({
   const properties = useQuery(api.listings.getSimilarRealEstateListings, {
     excludeId: id,
     city: property.city,
-    type: property.type,
+    propertyType: property.propertyType,
     limit: 6,
   });
 
@@ -51,17 +59,19 @@ export function SimilarListings({
           >
             <div className="relative h-80 w-full rounded-xl overflow-hidden shadow-xl">
               <Image
-                src={list.coverPhoto || "/placeholder-image.jpg"}
+                src={list.images?.[0]?.secureUrl || "/default-cover.jpg"}
                 alt={list.title}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
-              <Badge className="absolute top-2 left-2 z-10">{list.type}</Badge>
+              <Badge className="absolute top-2 left-2 z-10">
+                {propertyTypeLabels[list.propertyType] || list.propertyType}
+              </Badge>
 
               {/* Indicateur de photos multiples */}
-              {list.photos.length > 0 && (
+              {list.images && list.images.length > 1 && (
                 <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-md z-10">
-                  +{list.photos.length + 1} photos
+                  {list.images.length} photos
                 </div>
               )}
 
@@ -73,7 +83,11 @@ export function SimilarListings({
                 <MapPin className="size-3" />
                 {list.city}
               </div>
-              <PriceDisplay price={list.price} className="text-primary" />
+              <PriceDisplay
+                price={list.price}
+                listingMode={list.listingMode}
+                className="text-primary"
+              />
             </div>
           </Link>
         ))}

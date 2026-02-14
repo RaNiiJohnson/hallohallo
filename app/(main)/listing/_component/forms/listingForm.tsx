@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import * as z from "zod";
 import { useState } from "react";
 import Image from "next/image";
@@ -253,7 +253,8 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
     }
   }
 
-  const extras = form.watch("extras") ?? [];
+  const listingMode = useWatch({ control: form.control, name: "listingMode" });
+  const extras = useWatch({ control: form.control, name: "extras" }) ?? [];
 
   return (
     <div className="space-y-6">
@@ -417,7 +418,11 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="price">Prix *</FieldLabel>
+                <FieldLabel htmlFor="price">
+                  {listingMode === "sale"
+                    ? "Prix de vente *"
+                    : "Loyer mensuel *"}
+                </FieldLabel>
                 <InputGroup>
                   <Input
                     {...field}
@@ -537,61 +542,63 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
 
         {/* ─── Step 4: Conditions ─── */}
         <FieldSet className={`space-y-4 ${currentStep !== 4 ? "hidden" : ""}`}>
-          <div className="grid grid-cols-2 gap-4">
-            <Controller
-              name="deposit"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="deposit">Caution</FieldLabel>
-                  <InputGroup>
-                    <Input
-                      {...field}
-                      id="deposit"
-                      type="number"
-                      min="0"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="Ex: 1700"
-                      autoComplete="off"
-                    />
-                    <InputGroupAddon align="inline-end">
-                      <InputGroupText>€</InputGroupText>
-                    </InputGroupAddon>
-                  </InputGroup>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
+          {listingMode === "rent" && (
+            <div className="grid grid-cols-2 gap-4">
+              <Controller
+                name="deposit"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="deposit">Caution</FieldLabel>
+                    <InputGroup>
+                      <Input
+                        {...field}
+                        id="deposit"
+                        type="number"
+                        min="0"
+                        aria-invalid={fieldState.invalid}
+                        placeholder="Ex: 1700"
+                        autoComplete="off"
+                      />
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>€</InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
-            <Controller
-              name="charges"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="charges">Charges</FieldLabel>
-                  <InputGroup>
-                    <Input
-                      {...field}
-                      id="charges"
-                      type="number"
-                      min="0"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="Ex: 150"
-                      autoComplete="off"
-                    />
-                    <InputGroupAddon align="inline-end">
-                      <InputGroupText>€/mois</InputGroupText>
-                    </InputGroupAddon>
-                  </InputGroup>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-          </div>
+              <Controller
+                name="charges"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="charges">Charges</FieldLabel>
+                    <InputGroup>
+                      <Input
+                        {...field}
+                        id="charges"
+                        type="number"
+                        min="0"
+                        aria-invalid={fieldState.invalid}
+                        placeholder="Ex: 150"
+                        autoComplete="off"
+                      />
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>€/mois</InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+            </div>
+          )}
 
           <Controller
             name="pets"

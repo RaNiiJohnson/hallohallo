@@ -4,6 +4,7 @@ import { AlertCircleIcon, ImageIcon, UploadIcon, XIcon } from "lucide-react";
 
 import { useFileUpload } from "@/hooks/use-file-upload";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 // Create some dummy initial files
 const initialFiles = [
@@ -104,14 +105,16 @@ export default function Component() {
                   className="relative aspect-square rounded-md bg-accent"
                   key={file.id}
                 >
-                  <img
+                  <Image
                     alt={file.file.name}
                     className="size-full rounded-[inherit] object-cover"
-                    src={file.preview}
+                    src={file.preview || ""}
+                    width={100}
+                    height={100}
                   />
                   <Button
                     aria-label="Remove image"
-                    className="-top-2 -right-2 absolute size-6 rounded-full border-2 border-background shadow-none focus-visible:border-background"
+                    className="-top-2 -right-2 absolute size-6 rounded-full border-2 border-background shadow-none z-10 focus-visible:border-background"
                     onClick={() => removeFile(file.id)}
                     size="icon"
                   >
