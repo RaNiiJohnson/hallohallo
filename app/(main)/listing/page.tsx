@@ -37,7 +37,7 @@ export default function ListingPageContent() {
               />
             )}
           </div>
-          {/* <ListingList isAuthenticated={isAuthenticated} /> */}
+          <ListingList isAuthenticated={isAuthenticated} />
         </div>
         <div className="text-center flex flex-col items-center mt-16 p-8 bg-card border rounded-xl shadow-sm">
           <h3 className="text-2xl font-bold mb-4">

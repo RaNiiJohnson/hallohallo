@@ -201,13 +201,11 @@ export const createListing = mutation({
     bathrooms: v.number(),
     floor: v.number(),
     pets: v.boolean(),
-    images: v.optional(
-      v.array(
-        v.object({
-          publicId: v.string(),
-          secureUrl: v.string(),
-        }),
-      ),
+    images: v.array(
+      v.object({
+        publicId: v.string(),
+        secureUrl: v.string(),
+      }),
     ),
     description: v.string(),
     extras: v.array(v.string()),

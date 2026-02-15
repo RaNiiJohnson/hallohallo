@@ -10,14 +10,7 @@ import { Id } from "@convex/_generated/dataModel";
 import { useQuery } from "convex-helpers/react/cache";
 import { api } from "@convex/_generated/api";
 import { ListingListDetails } from "@/lib/convexTypes";
-
-const propertyTypeLabels: Record<string, string> = {
-  room: "Chambre",
-  apartment: "Appartement",
-  house: "Maison",
-  studio: "Studio",
-  shared: "Colocation",
-};
+import { listingTypeLabels } from "../../_component/forms/listingForm";
 
 export function SimilarListings({
   id,
@@ -65,7 +58,7 @@ export function SimilarListings({
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <Badge className="absolute top-2 left-2 z-10">
-                {propertyTypeLabels[list.propertyType] || list.propertyType}
+                {listingTypeLabels[list.propertyType]}
               </Badge>
 
               {/* Indicateur de photos multiples */}

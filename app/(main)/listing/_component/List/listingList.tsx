@@ -24,6 +24,7 @@ import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import clsx from "clsx";
+import { listingTypeLabels } from "../forms/listingForm";
 
 export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
   const [filters] = useQueryStates({
@@ -176,7 +177,7 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <Badge className="absolute top-2 left-2 z-10">
-                {list.propertyType}
+                {listingTypeLabels[list.propertyType]}
               </Badge>
 
               {isAuthenticated && (

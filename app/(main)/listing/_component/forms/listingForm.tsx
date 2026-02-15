@@ -54,6 +54,8 @@ import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { LocationPicker } from "@/lib/LocationPicker";
 import { useFileUpload } from "@/hooks/use-file-upload";
+import { useCloudinaryUpload } from "@imaxis/cloudinary-convex/react";
+import { fileToBase64 } from "@/lib/utils";
 
 const listingTypeValues = [
   "room",
@@ -65,7 +67,10 @@ const listingTypeValues = [
 
 const listingModeValues = ["rent", "sale"] as const;
 
-const listingTypeLabels: Record<(typeof listingTypeValues)[number], string> = {
+export const listingTypeLabels: Record<
+  (typeof listingTypeValues)[number],
+  string
+> = {
   room: "Chambre",
   apartment: "Appartement",
   house: "Maison",
@@ -73,7 +78,10 @@ const listingTypeLabels: Record<(typeof listingTypeValues)[number], string> = {
   shared: "Colocation",
 };
 
-const listingModeLabels: Record<(typeof listingModeValues)[number], string> = {
+export const listingModeLabels: Record<
+  (typeof listingModeValues)[number],
+  string
+> = {
   rent: "À louer",
   sale: "À vendre",
 };
@@ -97,6 +105,7 @@ const formSchema = z.object({
   bedrooms: z.string().min(1, "Le nombre de chambres est requis"),
   floor: z.string().min(1, "L'étage est requis"),
   pets: z.boolean(),
+  images: z.array(z.object({ publicId: z.string(), secureUrl: z.string() })),
   description: z
     .string()
     .min(10, "La description doit contenir au moins 10 caractères"),
@@ -109,7 +118,9 @@ interface ListingFormProps {
 }
 
 export function ListingForm({ onSuccess }: ListingFormProps) {
+  const { upload } = useCloudinaryUpload(api.cloudinary.upload);
   const createListing = useMutation(api.listings.createListing);
+
   const [currentStep, setCurrentStep] = useState(1);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [extraInput, setExtraInput] = useState("");
@@ -152,6 +163,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
       bedrooms: "",
       floor: "",
       pets: false,
+      images: [],
       description: "",
       extras: [],
       availableFrom: "",
@@ -186,7 +198,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
         // deposit, charges, pets, availableFrom are all optional — no strict validation needed
         break;
       case 5:
-        fieldsToValidate = ["description"];
+        fieldsToValidate = ["description", "images"];
         break;
     }
 
@@ -221,7 +233,26 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
   };
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
+    if (files.length === 0) return;
     try {
+      const uploadPromises = files.map(async (file) => {
+        if (file.file instanceof File) {
+          const base64 = await fileToBase64(file.file);
+          const res = await upload(base64, { folder: "real_estates" });
+          if (!res.publicId || !res.secureUrl) {
+            throw new Error("Erreur lors de l'upload de l'image");
+          }
+          return { publicId: res.publicId, secureUrl: res.secureUrl };
+        }
+        // Handle existing files (FileMetadata)
+        return {
+          publicId: file.file.id,
+          secureUrl: file.file.url,
+        };
+      });
+
+      const images = await Promise.all(uploadPromises);
+
       await createListing({
         title: data.title,
         propertyType: data.propertyType,
@@ -241,7 +272,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
         availableFrom: data.availableFrom
           ? new Date(data.availableFrom).getTime()
           : undefined,
-        // images: handled via Cloudinary separately
+        images,
       });
 
       toast.success("Annonce publiée avec succès !");
@@ -774,7 +805,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                         <Button
                           type="button"
                           aria-label="Supprimer l'image"
-                          className="-top-2 -right-2 absolute size-6 rounded-full border-2 border-background shadow-none focus-visible:border-background"
+                          className="-top-2 -right-2 absolute size-6 z-10 rounded-full border-2 border-background shadow-none focus-visible:border-background"
                           onClick={() => removeFile(file.id)}
                           size="icon"
                         >

@@ -20,19 +20,10 @@ import { Item, ItemContent, ItemSeparator } from "@/components/ui/item";
 import { PriceDisplay } from "../../_component/price";
 import { truncateText } from "@/lib/utils";
 import { ListingListDetails } from "@/lib/convexTypes";
-
-const propertyTypeLabels: Record<string, string> = {
-  room: "Chambre",
-  apartment: "Appartement",
-  house: "Maison",
-  studio: "Studio",
-  shared: "Colocation",
-};
-
-const listingModeLabels: Record<string, string> = {
-  rent: "À louer",
-  sale: "À vendre",
-};
+import {
+  listingModeLabels,
+  listingTypeLabels,
+} from "../../_component/forms/listingForm";
 
 interface PropertyDetailsProps {
   property: ListingListDetails;
@@ -66,8 +57,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
             </div>
             <div className="flex gap-2 mt-2">
               <Badge variant="secondary">
-                {propertyTypeLabels[property.propertyType] ||
-                  property.propertyType}
+                {listingTypeLabels[property.propertyType]}
               </Badge>
               <Badge
                 variant={
