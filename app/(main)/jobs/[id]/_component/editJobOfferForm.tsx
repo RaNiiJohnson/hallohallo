@@ -47,10 +47,17 @@ import {
   contractTypeValues,
   contractTypeLabels,
 } from "../../_component/forms/jobOfferForm";
+import { LocationPicker } from "@/lib/LocationPicker";
 
 const formSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
   type: z.enum(jobTypeValues),
+  location: z
+    .object({
+      lat: z.number(),
+      lng: z.number(),
+    })
+    .optional(),
   contractType: z.enum(contractTypeValues),
   city: z.string().min(1, "La ville est requise"),
   duration: z.string().min(1, "La durée est requise"),
@@ -88,6 +95,7 @@ export function EditJobOfferForm({
     defaultValues: {
       title: jobOffer?.title,
       type: jobOffer?.type as (typeof jobTypeValues)[number],
+      location: jobOffer?.location,
       contractType:
         jobOffer?.contractType as (typeof contractTypeValues)[number],
       city: jobOffer?.city,
@@ -161,6 +169,7 @@ export function EditJobOfferForm({
         id: jobOffer._id,
         title: data.title,
         type: data.type,
+        location: data.location,
         contractType: data.contractType,
         city: data.city,
         duration: data.duration,
@@ -329,6 +338,26 @@ export function EditJobOfferForm({
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
+              </Field>
+            )}
+          />
+
+          {/* Location Map Picker */}
+          <Controller
+            name="location"
+            control={form.control}
+            render={({ field }) => (
+              <Field>
+                <FieldLabel>Position sur la carte (optionnel)</FieldLabel>
+                <FieldDescription>
+                  Cliquez sur la carte pour indiquer la position exacte du
+                  poste. La ville sera mise à jour automatiquement.
+                </FieldDescription>
+                <LocationPicker
+                  value={field.value}
+                  onChange={field.onChange}
+                  onCityChange={(city) => form.setValue("city", city)}
+                />
               </Field>
             )}
           />
