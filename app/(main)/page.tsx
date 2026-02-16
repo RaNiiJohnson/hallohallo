@@ -101,7 +101,7 @@ function HomePageContent() {
             <div className="space-y-4 opacity-100">
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
-                  href="/communaute"
+                  href="/community"
                   className="z-10 flex items-center justify-center"
                 >
                   <div
