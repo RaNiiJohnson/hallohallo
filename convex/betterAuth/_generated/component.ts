@@ -36,14 +36,14 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   city?: null | string;
                   company?: null | string;
                   country?: null | string;
-                  coverImage?: string;
+                  coverImage?: null | string;
                   createdAt: number;
                   email: string;
                   emailVerified: boolean;
                   experienceYears?: null | number;
                   field?: null | string;
                   headline?: null | string;
-                  image?: string;
+                  image?: null | string;
                   industry?: null | string;
                   isPublic?: null | boolean;
                   isServiceProvider?: null | boolean;
@@ -54,7 +54,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   showEmail?: null | boolean;
                   showPhone?: null | boolean;
                   skills?: null | Array<string>;
-                  slug?: null | string;
+                  slug: string;
                   status?: null | string;
                   updatedAt: number;
                   userId?: null | string;
@@ -129,10 +129,10 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "email"
                     | "emailVerified"
                     | "image"
-                    | "coverImage"
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "coverImage"
                     | "slug"
                     | "headline"
                     | "bio"
@@ -337,10 +337,10 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "email"
                     | "emailVerified"
                     | "image"
-                    | "coverImage"
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "coverImage"
                     | "slug"
                     | "headline"
                     | "bio"
@@ -614,14 +614,14 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   city?: null | string;
                   company?: null | string;
                   country?: null | string;
-                  coverImage?: string;
+                  coverImage?: null | string;
                   createdAt?: number;
                   email?: string;
                   emailVerified?: boolean;
                   experienceYears?: null | number;
                   field?: null | string;
                   headline?: null | string;
-                  image?: string;
+                  image?: null | string;
                   industry?: null | string;
                   isPublic?: null | boolean;
                   isServiceProvider?: null | boolean;
@@ -632,7 +632,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   showEmail?: null | boolean;
                   showPhone?: null | boolean;
                   skills?: null | Array<string>;
-                  slug?: null | string;
+                  slug?: string;
                   status?: null | string;
                   updatedAt?: number;
                   userId?: null | string;
@@ -644,10 +644,10 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "email"
                     | "emailVerified"
                     | "image"
-                    | "coverImage"
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "coverImage"
                     | "slug"
                     | "headline"
                     | "bio"
@@ -887,14 +887,14 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   city?: null | string;
                   company?: null | string;
                   country?: null | string;
-                  coverImage?: string;
+                  coverImage?: null | string;
                   createdAt?: number;
                   email?: string;
                   emailVerified?: boolean;
                   experienceYears?: null | number;
                   field?: null | string;
                   headline?: null | string;
-                  image?: string;
+                  image?: null | string;
                   industry?: null | string;
                   isPublic?: null | boolean;
                   isServiceProvider?: null | boolean;
@@ -905,7 +905,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   showEmail?: null | boolean;
                   showPhone?: null | boolean;
                   skills?: null | Array<string>;
-                  slug?: null | string;
+                  slug?: string;
                   status?: null | string;
                   updatedAt?: number;
                   userId?: null | string;
@@ -917,10 +917,10 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "email"
                     | "emailVerified"
                     | "image"
-                    | "coverImage"
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "coverImage"
                     | "slug"
                     | "headline"
                     | "bio"
@@ -1160,14 +1160,14 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
             city?: null | string;
             company?: null | string;
             country?: null | string;
-            coverImage?: string;
+            coverImage?: null | string;
             createdAt?: number;
             email?: string;
             emailVerified?: boolean;
             experienceYears?: null | number;
             field?: null | string;
             headline?: null | string;
-            image?: string;
+            image?: null | string;
             industry?: null | string;
             isPublic?: null | boolean;
             isServiceProvider?: null | boolean;
@@ -1178,7 +1178,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
             showEmail?: null | boolean;
             showPhone?: null | boolean;
             skills?: null | Array<string>;
-            slug?: null | string;
+            slug?: string;
             status?: null | string;
             updatedAt?: number;
             userId?: null | string;
