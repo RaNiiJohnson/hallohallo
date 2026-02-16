@@ -6,22 +6,22 @@ import { MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { PriceDisplay } from "../../_component/price";
-import { Id } from "@convex/_generated/dataModel";
 import { useQuery } from "convex-helpers/react/cache";
 import { api } from "@convex/_generated/api";
 import { ListingListDetails } from "@/lib/convexTypes";
+import { listingTypeLabels } from "../../_component/forms/listingForm";
 
 export function SimilarListings({
-  id,
+  slug,
   property,
 }: {
-  id: Id<"RealestateListing">;
+  slug: string;
   property: ListingListDetails;
 }) {
   const properties = useQuery(api.listings.getSimilarRealEstateListings, {
-    excludeId: id,
+    excludeSlug: slug,
     city: property.city,
-    type: property.type,
+    propertyType: property.propertyType,
     limit: 6,
   });
 
@@ -45,23 +45,25 @@ export function SimilarListings({
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {properties.map((list) => (
           <Link
-            key={list._id}
-            href={`/listing/${list._id}`}
+            key={list.slug}
+            href={`/listing/${list.slug}`}
             className="relative group cursor-pointer transition-all duration-300 h-fit block"
           >
             <div className="relative h-80 w-full rounded-xl overflow-hidden shadow-xl">
               <Image
-                src={list.coverPhoto || "/placeholder-image.jpg"}
+                src={list.images?.[0]?.secureUrl || "/default-cover.jpg"}
                 alt={list.title}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
-              <Badge className="absolute top-2 left-2 z-10">{list.type}</Badge>
+              <Badge className="absolute top-2 left-2 z-10">
+                {listingTypeLabels[list.propertyType]}
+              </Badge>
 
               {/* Indicateur de photos multiples */}
-              {list.photos.length > 0 && (
+              {list.images && list.images.length > 1 && (
                 <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-md z-10">
-                  +{list.photos.length + 1} photos
+                  {list.images.length} photos
                 </div>
               )}
 
@@ -71,9 +73,13 @@ export function SimilarListings({
               <h3 className="font-semibold mb-1 line-clamp-1">{list.title}</h3>
               <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
                 <MapPin className="size-3" />
-                {list.city} - {list.district}
+                {list.city}
               </div>
-              <PriceDisplay price={list.price} className="text-primary" />
+              <PriceDisplay
+                price={list.price}
+                listingMode={list.listingMode}
+                className="text-primary"
+              />
             </div>
           </Link>
         ))}

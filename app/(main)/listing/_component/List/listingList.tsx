@@ -24,6 +24,7 @@ import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import clsx from "clsx";
+import { listingTypeLabels } from "../forms/listingForm";
 
 export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
   const [filters] = useQueryStates({
@@ -42,7 +43,9 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
     api.listings.getListing,
     {
       searchTerm: filters.search,
-      type: filters.type,
+      propertyType: filters.type
+        ? (filters.type as "room" | "apartment" | "house" | "studio" | "shared")
+        : undefined,
       bedrooms: filters.bedrooms,
       minPrice: filters.minPrice > 0 ? filters.minPrice : undefined,
       maxPrice: filters.maxPrice > 0 ? filters.maxPrice : undefined,
@@ -144,8 +147,8 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
       >
         {listings.map((list) => (
           <Link
-            key={list._id}
-            href={`/listing/${list._id}`}
+            key={list.slug}
+            href={`/listing/${list.slug}`}
             className={cn(
               "relative group cursor-pointer transition-all duration-300 h-fit block",
               selectedId === list._id &&
@@ -162,12 +165,14 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
           >
             <div className="relative h-80 w-full rounded-xl overflow-hidden shadow-xl">
               <Image
-                src={list.coverPhoto || "/placeholder-image.jpg"}
+                src={list.images?.[0]?.secureUrl || "/default-cover.jpg"}
                 alt={list.title}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
-              <Badge className="absolute top-2 left-2 z-10">{list.type}</Badge>
+              <Badge className="absolute top-2 left-2 z-10">
+                {listingTypeLabels[list.propertyType]}
+              </Badge>
 
               {isAuthenticated && (
                 <BookmarkButton
@@ -182,10 +187,14 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
               <h3 className="font-semibold mb-1 line-clamp-1">{list.title}</h3>
               <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
                 <MapPin className="size-3" />
-                {list.city} - {list.district}
+                {list.city}
               </div>
               <div className="font-bold">
-                <PriceDisplay price={list.price} className="text-primary" />
+                <PriceDisplay
+                  price={list.price}
+                  listingMode={list.listingMode}
+                  className="text-primary"
+                />
               </div>
             </div>
           </Link>

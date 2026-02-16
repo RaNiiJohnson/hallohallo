@@ -27,11 +27,11 @@ import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
 import { useDebounce } from "use-debounce";
 
 const LISTING_TYPES = [
-  { value: "Appartement", label: "Appartement" },
-  { value: "Maison", label: "Maison" },
-  { value: "Studio", label: "Studio" },
-  { value: "Colocation", label: "Colocation" },
-  { value: "Chambre", label: "Chambre" },
+  { value: "apartment", label: "Appartement" },
+  { value: "house", label: "Maison" },
+  { value: "studio", label: "Studio" },
+  { value: "shared", label: "Colocation" },
+  { value: "room", label: "Chambre" },
 ];
 
 const BEDROOMS_OPTIONS = [

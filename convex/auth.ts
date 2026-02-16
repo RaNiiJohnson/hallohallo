@@ -7,6 +7,7 @@ import { betterAuth, type BetterAuthOptions } from "better-auth/minimal";
 import authConfig from "./auth.config";
 import authSchema from "./betterAuth/schema";
 import { UserWithUrls } from "./users";
+import { generatedSlug } from "../src/lib/utils";
 
 const siteUrl = process.env.SITE_URL!;
 
@@ -34,21 +35,10 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
       user: {
         create: {
           before: async (user) => {
-            const baseSlug = user.name
-              .toLowerCase()
-              .trim()
-              .normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, "")
-              .replace(/\s+/g, "_")
-              .replace(/[^\w-]+/g, "")
-              .replace(/--+/g, "-");
-
-            const uniqueSlug = `${baseSlug}_${Math.random().toString(36).substring(2, 6)}`;
-
             return {
               data: {
                 ...user,
-                slug: uniqueSlug,
+                slug: generatedSlug(user.name),
               },
             };
           },

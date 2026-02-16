@@ -4,7 +4,6 @@ import {
   type ChangeEvent,
   type DragEvent,
   type InputHTMLAttributes,
-  type Ref,
   useCallback,
   useRef,
   useState,
@@ -54,7 +53,9 @@ export type FileUploadActions = {
   getInputProps: (
     props?: InputHTMLAttributes<HTMLInputElement>,
   ) => InputHTMLAttributes<HTMLInputElement> & {
-    ref: Ref<HTMLInputElement>;
+    // Use `any` here to avoid cross-React ref type conflicts across packages
+    // biome-ignore lint/suspicious/noExplicitAny: intentional
+    ref: any;
   };
 };
 
@@ -372,7 +373,9 @@ export const useFileUpload = (
         accept: props.accept || accept,
         multiple: props.multiple !== undefined ? props.multiple : multiple,
         onChange: handleFileChange,
-        ref: inputRef as Ref<HTMLInputElement>,
+        // Cast to `any` to prevent mismatched React ref type errors across workspaces
+        // biome-ignore lint/suspicious/noExplicitAny: Intentional
+        ref: inputRef as any,
         type: "file" as const,
       };
     },

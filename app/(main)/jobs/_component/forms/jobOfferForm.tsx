@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm, FieldPath } from "react-hook-form";
 import * as z from "zod";
 import { useState } from "react";
 
@@ -45,38 +45,65 @@ import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
-import { LocationPicker } from "./LocationPicker";
+import { LocationPicker } from "@/lib/LocationPicker";
 
-const jobTypes = [
-  "Au pair",
-  "Formation",
-  "Volontariat",
-  "Stage",
-  "Mini-job",
-  "Emploi",
-  "Freelance",
-  "Bourse d'étude",
-];
+export const jobTypeValues = [
+  "auPair",
+  "training",
+  "voluntary",
+  "internship",
+  "miniJob",
+  "job",
+  "freelance",
+  "scholarship",
+] as const;
 
-const contractTypes = [
+export const contractTypeValues = [
   "CDI",
   "CDD",
   "FSJ/FOJ/BFD",
-  "Temps plein",
-  "Temps partiel",
-  "Freelance",
-  "Apprentissage",
-];
+  "fullTime",
+  "partTime",
+  "freelance",
+  "apprenticeship",
+] as const;
+
+export const jobTypeLabels: Record<(typeof jobTypeValues)[number], string> = {
+  auPair: "Au pair",
+  training: "Formation",
+  voluntary: "Volontariat",
+  internship: "Stage",
+  miniJob: "Mini-job",
+  job: "Emploi",
+  freelance: "Freelance",
+  scholarship: "Bourse d'étude",
+};
+
+export const contractTypeLabels: Record<
+  (typeof contractTypeValues)[number],
+  string
+> = {
+  CDI: "CDI",
+  CDD: "CDD",
+  "FSJ/FOJ/BFD": "FSJ/FOJ/BFD",
+  fullTime: "Temps plein",
+  partTime: "Temps partiel",
+  freelance: "Freelance",
+  apprenticeship: "Apprentissage",
+};
+
+const salaryPeriodValues = ["hour", "month", "year"] as const;
+
 const formSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
-  type: z.string().min(1, "Le type d'offre est requis"),
+  type: z.enum(jobTypeValues),
   location: z
     .object({
       lat: z.number(),
       lng: z.number(),
     })
     .optional(),
-  contractType: z.string().min(1, "Le type de contrat est requis"),
+  contractType: z.enum(contractTypeValues),
   city: z.string().min(1, "La ville est requise"),
   duration: z.string().min(1, "La durée est requise"),
   startDate: z.string().min(1, "La date de début est requise"),
@@ -93,7 +120,10 @@ const formSchema = z.object({
     .min(1, "Ajoutez au moins un certificat.")
     .max(5, "Vous pouvez ajouter jusqu'à 5 certificats."),
   salary: z.string().min(1, "Le salaire est requis"),
+  salaryPeriod: z.enum(salaryPeriodValues),
 });
+
+type FormSchema = z.infer<typeof formSchema>;
 
 interface JobOfferFormProps {
   onSuccess?: () => void;
@@ -108,8 +138,8 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
-      type: "",
-      contractType: "",
+      type: "auPair",
+      contractType: "CDI",
       city: "",
       duration: "",
       startDate: "",
@@ -117,6 +147,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
       description: "",
       certificates: [],
       salary: "",
+      salaryPeriod: "month",
     },
   });
 
@@ -136,7 +167,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
   ];
 
   const nextStep = async () => {
-    let fieldsToValidate: (keyof z.infer<typeof formSchema>)[] = [];
+    let fieldsToValidate: FieldPath<FormSchema>[] = [];
 
     switch (currentStep) {
       case 1:
@@ -148,6 +179,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
           "city",
           "startDate",
           "salary",
+          "salaryPeriod",
           "duration",
         ];
         break;
@@ -171,9 +203,9 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
     }
   };
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
+  const onSubmit = async (data: FormSchema) => {
     try {
-      createJob({
+      await createJob({
         title: data.title,
         type: data.type,
         location: data.location,
@@ -185,9 +217,10 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
         description: data.description,
         certificates:
           data.certificates
-            ?.map((cert) => cert.certificate)
-            .filter((cert) => cert.trim() !== "") || [],
-        salary: data.salary,
+            ?.map((cert: { certificate: string }) => cert.certificate)
+            .filter((cert: string) => cert.trim() !== "") || [],
+        salary: Number(data.salary),
+        salaryPeriod: data.salaryPeriod,
       });
       toast.success("Offre créée avec succès");
       form.reset();
@@ -195,7 +228,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
     } catch {
       toast.success("Erreur lors de la création de l'offre");
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -280,9 +313,9 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
                     <SelectValue placeholder="Sélectionnez le type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {jobTypes.map((type) => (
+                    {jobTypeValues.map((type) => (
                       <SelectItem key={type} value={type}>
-                        {type}
+                        {jobTypeLabels[type]}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -315,9 +348,9 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
                     <SelectValue placeholder="Sélectionnez le contrat" />
                   </SelectTrigger>
                   <SelectContent>
-                    {contractTypes.map((contract) => (
+                    {contractTypeValues.map((contract) => (
                       <SelectItem key={contract} value={contract}>
-                        {contract}
+                        {contractTypeLabels[contract]}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -426,123 +459,55 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             }}
           />
 
-          <Controller
-            name="salary"
-            control={form.control}
-            render={({ field, fieldState }) => {
-              // Parse existing salary value with better null handling
-              const parseExistingSalary = (
-                value: string | null | undefined,
-              ) => {
-                if (!value || typeof value !== "string") {
-                  return { amount: "", period: "" };
-                }
-
-                // Check for "À négocier" or similar
-                if (value.toLowerCase().includes("négocier")) {
-                  return { amount: "", period: "negotiable" };
-                }
-
-                // Extract number from string
-                const amountMatch = value.match(/(\d+(?:\.\d+)?)/);
-                const amount = amountMatch ? amountMatch[1] : "";
-
-                // Determine period
-                let period = "";
-                if (value.includes("/mois") || value.includes("mois")) {
-                  period = "month";
-                } else if (value.includes("/an") || value.includes("annuel")) {
-                  period = "year";
-                } else if (
-                  value.includes("/heure") ||
-                  value.includes("heure")
-                ) {
-                  period = "hour";
-                }
-
-                return { amount, period };
-              };
-
-              const { amount, period } = parseExistingSalary(field.value);
-
-              // Update the combined value whenever amount or period changes
-              const updateSalary = (newAmount: string, newPeriod: string) => {
-                if (newPeriod === "negotiable") {
-                  field.onChange("À négocier");
-                } else if (newAmount && newPeriod) {
-                  const periodText =
-                    {
-                      month: "/mois",
-                      year: "/an",
-                      hour: "/heure",
-                    }[newPeriod] || "";
-                  field.onChange(`${newAmount}€${periodText}`);
-                } else if (newAmount && !newPeriod) {
-                  // Keep amount even without period selected
-                  field.onChange(`${newAmount}€`);
-                } else {
-                  field.onChange("");
-                }
-              };
-
-              return (
-                <Field data-invalid={fieldState.invalid}>
+          <div className="flex gap-4">
+            <Controller
+              name="salary"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field className="flex-1" data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="job-salary">Salaire *</FieldLabel>
-                  <div className="flex gap-2">
-                    <Input
-                      id="job-salary"
-                      type="number"
-                      value={period === "negotiable" ? "" : amount}
-                      onChange={(e) => {
-                        const newAmount = e.target.value;
-                        updateSalary(newAmount, period);
-                      }}
-                      aria-invalid={fieldState.invalid}
-                      placeholder={
-                        period === "negotiable"
-                          ? "Salaire à négocier"
-                          : "Montant"
-                      }
-                      autoComplete="off"
-                      disabled={period === "negotiable"}
-                      className="flex-1"
-                    />
-                    <Select
-                      value={period || ""}
-                      onValueChange={(newPeriod) => {
-                        if (newPeriod === "negotiable") {
-                          updateSalary("", newPeriod);
-                        } else {
-                          updateSalary(amount, newPeriod);
-                        }
-                      }}
-                    >
-                      <SelectTrigger
-                        className="w-[180px]"
-                        aria-invalid={fieldState.invalid}
-                      >
-                        <SelectValue placeholder="Période" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="month">€/mois</SelectItem>
-                        <SelectItem value="year">€/an</SelectItem>
-                        <SelectItem value="hour">€/heure</SelectItem>
-                        <SelectItem value="negotiable">À négocier</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <FieldDescription>
-                    {period === "negotiable"
-                      ? "Le salaire sera à négocier avec le candidat"
-                      : "Entrez le montant et sélectionnez la période"}
-                  </FieldDescription>
+                  <Input
+                    {...field}
+                    id="job-salary"
+                    type="number"
+                    min="0"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Montant"
+                    autoComplete="off"
+                  />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
                 </Field>
-              );
-            }}
-          />
+              )}
+            />
+
+            <Controller
+              name="salaryPeriod"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field className="w-[180px]" data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="salary-period">Période *</FieldLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger
+                      id="salary-period"
+                      aria-invalid={fieldState.invalid}
+                    >
+                      <SelectValue placeholder="Période" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="month">€/mois</SelectItem>
+                      <SelectItem value="year">€/an</SelectItem>
+                      <SelectItem value="hour">€/heure</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </div>
 
           <Controller
             name="duration"

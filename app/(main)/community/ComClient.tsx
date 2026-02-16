@@ -4,9 +4,10 @@ import { api } from "@convex/_generated/api";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
+import Link from "next/link";
 
 export default function ComClient({
   preloadedUsers,
@@ -84,13 +85,18 @@ export default function ComClient({
                 )}
 
                 {/* Bouton fixé en bas avec mt-auto */}
-                <Button
-                  variant="outline"
-                  className="w-full font-medium mt-auto"
-                  size="sm"
+                <Link
+                  href={`/hl/${user.slug}`}
+                  // button variant outline using buttonVariant on classname
+
+                  className={buttonVariants({
+                    variant: "outline",
+                    size: "sm",
+                    className: "w-full font-medium mt-auto",
+                  })}
                 >
                   voir profil
-                </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>

@@ -3,8 +3,9 @@
 import { Briefcase, MapPin, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { SalaryDisplay } from "./salary";
+import { jobTypeLabels, contractTypeLabels } from "./forms/jobOfferForm";
 import { getRelativeTime } from "@/lib/date";
+import { SalaryDisplay } from "./salary";
 import { JobPageSkeleton } from "./skeleton";
 import { api } from "@convex/_generated/api";
 import { usePaginatedQuery } from "convex-helpers/react/cache";
@@ -15,9 +16,9 @@ import clsx from "clsx";
 
 export function JobList() {
   const [filters] = useQueryStates({
-    search: parseAsString,
-    type: parseAsString,
-    contract: parseAsString,
+    search: parseAsString.withDefault(""),
+    type: parseAsString.withDefault(""),
+    contract: parseAsString.withDefault(""),
   });
   const {
     results: jobs,
@@ -26,9 +27,28 @@ export function JobList() {
   } = usePaginatedQuery(
     api.jobs.getJobs,
     {
-      contractType: filters.contract || undefined,
-      searchTerm: filters.search || undefined,
-      type: filters.type || undefined,
+      searchTerm: filters.search,
+      contractType: filters.contract
+        ? (filters.contract as
+            | "CDI"
+            | "CDD"
+            | "FSJ/FOJ/BFD"
+            | "fullTime"
+            | "partTime"
+            | "freelance"
+            | "apprenticeship")
+        : undefined,
+      type: filters.type
+        ? (filters.type as
+            | "auPair"
+            | "training"
+            | "voluntary"
+            | "internship"
+            | "miniJob"
+            | "job"
+            | "freelance"
+            | "scholarship")
+        : undefined,
     },
     { initialNumItems: 5 },
   );
@@ -64,7 +84,7 @@ export function JobList() {
   return (
     <div className="space-y-3">
       {jobs.map((job) => (
-        <Link key={job._id} href={`/jobs/${job._id}`} className="block group">
+        <Link key={job.slug} href={`/jobs/${job.slug}`} className="block group">
           <div className="bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:border-primary/30">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
@@ -74,9 +94,13 @@ export function JobList() {
                 </h3>
 
                 {/* Company */}
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-sm font-medium text-foreground">
-                    {job.company}
+                <div className="flex items-center gap-1 mb-2">
+                  <SalaryDisplay
+                    salary={job.salary}
+                    className="text-foreground"
+                  />
+                  <span className="text-primary text-xs font-normal">
+                    /{job.salaryPeriod}
                   </span>
                 </div>
 
@@ -88,16 +112,11 @@ export function JobList() {
                   </div>
                   <div className="flex items-center gap-1">
                     <Briefcase className="h-4 w-4" />
-                    <span>{job.type}</span>
+                    <span>
+                      {jobTypeLabels[job.type as keyof typeof jobTypeLabels] ??
+                        job.type}
+                    </span>
                   </div>
-                  {job.salary && (
-                    <div className="flex items-center gap-1">
-                      <SalaryDisplay
-                        salary={job.salary}
-                        className="text-foreground"
-                      />
-                    </div>
-                  )}
                 </div>
 
                 {/* Badges */}
@@ -106,7 +125,9 @@ export function JobList() {
                     variant="secondary"
                     className="bg-secondary/50 hover:bg-secondary/70 text-xs font-normal"
                   >
-                    {job.contractType}
+                    {contractTypeLabels[
+                      job.contractType as keyof typeof contractTypeLabels
+                    ] ?? job.contractType}
                   </Badge>
                   {job.duration && (
                     <Badge variant="outline" className="text-xs font-normal">

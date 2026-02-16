@@ -65,7 +65,7 @@ export function AuthNavClient() {
           <div className="flex items-center gap-2">
             <DropdownMenu open={open} onOpenChange={setOpen}>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center sm:space-x-2 hover:bg-accent rounded-lg sm:py-2 sm:px-4 transition-colors cursor-pointer">
+                <div className="flex items-center xl:space-x-2 hover:bg-accent rounded-lg xl:py-2 xl:px-4 transition-colors cursor-pointer">
                   <Button
                     variant="outline"
                     className="relative h-8 w-8 rounded-full"
@@ -77,7 +77,7 @@ export function AuthNavClient() {
                       />
                     </Avatar>
                   </Button>
-                  <span className="hidden sm:block text-sm font-medium">
+                  <span className="hidden xl:block text-sm font-medium">
                     {user.name || user.email}
                   </span>
                 </div>

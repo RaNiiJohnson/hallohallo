@@ -25,25 +25,22 @@ import { useQueryStates, parseAsString } from "nuqs";
 import { useEffect, useState, useTransition } from "react";
 import { useDebounce } from "use-debounce";
 
-const JOB_TYPES = [
-  { value: "Au pair", label: "Au pair" },
-  { value: "Formation", label: "Formation" },
-  { value: "Volontariat", label: "Volontariat" },
-  { value: "Stage", label: "Stage" },
-  { value: "Mini-job", label: "Mini-job" },
-  { value: "Emploi", label: "Emploi" },
-  { value: "Bourse d'étude", label: "Bourse d'étude" },
-];
+import {
+  jobTypeValues,
+  jobTypeLabels,
+  contractTypeValues,
+  contractTypeLabels,
+} from "./forms/jobOfferForm";
 
-const CONTRACT_TYPES = [
-  { value: "CDD", label: "CDD" },
-  { value: "CDI", label: "CDI" },
-  { value: "FSJ/FOJ/BFD", label: "FSJ/FOJ/BFD" },
-  { value: "Temps plein", label: "Temps plein" },
-  { value: "Temps partiel", label: "Temps partiel" },
-  { value: "Freelance", label: "Freelance" },
-  { value: "Aprentissage", label: "Aprentissage" },
-];
+const JOB_TYPES = jobTypeValues.map((value) => ({
+  value,
+  label: jobTypeLabels[value],
+}));
+
+const CONTRACT_TYPES = contractTypeValues.map((value) => ({
+  value,
+  label: contractTypeLabels[value],
+}));
 
 export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

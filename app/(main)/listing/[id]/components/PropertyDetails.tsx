@@ -17,9 +17,14 @@ import {
 import { useState } from "react";
 import { ImageGrid } from "./ImageGrid";
 import { Item, ItemContent, ItemSeparator } from "@/components/ui/item";
-import { PriceDisplay, parsePrice } from "../../_component/price";
+import { PriceDisplay } from "../../_component/price";
 import { truncateText } from "@/lib/utils";
 import { ListingListDetails } from "@/lib/convexTypes";
+import {
+  listingModeLabels,
+  listingTypeLabels,
+} from "../../_component/forms/listingForm";
+import { LocationMap } from "@/lib/LocationMap";
 
 interface PropertyDetailsProps {
   property: ListingListDetails;
@@ -28,7 +33,7 @@ interface PropertyDetailsProps {
 export function PropertyDetails({ property }: PropertyDetailsProps) {
   const [showFullDescription, setShowFullDescription] = useState(false);
 
-  const formatDate = (date: Date | number | undefined) => {
+  const formatDate = (date: number | undefined) => {
     if (!date) return "Disponible immédiatement";
     return new Intl.DateTimeFormat("fr-FR", {
       day: "numeric",
@@ -39,41 +44,50 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
 
   return (
     <div className="space-y-8">
-      {/* En-tête avec titre et type */}
-
       {/* Galerie d'images */}
       <div className="w-full">
-        <ImageGrid
-          images={property.photos}
-          coverPhoto={property.coverPhoto}
-          title={property.title}
-        />
+        <ImageGrid images={property.images} title={property.title} />
       </div>
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1">
             <h1 className="text-2xl sm:text-3xl font-bold">{property.title}</h1>
             <div className="flex items-center gap-2 text-muted-foreground mt-2">
-              <MapPin className="h-4 w-4 hrink-0" />
-              <span className="text-sm sm:text-base">
-                {property.city} - {property.district}
-              </span>
+              <MapPin className="h-4 w-4 shrink-0" />
+              <span className="text-sm sm:text-base">{property.city}</span>
             </div>
-            <Badge variant="secondary" className="mt-2">
-              {property.type}
-            </Badge>
+            <div className="flex gap-2 mt-2">
+              <Badge variant="secondary">
+                {listingTypeLabels[property.propertyType]}
+              </Badge>
+              <Badge
+                variant={
+                  property.listingMode === "rent" ? "default" : "outline"
+                }
+              >
+                {listingModeLabels[property.listingMode]}
+              </Badge>
+            </div>
           </div>
 
           <div className="sm:text-right">
             <PriceDisplay
               price={property.price}
+              listingMode={property.listingMode}
               className="text-2xl sm:text-4xl"
             />
-            {parsePrice(property.deposit).amount && (
-              <div className="text-sm text-muted-foreground mt-1">
-                Caution : <PriceDisplay price={property.deposit} />
-              </div>
-            )}
+            {property.listingMode === "rent" &&
+              property.deposit !== undefined && (
+                <div className="text-sm text-muted-foreground mt-1">
+                  Caution : <PriceDisplay price={property.deposit} />
+                </div>
+              )}
+            {property.listingMode === "rent" &&
+              property.charges !== undefined && (
+                <div className="text-sm text-muted-foreground mt-1">
+                  Charges : <PriceDisplay price={property.charges} /> /mois
+                </div>
+              )}
           </div>
         </div>
       </div>
@@ -132,7 +146,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                 <div className="flex items-center gap-3">
                   <Calendar className="h-5 w-5 text-primary" />
                   <span className="font-medium">Disponible :</span>
-                  <span>{formatDate(property.available)}</span>
+                  <span>{formatDate(property.availableFrom)}</span>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -172,6 +186,24 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                 )}
               </div>
             </div>
+          </div>
+
+          <ItemSeparator />
+          {/* Location Map - Only show if coordinates exist */}
+          <div>
+            <div className="py-6">
+              <h2 className="text-xl font-semibold mb-4">Localisation</h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                {property.city}
+              </p>
+            </div>
+            {property.location && (
+              <LocationMap
+                location={property.location}
+                city={property.city}
+                listing={true}
+              />
+            )}
           </div>
 
           <ItemSeparator />

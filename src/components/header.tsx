@@ -219,7 +219,7 @@ export function Header() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            className="absolute top-full left-0 right-0 md:hidden border-t bg-background/95 backdrop-blur-sm shadow-lg z-40"
+            className="absolute top-full left-0 right-0 lg:hidden border-t bg-background/95 backdrop-blur-sm shadow-lg z-40"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}

@@ -7,6 +7,7 @@ import { Plus } from "lucide-react";
 import { RealEstatesFilters } from "./_component/listingFilters";
 import { ListingList } from "./_component/List/listingList";
 import Link from "next/link";
+import { PublishListingDialog } from "./_component/dialogs/publishListingDialog";
 
 export default function ListingPageContent() {
   const { isAuthenticated } = useConvexAuth();
@@ -26,10 +27,14 @@ export default function ListingPageContent() {
               <h2 className="text-2xl font-bold">Immobilier</h2>
             </div>
             {isAuthenticated && (
-              <Button className="flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                <span>Publier une annonce</span>
-              </Button>
+              <PublishListingDialog
+                trigger={
+                  <Button className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    <span>Publier une annonce</span>
+                  </Button>
+                }
+              />
             )}
           </div>
           <ListingList isAuthenticated={isAuthenticated} />
@@ -44,10 +49,9 @@ export default function ListingPageContent() {
             futurs locataires.
           </p>
           {isAuthenticated ? (
-            <Button className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              <span>Publier une annonce</span>
-            </Button>
+            <PublishListingDialog
+              trigger={<Button size="lg">Publier une annonce</Button>}
+            />
           ) : (
             <Link href="/register" className={buttonVariants({ size: "lg" })}>
               S&apos;inscrire pour publier
