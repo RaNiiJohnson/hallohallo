@@ -54,7 +54,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
         },
         slug: {
           type: "string",
-          required: false,
+          required: true,
         },
 
         // === PROFIL PROFESSIONNEL ===

@@ -26,7 +26,7 @@ export default defineSchema({
       v.literal("freelance"),
       v.literal("scholarship"),
     ),
-    slug: v.optional(v.string()),
+    slug: v.string(),
     location: v.optional(
       v.object({
         lat: v.number(),
@@ -80,7 +80,7 @@ export default defineSchema({
       v.literal("shared"),
     ),
     listingMode: v.union(v.literal("rent"), v.literal("sale")),
-    slug: v.optional(v.string()),
+    slug: v.string(),
     location: v.optional(
       v.object({
         lat: v.number(),
