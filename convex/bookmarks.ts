@@ -21,7 +21,7 @@ export const getMyBookmarks = query({
             : await ctx.db.get(b.resourceId as Id<"RealestateListing">);
 
         return { ...b, details };
-      })
+      }),
     );
   },
 });
@@ -37,7 +37,7 @@ export const toggleBookmark = mutation({
     const existing = await ctx.db
       .query("bookmarks")
       .withIndex("by_user_resource", (q) =>
-        q.eq("userId", args.userId).eq("resourceId", args.resourceId)
+        q.eq("userId", args.userId).eq("resourceId", args.resourceId),
       )
       .unique();
 
@@ -50,7 +50,6 @@ export const toggleBookmark = mutation({
       userId: args.userId,
       resourceId: args.resourceId,
       resourceType: args.resourceType,
-      createdAt: Date.now(),
     });
     return { bookmarked: true };
   },

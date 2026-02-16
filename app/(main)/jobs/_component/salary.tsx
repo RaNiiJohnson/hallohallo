@@ -1,5 +1,3 @@
-import { Wallet } from "lucide-react";
-
 export interface ParsedSalary {
   amount: string;
   period: string;
@@ -35,17 +33,12 @@ export function parseSalary(value: string | null | undefined): ParsedSalary {
 }
 
 interface SalaryDisplayProps {
-  salary: string | null | undefined;
+  salary: string | number;
   className?: string;
-  showIcon?: boolean;
 }
 
-export function SalaryDisplay({
-  salary,
-  className = "",
-  showIcon = true,
-}: SalaryDisplayProps) {
-  const parsed = parseSalary(salary);
+export function SalaryDisplay({ salary, className }: SalaryDisplayProps) {
+  const parsed = parseSalary(typeof salary === "string" ? salary : null);
 
   if (parsed.isNegotiable) {
     return (
@@ -55,19 +48,14 @@ export function SalaryDisplay({
     );
   }
 
-  if (!parsed.amount) {
-    return null;
-  }
-
-  return (
-    <span className={`font-medium  ${className}`}>
-      <Wallet className={showIcon ? "h-4 w-4 mr-1 inline" : "hidden"} />
-      <span className="font-semibold">{parsed.amount}€ </span>
-      {parsed.period && (
-        <span className="text-muted-foreground text-xs font-normal">
-          /{parsed.period}
+  if (typeof salary === "number") {
+    return (
+      <span className={`font-medium ${className}`}>
+        <span className="font-semibold">
+          {salary.toLocaleString()}
+          <span className="text-primary ml-0.5">€</span>
         </span>
-      )}
-    </span>
-  );
+      </span>
+    );
+  }
 }

@@ -3,6 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
+  jobTypeLabels,
+  contractTypeLabels,
+} from "../_component/forms/jobOfferForm";
+import {
   ArrowLeft,
   MapPin,
   Building2,
@@ -24,8 +28,8 @@ import { SalaryDisplay } from "../_component/salary";
 import { useQuery } from "convex-helpers/react/cache";
 import { api } from "@convex/_generated/api";
 import { EditJobDialog } from "./_component/editJobDialog";
-import { JobLocationMap } from "./_component/JobLocationMap";
 import { Preloaded, usePreloadedQuery } from "convex/react";
+import { LocationMap } from "@/lib/LocationMap";
 
 export function JobDetailsPage(props: {
   preloadedJob: Preloaded<typeof api.jobs.getJobWithContact>;
@@ -44,7 +48,7 @@ export function JobDetailsPage(props: {
     <div className="min-h-screen bg-muted/30">
       {/* Hero Section without image */}
       <div className="relative w-full bg-background">
-        <div className="max-w-7xl mx-auto px-4 pt-8 sm:pt-12">
+        <div className="max-w-full mx-auto px-4 pt-8 sm:pt-12">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6 sm:mb-8">
             <Link
@@ -156,26 +160,26 @@ export function JobDetailsPage(props: {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
+      <div className="max-w-5xl mx-auto px-4 py-6">
+        <div className="grid lg:grid-cols-3 gap-4 lg:gap-8">
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Job Overview */}
             <div className="bg-card border rounded-lg shadow-sm">
-              <div className="p-6 border-b">
+              <div className="p-4 border-b">
                 <h2 className="text-xl font-semibold flex items-center gap-2">
                   <FileText className="w-5 h-5" />
                   Aperçu de l&apos;offre
                 </h2>
               </div>
-              <div className="p-6">
-                <div className="grid sm:grid-cols-2 gap-6">
+              <div className="p-4">
+                <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
                       Date de publication
                     </p>
                     <p className="font-semibold">
-                      {formatDateLong(jobOffer.createdAt)}
+                      {formatDateLong(jobOffer._creationTime)}
                     </p>
                   </div>
 
@@ -190,7 +194,10 @@ export function JobDetailsPage(props: {
 
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Salaire</p>
-                    <SalaryDisplay showIcon={false} salary={jobOffer.salary} />
+                    <SalaryDisplay salary={jobOffer.salary} />{" "}
+                    <span className="text-primary text-xs font-normal">
+                      /{jobOffer.salaryPeriod}
+                    </span>
                   </div>
 
                   <div className="space-y-1">
@@ -226,10 +233,10 @@ export function JobDetailsPage(props: {
 
             {/* Job Description */}
             <div className="bg-card border rounded-lg shadow-sm">
-              <div className="p-6 border-b">
+              <div className="p-4 border-b">
                 <h2 className="text-xl font-semibold">Description du poste</h2>
               </div>
-              <div className="p-6">
+              <div className="p-4">
                 <div className="prose prose-sm sm:prose-base max-w-none dark:prose-invert">
                   <p className="whitespace-pre-wrap text-foreground/90 leading-relaxed">
                     {jobOffer.description}
@@ -240,22 +247,19 @@ export function JobDetailsPage(props: {
 
             {/* Location Map - Only show if coordinates exist */}
             {jobOffer.location && (
-              <JobLocationMap
-                location={jobOffer.location}
-                city={jobOffer.city}
-              />
+              <LocationMap location={jobOffer.location} city={jobOffer.city} />
             )}
 
             {/* Certificates */}
             {jobOffer.certificates && jobOffer.certificates.length > 0 && (
               <div className="bg-card border rounded-lg shadow-sm">
-                <div className="p-6 border-b">
+                <div className="p-4 border-b">
                   <h2 className="text-xl font-semibold flex items-center gap-2">
                     <Award className="w-5 h-5" />
                     Certificats requis
                   </h2>
                 </div>
-                <div className="p-6">
+                <div className="p-4">
                   <div className="flex flex-wrap gap-2">
                     {jobOffer.certificates.map((cert, index) => (
                       <Badge
@@ -273,14 +277,14 @@ export function JobDetailsPage(props: {
 
             {/* Contact Information */}
             <div className="bg-primary/5 border border-primary/20 rounded-lg shadow-sm">
-              <div className="p-6 border-b border-primary/20">
+              <div className="p-4 border-b border-primary/20">
                 <h2 className="text-xl font-semibold">Comment postuler</h2>
                 <p className="text-sm text-muted-foreground mt-1">
                   Intéressé par ce poste ? Envoyez votre candidature au contact
                   ci-dessous.
                 </p>
               </div>
-              <div className="p-6">
+              <div className="p-4">
                 <div className="flex items-center gap-4 p-4 bg-background rounded-lg border">
                   <div className="p-3 bg-primary/10 rounded-lg">
                     <Mail className="w-6 h-6 text-primary" />
@@ -305,12 +309,12 @@ export function JobDetailsPage(props: {
           <div className="space-y-6">
             {/* Company Info */}
             <div className="bg-card border rounded-lg shadow-sm">
-              <div className="p-6 border-b">
+              <div className="p-4 border-b">
                 <h2 className="text-xl font-semibold">
                   Informations sur l&apos;entreprise
                 </h2>
               </div>
-              <div className="p-6">
+              <div className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="p-3 bg-primary/10 rounded-lg">
                     <Building2 className="w-8 h-8 text-primary" />
@@ -329,10 +333,10 @@ export function JobDetailsPage(props: {
 
             {/* Publisher Info */}
             <div className="bg-card border rounded-lg shadow-sm">
-              <div className="p-6 border-b">
+              <div className="p-4 border-b">
                 <h2 className="text-xl font-semibold">Publié par</h2>
               </div>
-              <div className="p-6">
+              <div className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
                     <span className="text-lg font-semibold text-primary">
@@ -344,7 +348,7 @@ export function JobDetailsPage(props: {
                       {jobOffer.contact?.name || "Anonyme"}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {getRelativeTime(jobOffer.createdAt)}
+                      {getRelativeTime(jobOffer._creationTime)}
                     </p>
                   </div>
                 </div>
@@ -353,22 +357,30 @@ export function JobDetailsPage(props: {
 
             {/* Quick Summary */}
             <div className="bg-muted/30 border rounded-lg shadow-sm">
-              <div className="p-6 border-b">
+              <div className="p-4 border-b">
                 <h2 className="text-xl font-semibold">Résumé rapide</h2>
               </div>
-              <div className="p-6 space-y-3">
-                <div className="flex items-center justify-between py-3 border-b">
-                  <span className="text-sm text-muted-foreground">
-                    Type d&apos;emploi
-                  </span>
-                  <Badge variant="secondary">{jobOffer.type}</Badge>
-                </div>
-
-                <div className="flex items-center justify-between py-3 border-b">
-                  <span className="text-sm text-muted-foreground">Contrat</span>
-                  <span className="font-semibold text-sm">
-                    {jobOffer.contractType}
-                  </span>
+              <div className="p-4 space-y-3">
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <Badge variant="secondary" className="font-semibold">
+                    {jobTypeLabels[
+                      jobOffer.type as keyof typeof jobTypeLabels
+                    ] ?? jobOffer.type}
+                  </Badge>
+                  <div className="flex items-center text-muted-foreground bg-muted px-2.5 py-0.5 rounded-md">
+                    <Briefcase className="w-4 h-4 mr-1.5" />
+                    <span className="font-semibold text-sm">
+                      {contractTypeLabels[
+                        jobOffer.contractType as keyof typeof contractTypeLabels
+                      ] ?? jobOffer.contractType}
+                    </span>
+                  </div>
+                  <div className="flex items-center text-muted-foreground bg-muted px-2.5 py-0.5 rounded-md">
+                    <MapPin className="w-4 h-4 mr-1.5" />
+                    <span className="font-semibold text-sm">
+                      {jobOffer.city}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-between py-3 border-b">
@@ -380,13 +392,16 @@ export function JobDetailsPage(props: {
 
                 <div className="flex items-center justify-between py-3 border-b">
                   <span className="text-sm text-muted-foreground">Salaire</span>
-                  <SalaryDisplay showIcon={false} salary={jobOffer.salary} />
+                  <SalaryDisplay salary={jobOffer.salary} />
+                  <span className="text-primary text-xs font-normal">
+                    /{jobOffer.salaryPeriod}
+                  </span>
                 </div>
 
                 <div className="flex items-center justify-between py-3">
                   <span className="text-sm text-muted-foreground">Publié</span>
                   <span className="font-semibold text-sm">
-                    {getRelativeTime(jobOffer.createdAt)}
+                    {getRelativeTime(jobOffer._creationTime)}
                   </span>
                 </div>
               </div>
@@ -394,7 +409,7 @@ export function JobDetailsPage(props: {
 
             {/* Apply CTA */}
             <div className="bg-primary text-primary-foreground border rounded-lg shadow-sm">
-              <div className="p-6">
+              <div className="p-4">
                 <h3 className="font-bold text-lg mb-2">Prêt à postuler ?</h3>
                 <p className="text-sm text-primary-foreground/90 mb-4">
                   Ne manquez pas cette opportunité. Postulez maintenant !

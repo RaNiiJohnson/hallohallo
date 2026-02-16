@@ -33,8 +33,29 @@ export const getJobs = query({
   args: {
     paginationOpts: paginationOptsValidator,
     searchTerm: v.optional(v.string()),
-    type: v.optional(v.string()),
-    contractType: v.optional(v.string()),
+    type: v.optional(
+      v.union(
+        v.literal("auPair"),
+        v.literal("training"),
+        v.literal("voluntary"),
+        v.literal("internship"),
+        v.literal("miniJob"),
+        v.literal("job"),
+        v.literal("freelance"),
+        v.literal("scholarship"),
+      ),
+    ),
+    contractType: v.optional(
+      v.union(
+        v.literal("CDI"),
+        v.literal("CDD"),
+        v.literal("FSJ/FOJ/BFD"),
+        v.literal("fullTime"),
+        v.literal("partTime"),
+        v.literal("freelance"),
+        v.literal("apprenticeship"),
+      ),
+    ),
   },
   handler: async (ctx, args) => {
     const { searchTerm, type, contractType } = args;
@@ -45,9 +66,8 @@ export const getJobs = query({
         .query("JobOffer")
         .withSearchIndex("search_all_fields", (q) => {
           let search = q.search("searchAll", searchTerm);
-          if (type && type !== "all") search = search.eq("type", type);
-          if (contractType && contractType !== "all")
-            search = search.eq("contractType", contractType);
+          if (type) search = search.eq("type", type);
+          if (contractType) search = search.eq("contractType", contractType);
           return search;
         });
 
@@ -59,13 +79,13 @@ export const getJobs = query({
     let results;
 
     // On utilise les index définis dans schéma
-    if (type && type !== "all") {
+    if (type) {
       results = await ctx.db
         .query("JobOffer")
         .withIndex("by_type", (q) => q.eq("type", type))
         .order("desc")
         .paginate(args.paginationOpts);
-    } else if (contractType && contractType !== "all") {
+    } else if (contractType) {
       results = await ctx.db
         .query("JobOffer")
         .withIndex("by_contract", (q) => q.eq("contractType", contractType))
@@ -80,7 +100,7 @@ export const getJobs = query({
 
     // Filtre manuel si les deux (type ET contract) sont présents sans searchTerm
     // (car Convex ne supporte qu'un seul index à la fois)
-    if (type && type !== "all" && contractType && contractType !== "all") {
+    if (type && contractType) {
       return {
         ...results,
         page: results.page.filter((job) => job.contractType === contractType),
@@ -94,21 +114,43 @@ export const getJobs = query({
 export const createJob = mutation({
   args: {
     title: v.string(),
-    type: v.string(),
+    type: v.union(
+      v.literal("auPair"),
+      v.literal("training"),
+      v.literal("voluntary"),
+      v.literal("internship"),
+      v.literal("miniJob"),
+      v.literal("job"),
+      v.literal("freelance"),
+      v.literal("scholarship"),
+    ),
     location: v.optional(
       v.object({
         lat: v.number(),
         lng: v.number(),
       }),
     ),
-    contractType: v.string(),
+    contractType: v.union(
+      v.literal("CDI"),
+      v.literal("CDD"),
+      v.literal("FSJ/FOJ/BFD"),
+      v.literal("fullTime"),
+      v.literal("partTime"),
+      v.literal("freelance"),
+      v.literal("apprenticeship"),
+    ),
     city: v.string(),
     duration: v.string(),
     startDate: v.string(),
     company: v.string(),
     description: v.string(),
     certificates: v.array(v.string()),
-    salary: v.string(),
+    salary: v.number(),
+    salaryPeriod: v.union(
+      v.literal("hour"),
+      v.literal("month"),
+      v.literal("year"),
+    ),
   },
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);
@@ -124,7 +166,6 @@ export const createJob = mutation({
       slug: generatedSlug(args.title),
       authorId: user._id,
       authorName: user.name,
-      createdAt: Date.now(),
       updatedAt: Date.now(),
       searchAll: searchAllContent,
     });
@@ -136,21 +177,43 @@ export const updateJob = mutation({
   args: {
     id: v.id("JobOffer"),
     title: v.string(),
-    type: v.string(),
+    type: v.union(
+      v.literal("auPair"),
+      v.literal("training"),
+      v.literal("voluntary"),
+      v.literal("internship"),
+      v.literal("miniJob"),
+      v.literal("job"),
+      v.literal("freelance"),
+      v.literal("scholarship"),
+    ),
     location: v.optional(
       v.object({
         lat: v.number(),
         lng: v.number(),
       }),
     ),
-    contractType: v.string(),
+    contractType: v.union(
+      v.literal("CDI"),
+      v.literal("CDD"),
+      v.literal("FSJ/FOJ/BFD"),
+      v.literal("fullTime"),
+      v.literal("partTime"),
+      v.literal("freelance"),
+      v.literal("apprenticeship"),
+    ),
     city: v.string(),
     duration: v.string(),
     startDate: v.string(),
     company: v.string(),
     description: v.string(),
     certificates: v.array(v.string()),
-    salary: v.string(),
+    salary: v.number(),
+    salaryPeriod: v.union(
+      v.literal("hour"),
+      v.literal("month"),
+      v.literal("year"),
+    ),
   },
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);
@@ -165,9 +228,12 @@ export const updateJob = mutation({
     // Remove id from args before updating because it's not a field of the document
     const { id, ...updateData } = args;
 
+    const searchAllContent = `${args.title} ${args.type} ${args.city} ${args.contractType} ${args.description}`;
+
     await ctx.db.patch("JobOffer", id, {
       ...updateData,
       updatedAt: Date.now(),
+      searchAll: searchAllContent,
     });
   },
 });

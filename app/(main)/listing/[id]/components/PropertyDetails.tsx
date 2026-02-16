@@ -24,6 +24,7 @@ import {
   listingModeLabels,
   listingTypeLabels,
 } from "../../_component/forms/listingForm";
+import { LocationMap } from "@/lib/LocationMap";
 
 interface PropertyDetailsProps {
   property: ListingListDetails;
@@ -185,6 +186,24 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                 )}
               </div>
             </div>
+          </div>
+
+          <ItemSeparator />
+          {/* Location Map - Only show if coordinates exist */}
+          <div>
+            <div className="py-6">
+              <h2 className="text-xl font-semibold mb-4">Localisation</h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                {property.city}
+              </p>
+            </div>
+            {property.location && (
+              <LocationMap
+                location={property.location}
+                city={property.city}
+                listing={true}
+              />
+            )}
           </div>
 
           <ItemSeparator />

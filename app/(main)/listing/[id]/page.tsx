@@ -30,7 +30,7 @@ export default function PropertyPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header avec navigation */}
-      <div className="flex items-center justify-between border-bmax-w-7xl mx-auto px-4 py-2 sm:py-4">
+      <div className="flex items-center justify-between border-b max-w-full mx-auto px-4 py-2 sm:py-4">
         <Link href="/listing">
           <Button variant="ghost" className="flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
@@ -61,9 +61,9 @@ export default function PropertyPage() {
       </div>
 
       {/* Contenu principal */}
-      <div className="max-w-4xl mx-auto py-8 px-4">
+      <div className="max-w-5xl mx-auto py-8 px-4">
         <PropertyDetails property={property} />
-        Section des annonces similaires
+        {/* Section des annonces similaires */}
         <div className="mt-16">
           <SimilarListings id={params.id} property={property} />
         </div>

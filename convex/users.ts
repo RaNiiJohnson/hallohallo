@@ -77,7 +77,7 @@ export const getAllUsers = query({
 export const updateUser = mutation({
   args: {
     id: v.string(),
-    patch: partial(userValidator.omit("createdAt", "updatedAt")),
+    patch: partial(userValidator.omit("updatedAt")),
   },
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);

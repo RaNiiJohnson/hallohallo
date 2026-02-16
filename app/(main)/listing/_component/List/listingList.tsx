@@ -43,15 +43,9 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
     api.listings.getListing,
     {
       searchTerm: filters.search,
-      propertyType:
-        filters.type && filters.type !== "all"
-          ? (filters.type as
-              | "room"
-              | "apartment"
-              | "house"
-              | "studio"
-              | "shared")
-          : undefined,
+      propertyType: filters.type
+        ? (filters.type as "room" | "apartment" | "house" | "studio" | "shared")
+        : undefined,
       bedrooms: filters.bedrooms,
       minPrice: filters.minPrice > 0 ? filters.minPrice : undefined,
       maxPrice: filters.maxPrice > 0 ? filters.maxPrice : undefined,

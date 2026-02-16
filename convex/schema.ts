@@ -9,7 +9,6 @@ export default defineSchema({
     experience: v.optional(v.string()),
     tarif: v.optional(v.string()),
     available: v.boolean(),
-    createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index("by_userId", ["userId"])
@@ -17,7 +16,16 @@ export default defineSchema({
 
   JobOffer: defineTable({
     title: v.string(),
-    type: v.string(),
+    type: v.union(
+      v.literal("auPair"),
+      v.literal("training"),
+      v.literal("voluntary"),
+      v.literal("internship"),
+      v.literal("miniJob"),
+      v.literal("job"),
+      v.literal("freelance"),
+      v.literal("scholarship"),
+    ),
     slug: v.optional(v.string()),
     location: v.optional(
       v.object({
@@ -25,17 +33,29 @@ export default defineSchema({
         lng: v.number(),
       }),
     ),
-    contractType: v.string(),
+    contractType: v.union(
+      v.literal("CDI"),
+      v.literal("CDD"),
+      v.literal("FSJ/FOJ/BFD"),
+      v.literal("fullTime"),
+      v.literal("partTime"),
+      v.literal("freelance"),
+      v.literal("apprenticeship"),
+    ),
     city: v.string(),
     duration: v.string(),
     startDate: v.string(),
     company: v.string(),
     description: v.string(),
     certificates: v.array(v.string()),
-    salary: v.string(),
+    salary: v.number(),
+    salaryPeriod: v.union(
+      v.literal("hour"),
+      v.literal("month"),
+      v.literal("year"),
+    ),
     authorId: v.string(),
     authorName: v.optional(v.string()),
-    createdAt: v.number(),
     updatedAt: v.number(),
     searchAll: v.optional(v.string()),
   })
@@ -135,7 +155,6 @@ export default defineSchema({
     userId: v.string(),
     resourceId: v.union(v.id("JobOffer"), v.id("RealestateListing")),
     resourceType: v.union(v.literal("job"), v.literal("realEstate")),
-    createdAt: v.number(),
   })
     .index("by_userId", ["userId"])
     .index("by_user_resource", ["userId", "resourceId"]),
