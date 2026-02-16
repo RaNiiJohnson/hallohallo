@@ -147,8 +147,8 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
       >
         {listings.map((list) => (
           <Link
-            key={list._id}
-            href={`/listing/${list._id}`}
+            key={list.slug}
+            href={`/listing/${list.slug}`}
             className={cn(
               "relative group cursor-pointer transition-all duration-300 h-fit block",
               selectedId === list._id &&

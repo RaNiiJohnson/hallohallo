@@ -9,14 +9,13 @@ import { PropertyPageSkeleton } from "../_component/skeleton";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { useQuery } from "convex-helpers/react/cache";
 import { api } from "@convex/_generated/api";
-import { Id } from "@convex/_generated/dataModel";
 import { SimilarListings } from "./components/SimilarListings";
 
 export default function PropertyPage() {
-  const params = useParams<{ id: Id<"RealestateListing"> }>();
+  const params = useParams<{ id: string }>();
 
   const property = useQuery(api.listings.getListingWithContact, {
-    id: params.id,
+    slug: params.id,
   });
 
   if (property === undefined) {
@@ -65,7 +64,7 @@ export default function PropertyPage() {
         <PropertyDetails property={property} />
         {/* Section des annonces similaires */}
         <div className="mt-16">
-          <SimilarListings id={params.id} property={property} />
+          <SimilarListings slug={params.id} property={property} />
         </div>
       </div>
     </div>

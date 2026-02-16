@@ -6,21 +6,24 @@ import {
   Query,
   QueryInitializer,
 } from "convex/server";
-import { DataModel, Id } from "./_generated/dataModel";
+import { DataModel } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { authComponent } from "./auth";
 
 export const getListingWithContact = query({
-  args: { id: v.id("RealestateListing") },
-  handler: async (ctx, args) => {
-    const listing = await ctx.db.get("RealestateListing", args.id);
+  args: { slug: v.string() },
+  handler: async (ctx, { slug }) => {
+    const listing = await ctx.db
+      .query("RealestateListing")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .unique();
     if (!listing) return null;
 
     // Récupération des informations de contact via l'index
     const contact = await ctx.db
       .query("RealestateContactInfo")
-      .withIndex("by_listingId", (q) => q.eq("listingId", args.id))
+      .withIndex("by_listingId", (q) => q.eq("listingId", listing._id))
       .unique(); // Utilise .unique() si une annonce n'a qu'un seul bloc de contact
 
     return {
@@ -31,12 +34,12 @@ export const getListingWithContact = query({
 });
 
 export const getListingMetadata = query({
-  args: { id: v.string() },
-  handler: async (ctx, args) => {
-    const listing = await ctx.db.get(
-      "RealestateListing",
-      args.id as Id<"RealestateListing">,
-    );
+  args: { slug: v.string() },
+  handler: async (ctx, { slug }) => {
+    const listing = await ctx.db
+      .query("RealestateListing")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .unique();
 
     return listing;
   },
@@ -133,7 +136,7 @@ export const listListingsByCity = query({
 
 export const getSimilarRealEstateListings = query({
   args: {
-    excludeId: v.id("RealestateListing"),
+    excludeSlug: v.string(),
     city: v.string(),
     propertyType: v.union(
       v.literal("room"),
@@ -148,7 +151,7 @@ export const getSimilarRealEstateListings = query({
     const byCity = await ctx.db
       .query("RealestateListing")
       .withIndex("by_city", (q) => q.eq("city", args.city))
-      .filter((q) => q.neq(q.field("_id"), args.excludeId))
+      .filter((q) => q.neq(q.field("slug"), args.excludeSlug))
       .order("desc")
       .take(args.limit);
 
@@ -163,7 +166,7 @@ export const getSimilarRealEstateListings = query({
       )
       .filter((q) =>
         q.and(
-          q.neq(q.field("_id"), args.excludeId),
+          q.neq(q.field("slug"), args.excludeSlug),
           q.neq(q.field("city"), args.city), // éviter les doublons ville déjà pris
         ),
       )

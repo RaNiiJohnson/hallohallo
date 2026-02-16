@@ -9,7 +9,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const listing = await fetchQuery(api.listings.getListingMetadata, {
-    id,
+    slug: id,
   });
 
   if (!listing) {
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return {
-    title: listing.title,
+    title: `${listing.title} | Hallo Hallo`,
     description: listing.description,
   };
 }

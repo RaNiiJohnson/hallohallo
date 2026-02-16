@@ -6,21 +6,20 @@ import { MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { PriceDisplay } from "../../_component/price";
-import { Id } from "@convex/_generated/dataModel";
 import { useQuery } from "convex-helpers/react/cache";
 import { api } from "@convex/_generated/api";
 import { ListingListDetails } from "@/lib/convexTypes";
 import { listingTypeLabels } from "../../_component/forms/listingForm";
 
 export function SimilarListings({
-  id,
+  slug,
   property,
 }: {
-  id: Id<"RealestateListing">;
+  slug: string;
   property: ListingListDetails;
 }) {
   const properties = useQuery(api.listings.getSimilarRealEstateListings, {
-    excludeId: id,
+    excludeSlug: slug,
     city: property.city,
     propertyType: property.propertyType,
     limit: 6,
@@ -46,8 +45,8 @@ export function SimilarListings({
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {properties.map((list) => (
           <Link
-            key={list._id}
-            href={`/listing/${list._id}`}
+            key={list.slug}
+            href={`/listing/${list.slug}`}
             className="relative group cursor-pointer transition-all duration-300 h-fit block"
           >
             <div className="relative h-80 w-full rounded-xl overflow-hidden shadow-xl">

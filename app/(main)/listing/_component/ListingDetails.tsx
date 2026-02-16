@@ -40,7 +40,7 @@ export function ListingDetails({
 
       <div className="space-y-4">
         {/* Bouton vers les détails complets */}
-        <Link href={`/listing/${listing._id}`} className="block mt-4">
+        <Link href={`/listing/${listing.slug}`} className="block mt-4">
           <Button className="w-full flex items-center gap-2">
             <ExternalLink className="size-4" />
             Voir tous les détails
@@ -83,7 +83,7 @@ export function ListingDetailsContent({
       </div>
 
       {/* Bouton vers les détails complets */}
-      <Link href={`/listing/${listing._id}`} className="block mt-4">
+      <Link href={`/listing/${listing.slug}`} className="block mt-4">
         <Button className="w-full flex items-center gap-2">
           <ExternalLink className="size-4" />
           Voir tous les détails

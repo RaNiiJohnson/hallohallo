@@ -2,19 +2,22 @@ import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { authComponent } from "./auth";
 import { paginationOptsValidator } from "convex/server";
-import { Id } from "./_generated/dataModel";
 import { generatedSlug } from "../src/lib/utils";
 
 export const getJobWithContact = query({
-  args: { id: v.id("JobOffer") },
-  handler: async (ctx, args) => {
-    const job = await ctx.db.get("JobOffer", args.id);
+  args: { slug: v.string() },
+  handler: async (ctx, { slug }) => {
+    const job = await ctx.db
+      .query("JobOffer")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .unique();
+
     if (!job) return null;
 
     // Récupération rapide via l'index
     const contact = await ctx.db
       .query("JobContactInfo")
-      .withIndex("by_jobId", (q) => q.eq("jobId", args.id))
+      .withIndex("by_jobId", (q) => q.eq("jobId", job._id))
       .unique();
 
     return { ...job, contact };
@@ -22,9 +25,12 @@ export const getJobWithContact = query({
 });
 
 export const getJobMetadata = query({
-  args: { id: v.string() },
-  handler: async (ctx, args) => {
-    const job = await ctx.db.get("JobOffer", args.id as Id<"JobOffer">);
+  args: { slug: v.string() },
+  handler: async (ctx, { slug }) => {
+    const job = await ctx.db
+      .query("JobOffer")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .unique();
     return job;
   },
 });
