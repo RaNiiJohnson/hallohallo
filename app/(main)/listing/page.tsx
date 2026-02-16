@@ -8,6 +8,8 @@ import { RealEstatesFilters } from "./_component/listingFilters";
 import { ListingList } from "./_component/List/listingList";
 import Link from "next/link";
 import { PublishListingDialog } from "./_component/dialogs/publishListingDialog";
+import { Suspense } from "react";
+import { ListingPageSkeleton } from "./_component/skeleton";
 
 export default function ListingPageContent() {
   const { isAuthenticated } = useConvexAuth();
@@ -20,24 +22,32 @@ export default function ListingPageContent() {
       />
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="relative">
-          <RealEstatesFilters isAuthenticated={isAuthenticated} />
+          <Suspense
+            fallback={
+              <div className="space-y-6">
+                <ListingPageSkeleton />
+              </div>
+            }
+          >
+            <RealEstatesFilters isAuthenticated={isAuthenticated} />
 
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 my-8">
-            <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-bold">Immobilier</h2>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 my-8">
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-bold">Immobilier</h2>
+              </div>
+              {isAuthenticated && (
+                <PublishListingDialog
+                  trigger={
+                    <Button className="flex items-center gap-2">
+                      <Plus className="h-4 w-4" />
+                      <span>Publier une annonce</span>
+                    </Button>
+                  }
+                />
+              )}
             </div>
-            {isAuthenticated && (
-              <PublishListingDialog
-                trigger={
-                  <Button className="flex items-center gap-2">
-                    <Plus className="h-4 w-4" />
-                    <span>Publier une annonce</span>
-                  </Button>
-                }
-              />
-            )}
-          </div>
-          <ListingList isAuthenticated={isAuthenticated} />
+            <ListingList isAuthenticated={isAuthenticated} />
+          </Suspense>
         </div>
         <div className="text-center flex flex-col items-center mt-16 p-8 bg-card border rounded-xl shadow-sm">
           <h3 className="text-2xl font-bold mb-4">

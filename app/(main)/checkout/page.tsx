@@ -1,5 +1,9 @@
 // "use client";
 
+export default function page() {
+  return <div>page</div>;
+}
+
 // import CheckoutForm from "@/components/CheckoutForm";
 // import {
 //   Card,
