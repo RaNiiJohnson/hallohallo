@@ -7,6 +7,8 @@ import { PublishJobDialog } from "./_component/dialogs/publishJobDialog";
 import { JobList } from "./_component/jobList";
 import Link from "next/link";
 import { useConvexAuth } from "convex/react";
+import { Suspense } from "react";
+import { JobFiltersSkeleton, JobPageSkeleton } from "./_component/skeleton";
 
 export default function JobsPage() {
   const { isAuthenticated } = useConvexAuth();
@@ -21,15 +23,24 @@ export default function JobsPage() {
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="relative">
-          <JobFilters isAuthenticated={isAuthenticated} />
+          <Suspense
+            fallback={
+              <div className="space-y-6">
+                <JobFiltersSkeleton />
+                <JobPageSkeleton />
+              </div>
+            }
+          >
+            <JobFilters isAuthenticated={isAuthenticated} />
 
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 my-8">
-            <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-bold">Opportunités</h2>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 my-8">
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-bold">Opportunités</h2>
+              </div>
+              {isAuthenticated && <PublishJobDialog />}
             </div>
-            {isAuthenticated && <PublishJobDialog />}
-          </div>
-          <JobList />
+            <JobList />
+          </Suspense>
         </div>
         {/* Call to action */}
         <div className="text-center flex flex-col items-center  mt-16 p-8 bg-card border rounded-xl shadow-sm">
