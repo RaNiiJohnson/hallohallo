@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   jobTypeLabels,
   contractTypeLabels,
+  salaryPeriodLabels,
 } from "../_component/forms/jobOfferForm";
 import {
   ArrowLeft,
@@ -196,7 +197,7 @@ export function JobDetailsPage(props: {
                     <p className="text-sm text-muted-foreground">Salaire</p>
                     <SalaryDisplay salary={jobOffer.salary} />{" "}
                     <span className="text-primary text-xs font-normal">
-                      /{jobOffer.salaryPeriod}
+                      /{salaryPeriodLabels[jobOffer.salaryPeriod]}
                     </span>
                   </div>
 
@@ -331,7 +332,7 @@ export function JobDetailsPage(props: {
               </div>
             </div>
 
-            {/* Publisher Info */}
+            {/* Publisher Info
             <div className="bg-card border rounded-lg shadow-sm">
               <div className="p-4 border-b">
                 <h2 className="text-xl font-semibold">Publié par</h2>
@@ -353,7 +354,7 @@ export function JobDetailsPage(props: {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Quick Summary */}
             <div className="bg-muted/30 border rounded-lg shadow-sm">
@@ -394,7 +395,7 @@ export function JobDetailsPage(props: {
                   <span className="text-sm text-muted-foreground">Salaire</span>
                   <SalaryDisplay salary={jobOffer.salary} />
                   <span className="text-primary text-xs font-normal">
-                    /{jobOffer.salaryPeriod}
+                    /{salaryPeriodLabels[jobOffer.salaryPeriod]}
                   </span>
                 </div>
 

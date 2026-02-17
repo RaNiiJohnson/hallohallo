@@ -3,7 +3,11 @@
 import { Briefcase, MapPin, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { jobTypeLabels, contractTypeLabels } from "./forms/jobOfferForm";
+import {
+  jobTypeLabels,
+  contractTypeLabels,
+  salaryPeriodLabels,
+} from "./forms/jobOfferForm";
 import { getRelativeTime } from "@/lib/date";
 import { SalaryDisplay } from "./salary";
 import { JobPageSkeleton } from "./skeleton";
@@ -100,7 +104,7 @@ export function JobList() {
                     className="text-foreground"
                   />
                   <span className="text-primary text-xs font-normal">
-                    /{job.salaryPeriod}
+                    /{salaryPeriodLabels[job.salaryPeriod]}
                   </span>
                 </div>
 

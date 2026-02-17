@@ -94,6 +94,15 @@ export const contractTypeLabels: Record<
 
 const salaryPeriodValues = ["hour", "month", "year"] as const;
 
+export const salaryPeriodLabels: Record<
+  (typeof salaryPeriodValues)[number],
+  string
+> = {
+  hour: "heure",
+  month: "mois",
+  year: "année",
+};
+
 const formSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
   type: z.enum(jobTypeValues),
