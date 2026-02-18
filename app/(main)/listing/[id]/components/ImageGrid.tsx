@@ -86,18 +86,18 @@ export function ImageGrid({ images, title }: ImageGridProps) {
   }, [api, isFullscreen, fullscreenIndex]);
 
   // Navigation au clavier
-  useEffect(() => {
-    if (!isFullscreen || !api) return;
+  // useEffect(() => {
+  //   if (!isFullscreen || !api) return;
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") api.scrollPrev();
-      if (e.key === "ArrowRight") api.scrollNext();
-      if (e.key === "Escape") closeFullscreen();
-    };
+  //   const handleKeyDown = (e: KeyboardEvent) => {
+  //     if (e.key === "ArrowLeft") api.scrollPrev();
+  //     if (e.key === "ArrowRight") api.scrollNext();
+  //     if (e.key === "Escape") closeFullscreen();
+  //   };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isFullscreen, api]);
+  //   window.addEventListener("keydown", handleKeyDown);
+  //   return () => window.removeEventListener("keydown", handleKeyDown);
+  // }, [isFullscreen, api]);
 
   if (allImages.length === 0) {
     return (
