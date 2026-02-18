@@ -50,11 +50,14 @@ import {
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
-import { useAction, useMutation } from "convex/react";
+import { useMutation } from "convex/react";
+import { useCloudinaryUpload } from "@imaxis/cloudinary-convex/react";
+import { fileToBase64 } from "@/lib/utils";
+
 import { api } from "@convex/_generated/api";
 import { LocationPicker } from "@/lib/LocationPicker";
 import { useFileUpload } from "@/hooks/use-file-upload";
-import { uploadDirectToCloudinary } from "@convex/utils";
+import imageCompression from "browser-image-compression";
 
 const listingTypeValues = [
   "room",
@@ -117,8 +120,8 @@ interface ListingFormProps {
 }
 
 export function ListingForm({ onSuccess }: ListingFormProps) {
-  const getCredentials = useAction(api.cloudinary.generateUploadCredentials);
-  const finalizeUploadMutation = useMutation(api.cloudinary.finalizeUpload);
+  const { upload } = useCloudinaryUpload(api.cloudinary.upload);
+
   const createListing = useMutation(api.listings.createListing);
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -126,7 +129,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
   const [extraInput, setExtraInput] = useState("");
 
   // Image upload hook
-  const maxSizeMB = 9;
+  const maxSizeMB = 20;
   const maxSize = maxSizeMB * 1024 * 1024;
   const maxFiles = 10;
 
@@ -235,29 +238,27 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
   async function onSubmit(data: z.infer<typeof formSchema>) {
     if (files.length === 0) return;
     try {
-      const uploadPromises = files.map(async (fileWrapper) => {
-        const f = fileWrapper.file;
-
-        // Nouveau fichier (File)
-        if (f instanceof File) {
-          const { publicId, secureUrl } = await uploadDirectToCloudinary(
-            f,
-            getCredentials,
-            finalizeUploadMutation,
-            // Optionnel : callback de progression globale
-            (percent) => {
-              // tu peux stocker ce pourcentage dans un state si tu veux
-              console.log("Progress:", percent);
-            },
-          );
-
-          return { publicId, secureUrl };
+      const uploadPromises = files.map(async (file) => {
+        if (file.file instanceof File) {
+          const compressedFile = await imageCompression(file.file, {
+            maxSizeMB: 0.5,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+          });
+          const base64 = await fileToBase64(compressedFile);
+          const res = await upload(base64, {
+            folder: "real_estates",
+            tags: ["listing_image"],
+          });
+          if (!res.publicId || !res.secureUrl) {
+            throw new Error("Erreur lors de l'upload de l'image");
+          }
+          return { publicId: res.publicId, secureUrl: res.secureUrl };
         }
 
-        // Fichier existant (FileMetadata)
         return {
-          publicId: f.id,
-          secureUrl: f.url,
+          publicId: file.file.id,
+          secureUrl: file.file.url,
         };
       });
 
