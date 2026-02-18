@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   Carousel,
   CarouselContent,
@@ -14,11 +9,10 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import type { CarouselApi } from "@/components/ui/carousel";
-import { Button } from "@/components/ui/button";
 
 interface CloudinaryImage {
   publicId: string;
@@ -261,14 +255,6 @@ export function ImageGrid({ images, title }: ImageGridProps) {
               </div>
             )}
           </Carousel>
-          <DialogClose asChild>
-            <Button
-              variant="outline"
-              className="absolute top-3 right-3 h-12 w-12 z-20"
-            >
-              <X className="h-8 w-8" />
-            </Button>
-          </DialogClose>
         </DialogContent>
       </Dialog>
     </>
