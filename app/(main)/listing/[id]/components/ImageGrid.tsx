@@ -1,6 +1,11 @@
 "use client";
 
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Carousel,
   CarouselContent,
@@ -9,10 +14,11 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import type { CarouselApi } from "@/components/ui/carousel";
+import { Button } from "@/components/ui/button";
 
 interface CloudinaryImage {
   publicId: string;
@@ -36,6 +42,35 @@ export function ImageGrid({ images, title }: ImageGridProps) {
   const openFullscreen = (index: number) => {
     setFullscreenIndex(index);
     setIsFullscreen(true);
+    // Ajoute une entrée dans l'historique pour intercepter le bouton retour mobile
+    window.history.pushState({ modal: "image-gallery" }, "");
+  };
+
+  const closeFullscreen = () => {
+    setIsFullscreen(false);
+  };
+
+  // Intercepte le bouton retour du navigateur (mobile)
+  useEffect(() => {
+    const handlePopState = () => {
+      if (isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [isFullscreen]);
+
+  // Quand le dialog est fermé via onOpenChange (croix, overlay),
+  // on retire l'entrée history qu'on avait poussée
+  const handleOpenChange = (open: boolean) => {
+    if (!open && isFullscreen) {
+      // L'utilisateur a fermé via la croix ou l'overlay (pas via popstate)
+      // On revient en arrière dans l'historique pour ne pas laisser une entrée orpheline
+      window.history.back();
+      closeFullscreen();
+    }
   };
 
   // Synchroniser l'index avec le carousel
@@ -61,15 +96,9 @@ export function ImageGrid({ images, title }: ImageGridProps) {
     if (!isFullscreen || !api) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") {
-        api.scrollPrev();
-      }
-      if (e.key === "ArrowRight") {
-        api.scrollNext();
-      }
-      if (e.key === "Escape") {
-        setIsFullscreen(false);
-      }
+      if (e.key === "ArrowLeft") api.scrollPrev();
+      if (e.key === "ArrowRight") api.scrollNext();
+      if (e.key === "Escape") closeFullscreen();
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -102,7 +131,7 @@ export function ImageGrid({ images, title }: ImageGridProps) {
             src={allImages[0].secureUrl}
             alt={`${title} - Image principale`}
             fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105 group-hover:z-10"
+            className="object-cover"
             sizes="(max-width: 768px) 50vw, 25vw"
           />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
@@ -119,7 +148,7 @@ export function ImageGrid({ images, title }: ImageGridProps) {
               src={image.secureUrl}
               alt={`${title} - Image ${index + 2}`}
               fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="object-cover"
               sizes="(max-width: 768px) 25vw, 12.5vw"
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
@@ -150,8 +179,8 @@ export function ImageGrid({ images, title }: ImageGridProps) {
       </div>
 
       {/* Modal plein écran avec Carousel */}
-      <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
-        <DialogContent className="max-w-[95vw] md:max-w-[97vw] max-h-[95vh] p-0 bg-black/90 border-0">
+      <Dialog open={isFullscreen} onOpenChange={handleOpenChange}>
+        <DialogContent className="max-w-[95vw] md:max-w-[97vw] max-h-[95vh] p-0 border-0 rounded-none   ">
           <DialogTitle className="sr-only">
             Galerie d&apos;images - {title}
           </DialogTitle>
@@ -232,6 +261,14 @@ export function ImageGrid({ images, title }: ImageGridProps) {
               </div>
             )}
           </Carousel>
+          <DialogClose asChild>
+            <Button
+              variant="outline"
+              className="absolute top-3 right-3 h-12 w-12 z-20"
+            >
+              <X className="h-8 w-8" />
+            </Button>
+          </DialogClose>
         </DialogContent>
       </Dialog>
     </>
