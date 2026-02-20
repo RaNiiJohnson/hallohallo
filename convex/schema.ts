@@ -163,13 +163,13 @@ export default defineSchema({
     name: v.string(),
     description: v.string(),
     authorId: v.string(),
-    authorName: v.optional(v.string()),
+    authorName: v.string(),
     privacy: v.union(
       v.literal("public"),
       v.literal("private"),
       v.literal("secret"),
     ),
-    searchAll: v.optional(v.string()),
+    searchAll: v.string(),
   })
     .index("by_authorId", ["authorId"])
     .index("by_slug", ["slug"])
@@ -187,7 +187,8 @@ export default defineSchema({
     ),
   })
     .index("by_userId", ["userId"])
-    .index("by_communityId", ["communityId"]),
+    .index("by_communityId", ["communityId"])
+    .index("by_userId_communityId", ["userId", "communityId"]),
 
   posts: defineTable({
     slug: v.string(),
@@ -195,8 +196,8 @@ export default defineSchema({
     communityId: v.id("communities"),
     content: v.string(),
     authorId: v.string(),
-    authorName: v.optional(v.string()),
-    searchAll: v.optional(v.string()),
+    authorName: v.string(),
+    searchAll: v.string(),
   })
     .index("by_authorId", ["authorId"])
     .index("by_slug", ["slug"])
@@ -214,7 +215,7 @@ export default defineSchema({
 
   postComments: defineTable({
     authorId: v.string(),
-    authorName: v.optional(v.string()),
+    authorName: v.string(),
     postId: v.id("posts"),
     content: v.string(),
   })
@@ -230,7 +231,7 @@ export default defineSchema({
 
   postCommentReplies: defineTable({
     authorId: v.string(),
-    authorName: v.optional(v.string()),
+    authorName: v.string(),
     commentId: v.id("postComments"),
     content: v.string(),
   })

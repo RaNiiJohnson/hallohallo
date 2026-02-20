@@ -31,6 +31,13 @@ export const createCommunty = mutation({
       privacy: args.privacy,
       searchAll: `${args.name} ${args.description} ${user.name}`,
     });
+
+    await ctx.db.insert("communityMembers", {
+      userId: user._id,
+      communityId: comId,
+      role: "admin",
+    });
+
     return comId;
   },
 });
@@ -189,5 +196,97 @@ export const deleteCommunity = mutation({
 
     // 8. Supprimer la communauté
     await ctx.db.delete(args.id);
+  },
+});
+
+export const joinCommunity = mutation({
+  args: {
+    communityId: v.id("communities"),
+  },
+  handler: async (ctx, args) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) throw new Error("Not authenticated");
+
+    const community = await ctx.db.get(args.communityId);
+    if (!community) throw new Error("Community not found");
+
+    await ctx.db.insert("communityMembers", {
+      userId: user._id,
+      communityId: args.communityId,
+      role: "member",
+    });
+  },
+});
+
+export const leaveCommunity = mutation({
+  args: {
+    communityId: v.id("communities"),
+  },
+  handler: async (ctx, args) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) throw new Error("Not authenticated");
+
+    const community = await ctx.db.get("communities", args.communityId);
+    if (!community) throw new Error("Community not found");
+
+    const membership = await ctx.db
+      .query("communityMembers")
+      .withIndex("by_userId_communityId", (q) =>
+        q.eq("userId", user._id).eq("communityId", args.communityId),
+      )
+      .unique();
+
+    if (!membership) {
+      // optionally: throw or just return
+      throw new Error("Membership not found");
+    }
+
+    await ctx.db.delete("communityMembers", membership._id);
+  },
+});
+
+export const getCommunityMembers = query({
+  args: {
+    communityId: v.id("communities"),
+  },
+  handler: async (ctx, args) => {
+    const members = await ctx.db
+      .query("communityMembers")
+      .withIndex("by_communityId", (q) => q.eq("communityId", args.communityId))
+      .collect();
+    return members;
+  },
+});
+
+export const getCommunityMembersWithUser = query({
+  args: {
+    communityId: v.id("communities"),
+  },
+  handler: async (ctx, args) => {
+    const members = await ctx.db
+      .query("communityMembers")
+      .withIndex("by_communityId", (q) => q.eq("communityId", args.communityId))
+      .collect();
+    return members;
+  },
+});
+
+export const inviteToCommunity = mutation({
+  args: {
+    communityId: v.id("communities"),
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) throw new Error("Not authenticated");
+
+    const community = await ctx.db.get(args.communityId);
+    if (!community) throw new Error("Community not found");
+
+    await ctx.db.insert("communityMembers", {
+      userId: args.userId,
+      communityId: args.communityId,
+      role: "member",
+    });
   },
 });
