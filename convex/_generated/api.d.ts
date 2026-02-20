@@ -11,13 +11,16 @@
 import type * as auth from "../auth.js";
 import type * as bookmarks from "../bookmarks.js";
 import type * as cloudinary from "../cloudinary.js";
+import type * as communities from "../communities.js";
 import type * as http from "../http.js";
 import type * as jobs from "../jobs.js";
 import type * as listings from "../listings.js";
+import type * as posts_comments from "../posts/comments.js";
+import type * as posts_likes from "../posts/likes.js";
+import type * as posts_posts from "../posts/posts.js";
 import type * as stripe from "../stripe.js";
 import type * as upload from "../upload.js";
 import type * as users from "../users.js";
-import type * as utils from "../utils.js";
 
 import type {
   ApiFromModules,
@@ -29,13 +32,16 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   bookmarks: typeof bookmarks;
   cloudinary: typeof cloudinary;
+  communities: typeof communities;
   http: typeof http;
   jobs: typeof jobs;
   listings: typeof listings;
+  "posts/comments": typeof posts_comments;
+  "posts/likes": typeof posts_likes;
+  "posts/posts": typeof posts_posts;
   stripe: typeof stripe;
   upload: typeof upload;
   users: typeof users;
-  utils: typeof utils;
 }>;
 
 /**
