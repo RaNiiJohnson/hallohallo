@@ -151,7 +151,7 @@ export default function CommunityClient({
                     {post.title}
                   </h2>
                   {post.content && (
-                    <p className="text-sm text-foreground/80 line-clamp-2 mb-2">
+                    <p className="text-sm text-foreground/80 line-clamp-6 mb-2 whitespace-pre-wrap">
                       {post.content}
                     </p>
                   )}

@@ -297,7 +297,7 @@ export default function PostClient({
           </h1>
 
           {post.content && (
-            <p className="text-sm text-foreground leading-relaxed mb-4">
+            <p className="text-sm text-foreground leading-relaxed mb-4 whitespace-pre-wrap">
               {post.content}
             </p>
           )}

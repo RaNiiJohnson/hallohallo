@@ -85,7 +85,7 @@ export default function ComList() {
                       {post.title}
                     </h2>
                     {post.content && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">
+                      <p className="text-sm text-muted-foreground line-clamp-6 whitespace-pre-wrap">
                         {post.content}
                       </p>
                     )}
