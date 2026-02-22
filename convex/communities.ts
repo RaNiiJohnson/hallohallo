@@ -5,6 +5,22 @@ import { authComponent } from "./auth";
 import { paginationOptsValidator } from "convex/server";
 import { getManyFrom } from "convex-helpers/server/relationships";
 
+export const isMember = query({
+  args: { communityId: v.id("communities") },
+  handler: async (ctx, args) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) return null;
+
+    const member = await ctx.db
+      .query("communityMembers")
+      .withIndex("by_userId", (q) => q.eq("userId", user._id))
+      .filter((q) => q.eq(q.field("communityId"), args.communityId))
+      .first();
+
+    return member ?? null;
+  },
+});
+
 export const createCommunty = mutation({
   args: {
     name: v.string(),
