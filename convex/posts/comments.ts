@@ -1,4 +1,3 @@
-// convex/comments.ts
 import { mutation } from "../_generated/server";
 import { v } from "convex/values";
 import { authComponent } from "../auth";
@@ -12,12 +11,21 @@ export const addComment = mutation({
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) throw new Error("Not authenticated");
 
+    const post = await ctx.db.get(args.postId);
+    if (!post) throw new Error("Post not found");
+
     const commentId = await ctx.db.insert("postComments", {
       postId: args.postId,
       authorId: user._id,
       content: args.content,
       authorName: user.name,
     });
+
+    // Incrémenter commentsCount sur le post
+    await ctx.db.patch(args.postId, {
+      commentsCount: (post.commentsCount ?? 0) + 1,
+    });
+
     return commentId;
   },
 });
@@ -31,6 +39,8 @@ export const deleteComment = mutation({
     const comment = await ctx.db.get(args.commentId);
     if (!comment) throw new Error("Comment not found");
     if (comment.authorId !== user._id) throw new Error("Not authorized");
+
+    const post = await ctx.db.get(comment.postId);
 
     // 1. Likes du commentaire
     const commentLikes = await ctx.db
@@ -46,7 +56,6 @@ export const deleteComment = mutation({
       .collect();
 
     for (const reply of replies) {
-      // 3. Likes des replies
       const replyLikes = await ctx.db
         .query("postCommentReplyLikes")
         .withIndex("by_replyId", (q) => q.eq("replyId", reply._id))
@@ -55,8 +64,15 @@ export const deleteComment = mutation({
       await ctx.db.delete(reply._id);
     }
 
-    // 4. Commentaire lui-même
+    // 3. Commentaire lui-même
     await ctx.db.delete(args.commentId);
+
+    // 4. Décrémenter commentsCount sur le post
+    if (post) {
+      await ctx.db.patch(comment.postId, {
+        commentsCount: Math.max((post.commentsCount ?? 0) - 1, 0),
+      });
+    }
   },
 });
 
@@ -95,6 +111,7 @@ export const addReply = mutation({
       authorName: user.name,
       content: args.content,
     });
+
     return replyId;
   },
 });

@@ -163,19 +163,19 @@ export default defineSchema({
     name: v.string(),
     description: v.string(),
     authorId: v.string(),
-    authorName: v.string(),
+    authorName: v.optional(v.string()),
     privacy: v.union(
       v.literal("public"),
       v.literal("private"),
       v.literal("secret"),
     ),
-    searchAll: v.string(),
+    searchAll: v.optional(v.string()),
+    membersCount: v.optional(v.number()),
+    postsCount: v.optional(v.number()),
   })
     .index("by_authorId", ["authorId"])
     .index("by_slug", ["slug"])
-    .searchIndex("search_all_fields", {
-      searchField: "searchAll",
-    }),
+    .searchIndex("search_all_fields", { searchField: "searchAll" }),
 
   communityMembers: defineTable({
     userId: v.string(),
@@ -196,15 +196,15 @@ export default defineSchema({
     communityId: v.id("communities"),
     content: v.string(),
     authorId: v.string(),
-    authorName: v.string(),
-    searchAll: v.string(),
+    authorName: v.optional(v.string()),
+    searchAll: v.optional(v.string()),
+    likesCount: v.optional(v.number()),
+    commentsCount: v.optional(v.number()),
   })
     .index("by_authorId", ["authorId"])
     .index("by_slug", ["slug"])
     .index("by_communityId", ["communityId"])
-    .searchIndex("search_all_fields", {
-      searchField: "searchAll",
-    }),
+    .searchIndex("search_all_fields", { searchField: "searchAll" }),
 
   postLikes: defineTable({
     userId: v.string(),
