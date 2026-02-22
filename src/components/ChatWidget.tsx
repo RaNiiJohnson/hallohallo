@@ -5,7 +5,15 @@ import { useQuery, useMutation, useConvexAuth } from "convex/react";
 import { usePaginatedQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
-import { MessageCircle, X, Minus, Send, ChevronLeft } from "lucide-react";
+import {
+  MessageCircle,
+  X,
+  Minus,
+  Send,
+  ChevronLeft,
+  Maximize2,
+  Minimize2,
+} from "lucide-react";
 import { getRelativeTime } from "@/lib/date";
 import { toast } from "sonner";
 
@@ -20,10 +28,14 @@ function ChatWindow({
   community,
   onBack,
   onClose,
+  isFullscreen,
+  onToggleFullscreen,
 }: {
   community: Community;
   onBack: () => void;
   onClose: () => void;
+  isFullscreen: boolean;
+  onToggleFullscreen: () => void;
 }) {
   const [content, setContent] = useState("");
   const sendMessage = useMutation(api.messages.sendMessage);
@@ -77,6 +89,14 @@ function ChatWindow({
             {community.name}
           </span>
         </div>
+        {/* Fullscreen toggle — desktop seulement */}
+        <button
+          onClick={onToggleFullscreen}
+          className="hidden sm:block text-muted-foreground hover:text-foreground transition-colors mr-1"
+          title={isFullscreen ? "Réduire" : "Plein écran"}
+        >
+          {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+        </button>
         <button
           onClick={onClose}
           className="text-muted-foreground hover:text-foreground transition-colors"
@@ -85,7 +105,7 @@ function ChatWindow({
         </button>
       </div>
 
-      {/* Messages — seul scroll ici */}
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-3 space-y-2 overscroll-contain">
         {status === "CanLoadMore" && (
           <button
@@ -154,10 +174,14 @@ function CommunityList({
   communities,
   onSelect,
   onClose,
+  isFullscreen,
+  onToggleFullscreen,
 }: {
   communities: Community[];
   onSelect: (c: Community) => void;
   onClose: () => void;
+  isFullscreen: boolean;
+  onToggleFullscreen: () => void;
 }) {
   return (
     <div className="flex flex-col h-full">
@@ -165,12 +189,21 @@ function CommunityList({
         <span className="text-sm font-semibold text-foreground">
           Mes communautés
         </span>
-        <button
-          onClick={onClose}
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <X size={14} />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onToggleFullscreen}
+            className="hidden sm:block text-muted-foreground hover:text-foreground transition-colors"
+            title={isFullscreen ? "Réduire" : "Plein écran"}
+          >
+            {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+          </button>
+          <button
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <X size={14} />
+          </button>
+        </div>
       </div>
       <div className="flex-1 overflow-y-auto overscroll-contain">
         {communities.length === 0 ? (
@@ -203,13 +236,23 @@ function CommunityList({
 export function ChatWidget() {
   const { isAuthenticated } = useConvexAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(
     null,
   );
 
+  const communities = useQuery(
+    api.communities.getMyCommunities,
+    isAuthenticated ? {} : "skip",
+  );
+
+  // Bloquer scroll body sur mobile
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = "hidden";
+      const isMobile = window.matchMedia("(max-width: 639px)").matches;
+      if (isMobile) {
+        document.body.style.overflow = "hidden";
+      }
     } else {
       document.body.style.overflow = "";
     }
@@ -218,55 +261,103 @@ export function ChatWidget() {
     };
   }, [isOpen]);
 
-  const communities = useQuery(
-    api.communities.getMyCommunities,
-    isAuthenticated ? {} : "skip",
-  );
+  // Échap → fermer
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        setIsOpen(false);
+        setIsFullscreen(false);
+        setSelectedCommunity(null);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
+
+  // Bouton retour mobile
+  useEffect(() => {
+    if (isOpen) {
+      window.history.pushState({ chatOpen: true }, "");
+    }
+    const handlePopState = () => {
+      if (isOpen) {
+        setIsOpen(false);
+        setIsFullscreen(false);
+        setSelectedCommunity(null);
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [isOpen]);
 
   if (!isAuthenticated || !communities || communities.length === 0) return null;
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setIsFullscreen(false);
+    setSelectedCommunity(null);
+  };
+
+  const handleToggleFullscreen = () => setIsFullscreen(!isFullscreen);
 
   const content = selectedCommunity ? (
     <ChatWindow
       community={selectedCommunity}
       onBack={() => setSelectedCommunity(null)}
-      onClose={() => {
-        setIsOpen(false);
-        setSelectedCommunity(null);
-      }}
+      onClose={handleClose}
+      isFullscreen={isFullscreen}
+      onToggleFullscreen={handleToggleFullscreen}
     />
   ) : (
     <CommunityList
       communities={communities as Community[]}
       onSelect={setSelectedCommunity}
-      onClose={() => setIsOpen(false)}
+      onClose={handleClose}
+      isFullscreen={isFullscreen}
+      onToggleFullscreen={handleToggleFullscreen}
     />
   );
 
   return (
     <>
-      {/* Mobile fullscreen — complètement séparé du container flottant */}
+      {/* Mobile fullscreen — toujours inset-0 */}
       {isOpen && (
         <div className="sm:hidden fixed inset-0 z-50 bg-background flex flex-col">
           {content}
         </div>
       )}
 
-      {/* Desktop + bouton flottant */}
-      <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
+      {/* Desktop */}
+      <div className="fixed bottom-4 right-4 z-50 flex-col items-end gap-2 hidden sm:flex">
         {isOpen && (
-          <div className="hidden sm:flex w-80 h-96 bg-background border border-border rounded-xl shadow-xl overflow-hidden flex-col">
+          <div
+            className={`bg-background border border-border rounded-xl shadow-xl overflow-hidden flex flex-col transition-all duration-200 ${
+              isFullscreen
+                ? "fixed top-4 bottom-4 right-4 w-full max-w-2xl h-auto"
+                : "w-80 h-96"
+            }`}
+          >
             {content}
           </div>
         )}
 
-        {/* Bouton — caché sur mobile quand ouvert */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className={`w-12 h-12 rounded-full bg-primary text-primary-foreground items-center justify-center shadow-lg hover:bg-primary/90 transition-colors ${isOpen ? "hidden sm:flex" : "flex"}`}
+          className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:bg-primary/90 transition-colors"
         >
           {isOpen ? <Minus size={18} /> : <MessageCircle size={18} />}
         </button>
       </div>
+
+      {/* Bouton flottant mobile — caché quand chat ouvert */}
+      {!isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="sm:hidden fixed bottom-4 right-4 z-50 w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:bg-primary/90 transition-colors"
+        >
+          <MessageCircle size={18} />
+        </button>
+      )}
     </>
   );
 }
