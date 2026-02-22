@@ -32,7 +32,7 @@ export default function ComList() {
               </div>
               <div>
                 <p className="font-semibold text-foreground">
-                  r/{community.name}
+                  hallo/{community.name}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {community.description}

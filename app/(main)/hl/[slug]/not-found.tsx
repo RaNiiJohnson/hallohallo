@@ -17,7 +17,7 @@ export default function NotFound() {
           <p className="text-muted-foreground">
             Ce profil n&apos;existe pas ou a été supprimé.
           </p>
-          <Link href="/community">
+          <Link href="/communities">
             <Button className="w-full">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Retour aux communautés

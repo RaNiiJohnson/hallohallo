@@ -71,16 +71,16 @@ export function Header() {
             className="relative"
           >
             <Link
-              href="/community"
+              href="/communities"
               className={`text-accent-foreground/60 font-medium transition-colors relative z-10 ${
-                pathname === "/community"
+                pathname === "/communities"
                   ? "text-foreground"
                   : "hover:text-foreground"
               }`}
             >
               Communauté
             </Link>
-            {pathname === "/community" && (
+            {pathname === "/communities" && (
               <motion.div
                 className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                 layoutId="activeTab"
@@ -235,7 +235,7 @@ export function Header() {
               {/* Navigation mobile */}
               {[
                 { href: "/", label: "Accueil" },
-                { href: "/communaute", label: "Communauté" },
+                { href: "/communities", label: "Communauté" },
                 { href: "/jobs", label: "Opportunités" },
                 { href: "/listing", label: "Immobilier" },
                 ...(isAuthenticated

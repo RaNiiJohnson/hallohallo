@@ -37,7 +37,7 @@ export default function CommunityClient({
   const handleJoin = async () => {
     try {
       await joinCommunity({ communityId: community._id });
-      toast.success(`Vous avez rejoint r/${community.name} !`);
+      toast.success(`Vous avez rejoint hallo/${community.name} !`);
     } catch {
       toast.error("Erreur lors de l'adhésion");
     }
@@ -46,7 +46,7 @@ export default function CommunityClient({
   const handleLeave = async () => {
     try {
       await leaveCommunity({ communityId: community._id });
-      toast.success(`Vous avez quitté r/${community.name}`);
+      toast.success(`Vous avez quitté hallo/${community.name}`);
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Erreur";
       toast.error(message);
@@ -64,7 +64,7 @@ export default function CommunityClient({
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-foreground">
-                  r/{community.name}
+                  hallo/{community.name}
                 </h1>
                 <p className="text-sm text-muted-foreground mt-0.5">
                   {community.description}
