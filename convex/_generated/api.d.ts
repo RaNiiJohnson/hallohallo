@@ -15,6 +15,7 @@ import type * as communities from "../communities.js";
 import type * as http from "../http.js";
 import type * as jobs from "../jobs.js";
 import type * as listings from "../listings.js";
+import type * as messages from "../messages.js";
 import type * as posts_comments from "../posts/comments.js";
 import type * as posts_likes from "../posts/likes.js";
 import type * as posts_posts from "../posts/posts.js";
@@ -36,6 +37,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   jobs: typeof jobs;
   listings: typeof listings;
+  messages: typeof messages;
   "posts/comments": typeof posts_comments;
   "posts/likes": typeof posts_likes;
   "posts/posts": typeof posts_posts;

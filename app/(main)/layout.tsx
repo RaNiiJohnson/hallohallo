@@ -1,3 +1,4 @@
+import { ChatWidget } from "@/components/ChatWidget";
 import Footer from "@/components/footer";
 import { Header } from "@/components/header";
 
@@ -11,6 +12,7 @@ export default function RootLayout({
       <Header />
       <main className="mx-auto w-full min-h-screen">{children}</main>
       <Footer />
+      <ChatWidget />
     </>
   );
 }

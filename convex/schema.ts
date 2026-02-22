@@ -244,4 +244,12 @@ export default defineSchema({
   })
     .index("by_userId", ["userId"])
     .index("by_replyId", ["replyId"]),
+
+    communityMessages: defineTable({
+  communityId: v.id("communities"),
+  authorId: v.string(),
+  authorName: v.optional(v.string()),
+  content: v.string(),
+})
+  .index("by_communityId", ["communityId"])
 });

@@ -119,6 +119,24 @@ export const getCommunity = query({
   },
 });
 
+export const getMyCommunities = query({
+  handler: async (ctx) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) return [];
+
+    const memberships = await ctx.db
+      .query("communityMembers")
+      .withIndex("by_userId", (q) => q.eq("userId", user._id))
+      .collect();
+
+    const communities = await Promise.all(
+      memberships.map((m) => ctx.db.get(m.communityId)),
+    );
+
+    return communities.filter(Boolean);
+  },
+});
+
 export const getCommunityWithPosts = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
@@ -230,7 +248,14 @@ export const deleteCommunity = mutation({
       .collect();
     for (const member of members) await ctx.db.delete(member._id);
 
-    // 3. Communauté
+    // 3. Messages
+    const messages = await ctx.db
+      .query("communityMessages")
+      .withIndex("by_communityId", (q) => q.eq("communityId", args.id))
+      .collect();
+    for (const message of messages) await ctx.db.delete(message._id);
+
+    // 4. Communauté
     await ctx.db.delete(args.id);
   },
 });
@@ -288,5 +313,13 @@ export const leaveCommunity = mutation({
     await ctx.db.patch(args.communityId, {
       membersCount: Math.max((community.membersCount ?? 0) - 1, 0),
     });
+  },
+});
+
+export const getMe = query({
+  handler: async (ctx) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) return null;
+    return user;
   },
 });
