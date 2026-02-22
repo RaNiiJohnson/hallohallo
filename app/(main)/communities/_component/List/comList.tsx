@@ -36,7 +36,7 @@ export default function ComList() {
       {results?.map((community) => (
         <div
           key={community._id}
-          className="w-full max-w-4xl border border-border rounded-xl overflow-hidden"
+          className="w-full max-w-4xl bg-card dark:bg-card/35 border border-border rounded-xl overflow-hidden"
         >
           {/* Header communauté */}
           <Link

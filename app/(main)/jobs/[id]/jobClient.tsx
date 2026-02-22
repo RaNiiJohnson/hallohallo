@@ -166,7 +166,7 @@ export function JobDetailsPage(props: {
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Job Overview */}
-            <div className="bg-card border rounded-lg shadow-sm">
+            <div className="bg-card dark:bg-card/35 border rounded-lg shadow-sm">
               <div className="p-4 border-b">
                 <h2 className="text-xl font-semibold flex items-center gap-2">
                   <FileText className="w-5 h-5" />
@@ -233,7 +233,7 @@ export function JobDetailsPage(props: {
             </div>
 
             {/* Job Description */}
-            <div className="bg-card border rounded-lg shadow-sm">
+            <div className="bg-card dark:bg-card/35 border rounded-lg shadow-sm">
               <div className="p-4 border-b">
                 <h2 className="text-xl font-semibold">Description du poste</h2>
               </div>
@@ -253,7 +253,7 @@ export function JobDetailsPage(props: {
 
             {/* Certificates */}
             {jobOffer.certificates && jobOffer.certificates.length > 0 && (
-              <div className="bg-card border rounded-lg shadow-sm">
+              <div className="bg-card dark:bg-card/35 border rounded-lg shadow-sm">
                 <div className="p-4 border-b">
                   <h2 className="text-xl font-semibold flex items-center gap-2">
                     <Award className="w-5 h-5" />
@@ -309,7 +309,7 @@ export function JobDetailsPage(props: {
           {/* Right Column - Sidebar */}
           <div className="space-y-6">
             {/* Company Info */}
-            <div className="bg-card border rounded-lg shadow-sm">
+            <div className="bg-card dark:bg-card/35 border rounded-lg shadow-sm">
               <div className="p-4 border-b">
                 <h2 className="text-xl font-semibold">
                   Informations sur l&apos;entreprise
@@ -333,7 +333,7 @@ export function JobDetailsPage(props: {
             </div>
 
             {/* Publisher Info
-            <div className="bg-card border rounded-lg shadow-sm">
+            <div className="bg-card dark:bg-card/35 border rounded-lg shadow-sm">
               <div className="p-4 border-b">
                 <h2 className="text-xl font-semibold">Publié par</h2>
               </div>
