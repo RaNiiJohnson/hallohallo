@@ -9,12 +9,12 @@ import {
 import { api } from "@convex/_generated/api";
 import { getRelativeTime } from "@/lib/date";
 import {
-  ArrowUp,
   Bookmark,
   MessageSquare,
   Share2,
   ChevronDown,
   ChevronUp,
+  CheckIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -22,21 +22,37 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Id } from "@convex/_generated/dataModel";
 
-// ─── Like Button ─────────────────────────────────────────
+// ─── Like Button (used for comments/replies) ────────────────
 
-function LikeButton({ count, onLike }: { count: number; onLike: () => void }) {
+function LikeButton({
+  count,
+  onLike,
+  isLiked,
+}: {
+  count: number;
+  onLike: () => void;
+  isLiked?: boolean;
+}) {
   return (
-    <div className="flex items-center gap-1 bg-muted rounded-full px-3 py-1">
-      <button
-        onClick={onLike}
-        className="text-muted-foreground hover:text-primary transition-colors"
-      >
-        <ArrowUp size={14} />
-      </button>
-      <span className="text-xs font-semibold text-foreground min-w-[1.5rem] text-center">
-        {count}
-      </span>
-    </div>
+    <Button
+      variant="ghost"
+      size="sm"
+      className={`group flex items-center gap-1.5 transition-colors h-8 px-2 ${
+        isLiked
+          ? "text-green-500 hover:bg-green-500/20"
+          : "text-muted-foreground hover:text-green-500 hover:bg-green-500/10"
+      }`}
+      onClick={(e) => {
+        e.preventDefault();
+        onLike();
+      }}
+    >
+      <CheckIcon
+        size={15}
+        className="transition-transform group-active:scale-95"
+      />
+      <span className="text-xs font-medium">{count}</span>
+    </Button>
   );
 }
 
@@ -52,6 +68,7 @@ function ReplyItem({
     content: string;
     likes: { userId: string }[];
     likesCount: number;
+    userHasLiked?: boolean;
   } | null;
 }) {
   const likeReply = useMutation(api.posts.likes.likeReply);
@@ -67,11 +84,15 @@ function ReplyItem({
   return (
     <div className="ml-8 pl-4 border-l border-border py-2">
       <p className="text-xs text-muted-foreground mb-1">
-        <span className="text-primary font-medium">u/{reply.authorName}</span> •{" "}
+        <span className="text-primary font-medium">{reply.authorName}</span> •{" "}
         {getRelativeTime(reply._creationTime)}
       </p>
       <p className="text-sm text-foreground mb-2">{reply.content}</p>
-      <LikeButton count={reply.likesCount} onLike={handleLike} />
+      <LikeButton
+        count={reply.likesCount}
+        onLike={handleLike}
+        isLiked={reply.userHasLiked}
+      />
     </div>
   );
 }
@@ -88,6 +109,7 @@ function CommentItem({
     content: string;
     likes: { userId: string }[];
     likesCount: number;
+    userHasLiked?: boolean;
     replies: ({
       _id: Id<"postCommentReplies">;
       _creationTime: number;
@@ -95,6 +117,7 @@ function CommentItem({
       content: string;
       likes: { userId: string }[];
       likesCount: number;
+      userHasLiked?: boolean;
     } | null)[];
   } | null;
 }) {
@@ -133,11 +156,13 @@ function CommentItem({
   const validReplies = comment.replies.filter(Boolean);
 
   return (
-    <div className="bg-card border border-border rounded-xl p-4">
+    <div className="border-b border-border py-4">
       {/* Author */}
-      <p className="text-xs text-muted-foreground mb-1">
-        <span className="text-primary font-medium">u/{comment.authorName}</span>{" "}
-        • {getRelativeTime(comment._creationTime)}
+      <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1.5">
+        <span className="text-primary font-bold hover:underline cursor-pointer">
+          {comment.authorName}
+        </span>{" "}
+        • <span>{getRelativeTime(comment._creationTime)}</span>
       </p>
 
       {/* Content */}
@@ -145,7 +170,11 @@ function CommentItem({
 
       {/* Actions */}
       <div className="flex items-center gap-3">
-        <LikeButton count={comment.likesCount} onLike={handleLike} />
+        <LikeButton
+          count={comment.likesCount}
+          onLike={handleLike}
+          isLiked={comment.userHasLiked}
+        />
 
         {isAuthenticated && (
           <button
@@ -252,11 +281,14 @@ export default function PostClient({
 
   return (
     <div className="min-h-screen bg-background pb-12">
-      <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
+      <div className="max-w-3xl mx-auto py-2 space-y-4">
         {/* Post */}
-        <div className="bg-card border border-border rounded-xl p-5">
+        <article className="border-b border-border bg-background px-4 py-4">
           <p className="text-xs text-muted-foreground mb-1">
-            Posté par <span className="text-primary">u/{post.authorName}</span>{" "}
+            Posté par{" "}
+            <span className="text-primary hover:underline cursor-pointer">
+              {post.authorName}
+            </span>{" "}
             • {getRelativeTime(post._creationTime)}
           </p>
 
@@ -271,28 +303,80 @@ export default function PostClient({
           )}
 
           {/* Actions post */}
-          <div className="flex items-center gap-4">
-            <LikeButton count={post.likesCount ?? 0} onLike={handleLikePost} />
+          <div className="flex items-center gap-1 mt-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="group flex items-center gap-1.5 text-muted-foreground hover:text-blue-500 hover:bg-blue-500/10 transition-colors h-8 px-2"
+              onClick={(e) => {
+                e.preventDefault();
+                // Optionally scroll to comments here
+                document
+                  .getElementById("comments")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              <MessageSquare
+                size={15}
+                className="transition-transform group-active:scale-95"
+              />
+              <span className="text-xs font-medium">
+                {post.commentsCount ?? 0}
+              </span>
+            </Button>
 
-            <span className="flex items-center gap-1.5 text-muted-foreground text-xs">
-              <MessageSquare size={14} />
-              {post.commentsCount ?? 0}
-            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`group flex items-center gap-1.5 transition-colors h-8 px-2 ${
+                post.userHasLiked
+                  ? "text-green-500  hover:bg-green-500/20"
+                  : "text-muted-foreground hover:text-green-500 hover:bg-green-500/10"
+              }`}
+              onClick={(e) => {
+                e.preventDefault();
+                handleLikePost();
+              }}
+            >
+              <CheckIcon
+                size={15}
+                className="transition-transform group-active:scale-95"
+              />
+              <span className="text-xs font-medium">
+                {post.likesCount ?? 0}
+              </span>
+            </Button>
 
-            <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-xs transition-colors">
-              <Bookmark size={14} />
-            </button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="group flex items-center gap-1.5 text-muted-foreground hover:text-purple-500 hover:bg-purple-500/10 transition-colors h-8 px-2"
+            >
+              <Share2
+                size={15}
+                className="transition-transform group-active:scale-95"
+              />
+              <span className="text-xs font-medium hidden sm:inline">
+                Partager
+              </span>
+            </Button>
 
-            <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-xs transition-colors">
-              <Share2 size={14} />
-              <span>Partager</span>
-            </button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="group flex items-center gap-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors h-8 px-2 ml-auto"
+            >
+              <Bookmark
+                size={15}
+                className="transition-transform group-active:scale-95"
+              />
+            </Button>
           </div>
-        </div>
+        </article>
 
         {/* Ajouter un commentaire */}
         {isAuthenticated && (
-          <div className="bg-card border border-border rounded-xl p-4 space-y-2">
+          <div className="bg-background px-4 py-2 border-b border-border space-y-3">
             <p className="text-sm font-medium text-foreground">
               Ajouter un commentaire
             </p>
@@ -301,21 +385,24 @@ export default function PostClient({
               onChange={(e) => setCommentContent(e.target.value)}
               placeholder="Exprimez-vous..."
               rows={3}
-              className="resize-none text-sm"
+              className="resize-none text-sm bg-transparent border-border focus-visible:ring-1"
             />
-            <Button
-              onClick={handleComment}
-              disabled={isSubmitting || !commentContent.trim()}
-              size="sm"
-            >
-              {isSubmitting ? "Envoi..." : "Commenter"}
-            </Button>
+            <div className="flex justify-end">
+              <Button
+                onClick={handleComment}
+                disabled={isSubmitting || !commentContent.trim()}
+                size="sm"
+                className="rounded-full px-6"
+              >
+                {isSubmitting ? "Envoi..." : "Commenter"}
+              </Button>
+            </div>
           </div>
         )}
 
         {/* Comments */}
-        <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-foreground">
+        <div className="space-y-0 px-4 mt-4">
+          <h2 className="text-sm font-semibold text-foreground mb-4">
             {validComments.length} commentaire
             {validComments.length > 1 ? "s" : ""}
           </h2>

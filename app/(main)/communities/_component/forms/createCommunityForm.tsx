@@ -6,7 +6,6 @@ import * as z from "zod";
 
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -42,11 +41,11 @@ const formSchema = z.object({
   name: z
     .string()
     .min(3, "Le nom doit contenir au moins 3 caractères")
-    .max(50, "Le nom ne peut pas dépasser 50 caractères"),
+    .max(60, "Le nom ne peut pas dépasser 60 caractères"),
   description: z
     .string()
     .min(10, "La description doit contenir au moins 10 caractères")
-    .max(500, "La description ne peut pas dépasser 500 caractères"),
+    .max(200, "La description ne peut pas dépasser 200 caractères"),
   privacy: z.enum(privacyValues),
 });
 
@@ -111,9 +110,6 @@ export function CreateCommunityForm({ onSuccess }: CreateCommunityFormProps) {
                   placeholder="Ex: Francophones en Allemagne"
                   autoComplete="off"
                 />
-                <FieldDescription>
-                  Le nom sera utilisé pour générer l&apos;URL de la communauté.
-                </FieldDescription>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}

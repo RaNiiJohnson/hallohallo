@@ -76,6 +76,7 @@ export const getCommunitiesPreview = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
     const result = await ctx.db
       .query("communities")
       .order("desc")
@@ -91,9 +92,27 @@ export const getCommunitiesPreview = query({
           .order("desc")
           .take(3);
 
+        const recentPostsWithLikes = await Promise.all(
+          recentPosts.map(async (post) => {
+            let userHasLiked = false;
+            if (user) {
+              const existingLike = await ctx.db
+                .query("postLikes")
+                .withIndex("by_postId", (q) => q.eq("postId", post._id))
+                .filter((q) => q.eq(q.field("userId"), user._id))
+                .first();
+              if (existingLike) userHasLiked = true;
+            }
+            return {
+              ...post,
+              userHasLiked,
+            };
+          }),
+        );
+
         return {
           ...community,
-          recentPosts,
+          recentPosts: recentPostsWithLikes,
           membersCount: community.membersCount ?? 0,
           postsCount: community.postsCount ?? 0,
         };
@@ -140,6 +159,7 @@ export const getMyCommunities = query({
 export const getCommunityWithPosts = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
     const community = await ctx.db
       .query("communities")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
@@ -154,7 +174,25 @@ export const getCommunityWithPosts = query({
       "communityId",
     );
 
-    return { ...community, posts };
+    const postsWithLikes = await Promise.all(
+      posts.map(async (post) => {
+        let userHasLiked = false;
+        if (user) {
+          const existingLike = await ctx.db
+            .query("postLikes")
+            .withIndex("by_postId", (q) => q.eq("postId", post._id))
+            .filter((q) => q.eq(q.field("userId"), user._id))
+            .first();
+          if (existingLike) userHasLiked = true;
+        }
+        return {
+          ...post,
+          userHasLiked,
+        };
+      }),
+    );
+
+    return { ...community, posts: postsWithLikes };
   },
 });
 

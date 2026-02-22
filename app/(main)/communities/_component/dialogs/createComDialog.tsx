@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { CreateCommunityForm } from "../../createCommunityForm";
+import { CreateCommunityForm } from "../forms/createCommunityForm";
 
 interface CreateCommunityDialogProps {
   trigger?: React.ReactNode;

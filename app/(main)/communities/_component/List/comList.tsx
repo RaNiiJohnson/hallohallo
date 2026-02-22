@@ -2,127 +2,179 @@
 
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
-import { usePaginatedQuery } from "convex/react";
-import { ArrowUp, Bookmark, MessageSquare, Share2, Users } from "lucide-react";
+import { usePaginatedQuery, useMutation } from "convex/react";
+import { useConvexAuth } from "convex/react";
+import {
+  Bookmark,
+  MessageSquare,
+  Share2,
+  Users,
+  CheckIcon,
+} from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { toast } from "sonner";
+
+import { Id } from "@convex/_generated/dataModel";
 
 export default function ComList() {
+  const { isAuthenticated } = useConvexAuth();
+  const likePost = useMutation(api.posts.likes.likePost);
   const { results, loadMore, status } = usePaginatedQuery(
     api.communities.getCommunitiesPreview,
     {},
     { initialNumItems: 10 },
   );
 
+  const handleLike = async (postId: Id<"posts">) => {
+    if (!isAuthenticated) return toast.error("Connectez-vous pour liker");
+    await likePost({ postId });
+  };
+
   return (
-    <div className="flex flex-col sm:gap-6 items-center">
+    <div className="flex flex-col gap-4 items-center">
       {results?.map((community) => (
         <div
           key={community._id}
-          className="w-full max-w-3xl bg-card border border-border sm:rounded-xl overflow-hidden"
+          className="w-full max-w-4xl border border-border rounded-xl overflow-hidden"
         >
           {/* Header communauté */}
           <Link
             href={`/communities/${community.slug}`}
-            className="flex items-center justify-between p-4 border-b border-border hover:bg-muted/50 transition-colors"
+            className="flex items-center justify-between px-4 py-3 border-b border-border hover:bg-muted/30 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold">
-                r/
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0">
+                HL
               </div>
               <div>
-                <p className="font-semibold text-foreground">
+                <p className="font-semibold text-foreground text-sm">
                   hallo/{community.name}
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  {community.description}
-                </p>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+                  <span className="flex items-center gap-1">
+                    <Users size={11} />
+                    {community.membersCount ?? 0} membres
+                  </span>
+                  <span>{community.postsCount ?? 0} posts</span>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <Users size={13} />
-                {community.membersCount ?? 0}
-              </span>
-              <span>{community.postsCount ?? 0} posts</span>
-            </div>
+            <span className="text-xs text-primary font-medium hover:underline">
+              Voir tout →
+            </span>
           </Link>
 
-          {/* Posts récents de la communauté */}
-          <div className="divide-y divide-border">
+          {/* Posts récents */}
+          <div className="divide-y ml-11 divide-border">
             {community.recentPosts.length === 0 ? (
               <p className="text-sm text-muted-foreground p-4">
                 Aucun post pour le moment.
               </p>
             ) : (
               community.recentPosts.map((post) => (
-                <Link
-                  href={`/communities/${community.slug}/${post.slug}`}
+                <article
                   key={post._id}
-                  className="block p-4 hover:bg-muted/40 transition-colors cursor-pointer"
+                  className="px-4 py-3 hover:bg-muted/30 transition-colors"
                 >
-                  {/* Author + time */}
-                  <p className="text-xs text-muted-foreground mb-1">
+                  <Link
+                    href={`/communities/${community.slug}/${post.slug}`}
+                    className="block mb-3"
+                  >
+                    <h2 className="font-semibold text-foreground text-base leading-snug mb-1">
+                      {post.title}
+                    </h2>
+                    {post.content && (
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {post.content}
+                      </p>
+                    )}
+                  </Link>
+
+                  <p className="text-xs text-muted-foreground mb-2">
                     Posté par{" "}
                     <span className="text-primary hover:underline">
-                      u/{post.authorName}
+                      {post.authorName}
                     </span>{" "}
                     • {getRelativeTime(post._creationTime)}
                   </p>
 
-                  {/* Title */}
-                  <h2 className="font-semibold text-foreground text-base leading-snug mb-1">
-                    {post.title}
-                  </h2>
-
-                  {/* Preview */}
-                  {post.content && (
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                      {post.content}
-                    </p>
-                  )}
-
                   {/* Actions */}
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1 bg-muted rounded-full px-3 py-1">
-                      <ArrowUp size={14} className="text-muted-foreground" />
-                      <span className="text-xs font-semibold text-foreground min-w-[1.5rem] text-center">
+                  <div className="flex items-center gap-1 mt-2">
+                    <Link
+                      href={`/communities/${community.slug}/${post.slug}#comments`}
+                      className={buttonVariants({
+                        variant: "ghost",
+                        size: "sm",
+                        className:
+                          "group flex items-center gap-1.5 text-muted-foreground hover:text-blue-500 hover:bg-blue-500/10 transition-colors h-8 px-2",
+                      })}
+                    >
+                      <MessageSquare
+                        size={15}
+                        className="transition-transform group-active:scale-95"
+                      />
+                      <span className="text-xs font-medium">
+                        {post.commentsCount ?? 0}
+                      </span>
+                    </Link>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={`group flex items-center gap-1.5 transition-colors h-8 px-2 ${
+                        post.userHasLiked
+                          ? "text-green-500 hover:bg-green-500/20"
+                          : "text-muted-foreground hover:text-green-500 hover:bg-green-500/10"
+                      }`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleLike(post._id);
+                      }}
+                    >
+                      <CheckIcon
+                        size={15}
+                        className="transition-transform group-active:scale-95"
+                      />
+                      <span className="text-xs font-medium">
                         {post.likesCount ?? 0}
                       </span>
-                    </div>
+                    </Button>
 
-                    <span className="flex items-center gap-1.5 text-muted-foreground text-xs">
-                      <MessageSquare size={14} />
-                      {post.commentsCount ?? 0}
-                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="group flex items-center gap-1.5 text-muted-foreground hover:text-purple-500 hover:bg-purple-500/10 transition-colors h-8 px-2"
+                    >
+                      <Share2
+                        size={15}
+                        className="transition-transform group-active:scale-95"
+                      />
+                      <span className="text-xs font-medium hidden sm:inline">
+                        Partager
+                      </span>
+                    </Button>
 
-                    <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-xs transition-colors">
-                      <Bookmark size={14} />
-                    </button>
-
-                    <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-xs transition-colors">
-                      <Share2 size={14} />
-                      <span>Partager</span>
-                    </button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="group flex items-center gap-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors h-8 px-2 ml-auto"
+                    >
+                      <Bookmark
+                        size={15}
+                        className="transition-transform group-active:scale-95"
+                      />
+                    </Button>
                   </div>
-                </Link>
+                </article>
               ))
             )}
           </div>
-
-          {/* Voir plus */}
-          <Link
-            href={`/communities/${community.slug}`}
-            className="block text-center text-xs text-primary hover:underline p-3 border-t border-border"
-          >
-            Voir tous les posts →
-          </Link>
         </div>
       ))}
 
-      {/* Load more */}
       {status === "CanLoadMore" && (
-        <Button variant="outline" onClick={() => loadMore(10)} className="mt-4">
+        <Button variant="outline" onClick={() => loadMore(10)} className="mt-2">
           Charger plus
         </Button>
       )}

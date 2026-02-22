@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Id } from "@convex/_generated/dataModel";
-import { CreatePostForm } from "./forms/createPostForm";
+import { CreatePostForm } from "../forms/createPostForm";
 
 interface CreatePostDialogProps {
   communityId: Id<"communities">;

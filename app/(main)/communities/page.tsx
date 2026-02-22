@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import ComFilters from "./_component/comFilters";
 import ComList from "./_component/List/comList";
-import { CreateCommunityDialog } from "./_component/dialogs/forms/createComDialog";
+import { CreateCommunityDialog } from "./_component/dialogs/createComDialog";
 
 export default function page() {
   return (

@@ -5,11 +5,14 @@ import { v } from "convex/values";
 import { authComponent } from "../auth";
 import { Id } from "../_generated/dataModel";
 
+type AuthUser = Awaited<ReturnType<typeof authComponent.safeGetAuthUser>>;
+
 // ─── Helpers réutilisables ───────────────────────────────
 
 async function getReplyWithLikes(
   db: DatabaseReader,
   replyId: Id<"postCommentReplies">,
+  user: AuthUser,
 ) {
   const reply = await db.get(replyId);
   if (!reply) return null;
@@ -20,12 +23,24 @@ async function getReplyWithLikes(
     replyId,
     "replyId",
   );
-  return { ...reply, likes, likesCount: likes.length };
+
+  let userHasLiked = false;
+  if (user) {
+    const existingLike = await db
+      .query("postCommentReplyLikes")
+      .withIndex("by_replyId", (q) => q.eq("replyId", replyId))
+      .filter((q) => q.eq(q.field("userId"), user._id))
+      .first();
+    if (existingLike) userHasLiked = true;
+  }
+
+  return { ...reply, likes, likesCount: likes.length, userHasLiked };
 }
 
 async function getCommentWithMeta(
   db: DatabaseReader,
   commentId: Id<"postComments">,
+  user: AuthUser,
 ) {
   const comment = await db.get(commentId);
   if (!comment) return null;
@@ -42,13 +57,24 @@ async function getCommentWithMeta(
   ]);
 
   const repliesWithLikes = await Promise.all(
-    replies.map((r) => getReplyWithLikes(db, r._id)),
+    replies.map((r) => getReplyWithLikes(db, r._id, user)),
   );
+
+  let userHasLiked = false;
+  if (user) {
+    const existingLike = await db
+      .query("postCommentLikes")
+      .withIndex("by_commentId", (q) => q.eq("commentId", commentId))
+      .filter((q) => q.eq(q.field("userId"), user._id))
+      .first();
+    if (existingLike) userHasLiked = true;
+  }
 
   return {
     ...comment,
     likes: commentLikes,
     likesCount: commentLikes.length,
+    userHasLiked,
     replies: repliesWithLikes,
   };
 }
@@ -58,6 +84,7 @@ async function getCommentWithMeta(
 export const getPostWithMeta = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
     const post = await ctx.db
       .query("posts")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
@@ -70,13 +97,24 @@ export const getPostWithMeta = query({
     ]);
 
     const commentsWithMeta = await Promise.all(
-      comments.map((c) => getCommentWithMeta(ctx.db, c._id)),
+      comments.map((c) => getCommentWithMeta(ctx.db, c._id, user)),
     );
+
+    let userHasLiked = false;
+    if (user) {
+      const existingLike = await ctx.db
+        .query("postLikes")
+        .withIndex("by_postId", (q) => q.eq("postId", post._id))
+        .filter((q) => q.eq(q.field("userId"), user._id))
+        .first();
+      if (existingLike) userHasLiked = true;
+    }
 
     return {
       ...post,
       likes,
       likesCount: likes.length,
+      userHasLiked,
       comments: commentsWithMeta,
       commentsCount: comments.length,
     };
