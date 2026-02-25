@@ -49,9 +49,9 @@ export function JobDetailsPage(props: {
     <div className="min-h-screen bg-muted/30">
       {/* Hero Section without image */}
       <div className="relative w-full bg-background">
-        <div className="max-w-full mx-auto px-4 pt-8 sm:pt-12">
+        <div className="max-w-full mx-auto px-4 pt-2 sm:pt-8">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6 sm:mb-8">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2 sm:mb-4">
             <Link
               href="/jobs"
               className="hover:text-foreground transition-colors"

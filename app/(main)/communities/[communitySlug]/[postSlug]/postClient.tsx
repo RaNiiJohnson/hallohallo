@@ -15,12 +15,14 @@ import {
   ChevronDown,
   ChevronUp,
   CheckIcon,
+  ChevronRight,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Id } from "@convex/_generated/dataModel";
+import Link from "next/link";
 
 // ─── Like Button (used for comments/replies) ────────────────
 
@@ -281,6 +283,24 @@ export default function PostClient({
 
   return (
     <div className="min-h-screen bg-background pb-12">
+      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2 sm:mb-4  px-4 pt-2 sm:pt-8">
+        <Link
+          href="/communities"
+          className="hover:text-foreground transition-colors"
+        >
+          Communautés
+        </Link>
+        <span>
+          <ChevronRight className="w-4 h-4" />
+        </span>
+        <span className="text-foreground font-medium line-clamp-1">...</span>
+        <span>
+          <ChevronRight className="w-4 h-4" />
+        </span>
+        <span className="text-foreground font-medium line-clamp-1">
+          {post.title}
+        </span>
+      </div>
       <div className="max-w-3xl mx-auto py-2 space-y-4">
         {/* Post */}
         <article className="border-b border-border bg-background px-4 py-4">

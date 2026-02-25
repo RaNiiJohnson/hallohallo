@@ -14,6 +14,7 @@ import {
   Share2,
   Users,
   CheckIcon,
+  ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
 import { useConvexAuth } from "convex/react";
@@ -50,7 +51,7 @@ export default function CommunityClient({
   const handleJoin = async () => {
     try {
       await joinCommunity({ communityId: community._id });
-      toast.success(`Vous avez rejoint hallo/${community.name} !`);
+      toast.success(`Vous avez rejoint  ${community.name} !`);
     } catch {
       toast.error("Erreur lors de l'adhésion");
     }
@@ -59,7 +60,7 @@ export default function CommunityClient({
   const handleLeave = async () => {
     try {
       await leaveCommunity({ communityId: community._id });
-      toast.success(`Vous avez quitté hallo/${community.name}`);
+      toast.success(`Vous avez quitté  ${community.name}`);
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Erreur";
       toast.error(message);
@@ -68,14 +69,30 @@ export default function CommunityClient({
 
   return (
     <div className="min-h-screen bg-background pb-12">
+      {" "}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2 sm:mb-4  px-4 pt-2 sm:pt-8">
+        <Link
+          href="/communities"
+          className="hover:text-foreground transition-colors"
+        >
+          Communautés
+        </Link>
+        <span>
+          <ChevronRight className="w-4 h-4" />
+        </span>
+        <span className="text-foreground font-medium line-clamp-1">
+          {community.name}
+        </span>
+      </div>
       <div className="bg-card border-b border-border flex max-w-4xl mx-auto px-4 py-6">
+        {" "}
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg">
             HL
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">
-              hallo/{community.name}
+              {community.name}
             </h1>
             <p className="text-sm text-muted-foreground mt-0.5">
               {community.description}
@@ -87,31 +104,35 @@ export default function CommunityClient({
               </span>
               <span>{community.postsCount ?? 0} posts</span>
             </div>
+            <div className="flex items-center gap-2 mt-4">
+              {isAuthenticated && (
+                <>
+                  {isMember !== undefined ? (
+                    isMember ? (
+                      <>
+                        <CreatePostDialog communityId={community._id} />
+                        {isMember.role !== "admin" && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleLeave}
+                          >
+                            Quitter
+                          </Button>
+                        )}
+                      </>
+                    ) : (
+                      <Button size="sm" onClick={handleJoin}>
+                        Rejoindre
+                      </Button>
+                    )
+                  ) : null}
+                </>
+              )}
+            </div>
           </div>
         </div>
-
-        <div className="flex items-center gap-2">
-          {isAuthenticated && (
-            <>
-              {isMember ? (
-                <>
-                  <CreatePostDialog communityId={community._id} />
-                  {isMember.role !== "admin" && (
-                    <Button variant="outline" size="sm" onClick={handleLeave}>
-                      Quitter
-                    </Button>
-                  )}
-                </>
-              ) : (
-                <Button size="sm" onClick={handleJoin}>
-                  Rejoindre
-                </Button>
-              )}
-            </>
-          )}
-        </div>
       </div>
-
       <div className="max-w-4xl mx-auto py-2">
         <div className="flex flex-col">
           {community.posts.length === 0 ? (

@@ -29,7 +29,11 @@ export function CreatePostDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            className="flex items-center gap-2"
+          >
             <Plus className="h-4 w-4" />
             <span>Créer un post</span>
           </Button>

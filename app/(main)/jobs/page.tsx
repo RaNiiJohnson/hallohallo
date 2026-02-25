@@ -11,7 +11,7 @@ import { Suspense } from "react";
 import { JobFiltersSkeleton, JobPageSkeleton } from "./_component/skeleton";
 
 export default function JobsPage() {
-  const { isAuthenticated } = useConvexAuth();
+  const { isAuthenticated, isLoading } = useConvexAuth();
 
   return (
     <div className="min-h-screen bg-background pb-12">
@@ -37,7 +37,7 @@ export default function JobsPage() {
               <div className="flex items-center gap-2">
                 <h2 className="text-2xl font-bold">Opportunités</h2>
               </div>
-              {isAuthenticated && <PublishJobDialog />}
+              {isAuthenticated && !isLoading && <PublishJobDialog />}
             </div>
             <JobList />
           </Suspense>

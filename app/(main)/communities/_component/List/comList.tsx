@@ -2,20 +2,75 @@
 
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
-import { usePaginatedQuery, useMutation } from "convex/react";
+import { usePaginatedQuery, useMutation, useQuery } from "convex/react";
 import { useConvexAuth } from "convex/react";
 import {
   Bookmark,
+  CheckIcon,
   MessageSquare,
   Share2,
   Users,
-  CheckIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { toast } from "sonner";
-
 import { Id } from "@convex/_generated/dataModel";
+
+interface IsMemberProps {
+  _id: Id<"communities">;
+  name: string;
+}
+
+function IsMember({ _id, name }: IsMemberProps) {
+  const joinCommunity = useMutation(api.communities.joinCommunity);
+  const leaveCommunity = useMutation(api.communities.leaveCommunity);
+  const isMember = useQuery(
+    api.communities.isMember,
+    _id ? { communityId: _id } : "skip",
+  );
+
+  const handleJoin = async () => {
+    try {
+      await joinCommunity({ communityId: _id });
+      toast.success(`Vous avez rejoint  ${name} !`);
+    } catch {
+      toast.error("Erreur lors de l'adhésion");
+    }
+  };
+
+  const handleLeave = async () => {
+    try {
+      await leaveCommunity({ communityId: _id });
+      toast.success(`Vous avez quitté  ${name}`);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Erreur";
+      toast.error(message);
+    }
+  };
+
+  if (isMember === undefined || isMember === null) {
+    return null;
+  }
+
+  return isMember ? (
+    isMember.role !== "admin" ? (
+      <Button variant="destructive" size="sm" onClick={handleLeave}>
+        <Users
+          size={15}
+          className="transition-transform group-active:scale-95"
+        />
+        <span className="text-xs font-medium">Quitter</span>
+      </Button>
+    ) : (
+      <span>Votre communauté</span>
+    )
+  ) : (
+    <Button variant="ghost" size="sm" onClick={handleJoin}>
+      <Users size={15} className="transition-transform group-active:scale-95" />
+      <span className="text-xs font-medium">Rejoindre</span>
+    </Button>
+  );
+}
 
 export default function ComList() {
   const { isAuthenticated } = useConvexAuth();
@@ -49,7 +104,7 @@ export default function ComList() {
               </div>
               <div>
                 <p className="font-semibold text-foreground text-sm">
-                  hallo/{community.name}
+                  {community.name}
                 </p>
                 <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
                   <span className="flex items-center gap-1">
@@ -61,7 +116,7 @@ export default function ComList() {
               </div>
             </div>
             <span className="text-xs text-primary font-medium hover:underline">
-              Voir tout →
+              <IsMember _id={community._id} name={community.name} />
             </span>
           </Link>
 

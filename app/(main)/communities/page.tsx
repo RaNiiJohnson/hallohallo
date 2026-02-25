@@ -1,9 +1,13 @@
+"use client";
+
 import { Suspense } from "react";
 import ComFilters from "./_component/comFilters";
 import ComList from "./_component/List/comList";
 import { CreateCommunityDialog } from "./_component/dialogs/createComDialog";
+import { useConvexAuth } from "convex/react";
 
-export default function page() {
+export default function Page() {
+  const { isAuthenticated, isLoading } = useConvexAuth();
   return (
     <div className="min-h-screen bg-background pb-12">
       <div className="max-w-6xl mx-auto lg:px-4 sm:px-2 py-8">
@@ -23,7 +27,7 @@ export default function page() {
               <div className="flex items-center gap-2">
                 <h2 className="text-2xl font-bold">Communautés</h2>
               </div>
-              <CreateCommunityDialog />
+              {isAuthenticated && !isLoading && <CreateCommunityDialog />}
             </div>
             <ComList />
           </Suspense>
