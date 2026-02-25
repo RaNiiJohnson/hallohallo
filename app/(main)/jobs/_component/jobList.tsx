@@ -89,7 +89,7 @@ export function JobList() {
     <div className="space-y-3">
       {jobs.map((job) => (
         <Link key={job.slug} href={`/jobs/${job.slug}`} className="block group">
-          <div className="bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:border-primary/30">
+          <div className="bg-card dark:bg-card/35 border border-border rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:border-primary/30">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 {/* Title */}

@@ -40,7 +40,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/communaute"
+                  href="/communities"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   Communauté

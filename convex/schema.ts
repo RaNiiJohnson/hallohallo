@@ -157,4 +157,117 @@ export default defineSchema({
   })
     .index("by_userId", ["userId"])
     .index("by_user_resource", ["userId", "resourceId"]),
+
+  communities: defineTable({
+    slug: v.string(),
+    name: v.string(),
+    description: v.string(),
+    authorId: v.string(),
+    authorName: v.optional(v.string()),
+    privacy: v.union(
+      v.literal("public"),
+      v.literal("private"),
+      v.literal("secret"),
+    ),
+    searchAll: v.optional(v.string()),
+    membersCount: v.optional(v.number()),
+    postsCount: v.optional(v.number()),
+  })
+    .index("by_authorId", ["authorId"])
+    .index("by_slug", ["slug"])
+    .searchIndex("search_all_fields", { searchField: "searchAll" }),
+
+  communityMembers: defineTable({
+    userId: v.string(),
+    communityId: v.id("communities"),
+    role: v.union(
+      v.literal("admin"),
+      v.literal("member"),
+      v.literal("moderator"),
+    ),
+    lastReadAt: v.optional(v.number()),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_communityId", ["communityId"])
+    .index("by_userId_communityId", ["userId", "communityId"]),
+
+  posts: defineTable({
+    slug: v.string(),
+    title: v.string(),
+    communityId: v.id("communities"),
+    content: v.string(),
+    authorId: v.string(),
+    authorName: v.optional(v.string()),
+    searchAll: v.optional(v.string()),
+    likesCount: v.optional(v.number()),
+    commentsCount: v.optional(v.number()),
+  })
+    .index("by_authorId", ["authorId"])
+    .index("by_slug", ["slug"])
+    .index("by_communityId", ["communityId"])
+    .searchIndex("search_all_fields", { searchField: "searchAll" }),
+
+  postLikes: defineTable({
+    userId: v.string(),
+    postId: v.id("posts"),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_postId", ["postId"]),
+
+  postComments: defineTable({
+    authorId: v.string(),
+    authorName: v.string(),
+    postId: v.id("posts"),
+    content: v.string(),
+  })
+    .index("by_authorId", ["authorId"])
+    .index("by_postId", ["postId"]),
+
+  postCommentLikes: defineTable({
+    userId: v.string(),
+    commentId: v.id("postComments"),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_commentId", ["commentId"]),
+
+  postCommentReplies: defineTable({
+    authorId: v.string(),
+    authorName: v.string(),
+    commentId: v.id("postComments"),
+    content: v.string(),
+  })
+    .index("by_authorId", ["authorId"])
+    .index("by_commentId", ["commentId"]),
+
+  postCommentReplyLikes: defineTable({
+    userId: v.string(),
+    replyId: v.id("postCommentReplies"),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_replyId", ["replyId"]),
+
+  communityMessages: defineTable({
+    communityId: v.id("communities"),
+    authorId: v.string(),
+    authorName: v.optional(v.string()),
+    content: v.string(),
+  }).index("by_communityId", ["communityId"]),
+
+  notifications: defineTable({
+    userId: v.string(),
+    type: v.union(
+      v.literal("new_comment"),
+      v.literal("new_reply"),
+      v.literal("new_like"),
+      v.literal("new_comment_like"),
+      v.literal("new_reply_like"),
+    ),
+    read: v.boolean(),
+    postSlug: v.optional(v.string()),
+    communitySlug: v.optional(v.string()),
+    fromUserName: v.optional(v.string()),
+    message: v.optional(v.string()),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_userId_read", ["userId", "read"]),
 });
