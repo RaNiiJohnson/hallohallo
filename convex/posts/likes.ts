@@ -32,6 +32,20 @@ export const likePost = mutation({
     await ctx.db.patch(args.postId, {
       likesCount: (post.likesCount ?? 0) + 1,
     });
+
+    // Notification
+    if (post.authorId !== user._id) {
+      const community = await ctx.db.get(post.communityId);
+      await ctx.db.insert("notifications", {
+        userId: post.authorId,
+        type: "new_like",
+        read: false,
+        fromUserName: user.name,
+        postSlug: post.slug,
+        communitySlug: community?.slug,
+        message: `${user.name} a checké votre post "${post.title}"`,
+      });
+    }
   },
 });
 
@@ -40,6 +54,9 @@ export const likeComment = mutation({
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) throw new Error("Not authenticated");
+
+    const comment = await ctx.db.get(args.commentId);
+    if (!comment) throw new Error("Comment not found");
 
     const existing = await ctx.db
       .query("postCommentLikes")
@@ -56,6 +73,21 @@ export const likeComment = mutation({
       commentId: args.commentId,
       userId: user._id,
     });
+
+    // Notification
+    if (comment.authorId !== user._id) {
+      const post = await ctx.db.get(comment.postId);
+      const community = post ? await ctx.db.get(post.communityId) : null;
+      await ctx.db.insert("notifications", {
+        userId: comment.authorId,
+        type: "new_comment_like",
+        read: false,
+        fromUserName: user.name,
+        postSlug: post?.slug,
+        communitySlug: community?.slug,
+        message: `${user.name} a checké votre commentaire`,
+      });
+    }
   },
 });
 
@@ -64,6 +96,9 @@ export const likeReply = mutation({
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) throw new Error("Not authenticated");
+
+    const reply = await ctx.db.get(args.replyId);
+    if (!reply) throw new Error("Reply not found");
 
     const existing = await ctx.db
       .query("postCommentReplyLikes")
@@ -80,5 +115,21 @@ export const likeReply = mutation({
       replyId: args.replyId,
       userId: user._id,
     });
+
+    // Notification
+    if (reply.authorId !== user._id) {
+      const comment = await ctx.db.get(reply.commentId);
+      const post = comment ? await ctx.db.get(comment.postId) : null;
+      const community = post ? await ctx.db.get(post.communityId) : null;
+      await ctx.db.insert("notifications", {
+        userId: reply.authorId,
+        type: "new_reply_like",
+        read: false,
+        fromUserName: user.name,
+        postSlug: post?.slug,
+        communitySlug: community?.slug,
+        message: `${user.name} a checké votre réponse`,
+      });
+    }
   },
 });

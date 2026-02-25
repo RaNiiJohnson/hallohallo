@@ -21,10 +21,24 @@ export const addComment = mutation({
       authorName: user.name,
     });
 
-    // Incrémenter commentsCount sur le post
+    // Incrémenter commentsCount
     await ctx.db.patch(args.postId, {
       commentsCount: (post.commentsCount ?? 0) + 1,
     });
+
+    // Notification — pas se notifier soi-même
+    if (post.authorId !== user._id) {
+      const community = await ctx.db.get(post.communityId);
+      await ctx.db.insert("notifications", {
+        userId: post.authorId,
+        type: "new_comment",
+        read: false,
+        fromUserName: user.name,
+        postSlug: post.slug,
+        communitySlug: community?.slug,
+        message: `${user.name} a commenté votre post "${post.title}"`,
+      });
+    }
 
     return commentId;
   },
@@ -42,14 +56,12 @@ export const deleteComment = mutation({
 
     const post = await ctx.db.get(comment.postId);
 
-    // 1. Likes du commentaire
     const commentLikes = await ctx.db
       .query("postCommentLikes")
       .withIndex("by_commentId", (q) => q.eq("commentId", args.commentId))
       .collect();
     for (const like of commentLikes) await ctx.db.delete(like._id);
 
-    // 2. Replies
     const replies = await ctx.db
       .query("postCommentReplies")
       .withIndex("by_commentId", (q) => q.eq("commentId", args.commentId))
@@ -64,10 +76,8 @@ export const deleteComment = mutation({
       await ctx.db.delete(reply._id);
     }
 
-    // 3. Commentaire lui-même
     await ctx.db.delete(args.commentId);
 
-    // 4. Décrémenter commentsCount sur le post
     if (post) {
       await ctx.db.patch(comment.postId, {
         commentsCount: Math.max((post.commentsCount ?? 0) - 1, 0),
@@ -112,6 +122,21 @@ export const addReply = mutation({
       content: args.content,
     });
 
+    // Notification — pas se notifier soi-même
+    if (comment.authorId !== user._id) {
+      const post = await ctx.db.get(comment.postId);
+      const community = post ? await ctx.db.get(post.communityId) : null;
+      await ctx.db.insert("notifications", {
+        userId: comment.authorId,
+        type: "new_reply",
+        read: false,
+        fromUserName: user.name,
+        postSlug: post?.slug,
+        communitySlug: community?.slug,
+        message: `${user.name} a répondu à votre commentaire`,
+      });
+    }
+
     return replyId;
   },
 });
@@ -143,14 +168,12 @@ export const deleteReply = mutation({
     if (!reply) throw new Error("Reply not found");
     if (reply.authorId !== user._id) throw new Error("Not authorized");
 
-    // 1. Likes de la reply
     const replyLikes = await ctx.db
       .query("postCommentReplyLikes")
       .withIndex("by_replyId", (q) => q.eq("replyId", args.replyId))
       .collect();
     for (const like of replyLikes) await ctx.db.delete(like._id);
 
-    // 2. Reply elle-même
     await ctx.db.delete(args.replyId);
   },
 });

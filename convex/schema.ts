@@ -185,6 +185,7 @@ export default defineSchema({
       v.literal("member"),
       v.literal("moderator"),
     ),
+    lastReadAt: v.optional(v.number()),
   })
     .index("by_userId", ["userId"])
     .index("by_communityId", ["communityId"])
@@ -245,11 +246,28 @@ export default defineSchema({
     .index("by_userId", ["userId"])
     .index("by_replyId", ["replyId"]),
 
-    communityMessages: defineTable({
-  communityId: v.id("communities"),
-  authorId: v.string(),
-  authorName: v.optional(v.string()),
-  content: v.string(),
-})
-  .index("by_communityId", ["communityId"])
+  communityMessages: defineTable({
+    communityId: v.id("communities"),
+    authorId: v.string(),
+    authorName: v.optional(v.string()),
+    content: v.string(),
+  }).index("by_communityId", ["communityId"]),
+
+  notifications: defineTable({
+    userId: v.string(),
+    type: v.union(
+      v.literal("new_comment"),
+      v.literal("new_reply"),
+      v.literal("new_like"),
+      v.literal("new_comment_like"),
+      v.literal("new_reply_like"),
+    ),
+    read: v.boolean(),
+    postSlug: v.optional(v.string()),
+    communitySlug: v.optional(v.string()),
+    fromUserName: v.optional(v.string()),
+    message: v.optional(v.string()),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_userId_read", ["userId", "read"]),
 });
