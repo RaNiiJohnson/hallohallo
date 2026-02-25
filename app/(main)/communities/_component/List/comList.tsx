@@ -57,7 +57,7 @@ function ComListSkeleton() {
 function EmptyCommunities() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   return (
-    <div className="flex flex-col items-center justify-center py-20 px-4 text-center bg-card/50 dark:bg-card/20 border border-dashed border-border rounded-2xl w-full max-w-4xl animate-in fade-in zoom-in duration-500">
+    <div className="flex flex-col items-center justify-center py-20 px-4 text-center bg-card/50 dark:bg-card/20 border border-dashed border-border rounded-2xl w-full max-w-4xl animate-in fade-in zoom-in duration-500 mx-auto">
       <div className="relative mb-6">
         <div className="absolute -inset-1 bg-linear-to-r from-primary/20 to-blue-500/20 rounded-full blur-xl opacity-50"></div>
         <div className="relative bg-background p-5 rounded-full border border-border shadow-sm">
