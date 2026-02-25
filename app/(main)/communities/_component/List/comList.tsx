@@ -2,7 +2,7 @@
 
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
-import { usePaginatedQuery, useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { useConvexAuth } from "convex/react";
 import {
   Bookmark,
@@ -13,8 +13,72 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { Id } from "@convex/_generated/dataModel";
+import { usePaginatedQuery } from "convex-helpers/react/cache";
+
+function ComListSkeleton() {
+  return (
+    <div className="flex flex-col gap-4 items-center">
+      {Array.from({ length: 1 }).map((_, i) => (
+        <div
+          key={i}
+          className="w-full max-w-4xl bg-card dark:bg-card/35 border border-border rounded-xl overflow-hidden"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+            <div className="flex items-center gap-3">
+              <Skeleton className="w-8 h-8 rounded-full" />
+              <div className="space-y-1.5">
+                <Skeleton className="h-3.5 w-32" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+            </div>
+            <Skeleton className="h-7 w-20 rounded-md" />
+          </div>
+          {/* Posts */}
+          <div className="divide-y ml-11 divide-border">
+            {Array.from({ length: 2 }).map((_, j) => (
+              <div key={j} className="px-4 py-3 space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-5/6" />
+                <Skeleton className="h-3 w-28 mt-1" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function EmptyCommunities() {
+  const { isAuthenticated, isLoading } = useConvexAuth();
+  return (
+    <div className="flex flex-col items-center justify-center py-20 px-4 text-center bg-card/50 dark:bg-card/20 border border-dashed border-border rounded-2xl w-full max-w-4xl animate-in fade-in zoom-in duration-500">
+      <div className="relative mb-6">
+        <div className="absolute -inset-1 bg-linear-to-r from-primary/20 to-blue-500/20 rounded-full blur-xl opacity-50"></div>
+        <div className="relative bg-background p-5 rounded-full border border-border shadow-sm">
+          <Users className="w-10 h-10 text-primary" />
+        </div>
+      </div>
+      <h3 className="text-xl font-bold text-foreground mb-3">
+        Aucune communauté pour le moment
+      </h3>
+      <p className="text-muted-foreground max-w-md mx-auto leading-relaxed mb-8">
+        Créez votre première communauté dès maintenant et commencez à rassembler
+        des personnes partageant vos intérêts.{" "}
+        {isLoading
+          ? ""
+          : isAuthenticated
+            ? ""
+            : "Connectez-vous pour dès maintenant."}
+      </p>
+    </div>
+  );
+}
 
 interface IsMemberProps {
   _id: Id<"communities">;
@@ -85,6 +149,14 @@ export default function ComList() {
     if (!isAuthenticated) return toast.error("Connectez-vous pour liker");
     await likePost({ postId });
   };
+
+  if (status === "LoadingFirstPage") {
+    return <ComListSkeleton />;
+  }
+
+  if (results?.length === 0) {
+    return <EmptyCommunities />;
+  }
 
   return (
     <div className="flex flex-col gap-4 items-center">
