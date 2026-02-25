@@ -74,7 +74,7 @@ function EmptyCommunities() {
           ? ""
           : isAuthenticated
             ? ""
-            : "Connectez-vous pour dès maintenant."}
+            : "Connectez-vous dès maintenant."}
       </p>
     </div>
   );
