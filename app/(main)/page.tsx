@@ -101,7 +101,7 @@ function HomePageContent() {
             <div className="space-y-4 opacity-100">
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
-                  href="/community"
+                  href="/communities"
                   className="z-10 flex items-center justify-center"
                 >
                   <div
@@ -141,7 +141,7 @@ function HomePageContent() {
           </h2>
           <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
             {/* Communauté */}
-            <Card className="flex flex-col h-full">
+            <Card className="flex flex-col dark:bg-card/35 h-full">
               <CardHeader>
                 <CardTitle className="text-xl">Communauté</CardTitle>
               </CardHeader>
@@ -169,7 +169,7 @@ function HomePageContent() {
             </Card>
 
             {/* Opportunités */}
-            <Card className="flex flex-col h-full">
+            <Card className="flex flex-col dark:bg-card/35 h-full">
               <CardHeader>
                 <CardTitle className="text-xl">Opportunités</CardTitle>
               </CardHeader>
@@ -194,7 +194,7 @@ function HomePageContent() {
             </Card>
 
             {/* Immobilier */}
-            <Card className="flex flex-col h-full">
+            <Card className="flex flex-col dark:bg-card/35 h-full">
               <CardHeader>
                 <CardTitle className="text-xl">Immobilier</CardTitle>
               </CardHeader>
