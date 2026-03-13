@@ -3,11 +3,33 @@ import { generatedSlug } from "../../src/lib/utils";
 import { DatabaseReader, mutation, query } from "../_generated/server";
 import { v } from "convex/values";
 import { authComponent } from "../auth";
-import { Id } from "../_generated/dataModel";
+import { DataModel, Id } from "../_generated/dataModel";
+import {
+  communityPostsCount,
+  postCommentsCount,
+  postLikesCount,
+} from "../aggregates";
+import { Triggers } from "convex-helpers/server/triggers";
+import {
+  customCtx,
+  customMutation,
+} from "convex-helpers/server/customFunctions";
 
 type AuthUser = Awaited<ReturnType<typeof authComponent.safeGetAuthUser>>;
 
-// ─── Helpers réutilisables ───────────────────────────────
+// ─── Triggers
+
+const triggers = new Triggers<DataModel>();
+triggers.register("posts", communityPostsCount.trigger());
+triggers.register("postComments", postCommentsCount.trigger());
+triggers.register("postLikes", postLikesCount.trigger());
+
+const mutationWithTriggers = customMutation(
+  mutation,
+  customCtx(triggers.wrapDB),
+);
+
+// ─── Helpers réutilisables
 
 async function getReplyWithLikes(
   db: DatabaseReader,
@@ -79,7 +101,7 @@ async function getCommentWithMeta(
   };
 }
 
-// ─── Queries ─────────────────────────────────────────────
+// ─── Queries
 
 export const getPostWithMeta = query({
   args: { slug: v.string() },
@@ -91,8 +113,9 @@ export const getPostWithMeta = query({
       .unique();
     if (!post) return null;
 
-    const [likes, comments] = await Promise.all([
-      getManyFrom(ctx.db, "postLikes", "by_postId", post._id, "postId"),
+    const [likesCount, commentsCount, comments] = await Promise.all([
+      postLikesCount.count(ctx, { namespace: post._id }),
+      postCommentsCount.count(ctx, { namespace: post._id }),
       getManyFrom(ctx.db, "postComments", "by_postId", post._id, "postId"),
     ]);
 
@@ -112,16 +135,15 @@ export const getPostWithMeta = query({
 
     return {
       ...post,
-      likes,
-      likesCount: likes.length,
+      likesCount,
       userHasLiked,
       comments: commentsWithMeta,
-      commentsCount: comments.length,
+      commentsCount,
     };
   },
 });
 
-export const createPost = mutation({
+export const createPost = mutationWithTriggers({
   args: {
     content: v.string(),
     title: v.string(),
@@ -142,20 +164,13 @@ export const createPost = mutation({
       authorName: user.name,
       communityId: args.communityId,
       searchAll: `${args.title} ${args.content} ${user.name}`,
-      likesCount: 0,
-      commentsCount: 0,
-    });
-
-    // Incrémenter postsCount sur la communauté
-    await ctx.db.patch(args.communityId, {
-      postsCount: (community.postsCount ?? 0) + 1,
     });
 
     return postId;
   },
 });
 
-export const deletePost = mutation({
+export const deletePost = mutationWithTriggers({
   args: { postId: v.id("posts") },
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);
@@ -164,8 +179,6 @@ export const deletePost = mutation({
     const post = await ctx.db.get(args.postId);
     if (!post) throw new Error("Post not found");
     if (post.authorId !== user._id) throw new Error("Not authorized");
-
-    const community = await ctx.db.get(post.communityId);
 
     // 1. Likes du post
     const postLikes = await ctx.db
@@ -204,19 +217,11 @@ export const deletePost = mutation({
       await ctx.db.delete(comment._id);
     }
 
-    // 3. Post lui-même
+    // 3. Aggregate + delete du post
     await ctx.db.delete(args.postId);
-
-    // 4. Décrémenter postsCount sur la communauté
-    if (community) {
-      await ctx.db.patch(post.communityId, {
-        postsCount: Math.max((community.postsCount ?? 0) - 1, 0),
-      });
-    }
   },
 });
-
-export const updatePost = mutation({
+export const updatePost = mutationWithTriggers({
   args: {
     postId: v.id("posts"),
     content: v.string(),

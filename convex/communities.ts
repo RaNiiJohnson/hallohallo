@@ -4,6 +4,26 @@ import { generatedSlug } from "../src/lib/utils";
 import { authComponent } from "./auth";
 import { paginationOptsValidator } from "convex/server";
 import { getManyFrom } from "convex-helpers/server/relationships";
+import {
+  communityMembersCount,
+  communityPostsCount,
+  postLikesCount,
+} from "./aggregates";
+import { Triggers } from "convex-helpers/server/triggers";
+import { DataModel } from "./_generated/dataModel";
+import {
+  customCtx,
+  customMutation,
+} from "convex-helpers/server/customFunctions";
+
+const triggers = new Triggers<DataModel>();
+triggers.register("communityMembers", communityMembersCount.trigger());
+triggers.register("posts", communityPostsCount.trigger());
+
+const mutationWithTriggers = customMutation(
+  mutation,
+  customCtx(triggers.wrapDB),
+);
 
 export const isMember = query({
   args: { communityId: v.id("communities") },
@@ -21,7 +41,7 @@ export const isMember = query({
   },
 });
 
-export const createCommunty = mutation({
+export const createCommunty = mutationWithTriggers({
   args: {
     name: v.string(),
     description: v.string(),
@@ -84,6 +104,11 @@ export const getCommunitiesPreview = query({
 
     const communitiesWithPreview = await Promise.all(
       result.page.map(async (community) => {
+        const [membersCount, postsCount] = await Promise.all([
+          communityMembersCount.count(ctx, { namespace: community._id }),
+          communityPostsCount.count(ctx, { namespace: community._id }),
+        ]);
+
         const recentPosts = await ctx.db
           .query("posts")
           .withIndex("by_communityId", (q) =>
@@ -94,27 +119,27 @@ export const getCommunitiesPreview = query({
 
         const recentPostsWithLikes = await Promise.all(
           recentPosts.map(async (post) => {
-            let userHasLiked = false;
-            if (user) {
-              const existingLike = await ctx.db
-                .query("postLikes")
-                .withIndex("by_postId", (q) => q.eq("postId", post._id))
-                .filter((q) => q.eq(q.field("userId"), user._id))
-                .first();
-              if (existingLike) userHasLiked = true;
-            }
-            return {
-              ...post,
-              userHasLiked,
-            };
+            const [likesCount, userHasLiked] = await Promise.all([
+              postLikesCount.count(ctx, { namespace: post._id }),
+              user
+                ? ctx.db
+                    .query("postLikes")
+                    .withIndex("by_postId", (q) => q.eq("postId", post._id))
+                    .filter((q) => q.eq(q.field("userId"), user._id))
+                    .first()
+                    .then((l) => !!l)
+                : Promise.resolve(false),
+            ]);
+
+            return { ...post, likesCount, userHasLiked };
           }),
         );
 
         return {
           ...community,
           recentPosts: recentPostsWithLikes,
-          membersCount: community.membersCount ?? 0,
-          postsCount: community.postsCount ?? 0,
+          membersCount,
+          postsCount,
         };
       }),
     );
@@ -166,6 +191,11 @@ export const getCommunityWithPosts = query({
       .unique();
     if (!community) return null;
 
+    const [membersCount, postsCount] = await Promise.all([
+      communityMembersCount.count(ctx, { namespace: community._id }),
+      communityPostsCount.count(ctx, { namespace: community._id }),
+    ]);
+
     const posts = await getManyFrom(
       ctx.db,
       "posts",
@@ -176,27 +206,32 @@ export const getCommunityWithPosts = query({
 
     const postsWithLikes = await Promise.all(
       posts.map(async (post) => {
-        let userHasLiked = false;
-        if (user) {
-          const existingLike = await ctx.db
-            .query("postLikes")
-            .withIndex("by_postId", (q) => q.eq("postId", post._id))
-            .filter((q) => q.eq(q.field("userId"), user._id))
-            .first();
-          if (existingLike) userHasLiked = true;
-        }
-        return {
-          ...post,
-          userHasLiked,
-        };
+        const [likesCount, userHasLiked] = await Promise.all([
+          postLikesCount.count(ctx, { namespace: post._id }),
+          user
+            ? ctx.db
+                .query("postLikes")
+                .withIndex("by_postId", (q) => q.eq("postId", post._id))
+                .filter((q) => q.eq(q.field("userId"), user._id))
+                .first()
+                .then((l) => !!l)
+            : Promise.resolve(false),
+        ]);
+
+        return { ...post, likesCount, userHasLiked };
       }),
     );
 
-    return { ...community, posts: postsWithLikes };
+    return {
+      ...community,
+      membersCount,
+      postsCount,
+      posts: postsWithLikes,
+    };
   },
 });
 
-export const updateCommunity = mutation({
+export const updateCommunity = mutationWithTriggers({
   args: {
     id: v.id("communities"),
     name: v.string(),
@@ -224,7 +259,7 @@ export const updateCommunity = mutation({
   },
 });
 
-export const deleteCommunity = mutation({
+export const deleteCommunity = mutationWithTriggers({
   args: { id: v.id("communities") },
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);
@@ -298,7 +333,7 @@ export const deleteCommunity = mutation({
   },
 });
 
-export const joinCommunity = mutation({
+export const joinCommunity = mutationWithTriggers({
   args: { communityId: v.id("communities") },
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);
@@ -320,14 +355,10 @@ export const joinCommunity = mutation({
       communityId: args.communityId,
       role: "member",
     });
-
-    await ctx.db.patch(args.communityId, {
-      membersCount: (community.membersCount ?? 0) + 1,
-    });
   },
 });
 
-export const leaveCommunity = mutation({
+export const leaveCommunity = mutationWithTriggers({
   args: { communityId: v.id("communities") },
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);
@@ -347,10 +378,6 @@ export const leaveCommunity = mutation({
       throw new Error("Admin cannot leave — delete the community instead");
 
     await ctx.db.delete(member._id);
-
-    await ctx.db.patch(args.communityId, {
-      membersCount: Math.max((community.membersCount ?? 0) - 1, 0),
-    });
   },
 });
 

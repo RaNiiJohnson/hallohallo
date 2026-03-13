@@ -1,8 +1,23 @@
 import { mutation } from "../_generated/server";
 import { v } from "convex/values";
 import { authComponent } from "../auth";
+import { Triggers } from "convex-helpers/server/triggers";
+import { DataModel } from "../_generated/dataModel";
+import {
+  customCtx,
+  customMutation,
+} from "convex-helpers/server/customFunctions";
+import { postCommentsCount } from "../aggregates";
 
-export const addComment = mutation({
+const triggers = new Triggers<DataModel>();
+triggers.register("postComments", postCommentsCount.trigger());
+
+const mutationWithTriggers = customMutation(
+  mutation,
+  customCtx(triggers.wrapDB),
+);
+
+export const addComment = mutationWithTriggers({
   args: {
     postId: v.id("posts"),
     content: v.string(),
@@ -21,12 +36,6 @@ export const addComment = mutation({
       authorName: user.name,
     });
 
-    // Incrémenter commentsCount
-    await ctx.db.patch(args.postId, {
-      commentsCount: (post.commentsCount ?? 0) + 1,
-    });
-
-    // Notification — pas se notifier soi-même
     if (post.authorId !== user._id) {
       const community = await ctx.db.get(post.communityId);
       await ctx.db.insert("notifications", {
@@ -44,7 +53,7 @@ export const addComment = mutation({
   },
 });
 
-export const deleteComment = mutation({
+export const deleteComment = mutationWithTriggers({
   args: { commentId: v.id("postComments") },
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);
@@ -53,8 +62,6 @@ export const deleteComment = mutation({
     const comment = await ctx.db.get(args.commentId);
     if (!comment) throw new Error("Comment not found");
     if (comment.authorId !== user._id) throw new Error("Not authorized");
-
-    const post = await ctx.db.get(comment.postId);
 
     const commentLikes = await ctx.db
       .query("postCommentLikes")
@@ -77,16 +84,10 @@ export const deleteComment = mutation({
     }
 
     await ctx.db.delete(args.commentId);
-
-    if (post) {
-      await ctx.db.patch(comment.postId, {
-        commentsCount: Math.max((post.commentsCount ?? 0) - 1, 0),
-      });
-    }
   },
 });
 
-export const updateComment = mutation({
+export const updateComment = mutationWithTriggers({
   args: {
     commentId: v.id("postComments"),
     content: v.string(),
@@ -103,7 +104,7 @@ export const updateComment = mutation({
   },
 });
 
-export const addReply = mutation({
+export const addReply = mutationWithTriggers({
   args: {
     commentId: v.id("postComments"),
     content: v.string(),
@@ -141,7 +142,7 @@ export const addReply = mutation({
   },
 });
 
-export const updateReply = mutation({
+export const updateReply = mutationWithTriggers({
   args: {
     replyId: v.id("postCommentReplies"),
     content: v.string(),
@@ -158,7 +159,7 @@ export const updateReply = mutation({
   },
 });
 
-export const deleteReply = mutation({
+export const deleteReply = mutationWithTriggers({
   args: { replyId: v.id("postCommentReplies") },
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);
