@@ -13,26 +13,6 @@ export const postLikesCount = new TableAggregate<{
   sortKey: () => null,
 });
 
-export const commentLikesCount = new TableAggregate<{
-  Namespace: Id<"postComments">;
-  Key: null;
-  DataModel: DataModel;
-  TableName: "postCommentLikes";
-}>(components.aggregateByLikesComments, {
-  namespace: (doc) => doc.commentId,
-  sortKey: () => null,
-});
-
-export const commentLikesReplyCount = new TableAggregate<{
-  Namespace: Id<"postCommentReplies">;
-  Key: null;
-  DataModel: DataModel;
-  TableName: "postCommentReplyLikes";
-}>(components.aggregateByLikesComments, {
-  namespace: (doc) => doc.replyId,
-  sortKey: () => null,
-});
-
 export const postCommentsCount = new TableAggregate<{
   Namespace: Id<"posts">;
   Key: null;
