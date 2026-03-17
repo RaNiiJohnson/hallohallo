@@ -20,6 +20,9 @@ importers:
       '@convex-dev/better-auth':
         specifier: ^0.10.9
         version: 0.10.10(@better-auth/core@1.4.9(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.7(zod@4.3.5))(jose@6.1.3)(kysely@0.28.9)(nanostores@1.1.0))(@better-auth/utils@0.3.0)(@standard-schema/spec@1.1.0)(better-auth@1.4.9(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(better-call@1.1.7(zod@4.3.5))(convex@1.31.4(react@19.2.3))(nanostores@1.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3)
+      '@convex-dev/migrations':
+        specifier: ^0.3.1
+        version: 0.3.1(convex@1.31.4(react@19.2.3))
       '@convex-dev/stripe':
         specifier: ^0.1.3
         version: 0.1.3(@types/node@20.19.29)(convex@1.31.4(react@19.2.3))(react@19.2.3)
@@ -309,6 +312,11 @@ packages:
       convex: ^1.25.0
       react: ^18.3.1 || ^19.0.0
       react-dom: ^18.3.1 || ^19.0.0
+
+  '@convex-dev/migrations@0.3.1':
+    resolution: {integrity: sha512-dGiN82vWMN415/AGMcVooDOJk8iTousZahBBs27uA03pL74Uo3ksucUW3CiCfPx75rv+x9UnenEakimQYYNIrA==}
+    peerDependencies:
+      convex: ^1.24.8
 
   '@convex-dev/stripe@0.1.3':
     resolution: {integrity: sha512-yL0ygrWrjto9f7rprCb4KYp+p3Oka7KG5e3HBoJ9qSzbncpavZI+JTkGZnLCYZjPOo2ByCrBJvtGAxfP169Nzw==}
@@ -3841,6 +3849,10 @@ snapshots:
       - hono
       - nanostores
       - typescript
+
+  '@convex-dev/migrations@0.3.1(convex@1.31.4(react@19.2.3))':
+    dependencies:
+      convex: 1.31.4(react@19.2.3)
 
   '@convex-dev/stripe@0.1.3(@types/node@20.19.29)(convex@1.31.4(react@19.2.3))(react@19.2.3)':
     dependencies:

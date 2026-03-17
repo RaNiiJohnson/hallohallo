@@ -1,6 +1,7 @@
-import { components } from "./_generated/api";
+import { components, internal } from "./_generated/api";
 import { DataModel, Id } from "./_generated/dataModel";
 import { TableAggregate } from "@convex-dev/aggregate";
+import { Migrations } from "@convex-dev/migrations";
 import { mutation } from "./_generated/server";
 
 export const postLikesCount = new TableAggregate<{
@@ -43,22 +44,42 @@ export const communityMembersCount = new TableAggregate<{
   sortKey: () => null,
 });
 
-export const backfill = mutation({
-  handler: async (ctx) => {
-    const likes = await ctx.db.query("postLikes").collect();
-    for (const doc of likes)
-      await postLikesCount.insertIfDoesNotExist(ctx, doc);
+// ---- migrations ----
 
-    const comments = await ctx.db.query("postComments").collect();
-    for (const doc of comments)
-      await postCommentsCount.insertIfDoesNotExist(ctx, doc);
+export const migrations = new Migrations<DataModel>(components.migrations);
+export const run = migrations.runner();
 
-    const posts = await ctx.db.query("posts").collect();
-    for (const doc of posts)
-      await communityPostsCount.insertIfDoesNotExist(ctx, doc);
-
-    const members = await ctx.db.query("communityMembers").collect();
-    for (const doc of members)
-      await communityMembersCount.insertIfDoesNotExist(ctx, doc);
+export const backfillPostLikesCountMigration = migrations.define({
+  table: "postLikes",
+  migrateOne: async (ctx, doc) => {
+    await postLikesCount.insertIfDoesNotExist(ctx, doc);
   },
 });
+
+export const backfillPostCommentsCountMigration = migrations.define({
+  table: "postComments",
+  migrateOne: async (ctx, doc) => {
+    await postCommentsCount.insertIfDoesNotExist(ctx, doc);
+  },
+});
+
+export const backfillCommunityPostsCountMigration = migrations.define({
+  table: "posts",
+  migrateOne: async (ctx, doc) => {
+    await communityPostsCount.insertIfDoesNotExist(ctx, doc);
+  },
+});
+
+export const backfillCommunityMembersCountMigration = migrations.define({
+  table: "communityMembers",
+  migrateOne: async (ctx, doc) => {
+    await communityMembersCount.insertIfDoesNotExist(ctx, doc);
+  },
+});
+
+export const runAggregateBackfill = migrations.runner([
+  internal.aggregates.backfillPostLikesCountMigration,
+  internal.aggregates.backfillPostCommentsCountMigration,
+  internal.aggregates.backfillCommunityPostsCountMigration,
+  internal.aggregates.backfillCommunityMembersCountMigration,
+]);
