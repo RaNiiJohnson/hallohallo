@@ -2,7 +2,6 @@ import { components, internal } from "./_generated/api";
 import { DataModel, Id } from "./_generated/dataModel";
 import { TableAggregate } from "@convex-dev/aggregate";
 import { Migrations } from "@convex-dev/migrations";
-import { mutation } from "./_generated/server";
 
 export const postLikesCount = new TableAggregate<{
   Namespace: Id<"posts">;
