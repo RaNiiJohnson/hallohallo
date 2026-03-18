@@ -7,7 +7,6 @@ import {
   Bookmark,
   MessageSquare,
   Share2,
-  CheckIcon,
   ChevronRight,
   Pencil,
   Trash2,
