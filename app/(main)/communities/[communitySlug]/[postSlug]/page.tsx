@@ -7,252 +7,47 @@ import {
   Bookmark,
   MessageSquare,
   Share2,
-  ChevronDown,
-  ChevronUp,
   CheckIcon,
   ChevronRight,
+  Pencil,
+  Trash2,
+  Loader2,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Id } from "@convex/_generated/dataModel";
+import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useQuery } from "convex-helpers/react/cache";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import SkeletonPost from "./skeleton";
-
-// ─── Like Button (used for comments/replies) ────────────────
-
-function LikeButton({
-  count,
-  onLike,
-  isLiked,
-}: {
-  count: number;
-  onLike: () => void;
-  isLiked?: boolean;
-}) {
-  return (
-    <Button
-      variant="ghost"
-      size="sm"
-      className={`group flex items-center gap-1.5 transition-colors h-8 px-2 ${
-        isLiked
-          ? "text-green-500 hover:bg-green-500/20"
-          : "text-muted-foreground hover:text-green-500 hover:bg-green-500/10"
-      }`}
-      onClick={(e) => {
-        e.preventDefault();
-        onLike();
-      }}
-    >
-      <CheckIcon
-        size={15}
-        className="transition-transform group-active:scale-95"
-      />
-      <span className="text-xs font-medium">{count}</span>
-    </Button>
-  );
-}
-
-// ─── Reply Item ───────────────────────────────────────────
-
-function ReplyItem({
-  reply,
-}: {
-  reply: {
-    _id: Id<"postCommentReplies">;
-    _creationTime: number;
-    authorName?: string;
-    content: string;
-    likes: { userId: string }[];
-    likesCount: number;
-    userHasLiked?: boolean;
-  } | null;
-}) {
-  const likeReply = useMutation(api.posts.likes.likeReply);
-  const { isAuthenticated } = useConvexAuth();
-
-  if (!reply) return null;
-
-  const handleLike = async () => {
-    if (!isAuthenticated) return toast.error("Connectez-vous pour liker");
-    await likeReply({ replyId: reply._id });
-  };
-
-  return (
-    <div className="ml-8 pl-4 border-l border-border py-2">
-      <p className="text-xs text-muted-foreground mb-1">
-        <span className="text-primary font-medium">{reply.authorName}</span> •{" "}
-        {getRelativeTime(reply._creationTime)}
-      </p>
-      <p className="text-sm text-foreground mb-2">{reply.content}</p>
-      <LikeButton
-        count={reply.likesCount}
-        onLike={handleLike}
-        isLiked={reply.userHasLiked}
-      />
-    </div>
-  );
-}
-
-// ─── Comment Item ─────────────────────────────────────────
-
-function CommentItem({
-  comment,
-}: {
-  comment: {
-    _id: Id<"postComments">;
-    _creationTime: number;
-    authorName?: string;
-    content: string;
-    likes: { userId: string }[];
-    likesCount: number;
-    userHasLiked?: boolean;
-    replies: ({
-      _id: Id<"postCommentReplies">;
-      _creationTime: number;
-      authorName?: string;
-      content: string;
-      likes: { userId: string }[];
-      likesCount: number;
-      userHasLiked?: boolean;
-    } | null)[];
-  } | null;
-}) {
-  const likeComment = useMutation(api.posts.likes.likeComment);
-  const addReply = useMutation(api.posts.comments.addReply);
-  const { isAuthenticated } = useConvexAuth();
-
-  const [showReplies, setShowReplies] = useState(false);
-  const [showReplyForm, setShowReplyForm] = useState(false);
-  const [replyContent, setReplyContent] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  if (!comment) return null;
-
-  const handleLike = async () => {
-    if (!isAuthenticated) return toast.error("Connectez-vous pour liker");
-    await likeComment({ commentId: comment._id });
-  };
-
-  const handleReply = async () => {
-    if (!replyContent.trim()) return;
-    setIsSubmitting(true);
-    try {
-      await addReply({ commentId: comment._id, content: replyContent });
-      setReplyContent("");
-      setShowReplyForm(false);
-      setShowReplies(true);
-      toast.success("Réponse ajoutée !");
-    } catch {
-      toast.error("Erreur lors de l'ajout de la réponse");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const validReplies = comment.replies.filter(Boolean);
-
-  return (
-    <div className="border-b border-border py-4">
-      {/* Author */}
-      <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1.5">
-        <span className="text-primary font-bold hover:underline cursor-pointer">
-          {comment.authorName}
-        </span>{" "}
-        • <span>{getRelativeTime(comment._creationTime)}</span>
-      </p>
-
-      {/* Content */}
-      <p className="text-sm text-foreground mb-3">{comment.content}</p>
-
-      {/* Actions */}
-      <div className="flex items-center gap-3">
-        <LikeButton
-          count={comment.likesCount}
-          onLike={handleLike}
-          isLiked={comment.userHasLiked}
-        />
-
-        {isAuthenticated && (
-          <button
-            onClick={() => setShowReplyForm(!showReplyForm)}
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Répondre
-          </button>
-        )}
-
-        {validReplies.length > 0 && (
-          <button
-            onClick={() => setShowReplies(!showReplies)}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {showReplies ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-            {validReplies.length} réponse{validReplies.length > 1 ? "s" : ""}
-          </button>
-        )}
-      </div>
-
-      {/* Reply form */}
-      {showReplyForm && (
-        <div className="mt-3 ml-4 space-y-2">
-          <Textarea
-            value={replyContent}
-            onChange={(e) => setReplyContent(e.target.value)}
-            placeholder="Votre réponse..."
-            rows={2}
-            className="resize-none text-sm"
-          />
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              onClick={handleReply}
-              disabled={isSubmitting || !replyContent.trim()}
-            >
-              {isSubmitting ? "..." : "Répondre"}
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                setShowReplyForm(false);
-                setReplyContent("");
-              }}
-            >
-              Annuler
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Replies */}
-      {showReplies && (
-        <div className="mt-2">
-          {validReplies.map((reply) => (
-            <ReplyItem key={reply!._id} reply={reply} />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Post Client ──────────────────────────────────────────
+import { DeleteConfirmDialog } from "../../_component/deleteConfirmDialog";
+import { LikeButton } from "../../_component/likeButton";
+import { CommentItem } from "../../_component/commentItem";
 
 export default function PostClient() {
-  const { postSlug } = useParams();
+  const { postSlug, communitySlug } = useParams();
+  const router = useRouter();
   const post = useQuery(api.posts.posts.getPostWithMeta, {
     slug: postSlug as string,
   });
+  const me = useQuery(api.communities.getMe);
   const likePost = useMutation(api.posts.likes.likePost);
   const addComment = useMutation(api.posts.comments.addComment);
+  const updatePost = useMutation(api.posts.posts.updatePost);
+  const deletePost = useMutation(api.posts.posts.deletePost);
   const { isAuthenticated } = useConvexAuth();
 
   const [commentContent, setCommentContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Post edit state
+  const [isEditingPost, setIsEditingPost] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+  const [editPostContent, setEditPostContent] = useState("");
+  const [isSavingPost, setIsSavingPost] = useState(false);
+  const [isDeletingPost, setIsDeletingPost] = useState(false);
 
   if (post === undefined) {
     return <SkeletonPost />;
@@ -261,6 +56,9 @@ export default function PostClient() {
   if (post === null) {
     return <p className="text-muted-foreground p-8">Post introuvable.</p>;
   }
+
+  const currentUserId = me?._id;
+  const isPostOwner = currentUserId && post.authorId === currentUserId;
 
   const handleLikePost = async () => {
     if (!isAuthenticated) return toast.error("Connectez-vous pour liker");
@@ -278,6 +76,49 @@ export default function PostClient() {
       toast.error("Erreur lors de l'ajout du commentaire");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleStartEditPost = () => {
+    setEditTitle(post.title);
+    setEditPostContent(post.content ?? "");
+    setIsEditingPost(true);
+  };
+
+  const handleCancelEditPost = () => {
+    setIsEditingPost(false);
+    setEditTitle("");
+    setEditPostContent("");
+  };
+
+  const handleSavePost = async () => {
+    if (!editTitle.trim()) return;
+    setIsSavingPost(true);
+    try {
+      await updatePost({
+        postId: post._id,
+        title: editTitle,
+        content: editPostContent,
+      });
+      setIsEditingPost(false);
+      toast.success("Post modifié !");
+    } catch {
+      toast.error("Erreur lors de la modification du post");
+    } finally {
+      setIsSavingPost(false);
+    }
+  };
+
+  const handleDeletePost = async () => {
+    setIsDeletingPost(true);
+    try {
+      await deletePost({ postId: post._id });
+      toast.success("Post supprimé !");
+      router.push(`/communities/${communitySlug}`);
+    } catch {
+      toast.error("Erreur lors de la suppression du post");
+    } finally {
+      setIsDeletingPost(false);
     }
   };
 
@@ -314,14 +155,58 @@ export default function PostClient() {
             • {getRelativeTime(post._creationTime)}
           </p>
 
-          <h1 className="text-xl font-bold text-foreground mb-2">
-            {post.title}
-          </h1>
+          {isEditingPost ? (
+            <div className="space-y-3 mb-4">
+              <Input
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="text-xl font-bold"
+                placeholder="Titre du post"
+                autoFocus
+              />
+              <Textarea
+                value={editPostContent}
+                onChange={(e) => setEditPostContent(e.target.value)}
+                rows={5}
+                className="resize-none text-sm"
+                placeholder="Contenu du post..."
+              />
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={handleSavePost}
+                  disabled={isSavingPost || !editTitle.trim()}
+                >
+                  {isSavingPost ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin mr-2" />
+                      Enregistrement...
+                    </>
+                  ) : (
+                    "Enregistrer"
+                  )}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleCancelEditPost}
+                >
+                  Annuler
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <h1 className="text-xl font-bold text-foreground mb-2">
+                {post.title}
+              </h1>
 
-          {post.content && (
-            <p className="text-sm text-foreground leading-relaxed mb-4 whitespace-pre-wrap">
-              {post.content}
-            </p>
+              {post.content && (
+                <p className="text-sm text-foreground leading-relaxed mb-4 whitespace-pre-wrap">
+                  {post.content}
+                </p>
+              )}
+            </>
           )}
 
           {/* Actions post */}
@@ -332,7 +217,6 @@ export default function PostClient() {
               className="group flex items-center gap-1.5 text-muted-foreground hover:text-blue-500 hover:bg-blue-500/10 transition-colors h-8 px-2"
               onClick={(e) => {
                 e.preventDefault();
-                // Optionally scroll to comments here
                 document
                   .getElementById("comments")
                   ?.scrollIntoView({ behavior: "smooth" });
@@ -347,27 +231,11 @@ export default function PostClient() {
               </span>
             </Button>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`group flex items-center gap-1.5 transition-colors h-8 px-2 ${
-                post.userHasLiked
-                  ? "text-green-500  hover:bg-green-500/20"
-                  : "text-muted-foreground hover:text-green-500 hover:bg-green-500/10"
-              }`}
-              onClick={(e) => {
-                e.preventDefault();
-                handleLikePost();
-              }}
-            >
-              <CheckIcon
-                size={15}
-                className="transition-transform group-active:scale-95"
-              />
-              <span className="text-xs font-medium">
-                {post.likesCount ?? 0}
-              </span>
-            </Button>
+            <LikeButton
+              count={post.likesCount ?? 0}
+              onLike={handleLikePost}
+              isLiked={post.userHasLiked}
+            />
 
             <Button
               variant="ghost"
@@ -393,6 +261,36 @@ export default function PostClient() {
                 className="transition-transform group-active:scale-95"
               />
             </Button>
+
+            {/* Post edit/delete — only for author */}
+            {isPostOwner && !isEditingPost && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground h-8 px-2"
+                  onClick={handleStartEditPost}
+                >
+                  <Pencil size={15} />
+                </Button>
+
+                <DeleteConfirmDialog
+                  title="Supprimer le post"
+                  description="Voulez-vous vraiment supprimer ce post et tous ses commentaires ? Cette action est irréversible."
+                  onConfirm={handleDeletePost}
+                  isPending={isDeletingPost}
+                  trigger={
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-muted-foreground hover:text-destructive h-8 px-2"
+                    >
+                      <Trash2 size={15} />
+                    </Button>
+                  }
+                />
+              </>
+            )}
           </div>
         </article>
 
@@ -429,7 +327,11 @@ export default function PostClient() {
             {validComments.length > 1 ? "s" : ""}
           </h2>
           {validComments.map((comment) => (
-            <CommentItem key={comment!._id} comment={comment} />
+            <CommentItem
+              key={comment!._id}
+              comment={comment}
+              currentUserId={currentUserId}
+            />
           ))}
         </div>
       </div>
