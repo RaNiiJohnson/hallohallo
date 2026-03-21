@@ -163,7 +163,8 @@ export const createPost = mutationWithTriggers({
       title: args.title,
       authorName: user.name,
       communityId: args.communityId,
-      searchAll: `${args.title} ${args.content} ${user.name}`,
+      communityName: community.name,
+      searchAll: `${args.title} ${args.content} ${user.name} ${community.name}`,
     });
 
     return postId;
