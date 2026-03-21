@@ -195,6 +195,7 @@ export default defineSchema({
     slug: v.string(),
     title: v.string(),
     communityId: v.id("communities"),
+    communityName: v.optional(v.string()),
     content: v.string(),
     authorId: v.string(),
     authorName: v.optional(v.string()),

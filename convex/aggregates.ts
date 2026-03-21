@@ -2,6 +2,7 @@ import { components, internal } from "./_generated/api";
 import { DataModel, Id } from "./_generated/dataModel";
 import { TableAggregate } from "@convex-dev/aggregate";
 import { Migrations } from "@convex-dev/migrations";
+import { internalMutation, type MutationCtx } from "./_generated/server";
 
 export const postLikesCount = new TableAggregate<{
   Namespace: Id<"posts">;
@@ -82,3 +83,21 @@ export const runAggregateBackfill = migrations.runner([
   internal.aggregates.backfillCommunityPostsCountMigration,
   internal.aggregates.backfillCommunityMembersCountMigration,
 ]);
+
+// ---- clear aggregates ----
+
+const _clearAggregates = async (ctx: MutationCtx) => {
+  const posts = await ctx.db.query("posts").collect();
+  for (const post of posts) {
+    await postLikesCount.clear(ctx, { namespace: post._id });
+    await postCommentsCount.clear(ctx, { namespace: post._id });
+  }
+
+  const communities = await ctx.db.query("communities").collect();
+  for (const community of communities) {
+    await communityPostsCount.clear(ctx, { namespace: community._id });
+    await communityMembersCount.clear(ctx, { namespace: community._id });
+  }
+};
+
+export const clearAggregates = internalMutation(_clearAggregates);
