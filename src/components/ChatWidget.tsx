@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery, useMutation, useConvexAuth } from "convex/react";
 import { usePaginatedQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
@@ -16,6 +16,12 @@ import {
 } from "lucide-react";
 import { getRelativeTime } from "@/lib/date";
 import { toast } from "sonner";
+import { useWidget } from "@/components/WidgetContext";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 type Community = {
   _id: Id<"communities">;
@@ -255,11 +261,13 @@ function CommunityList({
 
 export function ChatWidget() {
   const { isAuthenticated } = useConvexAuth();
-  const [isOpen, setIsOpen] = useState(false);
+  const { activeWidget, openWidget, closeWidget } = useWidget();
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(
     null,
   );
+
+  const isOpen = activeWidget === "chat";
 
   const communities = useQuery(
     api.communities.getMyCommunities,
@@ -273,6 +281,13 @@ export function ChatWidget() {
 
   const hasAnyUnread = unreadIds.length > 0;
 
+  const handleClose = useCallback(() => {
+    closeWidget("chat");
+    setIsFullscreen(false);
+    setSelectedCommunity(null);
+  }, [closeWidget]);
+
+  // Lock body scroll on mobile when open
   useEffect(() => {
     if (isOpen) {
       const isMobile = window.matchMedia("(max-width: 639px)").matches;
@@ -285,38 +300,19 @@ export function ChatWidget() {
     };
   }, [isOpen]);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        setIsOpen(false);
-        setIsFullscreen(false);
-        setSelectedCommunity(null);
-      }
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
-
+  // History back to close on mobile
   useEffect(() => {
     if (isOpen) window.history.pushState({ chatOpen: true }, "");
     const handlePopState = () => {
       if (isOpen) {
-        setIsOpen(false);
-        setIsFullscreen(false);
-        setSelectedCommunity(null);
+        handleClose();
       }
     };
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, [isOpen]);
+  }, [isOpen, handleClose]);
 
   if (!isAuthenticated || !communities || communities.length === 0) return null;
-
-  const handleClose = () => {
-    setIsOpen(false);
-    setIsFullscreen(false);
-    setSelectedCommunity(null);
-  };
 
   const content = selectedCommunity ? (
     <ChatWindow
@@ -337,49 +333,61 @@ export function ChatWidget() {
     />
   );
 
-  const floatingBtn = (onClick: () => void) => (
-    <button
-      onClick={onClick}
-      className="relative w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:bg-primary/90 transition-colors"
-    >
-      {isOpen ? <Minus size={18} /> : <MessageCircle size={18} />}
-      {!isOpen && hasAnyUnread && (
-        <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-destructive rounded-full border-2 border-background" />
-      )}
-    </button>
-  );
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      openWidget("chat");
+    } else {
+      handleClose();
+    }
+  };
 
   return (
     <>
-      {/* Mobile fullscreen */}
+      {/* Mobile fullscreen panel (manual since Popover doesn't do fullscreen cleanly) */}
       {isOpen && (
-        <div className="sm:hidden fixed inset-0 z-50 bg-background flex flex-col">
+        <div className="sm:hidden fixed inset-0 z-50 bg-background flex flex-col data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2">
           {content}
         </div>
       )}
 
-      {/* Desktop */}
-      <div className="fixed bottom-4 right-4 z-50 flex-col items-end gap-2 hidden sm:flex">
-        {isOpen && (
-          <div
-            className={`bg-background border border-border rounded-xl shadow-xl overflow-hidden flex flex-col transition-all duration-200 ${
+      {/* Desktop Popover */}
+      <div className="fixed bottom-4 right-4 z-50">
+        <Popover open={isOpen} onOpenChange={handleOpenChange}>
+          <PopoverTrigger asChild>
+            <button
+              className={`relative w-12 h-12 rounded-full text-primary-foreground flex items-center justify-center shadow-lg transition-colors sm:flex bg-primary hover:bg-primary/90`}
+            >
+              <MessageCircle size={18} />
+              {hasAnyUnread && (
+                <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-destructive rounded-full border-2 border-background" />
+              )}
+            </button>
+          </PopoverTrigger>
+
+          {/* Dummy element for the minus button when open to maintain layout identical to what PopoverTrigger does */}
+          {isOpen && (
+            <button
+              onClick={handleClose}
+              className="relative w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:bg-primary/90 transition-colors sm:hidden"
+            >
+              <Minus size={18} />
+            </button>
+          )}
+
+          <PopoverContent
+            side="top"
+            align="end"
+            sideOffset={8}
+            className={`hidden sm:flex p-0 rounded-xl border border-border shadow-xl overflow-hidden max-h-[85vh] flex-col ${
               isFullscreen
-                ? "fixed top-4 bottom-4 right-4 w-full max-w-2xl h-auto"
+                ? "fixed inset-4 w-auto max-w-none h-auto z-60"
                 : "w-80 h-96"
             }`}
           >
             {content}
-          </div>
-        )}
-        {floatingBtn(() => setIsOpen(!isOpen))}
+          </PopoverContent>
+        </Popover>
       </div>
-
-      {/* Bouton mobile */}
-      {!isOpen && (
-        <div className="sm:hidden fixed bottom-4 right-4 z-50">
-          {floatingBtn(() => setIsOpen(true))}
-        </div>
-      )}
     </>
   );
 }

@@ -2,10 +2,15 @@
 
 import { useQuery, useMutation, useConvexAuth } from "convex/react";
 import { api } from "@convex/_generated/api";
-import { Bell, X, Minus } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Bell } from "lucide-react";
 import { getRelativeTime } from "@/lib/date";
 import Link from "next/link";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { useWidget } from "@/components/WidgetContext";
 
 const notificationIcon: Record<string, string> = {
   new_comment: "💬",
@@ -17,7 +22,9 @@ const notificationIcon: Record<string, string> = {
 
 export function NotificationWidget() {
   const { isAuthenticated } = useConvexAuth();
-  const [isOpen, setIsOpen] = useState(false);
+  const { activeWidget, openWidget, closeWidget } = useWidget();
+
+  const isOpen = activeWidget === "notifications";
 
   const notifications = useQuery(
     api.notifications.getMyNotifications,
@@ -32,28 +39,36 @@ export function NotificationWidget() {
   const markAllRead = useMutation(api.notifications.markAllRead);
   const markOneRead = useMutation(api.notifications.markOneRead);
 
-  // Échap pour fermer
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) setIsOpen(false);
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
-
-  // Marquer tout lu à l'ouverture
-  const handleOpen = () => {
-    setIsOpen(true);
-    // if (unreadCount && unreadCount > 0) markAllRead();
-  };
-
   if (!isAuthenticated) return null;
 
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      openWidget("notifications");
+    } else {
+      closeWidget("notifications");
+    }
+  };
+
   return (
-    <div className="fixed bottom-4 right-20 z-50 flex flex-col items-end gap-2">
-      {/* Widget ouvert */}
-      {isOpen && (
-        <div className="w-80 bg-background border border-border rounded-xl shadow-xl overflow-hidden flex flex-col max-h-96">
+    <div className="fixed bottom-4 right-20 z-50">
+      <Popover open={isOpen} onOpenChange={handleOpenChange}>
+        <PopoverTrigger asChild>
+          <button className="relative w-12 h-12 rounded-full bg-card border border-border text-foreground flex items-center justify-center shadow-lg hover:bg-muted transition-colors">
+            <Bell size={18} />
+            {!isOpen && unreadCount != null && unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-medium">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+          </button>
+        </PopoverTrigger>
+
+        <PopoverContent
+          side="top"
+          align="end"
+          sideOffset={8}
+          className="w-80 p-0 rounded-xl border border-border shadow-xl overflow-hidden max-h-96 flex flex-col"
+        >
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card shrink-0">
             <div className="flex items-center gap-2">
@@ -67,22 +82,14 @@ export function NotificationWidget() {
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-2">
-              {notifications && notifications.length > 0 && (
-                <button
-                  onClick={() => markAllRead()}
-                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Tout lu
-                </button>
-              )}
+            {notifications && notifications.length > 0 && (
               <button
-                onClick={() => setIsOpen(false)}
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => markAllRead()}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
               >
-                <Minus size={14} />
+                Tout lu
               </button>
-            </div>
+            )}
           </div>
 
           {/* Liste */}
@@ -106,7 +113,7 @@ export function NotificationWidget() {
                     onClick={() => {
                       if (!notif.read)
                         markOneRead({ notificationId: notif._id });
-                      setIsOpen(false);
+                      closeWidget("notifications");
                     }}
                     className={`flex items-start gap-3 px-4 py-3 hover:bg-muted/50 transition-colors border-b border-border last:border-0 ${
                       !notif.read ? "bg-primary/5" : ""
@@ -131,21 +138,8 @@ export function NotificationWidget() {
               })
             )}
           </div>
-        </div>
-      )}
-
-      {/* Bouton flottant */}
-      <button
-        onClick={isOpen ? () => setIsOpen(false) : handleOpen}
-        className="relative w-12 h-12 rounded-full bg-card border border-border text-foreground flex items-center justify-center shadow-lg hover:bg-muted transition-colors"
-      >
-        {isOpen ? <X size={18} /> : <Bell size={18} />}
-        {!isOpen && unreadCount != null && unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-medium">
-            {unreadCount > 9 ? "9+" : unreadCount}
-          </span>
-        )}
-      </button>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }
