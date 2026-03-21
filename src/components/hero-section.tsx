@@ -17,7 +17,7 @@ export function HeroSection({
   backgroundImage,
 }: HeroSectionProps) {
   return (
-    <div className="relative w-full bg-background text-foreground overflow-hidden">
+    <div className="relative -top-10 w-full bg-background text-foreground overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
