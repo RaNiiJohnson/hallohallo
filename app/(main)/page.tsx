@@ -26,7 +26,6 @@ import {
 } from "lucide-react";
 import { Suspense } from "react";
 import { cn } from "@/lib/utils";
-import { Highlighter } from "@/components/ui/highlighter";
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { useConvexAuth } from "convex/react";
@@ -134,12 +133,14 @@ function HomePageContent() {
       {/* Services Section */}
       <section className="py-8 sm:py-12 md:py-16 px-4 shrink-0">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl text-center mb-12">
-            <Highlighter action="underline" color="#FF9800">
-              Nos Services :
-            </Highlighter>
+          <h2 className="text-4xl text-center mb-8 font-bold tracking-tight">
+            <span className="relative inline-block">
+              <span className="relative z-10">Nos Services</span>
+              {/* <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-2/3 h-1.5 bg-linear-to-r from-primary to-orange-400 rounded-full blur-sm opacity-70"></span>
+              <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-2/3 h-1.5 bg-linear-to-r from-primary to-orange-400 rounded-full"></span> */}
+            </span>
           </h2>
-          <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
             {/* Communauté */}
             <Card className="flex flex-col dark:bg-card/35 h-full">
               <CardHeader>
@@ -226,10 +227,12 @@ function HomePageContent() {
       {/* About Us Section */}
       <section className="py-8 sm:py-12  bg-secondary md:py-16 px-4 shrink-0">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-4xl text-center mb-12">
-            <Highlighter action="underline" color="#FF9800">
-              À Propos de Nous :
-            </Highlighter>
+          <h2 className="text-4xl text-center mb-8 font-bold tracking-tight">
+            <span className="relative inline-block">
+              <span className="relative z-10">À Propos de Nous</span>
+              {/* <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-2/3 h-1.5 bg-linear-to-r from-primary to-orange-400 rounded-full blur-sm opacity-70"></span>
+              <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-2/3 h-1.5 bg-linear-to-r from-primary to-orange-400 rounded-full"></span> */}
+            </span>
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
             {reviews.slice(0, 4).map((review) => {
