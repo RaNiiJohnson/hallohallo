@@ -20,6 +20,7 @@ import Link from "next/link";
 import { getRelativeTime } from "@/lib/date";
 import { Id } from "@convex/_generated/dataModel";
 import { toast } from "sonner";
+import { ComListSkeleton } from "./_component/List/comList";
 
 export default function Page() {
   const { isAuthenticated, isLoading } = useConvexAuth();
@@ -48,7 +49,7 @@ export default function Page() {
     result.posts === undefined ||
     loading
   ) {
-    return <div>Loading...</div>;
+    return <ComListSkeleton />;
   }
 
   return (
@@ -85,8 +86,8 @@ export default function Page() {
                     key={post._id}
                     className="block px-4 py-4 hover:bg-muted/30 transition-colors border-b border-border bg-background max-w-4xl mx-auto"
                   >
-                    <div className="text-xs text-muted-foreground flex mb-2">
-                      <div className="flex items-center gap-1">
+                    <div className="flex sm:flex-row flex-col text-xs text-muted-foreground mb-2">
+                      <div className="flex flex-wrap items-center gap-1">
                         Posté par{" "}
                         <span className="text-primary hover:underline">
                           {post.authorName}
@@ -101,8 +102,6 @@ export default function Page() {
                           {post.communityName}
                         </Link>
                       </div>
-                      <span className="flex-1"></span>
-                      {getRelativeTime(post._creationTime ?? "")}
                     </div>
                     <Link
                       href={`/communities/${post.communitySlug}/${post.slug}`}
@@ -116,6 +115,10 @@ export default function Page() {
                           {post.content}
                         </p>
                       )}
+
+                      <span className="text-xs text-muted-foreground mt-2">
+                        {getRelativeTime(post._creationTime ?? "")}
+                      </span>
                     </Link>
                     <div className="flex items-center gap-1 mt-2">
                       <Link

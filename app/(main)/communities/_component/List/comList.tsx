@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import { Id } from "@convex/_generated/dataModel";
 import { usePaginatedQuery } from "convex-helpers/react/cache";
 
-function ComListSkeleton() {
+export function ComListSkeleton() {
   return (
     <div className="flex flex-col gap-4 items-center">
       {Array.from({ length: 1 }).map((_, i) => (
