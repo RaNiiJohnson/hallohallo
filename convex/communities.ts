@@ -55,9 +55,11 @@ export const createCommunty = mutationWithTriggers({
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) throw new Error("Not authenticated");
 
+    const slug = generatedSlug(args.name);
+
     const comId = await ctx.db.insert("communities", {
       name: args.name,
-      slug: generatedSlug(args.name),
+      slug,
       description: args.description,
       authorId: user._id,
       authorName: user.name,
@@ -72,7 +74,7 @@ export const createCommunty = mutationWithTriggers({
       role: "admin",
     });
 
-    return comId;
+    return { comId, slug };
   },
 });
 

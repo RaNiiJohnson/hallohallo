@@ -28,6 +28,7 @@ import {
 import { toast } from "sonner";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
+import { useRouter } from "next/navigation";
 
 const privacyValues = ["public", "private", "secret"] as const;
 
@@ -56,6 +57,7 @@ interface CreateCommunityFormProps {
 }
 
 export function CreateCommunityForm({ onSuccess }: CreateCommunityFormProps) {
+  const router = useRouter();
   const createCommunity = useMutation(api.communities.createCommunty);
 
   const form = useForm<FormSchema>({
@@ -69,7 +71,7 @@ export function CreateCommunityForm({ onSuccess }: CreateCommunityFormProps) {
 
   const onSubmit = async (data: FormSchema) => {
     try {
-      await createCommunity({
+      const { slug } = await createCommunity({
         name: data.name,
         description: data.description,
         privacy: data.privacy,
@@ -77,6 +79,7 @@ export function CreateCommunityForm({ onSuccess }: CreateCommunityFormProps) {
       toast.success("Communauté créée avec succès !");
       form.reset();
       onSuccess?.();
+      router.push(`/communities/${slug}`);
     } catch {
       toast.error("Erreur lors de la création de la communauté");
     }
