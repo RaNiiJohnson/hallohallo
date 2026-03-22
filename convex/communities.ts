@@ -63,8 +63,6 @@ export const createCommunty = mutationWithTriggers({
       authorName: user.name,
       privacy: args.privacy,
       searchAll: `${args.name} ${args.description} ${user.name}`,
-      membersCount: 1, // le créateur est ajouté comme admin
-      postsCount: 0,
     });
 
     // Ajouter le créateur comme admin

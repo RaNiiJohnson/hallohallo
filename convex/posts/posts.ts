@@ -8,12 +8,14 @@ import {
   communityPostsCount,
   postCommentsCount,
   postLikesCount,
+  postShuffle,
 } from "../aggregates";
 import { Triggers } from "convex-helpers/server/triggers";
 import {
   customCtx,
   customMutation,
 } from "convex-helpers/server/customFunctions";
+import Rand from "rand-seed";
 
 type AuthUser = Awaited<ReturnType<typeof authComponent.safeGetAuthUser>>;
 
@@ -143,6 +145,71 @@ export const getPostWithMeta = query({
   },
 });
 
+export const getShuffledPosts = query({
+  args: {
+    seed: v.string(), // fixe pour toute la session → même ordre
+    offset: v.number(), // 0, 10, 20, ...
+    numItems: v.number(), // 10 par page
+  },
+  handler: async (ctx, { seed, offset, numItems }) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    const count = await postShuffle.count(ctx);
+
+    if (count === 0) return { posts: [], hasMore: false, totalCount: 0 };
+
+    // Génère l'ordre shufflé une fois avec le seed
+    const rand = new Rand(seed);
+    const allIndexes = Array.from({ length: count }, (_, i) => i);
+    shuffle(allIndexes, rand);
+
+    const pageIndexes = allIndexes.slice(offset, offset + numItems);
+
+    const atIndexes = await Promise.all(
+      pageIndexes.map((i) => postShuffle.at(ctx, i)),
+    );
+
+    const posts = await Promise.all(
+      atIndexes.map(async ({ id }) => {
+        const post = await ctx.db.get(id);
+        if (!post) return null;
+
+        const [likesCount, commentsCount] = await Promise.all([
+          postLikesCount.count(ctx, { namespace: post._id }),
+          postCommentsCount.count(ctx, { namespace: post._id }),
+        ]);
+
+        let userHasLiked = false;
+        if (user) {
+          const existingLike = await ctx.db
+            .query("postLikes")
+            .withIndex("by_postId", (q) => q.eq("postId", post._id))
+            .filter((q) => q.eq(q.field("userId"), user._id))
+            .first();
+          if (existingLike) userHasLiked = true;
+        }
+
+        return { ...post, likesCount, commentsCount, userHasLiked };
+      }),
+    );
+
+    return {
+      posts: posts.filter((post): post is NonNullable<typeof post> => post !== null),
+      hasMore: offset + numItems < count,
+      hasPrevPage: offset > 0,
+      totalCount: count,
+    };
+  },
+});
+
+// Fisher-Yates
+function shuffle<T>(array: T[], rand: Rand): T[] {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(rand.next() * (i + 1));
+    [array[i], array[j]] = [array[j]!, array[i]!];
+  }
+  return array;
+}
+
 export const createPost = mutationWithTriggers({
   args: {
     content: v.string(),
@@ -164,8 +231,12 @@ export const createPost = mutationWithTriggers({
       authorName: user.name,
       communityId: args.communityId,
       communityName: community.name,
+      communitySlug: community.slug,
       searchAll: `${args.title} ${args.content} ${user.name} ${community.name}`,
     });
+
+    const postDoc = (await ctx.db.get(postId))!;
+    await postShuffle.insert(ctx, postDoc);
 
     return postId;
   },
@@ -218,10 +289,14 @@ export const deletePost = mutationWithTriggers({
       await ctx.db.delete(comment._id);
     }
 
-    // 3. Aggregate + delete du post
+    // 3. Delete postShuffle
+    await postShuffle.delete(ctx, post);
+
+    // 4. Aggregate + delete du post
     await ctx.db.delete(args.postId);
   },
 });
+
 export const updatePost = mutationWithTriggers({
   args: {
     postId: v.id("posts"),

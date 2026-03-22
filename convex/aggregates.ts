@@ -34,6 +34,14 @@ export const communityPostsCount = new TableAggregate<{
   sortKey: () => null,
 });
 
+export const postShuffle = new TableAggregate<{
+  DataModel: DataModel;
+  TableName: "posts";
+  Key: null;
+}>(components.postShuffle, {
+  sortKey: () => null,
+});
+
 export const communityMembersCount = new TableAggregate<{
   Namespace: Id<"communities">;
   Key: null;
@@ -77,11 +85,19 @@ export const backfillCommunityMembersCountMigration = migrations.define({
   },
 });
 
+export const backfillPostShuffleMigration = migrations.define({
+  table: "posts",
+  migrateOne: async (ctx, doc) => {
+    await postShuffle.insertIfDoesNotExist(ctx, doc);
+  },
+});
+
 export const runAggregateBackfill = migrations.runner([
   internal.aggregates.backfillPostLikesCountMigration,
   internal.aggregates.backfillPostCommentsCountMigration,
   internal.aggregates.backfillCommunityPostsCountMigration,
   internal.aggregates.backfillCommunityMembersCountMigration,
+  internal.aggregates.backfillPostShuffleMigration,
 ]);
 
 // ---- clear aggregates ----
@@ -98,6 +114,8 @@ const _clearAggregates = async (ctx: MutationCtx) => {
     await communityPostsCount.clear(ctx, { namespace: community._id });
     await communityMembersCount.clear(ctx, { namespace: community._id });
   }
+
+  await postShuffle.clear(ctx);
 };
 
 export const clearAggregates = internalMutation(_clearAggregates);

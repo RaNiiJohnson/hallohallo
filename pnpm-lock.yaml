@@ -119,6 +119,9 @@ importers:
       radix-ui:
         specifier: ^1.4.3
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.8))(@types/react@19.2.8)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      rand-seed:
+        specifier: ^3.0.0
+        version: 3.0.0
       react:
         specifier: 19.2.3
         version: 19.2.3
@@ -3229,6 +3232,9 @@ packages:
         optional: true
       '@types/react-dom':
         optional: true
+
+  rand-seed@3.0.0:
+    resolution: {integrity: sha512-Zy8wnL6whyIAGOX2i9Mn1Orq3t9TNizGUk8euxamr60Z3PmspwFeT+vCZPcYMAR5nOztnAKPtVi3jt8EzmCB6g==}
 
   react-day-picker@9.13.0:
     resolution: {integrity: sha512-euzj5Hlq+lOHqI53NiuNhCP8HWgsPf/bBAVijR50hNaY1XwjKjShAnIe8jm8RD2W9IJUvihDIZ+KrmqfFzNhFQ==}
@@ -6865,6 +6871,8 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.8
       '@types/react-dom': 19.2.3(@types/react@19.2.8)
+
+  rand-seed@3.0.0: {}
 
   react-day-picker@9.13.0(react@19.2.3):
     dependencies:
