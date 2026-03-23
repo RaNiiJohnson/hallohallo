@@ -89,17 +89,22 @@ export default function Page() {
                   >
                     <div className="flex sm:flex-row flex-col text-xs text-muted-foreground mb-2">
                       <div className="flex flex-wrap items-center gap-1">
-                        <Avatar>
-                          <AvatarImage
-                            src={post.author?.imageUrl || "/random-user.png"}
-                          />
-                          <AvatarFallback>
-                            {post.authorName?.slice(0, 2)?.toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="text-primary hover:underline">
-                          {post.authorName}
-                        </span>
+                        <Link
+                          href={`/hl/${post.author.slug}`}
+                          className="flex items-center gap-1"
+                        >
+                          <Avatar>
+                            <AvatarImage
+                              src={post.author?.imageUrl || "/random-user.png"}
+                            />
+                            <AvatarFallback>
+                              {post.authorName?.slice(0, 2)?.toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-primary hover:underline">
+                            {post.authorName}
+                          </span>
+                        </Link>
                         {"  "}
                         <ChevronRight className="size-3" />
                         {"  "}
