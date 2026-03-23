@@ -219,7 +219,7 @@ export default function ComList() {
                   </Link>
 
                   <p className="text-xs text-muted-foreground mb-2">
-                    Posté par{" "}
+                    {" "}
                     <span className="text-primary hover:underline">
                       {post.authorName}
                     </span>{" "}

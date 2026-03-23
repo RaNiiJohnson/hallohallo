@@ -3,6 +3,7 @@ import { generatedSlug } from "../../src/lib/utils";
 import { DatabaseReader, mutation, query } from "../_generated/server";
 import { v } from "convex/values";
 import { authComponent } from "../auth";
+import { components } from "../_generated/api";
 import { DataModel, Id } from "../_generated/dataModel";
 import {
   communityPostsCount,
@@ -188,12 +189,32 @@ export const getShuffledPosts = query({
           if (existingLike) userHasLiked = true;
         }
 
-        return { ...post, likesCount, commentsCount, userHasLiked };
+        const author = await ctx.runQuery(
+          components.betterAuth.users.getUserById,
+          { id: post.authorId },
+        );
+        let authorData = null;
+        if (author) {
+          const imageUrl = author.image
+            ? await ctx.storage.getUrl(author.image)
+            : null;
+          authorData = { ...author, imageUrl };
+        }
+
+        return {
+          ...post,
+          likesCount,
+          commentsCount,
+          userHasLiked,
+          author: authorData,
+        };
       }),
     );
 
     return {
-      posts: posts.filter((post): post is NonNullable<typeof post> => post !== null),
+      posts: posts.filter(
+        (post): post is NonNullable<typeof post> => post !== null,
+      ),
       hasMore: offset + numItems < count,
       hasPrevPage: offset > 0,
       totalCount: count,

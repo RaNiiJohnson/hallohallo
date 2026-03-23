@@ -21,6 +21,7 @@ import { getRelativeTime } from "@/lib/date";
 import { Id } from "@convex/_generated/dataModel";
 import { toast } from "sonner";
 import { ComListSkeleton } from "./_component/List/comList";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Page() {
   const { isAuthenticated, isLoading } = useConvexAuth();
@@ -88,7 +89,14 @@ export default function Page() {
                   >
                     <div className="flex sm:flex-row flex-col text-xs text-muted-foreground mb-2">
                       <div className="flex flex-wrap items-center gap-1">
-                        Posté par{" "}
+                        <Avatar>
+                          <AvatarImage
+                            src={post.author?.imageUrl || "/random-user.png"}
+                          />
+                          <AvatarFallback>
+                            {post.authorName?.slice(0, 2)?.toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
                         <span className="text-primary hover:underline">
                           {post.authorName}
                         </span>

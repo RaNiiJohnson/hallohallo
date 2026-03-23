@@ -24,6 +24,15 @@ export const getUserBySlug = query({
   },
 });
 
+export const getUserById = query({
+  args: { id: v.string() },
+  handler: async (ctx, { id }) => {
+    const normalizedId = ctx.db.normalizeId("user", id);
+    if (!normalizedId) return null;
+    return await ctx.db.get(normalizedId);
+  },
+});
+
 export const userValidator = schema.tables.user.validator;
 
 export type User = Doc<"user">;

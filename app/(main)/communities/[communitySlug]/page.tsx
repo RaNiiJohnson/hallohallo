@@ -164,7 +164,7 @@ export default function CommunityClient() {
                   className="block"
                 >
                   <p className="text-xs text-muted-foreground mb-1">
-                    Posté par{" "}
+                    {" "}
                     <span className="text-primary hover:underline">
                       {post.authorName}
                     </span>{" "}

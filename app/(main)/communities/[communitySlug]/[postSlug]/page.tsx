@@ -147,7 +147,7 @@ export default function PostClient() {
         {/* Post */}
         <article className="border-b border-border bg-background px-4 py-4">
           <p className="text-xs text-muted-foreground mb-1">
-            Posté par{" "}
+            {" "}
             <span className="text-primary hover:underline cursor-pointer">
               {post.authorName}
             </span>{" "}
