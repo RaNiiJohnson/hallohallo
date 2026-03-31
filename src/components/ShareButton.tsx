@@ -54,7 +54,6 @@ export function ShareButton({
   size = "sm",
   className = "gap-2",
 }: ShareButtonProps) {
-  // ✅ Après - calcul direct, pas de state du tout
   const currentUrl =
     url ?? (typeof window !== "undefined" ? window.location.href : "");
 
