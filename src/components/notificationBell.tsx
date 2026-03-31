@@ -18,6 +18,8 @@ const notificationIcon: Record<string, string> = {
   new_like: "✅",
   new_comment_like: "✅",
   new_reply_like: "✅",
+  new_member: "👥",
+  leave_community: "❌",
 };
 
 export function NotificationWidget() {

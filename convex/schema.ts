@@ -263,6 +263,8 @@ export default defineSchema({
       v.literal("new_like"),
       v.literal("new_comment_like"),
       v.literal("new_reply_like"),
+      v.literal("new_member"),
+      v.literal("leave_community"),
     ),
     read: v.boolean(),
     postSlug: v.optional(v.string()),

@@ -355,6 +355,18 @@ export const joinCommunity = mutationWithTriggers({
       communityId: args.communityId,
       role: "member",
     });
+
+    //notifcation
+    if (community.authorId !== user._id) {
+      await ctx.db.insert("notifications", {
+        userId: community.authorId,
+        type: "new_member",
+        read: false,
+        fromUserName: user.name,
+        communitySlug: community.slug,
+        message: `${user.name} a rejoint votre communauté "${community.name}"`,
+      });
+    }
   },
 });
 
@@ -378,6 +390,18 @@ export const leaveCommunity = mutationWithTriggers({
       throw new Error("Admin cannot leave — delete the community instead");
 
     await ctx.db.delete(member._id);
+
+    //notifcation
+    if (community.authorId !== user._id) {
+      await ctx.db.insert("notifications", {
+        userId: community.authorId,
+        type: "leave_community",
+        read: false,
+        fromUserName: user.name,
+        communitySlug: community.slug,
+        message: `${user.name} a quitté votre communauté "${community.name}"`,
+      });
+    }
   },
 });
 
