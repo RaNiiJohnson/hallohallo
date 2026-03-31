@@ -18,9 +18,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
+  const title = `${community.name} | Hallo Hallo`;
+  const description = community.description?.substring(0, 160) || "Communauté sur HalloHallo";
+
   return {
-    title: `${community.name} | Hallo Hallo`,
-    description: community.description,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      siteName: "HalloHallo",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   };
 }
 

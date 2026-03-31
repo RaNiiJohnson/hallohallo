@@ -18,9 +18,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
+  const title = `${job.title} | Hallo Hallo`;
+  // Limit description to ~160 chars for SEO best practices, removing newlines if necessary
+  const description = job.description?.substring(0, 160) || "Offre d'emploi sur HalloHallo";
+
   return {
-    title: `${job.title} | Hallo Hallo`,
-    description: job.description,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      siteName: "HalloHallo",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   };
 }
 

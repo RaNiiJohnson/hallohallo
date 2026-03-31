@@ -18,9 +18,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
+  const title = `${listing.title} | Hallo Hallo`;
+  const description = listing.description?.substring(0, 160) || "Annonce immobilière sur HalloHallo";
+  const imageUrl = listing.images?.[0]?.secureUrl;
+
   return {
-    title: `${listing.title} | Hallo Hallo`,
-    description: listing.description,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      siteName: "HalloHallo",
+      ...(imageUrl && {
+        images: [
+          {
+            url: imageUrl,
+            width: 1200,
+            height: 630,
+            alt: listing.title,
+          },
+        ],
+      }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      ...(imageUrl && { images: [imageUrl] }),
+    },
   };
 }
 

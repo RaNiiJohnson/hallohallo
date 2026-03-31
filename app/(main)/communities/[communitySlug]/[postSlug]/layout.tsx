@@ -18,9 +18,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
+  const title = `${post.title} | Hallo Hallo`;
+  const description = post.content?.substring(0, 160) || "Publication sur HalloHallo";
+
   return {
-    title: `${post.title} | Hallo Hallo`,
-    description: post.content,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      siteName: "HalloHallo",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   };
 }
 
