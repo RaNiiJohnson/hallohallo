@@ -14,7 +14,6 @@ import {
   ChevronLeft,
   ChevronRight,
   MessageSquare,
-  Share2,
 } from "lucide-react";
 import Link from "next/link";
 import { getRelativeTime } from "@/lib/date";
@@ -22,6 +21,7 @@ import { Id } from "@convex/_generated/dataModel";
 import { toast } from "sonner";
 import { ComListSkeleton } from "./_component/List/comList";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ShareButton } from "@/components/ShareButton";
 
 export default function Page() {
   const { isAuthenticated, isLoading } = useConvexAuth();
@@ -174,19 +174,12 @@ export default function Page() {
                         </span>
                       </Button>
 
-                      <Button
+                      <ShareButton
+                        text={post.title}
+                        url={typeof window !== "undefined" ? `${window.location.origin}/communities/${post.communitySlug}/${post.slug}` : ""}
                         variant="ghost"
-                        size="sm"
                         className="group flex items-center gap-1.5 text-muted-foreground hover:text-purple-500 hover:bg-purple-500/10 transition-colors h-8 px-2"
-                      >
-                        <Share2
-                          size={15}
-                          className="transition-transform group-active:scale-95"
-                        />
-                        <span className="text-xs font-medium hidden sm:inline">
-                          Partager
-                        </span>
-                      </Button>
+                      />
 
                       <Button
                         variant="ghost"

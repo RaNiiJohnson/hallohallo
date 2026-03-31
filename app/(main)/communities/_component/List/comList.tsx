@@ -8,7 +8,6 @@ import {
   Bookmark,
   CheckIcon,
   MessageSquare,
-  Share2,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -17,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { Id } from "@convex/_generated/dataModel";
 import { usePaginatedQuery } from "convex-helpers/react/cache";
+import { ShareButton } from "@/components/ShareButton";
 
 export function ComListSkeleton() {
   return (
@@ -268,19 +268,12 @@ export default function ComList() {
                       </span>
                     </Button>
 
-                    <Button
+                    <ShareButton
+                      text={post.title}
+                      url={typeof window !== "undefined" ? `${window.location.origin}/communities/${community.slug}/${post.slug}` : ""}
                       variant="ghost"
-                      size="sm"
                       className="group flex items-center gap-1.5 text-muted-foreground hover:text-purple-500 hover:bg-purple-500/10 transition-colors h-8 px-2"
-                    >
-                      <Share2
-                        size={15}
-                        className="transition-transform group-active:scale-95"
-                      />
-                      <span className="text-xs font-medium hidden sm:inline">
-                        Partager
-                      </span>
-                    </Button>
+                    />
 
                     <Button
                       variant="ghost"

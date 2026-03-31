@@ -6,7 +6,6 @@ import { getRelativeTime } from "@/lib/date";
 import {
   Bookmark,
   MessageSquare,
-  Share2,
   ChevronRight,
   Pencil,
   Trash2,
@@ -24,6 +23,7 @@ import SkeletonPost from "./skeleton";
 import { DeleteConfirmDialog } from "../../_component/deleteConfirmDialog";
 import { LikeButton } from "../../_component/likeButton";
 import { CommentItem } from "../../_component/commentItem";
+import { ShareButton } from "@/components/ShareButton";
 
 export default function PostClient() {
   const { postSlug, communitySlug } = useParams();
@@ -236,19 +236,12 @@ export default function PostClient() {
               isLiked={post.userHasLiked}
             />
 
-            <Button
+            <ShareButton
+              text={post.title}
+              url={typeof window !== "undefined" ? window.location.href : ""}
               variant="ghost"
-              size="sm"
               className="group flex items-center gap-1.5 text-muted-foreground hover:text-purple-500 hover:bg-purple-500/10 transition-colors h-8 px-2"
-            >
-              <Share2
-                size={15}
-                className="transition-transform group-active:scale-95"
-              />
-              <span className="text-xs font-medium hidden sm:inline">
-                Partager
-              </span>
-            </Button>
+            />
 
             <Button
               variant="ghost"

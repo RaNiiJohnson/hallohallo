@@ -1,9 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Heart, Share2 } from "lucide-react";
+import { ArrowLeft, Heart } from "lucide-react";
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
+import { ShareButton } from "@/components/ShareButton";
 import { PropertyDetails } from "./components/PropertyDetails";
 import { PropertyPageSkeleton } from "../_component/skeleton";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -39,14 +40,7 @@ export default function PropertyPage() {
 
         <div className="flex items-center gap-2">
           <ButtonGroup>
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <Share2 className="h-4 w-4" />
-              <span className="max-sm:hidden">Partager</span>
-            </Button>
+            <ShareButton text={property.title} />
             <Button
               variant="secondary"
               size="sm"

@@ -24,7 +24,7 @@ export function EditJobDialog({ jobOffer }: { jobOffer: JobOfferDetails }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="gap-2">
+        <Button size="sm" variant="outline" className="gap-2">
           <Pencil className="h-4 w-4" />
           <span>Modifier les détails</span>
         </Button>

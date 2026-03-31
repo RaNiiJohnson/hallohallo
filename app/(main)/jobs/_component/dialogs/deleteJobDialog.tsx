@@ -38,7 +38,7 @@ function DeleteJobDialog({ jobId }: { jobId: Id<"JobOffer"> }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="destructive">
+        <Button size="sm" variant="destructive">
           <Trash className="size-4" />
           Supprimer
         </Button>

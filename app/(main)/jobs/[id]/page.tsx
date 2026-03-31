@@ -15,13 +15,13 @@ import {
   Briefcase,
   FileText,
   Award,
-  Share2,
   Bookmark,
   ChevronRight,
 } from "lucide-react";
 import { notFound, useParams } from "next/navigation";
 import Link from "next/link";
 import { getRelativeTime, formatDateLong } from "@/lib/date";
+import { ShareButton } from "@/components/ShareButton";
 import { Separator } from "@/components/ui/separator";
 import { ButtonGroup } from "@/components/ui/button-group";
 import DeleteJobDialog from "../_component/dialogs/deleteJobDialog";
@@ -131,6 +131,7 @@ export default function JobDetailsPage() {
                 {isAuthor ? (
                   <ButtonGroup>
                     <DeleteJobDialog jobId={jobOffer._id} />
+                    <ShareButton text={jobOffer.title} />
                     <EditJobDialog jobOffer={jobOffer} />
                   </ButtonGroup>
                 ) : (
@@ -147,10 +148,7 @@ export default function JobDetailsPage() {
                       </a>
                     </Button>
 
-                    <Button variant="outline" size="sm" className="gap-2">
-                      <Share2 className="w-4 h-4" />
-                      Partager
-                    </Button>
+                    <ShareButton text={jobOffer.title} />
 
                     <Button variant="outline" size="sm">
                       <Bookmark className="w-4 h-4" />

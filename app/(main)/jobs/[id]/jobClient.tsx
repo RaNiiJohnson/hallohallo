@@ -15,7 +15,6 @@ import {
   Briefcase,
   FileText,
   Award,
-  Share2,
   Bookmark,
   ChevronRight,
 } from "lucide-react";
@@ -31,6 +30,7 @@ import { api } from "@convex/_generated/api";
 import { EditJobDialog } from "./_component/editJobDialog";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { LocationMap } from "@/lib/LocationMap";
+import { ShareButton } from "@/components/ShareButton";
 
 export function JobDetailsPage(props: {
   preloadedJob: Preloaded<typeof api.jobs.getJobWithContact>;
@@ -144,10 +144,7 @@ export function JobDetailsPage(props: {
                       </a>
                     </Button>
 
-                    <Button variant="outline" size="sm" className="gap-2">
-                      <Share2 className="w-4 h-4" />
-                      Partager
-                    </Button>
+                    <ShareButton text={jobOffer.title} />
 
                     <Button variant="outline" size="sm">
                       <Bookmark className="w-4 h-4" />

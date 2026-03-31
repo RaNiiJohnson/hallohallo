@@ -6,7 +6,6 @@ import { getRelativeTime } from "@/lib/date";
 import {
   Bookmark,
   MessageSquare,
-  Share2,
   Users,
   CheckIcon,
   ChevronRight,
@@ -20,6 +19,7 @@ import { Id } from "@convex/_generated/dataModel";
 import { useParams } from "next/navigation";
 import { useQuery } from "convex-helpers/react/cache";
 import SkeletonCommunity from "./skeleton";
+import { ShareButton } from "@/components/ShareButton";
 
 export default function CommunityClient() {
   const { communitySlug } = useParams();
@@ -220,19 +220,12 @@ export default function CommunityClient() {
                     </span>
                   </Button>
 
-                  <Button
+                  <ShareButton
+                    text={post.title}
+                    url={typeof window !== "undefined" ? `${window.location.origin}/communities/${community.slug}/${post.slug}` : ""}
                     variant="ghost"
-                    size="sm"
                     className="group flex items-center gap-1.5 text-muted-foreground hover:text-purple-500 hover:bg-purple-500/10 transition-colors h-8 px-2"
-                  >
-                    <Share2
-                      size={15}
-                      className="transition-transform group-active:scale-95"
-                    />
-                    <span className="text-xs font-medium hidden sm:inline">
-                      Partager
-                    </span>
-                  </Button>
+                  />
 
                   <Button
                     variant="ghost"
