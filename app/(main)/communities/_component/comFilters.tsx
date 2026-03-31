@@ -13,7 +13,7 @@ import { Filter, Search } from "lucide-react";
 
 export default function ComFilters() {
   return (
-    <div className="bg-background sticky top-0 p-4 z-100 ">
+    <div className="bg-background sticky top-0 p-2 z-40">
       <div className="flex flex-col gap-4 max-w-3xl mx-auto">
         <div className="flex gap-4">
           <InputGroup>

@@ -74,7 +74,7 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
   };
 
   return (
-    <div className="bg-background sticky top-0 p-4 z-100 ">
+    <div className="bg-background sticky top-0 p-2 z-40 ">
       <div className="flex flex-col gap-4 max-w-3xl mx-auto">
         {/* Barre de recherche principale */}
         <div className="flex gap-4">
