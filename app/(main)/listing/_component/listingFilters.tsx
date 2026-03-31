@@ -115,7 +115,7 @@ export function RealEstatesFilters({
   };
 
   return (
-    <div className="bg-background sticky top-0 p-6 pt-20 z-20 ">
+    <div className="w-full bg-background sticky top-0 p-6 z-100 ">
       <div className="flex flex-col gap-4 max-w-3xl mx-auto">
         {/* Barre de recherche principale */}
         <div className="flex gap-4">
