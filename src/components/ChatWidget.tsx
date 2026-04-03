@@ -312,7 +312,7 @@ export function ChatWidget() {
     return () => window.removeEventListener("popstate", handlePopState);
   }, [isOpen, handleClose]);
 
-  if (!isAuthenticated || !communities || communities.length === 0) return null;
+  if (!isAuthenticated || !communities) return null;
 
   const content = selectedCommunity ? (
     <ChatWindow
