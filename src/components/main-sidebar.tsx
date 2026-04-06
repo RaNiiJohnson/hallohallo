@@ -26,6 +26,7 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -55,6 +56,8 @@ export function MainSidebar({
 }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const user = useQuery(api.auth.getCurrentUser);
+  const myCommunities = useQuery(api.communities.getMyCommunities);
+  const topCommunities = useQuery(api.communities.getTopCommunities);
   const { isMobile, setOpenMobile } = useSidebar();
 
   const handleLogOut = async () => {
@@ -136,6 +139,65 @@ export function MainSidebar({
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </Authenticated>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Communautés</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <Authenticated>
+                {myCommunities?.map((community) => (
+                  <SidebarMenuItem key={community?._id}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === `/communities/${community?.slug}`}
+                    >
+                      <Link
+                        href={`/communities/${community?.slug}`}
+                        onClick={() => isMobile && setOpenMobile(false)}
+                      >
+                        <span className="truncate">{community?.name}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </Authenticated>
+              <Unauthenticated>
+                {topCommunities?.map((community) => (
+                  <SidebarMenuItem key={community._id}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === `/communities/${community.slug}`}
+                    >
+                      <Link
+                        href={`/communities/${community.slug}`}
+                        onClick={() => isMobile && setOpenMobile(false)}
+                      >
+                        <Users className="size-4" />
+                        <span className="truncate">{community.name}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </Unauthenticated>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === `/communities/explore`}
+                >
+                  <Link
+                    href={`/communities/explore`}
+                    onClick={() => isMobile && setOpenMobile(false)}
+                    className="text-muted-foreground mt-2"
+                  >
+                    <span className="truncate w-full text-center text-sm font-medium">
+                      Explorer tout...
+                    </span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
