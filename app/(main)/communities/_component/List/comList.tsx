@@ -219,11 +219,11 @@ export default function ComList() {
   return (
     <div>
       {/* ── Mode toggle */}
-      <ButtonGroup className="flex items-center px-4 py-3 max-w-4xl mx-auto">
+      <ButtonGroup className="flex w-full md:w-fit justify-between items-center px-4 py-3 max-w-4xl mx-auto">
         <Button
           variant={mode === "shuffle" ? "default" : "outline"}
-          size="sm"
-          className="gap-1.5"
+          size="xs"
+          className="gap-1.5 flex-1 md:flex-initial"
           onClick={() => setFilters({ mode: "shuffle", page: 1 })}
         >
           <Shuffle size={14} />
@@ -231,8 +231,8 @@ export default function ComList() {
         </Button>
         <Button
           variant={mode === "recent" ? "default" : "outline"}
-          size="sm"
-          className="gap-1.5"
+          size="xs"
+          className="gap-1.5 flex-1 md:flex-initial"
           onClick={() => setFilters({ mode: "recent", page: 1 })}
         >
           <ArrowDownUp size={14} />
@@ -240,8 +240,8 @@ export default function ComList() {
         </Button>
         <Button
           variant={mode === "oldest" ? "default" : "outline"}
-          size="sm"
-          className="gap-1.5"
+          size="xs"
+          className="gap-1.5 flex-1 md:flex-initial"
           onClick={() => setFilters({ mode: "oldest", page: 1 })}
         >
           <Calendar size={14} />
@@ -250,8 +250,8 @@ export default function ComList() {
         </Button>
         <Button
           variant={mode === "top" ? "default" : "outline"}
-          size="sm"
-          className="gap-1.5"
+          size="xs"
+          className="gap-1.5 flex-1 md:flex-initial"
           onClick={() => setFilters({ mode: "top", page: 1 })}
         >
           <Flame size={14} />
