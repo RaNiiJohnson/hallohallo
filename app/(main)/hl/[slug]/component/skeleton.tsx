@@ -19,6 +19,7 @@ export default function SkeletonProfile() {
                 src="/random-user.png"
                 alt="Avatar Skeleton"
                 fill
+                sizes="(max-width: 768px) 112px, 144px"
                 className="object-cover"
                 priority
               />

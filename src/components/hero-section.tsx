@@ -24,6 +24,7 @@ export function HeroSection({
           src={backgroundImage}
           alt="Hero background"
           fill
+          sizes="100vw"
           className="object-cover opacity-30"
           priority
         />
