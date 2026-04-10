@@ -32,7 +32,7 @@ export default function ExploreCommunitiesPage() {
             <Link
               key={community._id}
               href={`/communities/${community.slug}`}
-              className="group flex flex-col p-6 rounded-xl border bg-card hover:border-primary/50 hover:shadow-sm transition-all h-full"
+              className="group flex flex-col p-6 rounded-xl border bg-card dark:bg-card/35 hover:border-primary/50 hover:shadow-sm transition-all h-full"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-2 text-primary">
