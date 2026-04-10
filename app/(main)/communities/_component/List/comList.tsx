@@ -5,11 +5,14 @@ import { api } from "@convex/_generated/api";
 import { useMutation } from "convex/react";
 import { useConvexAuth } from "convex/react";
 import {
+  ArrowDownUp,
   Bookmark,
+  Calendar,
   CheckIcon,
-  ChevronLeft,
   ChevronRight,
+  Flame,
   MessageSquare,
+  Shuffle,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -18,9 +21,20 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { Id } from "@convex/_generated/dataModel";
 import { ShareButton } from "@/components/ShareButton";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRicherStableQuery } from "@/lib/useStableQuery";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { parseAsString, parseAsInteger, useQueryStates } from "nuqs";
+import { ButtonGroup } from "@/components/ui/button-group";
 
 export function ComListSkeleton() {
   return (
@@ -84,81 +98,114 @@ function EmptyCommunities() {
   );
 }
 
-// interface IsMemberProps {
-//   _id: Id<"communities">;
-//   name: string;
-// }
+// ─── Pagination helpers
 
-// function IsMember({ _id, name }: IsMemberProps) {
-//   const joinCommunity = useMutation(api.communities.joinCommunity);
-//   const leaveCommunity = useMutation(api.communities.leaveCommunity);
-//   const isMember = useQuery(
-//     api.communities.isMember,
-//     _id ? { communityId: _id } : "skip",
-//   );
+/** Returns the visible page numbers with -1 for ellipsis gaps */
+function getPageNumbers(currentPage: number, totalPages: number): number[] {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
 
-//   const handleJoin = async () => {
-//     try {
-//       await joinCommunity({ communityId: _id });
-//       toast.success(`Vous avez rejoint  ${name} !`);
-//     } catch {
-//       toast.error("Erreur lors de l'adhésion");
-//     }
-//   };
+  const pages: number[] = [1];
 
-//   const handleLeave = async () => {
-//     try {
-//       await leaveCommunity({ communityId: _id });
-//       toast.success(`Vous avez quitté  ${name}`);
-//     } catch (e: unknown) {
-//       const message = e instanceof Error ? e.message : "Erreur";
-//       toast.error(message);
-//     }
-//   };
+  if (currentPage > 3) pages.push(-1); // ellipsis
 
-//   if (isMember === undefined || isMember === null) {
-//     return null;
-//   }
+  const start = Math.max(2, currentPage - 1);
+  const end = Math.min(totalPages - 1, currentPage + 1);
 
-//   return isMember ? (
-//     isMember.role !== "admin" ? (
-//       <Button variant="destructive" size="sm" onClick={handleLeave}>
-//         <Users
-//           size={15}
-//           className="transition-transform group-active:scale-95"
-//         />
-//         <span className="text-xs font-medium">Quitter</span>
-//       </Button>
-//     ) : (
-//       <span>Votre communauté</span>
-//     )
-//   ) : (
-//     <Button variant="ghost" size="sm" onClick={handleJoin}>
-//       <Users size={15} className="transition-transform group-active:scale-95" />
-//       <span className="text-xs font-medium">Rejoindre</span>
-//     </Button>
-//   );
-// }
+  for (let i = start; i <= end; i++) pages.push(i);
+
+  if (currentPage < totalPages - 2) pages.push(-1); // ellipsis
+
+  pages.push(totalPages);
+  return pages;
+}
 
 export default function ComList() {
   const { isAuthenticated } = useConvexAuth();
   const likePost = useMutation(api.posts.likes.likePost);
-  const [seed] = useState(() => Math.random().toString(36).slice(2));
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(10);
+  const pageSize = 10;
 
-  const { data: result, isLoading: loading } = useRicherStableQuery(
-    api.posts.posts.getShuffledPosts,
-    {
-      seed,
-      offset: (currentPage - 1) * pageSize,
-      numItems: pageSize,
-    },
+  // ─── nuqs URL state
+  const [filters, setFilters] = useQueryStates({
+    mode: parseAsString.withDefault("shuffle"),
+    page: parseAsInteger.withDefault(1),
+  });
+
+  // Stable seed per mount — not persisted in URL
+  const [seed] = useState(() => crypto.randomUUID());
+
+  const currentPage = filters.page;
+  const offset = (currentPage - 1) * pageSize;
+  const mode = filters.mode;
+
+  // ── Shuffle mode
+  const { data: shuffledResult, isLoading: shuffleLoading } =
+    useRicherStableQuery(
+      api.posts.posts.getShuffledPosts,
+      mode === "shuffle" ? { seed, offset, numItems: pageSize } : "skip",
+    );
+
+  // ── Recent mode (desc)
+  const { data: recentResult, isLoading: recentLoading } = useRicherStableQuery(
+    api.posts.posts.getSortedPosts,
+    mode === "recent"
+      ? { order: "desc" as const, offset, numItems: pageSize }
+      : "skip",
   );
 
+  // ── Oldest mode (asc)
+  const { data: oldestResult, isLoading: oldestLoading } = useRicherStableQuery(
+    api.posts.posts.getSortedPosts,
+    mode === "oldest"
+      ? { order: "asc" as const, offset, numItems: pageSize }
+      : "skip",
+  );
+
+  // ── Top (most liked) mode
+  const { data: topResult, isLoading: topLoading } = useRicherStableQuery(
+    api.posts.posts.getSortedByLikes,
+    mode === "top" ? { offset, numItems: pageSize } : "skip",
+  );
+
+  const resultMap = {
+    shuffle: shuffledResult,
+    recent: recentResult,
+    oldest: oldestResult,
+    top: topResult,
+  };
+  const loadingMap = {
+    shuffle: shuffleLoading,
+    recent: recentLoading,
+    oldest: oldestLoading,
+    top: topLoading,
+  };
+  const result = resultMap[mode as keyof typeof resultMap] ?? shuffledResult;
+  const loading = loadingMap[mode as keyof typeof loadingMap] ?? shuffleLoading;
+
+  // Show numbered pagination for non-shuffle modes
+  const useNumberedPagination = mode !== "shuffle";
+
+  // ── Pagination numbers for numbered modes
+  const totalPages = useMemo(() => {
+    if (!result || !useNumberedPagination) return 0;
+    return Math.ceil(result.totalCount / pageSize);
+  }, [result, useNumberedPagination, pageSize]);
+
+  const visiblePages = useMemo(
+    () => getPageNumbers(currentPage, totalPages),
+    [currentPage, totalPages],
+  );
+
+  // ── Handlers
   const handleLike = async (postId: Id<"posts">) => {
     if (!isAuthenticated) return toast.error("Connectez-vous pour liker");
     await likePost({ postId });
+  };
+
+  const goToPage = (page: number) => {
+    if (loading) return;
+    setFilters({ page });
   };
 
   if (result === undefined) {
@@ -171,8 +218,51 @@ export default function ComList() {
 
   return (
     <div>
+      {/* ── Mode toggle */}
+      <ButtonGroup className="flex items-center px-4 py-3 max-w-4xl mx-auto">
+        <Button
+          variant={mode === "shuffle" ? "default" : "outline"}
+          size="sm"
+          className="gap-1.5"
+          onClick={() => setFilters({ mode: "shuffle", page: 1 })}
+        >
+          <Shuffle size={14} />
+          <span className="md:block hidden">Aléatoire</span>
+        </Button>
+        <Button
+          variant={mode === "recent" ? "default" : "outline"}
+          size="sm"
+          className="gap-1.5"
+          onClick={() => setFilters({ mode: "recent", page: 1 })}
+        >
+          <ArrowDownUp size={14} />
+          <span className="md:block hidden">Récent</span>
+        </Button>
+        <Button
+          variant={mode === "oldest" ? "default" : "outline"}
+          size="sm"
+          className="gap-1.5"
+          onClick={() => setFilters({ mode: "oldest", page: 1 })}
+        >
+          <Calendar size={14} />
+
+          <span className="md:block hidden">Ancien</span>
+        </Button>
+        <Button
+          variant={mode === "top" ? "default" : "outline"}
+          size="sm"
+          className="gap-1.5"
+          onClick={() => setFilters({ mode: "top", page: 1 })}
+        >
+          <Flame size={14} />
+
+          <span className="md:block hidden">Top</span>
+        </Button>
+      </ButtonGroup>
+
+      {/* ── Posts */}
       {result.posts.length === 0 ? (
-        <div>
+        <div className="px-4">
           <p className="text-muted-foreground mb-4">
             Aucun post pour le moment.
           </p>
@@ -186,7 +276,7 @@ export default function ComList() {
             <div className="flex sm:flex-row flex-col text-xs text-muted-foreground mb-2">
               <div className="flex flex-wrap items-center gap-1">
                 <Link
-                  href={`/hl/${post.author.slug}`}
+                  href={`/hl/${post.author?.slug}`}
                   className="flex items-center gap-1"
                 >
                   <Avatar>
@@ -296,24 +386,79 @@ export default function ComList() {
         ))
       )}
 
-      <div className="flex justify-center gap-4 mx-auto w-full py-4">
-        <Button
-          onClick={() => setCurrentPage(currentPage - 1)}
-          disabled={!result.hasPrevPage || loading}
-          variant="outline"
-          size="sm"
-        >
-          <ChevronLeft />
-        </Button>
-        <Button
-          onClick={() => setCurrentPage(currentPage + 1)}
-          disabled={!result.hasMore || loading}
-          variant="outline"
-          size="sm"
-        >
-          <ChevronRight />
-        </Button>
-      </div>
+      {/* ── Pagination */}
+      <Pagination className="py-4">
+        <PaginationContent>
+          {!useNumberedPagination ? (
+            /* ── Shuffle: simple < > */
+            <>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => goToPage(currentPage - 1)}
+                  className={
+                    !result.hasPrevPage || loading
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => goToPage(currentPage + 1)}
+                  className={
+                    !result.hasMore || loading
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                />
+              </PaginationItem>
+            </>
+          ) : (
+            /* ── Numbered pages 1 2 3 ... */
+            <>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => goToPage(currentPage - 1)}
+                  className={
+                    !result.hasPrevPage || loading
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                />
+              </PaginationItem>
+
+              {visiblePages.map((pageNum, idx) =>
+                pageNum === -1 ? (
+                  <PaginationItem key={`ellipsis-${idx}`}>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                ) : (
+                  <PaginationItem key={pageNum}>
+                    <PaginationLink
+                      isActive={pageNum === currentPage}
+                      onClick={() => goToPage(pageNum)}
+                      className="cursor-pointer"
+                    >
+                      {pageNum}
+                    </PaginationLink>
+                  </PaginationItem>
+                ),
+              )}
+
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => goToPage(currentPage + 1)}
+                  className={
+                    !result.hasMore || loading
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                />
+              </PaginationItem>
+            </>
+          )}
+        </PaginationContent>
+      </Pagination>
     </div>
   );
 }

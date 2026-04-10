@@ -42,6 +42,22 @@ export const postShuffle = new TableAggregate<{
   sortKey: () => null,
 });
 
+export const postSortedByDate = new TableAggregate<{
+  DataModel: DataModel;
+  TableName: "posts";
+  Key: number;
+}>(components.postSortedByDate, {
+  sortKey: (doc) => doc._creationTime,
+});
+
+export const postSortedByLikes = new TableAggregate<{
+  DataModel: DataModel;
+  TableName: "posts";
+  Key: number;
+}>(components.postSortedByLikes, {
+  sortKey: (doc) => doc.likesCount ?? 0,
+});
+
 export const communityMembersCount = new TableAggregate<{
   Namespace: Id<"communities">;
   Key: null;
@@ -92,12 +108,28 @@ export const backfillPostShuffleMigration = migrations.define({
   },
 });
 
+export const backfillPostSortedByDateMigration = migrations.define({
+  table: "posts",
+  migrateOne: async (ctx, doc) => {
+    await postSortedByDate.insertIfDoesNotExist(ctx, doc);
+  },
+});
+
+export const backfillPostSortedByLikesMigration = migrations.define({
+  table: "posts",
+  migrateOne: async (ctx, doc) => {
+    await postSortedByLikes.insertIfDoesNotExist(ctx, doc);
+  },
+});
+
 export const runAggregateBackfill = migrations.runner([
   internal.aggregates.backfillPostLikesCountMigration,
   internal.aggregates.backfillPostCommentsCountMigration,
   internal.aggregates.backfillCommunityPostsCountMigration,
   internal.aggregates.backfillCommunityMembersCountMigration,
   internal.aggregates.backfillPostShuffleMigration,
+  internal.aggregates.backfillPostSortedByDateMigration,
+  internal.aggregates.backfillPostSortedByLikesMigration,
 ]);
 
 // ---- clear aggregates ----
@@ -116,6 +148,8 @@ const _clearAggregates = async (ctx: MutationCtx) => {
   }
 
   await postShuffle.clear(ctx);
+  await postSortedByDate.clear(ctx);
+  await postSortedByLikes.clear(ctx);
 };
 
 export const clearAggregates = internalMutation(_clearAggregates);

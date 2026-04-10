@@ -1,7 +1,7 @@
 import { mutation } from "../_generated/server";
 import { v } from "convex/values";
 import { authComponent } from "../auth";
-import { postLikesCount } from "../aggregates";
+import { postLikesCount, postSortedByLikes } from "../aggregates";
 
 export const likePost = mutation({
   args: { postId: v.id("posts") },
@@ -21,6 +21,13 @@ export const likePost = mutation({
     if (existing) {
       await postLikesCount.delete(ctx, existing);
       await ctx.db.delete(existing._id);
+
+      // Sync likesCount & aggregate
+      const oldPost = (await ctx.db.get(args.postId))!;
+      const newCount = Math.max(0, (oldPost.likesCount ?? 1) - 1);
+      await ctx.db.patch(args.postId, { likesCount: newCount });
+      const updatedPost = (await ctx.db.get(args.postId))!;
+      await postSortedByLikes.replace(ctx, oldPost, updatedPost);
       return;
     }
 
@@ -30,6 +37,13 @@ export const likePost = mutation({
     });
     const likeDoc = (await ctx.db.get(likeId))!;
     await postLikesCount.insert(ctx, likeDoc);
+
+    // Sync likesCount & aggregate
+    const oldPost = (await ctx.db.get(args.postId))!;
+    const newCount = (oldPost.likesCount ?? 0) + 1;
+    await ctx.db.patch(args.postId, { likesCount: newCount });
+    const updatedPost = (await ctx.db.get(args.postId))!;
+    await postSortedByLikes.replace(ctx, oldPost, updatedPost);
 
     // Notification
     if (post.authorId !== user._id) {

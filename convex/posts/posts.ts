@@ -10,6 +10,8 @@ import {
   postCommentsCount,
   postLikesCount,
   postShuffle,
+  postSortedByDate,
+  postSortedByLikes,
 } from "../aggregates";
 import { Triggers } from "convex-helpers/server/triggers";
 import {
@@ -222,6 +224,82 @@ export const getShuffledPosts = query({
   },
 });
 
+export const getSortedPosts = query({
+  args: {
+    order: v.union(v.literal("asc"), v.literal("desc")),
+    offset: v.number(),
+    numItems: v.number(),
+  },
+  handler: async (ctx, { order, offset, numItems }) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    const count = await postSortedByDate.count(ctx);
+
+    if (count === 0) return { posts: [], hasMore: false, totalCount: 0 };
+
+    const pageIndexes = Array.from({ length: numItems }, (_, i) => {
+      const idx = offset + i;
+      if (idx >= count) return null;
+      return order === "desc" ? count - 1 - idx : idx;
+    }).filter((i): i is number => i !== null);
+
+    const atIndexes = await Promise.all(
+      pageIndexes.map((i) => postSortedByDate.at(ctx, i))
+    );
+
+    const posts = await Promise.all(
+      atIndexes.map(async (atIdx) => {
+        if (!atIdx) return null;
+        const post = await ctx.db.get(atIdx.id);
+        if (!post) return null;
+
+        const [likesCount, commentsCount] = await Promise.all([
+          postLikesCount.count(ctx, { namespace: post._id }),
+          postCommentsCount.count(ctx, { namespace: post._id }),
+        ]);
+
+        let userHasLiked = false;
+        if (user) {
+          const existingLike = await ctx.db
+            .query("postLikes")
+            .withIndex("by_postId", (q) => q.eq("postId", post._id))
+            .filter((q) => q.eq(q.field("userId"), user._id))
+            .first();
+          if (existingLike) userHasLiked = true;
+        }
+
+        const author = await ctx.runQuery(
+          components.betterAuth.users.getUserById,
+          { id: post.authorId },
+        );
+        let authorData = null;
+        if (author) {
+          const imageUrl = author.image
+            ? await ctx.storage.getUrl(author.image)
+            : null;
+          authorData = { ...author, imageUrl };
+        }
+
+        return {
+          ...post,
+          likesCount,
+          commentsCount,
+          userHasLiked,
+          author: authorData,
+        };
+      }),
+    );
+
+    return {
+      posts: posts.filter(
+        (post): post is NonNullable<typeof post> => post !== null,
+      ),
+      hasMore: offset + numItems < count,
+      hasPrevPage: offset > 0,
+      totalCount: count,
+    };
+  },
+});
+
 // Fisher-Yates
 function shuffle<T>(array: T[], rand: Rand): T[] {
   for (let i = array.length - 1; i > 0; i--) {
@@ -230,6 +308,82 @@ function shuffle<T>(array: T[], rand: Rand): T[] {
   }
   return array;
 }
+
+export const getSortedByLikes = query({
+  args: {
+    offset: v.number(),
+    numItems: v.number(),
+  },
+  handler: async (ctx, { offset, numItems }) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    const count = await postSortedByLikes.count(ctx);
+
+    if (count === 0) return { posts: [], hasMore: false, hasPrevPage: false, totalCount: 0 };
+
+    // Descending order: most likes first
+    const pageIndexes = Array.from({ length: numItems }, (_, i) => {
+      const idx = offset + i;
+      if (idx >= count) return null;
+      return count - 1 - idx;
+    }).filter((i): i is number => i !== null);
+
+    const atIndexes = await Promise.all(
+      pageIndexes.map((i) => postSortedByLikes.at(ctx, i))
+    );
+
+    const posts = await Promise.all(
+      atIndexes.map(async (atIdx) => {
+        if (!atIdx) return null;
+        const post = await ctx.db.get(atIdx.id);
+        if (!post) return null;
+
+        const [likesCount, commentsCount] = await Promise.all([
+          postLikesCount.count(ctx, { namespace: post._id }),
+          postCommentsCount.count(ctx, { namespace: post._id }),
+        ]);
+
+        let userHasLiked = false;
+        if (user) {
+          const existingLike = await ctx.db
+            .query("postLikes")
+            .withIndex("by_postId", (q) => q.eq("postId", post._id))
+            .filter((q) => q.eq(q.field("userId"), user._id))
+            .first();
+          if (existingLike) userHasLiked = true;
+        }
+
+        const author = await ctx.runQuery(
+          components.betterAuth.users.getUserById,
+          { id: post.authorId },
+        );
+        let authorData = null;
+        if (author) {
+          const imageUrl = author.image
+            ? await ctx.storage.getUrl(author.image)
+            : null;
+          authorData = { ...author, imageUrl };
+        }
+
+        return {
+          ...post,
+          likesCount,
+          commentsCount,
+          userHasLiked,
+          author: authorData,
+        };
+      }),
+    );
+
+    return {
+      posts: posts.filter(
+        (post): post is NonNullable<typeof post> => post !== null,
+      ),
+      hasMore: offset + numItems < count,
+      hasPrevPage: offset > 0,
+      totalCount: count,
+    };
+  },
+});
 
 export const createPost = mutationWithTriggers({
   args: {
@@ -258,6 +412,8 @@ export const createPost = mutationWithTriggers({
 
     const postDoc = (await ctx.db.get(postId))!;
     await postShuffle.insert(ctx, postDoc);
+    await postSortedByDate.insert(ctx, postDoc);
+    await postSortedByLikes.insert(ctx, postDoc);
 
     return postId;
   },
@@ -310,8 +466,10 @@ export const deletePost = mutationWithTriggers({
       await ctx.db.delete(comment._id);
     }
 
-    // 3. Delete postShuffle
+    // 3. Delete from aggregate tables
     await postShuffle.delete(ctx, post);
+    await postSortedByDate.delete(ctx, post);
+    await postSortedByLikes.delete(ctx, post);
 
     // 4. Aggregate + delete du post
     await ctx.db.delete(args.postId);
