@@ -5,7 +5,9 @@ import { api } from "@convex/_generated/api";
 import { useMutation } from "convex/react";
 import { useConvexAuth } from "convex/react";
 import {
+  ArrowDownNarrowWide,
   ArrowDownUp,
+  ArrowUpNarrowWide,
   Bookmark,
   Calendar,
   CheckIcon,
@@ -230,23 +232,23 @@ export default function ComList() {
           <span className="md:block hidden">Aléatoire</span>
         </Button>
         <Button
-          variant={mode === "recent" ? "default" : "outline"}
-          size="xs"
-          className="gap-1.5 flex-1 md:flex-initial"
-          onClick={() => setFilters({ mode: "recent", page: 1 })}
-        >
-          <ArrowDownUp size={14} />
-          <span className="md:block hidden">Récent</span>
-        </Button>
-        <Button
           variant={mode === "oldest" ? "default" : "outline"}
           size="xs"
           className="gap-1.5 flex-1 md:flex-initial"
           onClick={() => setFilters({ mode: "oldest", page: 1 })}
         >
-          <Calendar size={14} />
+          <ArrowUpNarrowWide size={14} />
 
           <span className="md:block hidden">Ancien</span>
+        </Button>
+        <Button
+          variant={mode === "recent" ? "default" : "outline"}
+          size="xs"
+          className="gap-1.5 flex-1 md:flex-initial"
+          onClick={() => setFilters({ mode: "recent", page: 1 })}
+        >
+          <ArrowDownNarrowWide size={14} />
+          <span className="md:block hidden">Récent</span>
         </Button>
         <Button
           variant={mode === "top" ? "default" : "outline"}
