@@ -6,10 +6,8 @@ import { useMutation } from "convex/react";
 import { useConvexAuth } from "convex/react";
 import {
   ArrowDownNarrowWide,
-  ArrowDownUp,
   ArrowUpNarrowWide,
   Bookmark,
-  Calendar,
   CheckIcon,
   ChevronRight,
   Flame,
