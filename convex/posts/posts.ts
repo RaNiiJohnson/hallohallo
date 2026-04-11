@@ -158,7 +158,7 @@ export const getShuffledPosts = query({
     const user = await authComponent.safeGetAuthUser(ctx);
     const count = await postShuffle.count(ctx);
 
-    if (count === 0) return { posts: [], hasMore: false, totalCount: 0 };
+    if (count === 0) return { posts: [], hasMore: false, hasPrevPage: false, totalCount: 0 };
 
     // Génère l'ordre shufflé une fois avec le seed
     const rand = new Rand(seed);
@@ -234,7 +234,7 @@ export const getSortedPosts = query({
     const user = await authComponent.safeGetAuthUser(ctx);
     const count = await postSortedByDate.count(ctx);
 
-    if (count === 0) return { posts: [], hasMore: false, totalCount: 0 };
+    if (count === 0) return { posts: [], hasMore: false, hasPrevPage: false, totalCount: 0 };
 
     const pageIndexes = Array.from({ length: numItems }, (_, i) => {
       const idx = offset + i;
