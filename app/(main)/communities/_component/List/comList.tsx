@@ -46,32 +46,37 @@ export default function ComList() {
     if (!loading) setFilters({ page });
   };
 
-  if (result === undefined) return <ComListSkeleton />;
-  if (result === null) return <EmptyCommunities />;
-
   return (
     <div>
       <ModeToggle mode={mode} onChange={handleModeChange} />
 
-      {result.posts.length === 0 ? (
-        <div className="px-4">
-          <p className="text-muted-foreground mb-4">
-            Aucun post pour le moment.
-          </p>
-        </div>
+      {result === undefined ? (
+        <ComListSkeleton />
+      ) : result === null ? (
+        <EmptyCommunities />
       ) : (
-        result.posts.map((post) => (
-          <PostCard key={post._id} post={post} onLike={handleLike} />
-        ))
-      )}
+        <>
+          {result.posts.length === 0 ? (
+            <div className="px-4 mt-4">
+              <p className="text-muted-foreground mb-4 text-center">
+                Aucun post pour le moment.
+              </p>
+            </div>
+          ) : (
+            result.posts.map((post) => (
+              <PostCard key={post._id} post={post} onLike={handleLike} />
+            ))
+          )}
 
-      <PostPagination
-        mode={mode}
-        result={result}
-        currentPage={currentPage}
-        loading={loading}
-        onGoToPage={goToPage}
-      />
+          <PostPagination
+            mode={mode}
+            result={result}
+            currentPage={currentPage}
+            loading={loading}
+            onGoToPage={goToPage}
+          />
+        </>
+      )}
     </div>
   );
 }
