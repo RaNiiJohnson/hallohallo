@@ -1,12 +1,13 @@
 import { getRelativeTime } from "@/lib/date";
-import { CheckIcon, ChevronRight, MessageSquare } from "lucide-react";
+import { ChevronRight, MessageSquare } from "lucide-react";
 import Link from "next/link";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Id } from "@convex/_generated/dataModel";
 import { ShareButton } from "@/components/ShareButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Post } from "./types";
 import { PostBookmarkButton } from "./PostBookmarkButton";
+import { LikeButton } from "../likeButton";
 
 export function PostCard({
   post,
@@ -77,25 +78,11 @@ export function PostCard({
           <span className="text-xs font-medium">{post.commentsCount ?? 0}</span>
         </Link>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          className={`group flex items-center gap-1.5 transition-colors h-8 px-2 ${
-            post.userHasLiked
-              ? "text-green-500 hover:bg-green-500/20"
-              : "text-muted-foreground hover:text-green-500 hover:bg-green-500/10"
-          }`}
-          onClick={(e) => {
-            e.preventDefault();
-            onLike(post._id);
-          }}
-        >
-          <CheckIcon
-            size={15}
-            className="transition-transform group-active:scale-95"
-          />
-          <span className="text-xs font-medium">{post.likesCount ?? 0}</span>
-        </Button>
+        <LikeButton
+          initialCount={post.likesCount ?? 0}
+          onLike={() => onLike(post._id)}
+          initialIsLiked={post.userHasLiked}
+        />
 
         <ShareButton
           text={post.title}

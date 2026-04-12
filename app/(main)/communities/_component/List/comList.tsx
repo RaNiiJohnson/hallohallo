@@ -40,7 +40,6 @@ export default function ComList() {
     await likePost({ postId });
   };
 
-
   const handleModeChange = (newMode: SortMode) =>
     setFilters({ mode: newMode, page: 1 });
   const goToPage = (page: number) => {

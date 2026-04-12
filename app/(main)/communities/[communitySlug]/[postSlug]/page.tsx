@@ -231,9 +231,9 @@ export default function PostClient() {
             </Button>
 
             <LikeButton
-              count={post.likesCount ?? 0}
+              initialCount={post.likesCount ?? 0}
               onLike={handleLikePost}
-              isLiked={post.userHasLiked}
+              initialIsLiked={post.userHasLiked}
             />
 
             <ShareButton

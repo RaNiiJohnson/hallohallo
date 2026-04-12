@@ -3,12 +3,7 @@
 import { useMutation, useConvexAuth } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { getRelativeTime } from "@/lib/date";
-import {
-  ChevronDown,
-  ChevronUp,
-  Pencil,
-  Trash2,
-} from "lucide-react";
+import { ChevronDown, ChevronUp, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -163,9 +158,9 @@ export function CommentItem({
       {/* Actions */}
       <div className="flex items-center gap-3">
         <LikeButton
-          count={comment.likesCount}
+          initialCount={comment.likesCount}
+          initialIsLiked={comment.userHasLiked}
           onLike={handleLike}
-          isLiked={comment.userHasLiked}
         />
 
         {isAuthenticated && (

@@ -118,9 +118,9 @@ export function ReplyItem({
 
       <div className="flex items-center gap-2">
         <LikeButton
-          count={reply.likesCount}
+          initialCount={reply.likesCount}
           onLike={handleLike}
-          isLiked={reply.userHasLiked}
+          initialIsLiked={reply.userHasLiked}
         />
 
         {isOwner && !isEditing && (
