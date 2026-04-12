@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Heart } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
@@ -9,17 +9,17 @@ import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 
-interface BookmarkButtonProps {
-  listingId: string;
+interface JobBookmarkButtonProps {
+  jobId: string;
   initialBookmark?: boolean;
   className?: string;
 }
 
-export const BookmarkButton = ({
-  listingId,
+export const JobBookmarkButton = ({
+  jobId,
   initialBookmark = false,
   className,
-}: BookmarkButtonProps) => {
+}: JobBookmarkButtonProps) => {
   const [optimisticIsBookmarked, setOptimisticIsBookmarked] = useOptimistic(
     initialBookmark,
     (_, newState: boolean) => newState,
@@ -39,8 +39,8 @@ export const BookmarkButton = ({
 
       try {
         await toggleBookmark({
-          resourceId: listingId as Id<"RealestateListing">,
-          resourceType: "realEstate",
+          resourceId: jobId as Id<"JobOffer">,
+          resourceType: "job",
         });
         toast.success(
           newState ? "Offre enregistrée" : "Offre retirée des favoris",
@@ -54,18 +54,19 @@ export const BookmarkButton = ({
   return (
     <Button
       variant="ghost"
-      size="icon-sm"
+      size="icon"
       className={cn(
-        "absolute top-2 right-2 rounded-md z-10 bg-white/70 backdrop-blur-sm text-red-500 transition-all group-hover:scale-110 hover:bg-white/90 hover:text-red-600",
+        "h-8 w-8 mt-2",
+        optimisticIsBookmarked
+          ? "text-blue-500 hover:bg-blue-500/20"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground",
         className,
       )}
       onClick={handleToggle}
     >
-      {optimisticIsBookmarked ? (
-        <Heart className="size-4 fill-current" />
-      ) : (
-        <Heart className="size-4" />
-      )}
+      <Bookmark
+        className={cn("w-4 h-4", optimisticIsBookmarked && "fill-current")}
+      />
       <span className="sr-only">
         {optimisticIsBookmarked ? "Retirer des favoris" : "Ajouter aux favoris"}
       </span>

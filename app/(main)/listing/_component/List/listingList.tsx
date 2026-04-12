@@ -33,6 +33,7 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
     bedrooms: parseAsInteger.withDefault(0),
     minPrice: parseAsInteger.withDefault(0),
     maxPrice: parseAsInteger.withDefault(0),
+    bookmarkedOnly: parseAsString.withDefault("false"),
   });
 
   const {
@@ -49,6 +50,7 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
       bedrooms: filters.bedrooms,
       minPrice: filters.minPrice > 0 ? filters.minPrice : undefined,
       maxPrice: filters.maxPrice > 0 ? filters.maxPrice : undefined,
+      bookmarkedOnly: filters.bookmarkedOnly === "true" ? true : undefined,
     },
     { initialNumItems: 3 },
   );
@@ -177,8 +179,8 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
 
               {isAuthenticated && (
                 <BookmarkButton
-                // listingId={list._id}
-                // initialBookmark={annonce.isBookmarked}
+                  listingId={list._id}
+                  initialBookmark={list.isBookmarked}
                 />
               )}
 

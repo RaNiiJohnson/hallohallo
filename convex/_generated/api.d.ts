@@ -11,6 +11,7 @@
 import type * as aggregates from "../aggregates.js";
 import type * as auth from "../auth.js";
 import type * as bookmarks from "../bookmarks.js";
+import type * as clean from "../clean.js";
 import type * as cloudinary from "../cloudinary.js";
 import type * as communities from "../communities.js";
 import type * as http from "../http.js";
@@ -35,6 +36,7 @@ declare const fullApi: ApiFromModules<{
   aggregates: typeof aggregates;
   auth: typeof auth;
   bookmarks: typeof bookmarks;
+  clean: typeof clean;
   cloudinary: typeof cloudinary;
   communities: typeof communities;
   http: typeof http;

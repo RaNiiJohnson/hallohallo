@@ -2,23 +2,27 @@
 import { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { authComponent } from "./auth";
 
-// convex/bookmarks.ts
 export const getMyBookmarks = query({
-  args: { userId: v.string() },
-  handler: async (ctx, args) => {
+  args: {},
+  handler: async (ctx) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) return [];
+
     const bookmarks = await ctx.db
       .query("bookmarks")
-      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .withIndex("by_userId", (q) => q.eq("userId", user._id))
       .collect();
 
     return Promise.all(
       bookmarks.map(async (b) => {
-        // On choisit la table selon le type stocké
         const details =
           b.resourceType === "job"
             ? await ctx.db.get(b.resourceId as Id<"JobOffer">)
-            : await ctx.db.get(b.resourceId as Id<"RealestateListing">);
+            : b.resourceType === "realEstate"
+            ? await ctx.db.get(b.resourceId as Id<"RealestateListing">)
+            : await ctx.db.get(b.resourceId as Id<"posts">);
 
         return { ...b, details };
       }),
@@ -28,16 +32,18 @@ export const getMyBookmarks = query({
 
 export const toggleBookmark = mutation({
   args: {
-    resourceId: v.union(v.id("JobOffer"), v.id("RealestateListing")),
-    resourceType: v.union(v.literal("job"), v.literal("realEstate")),
-    userId: v.string(),
+    resourceId: v.union(v.id("JobOffer"), v.id("RealestateListing"), v.id("posts")),
+    resourceType: v.union(v.literal("job"), v.literal("realEstate"), v.literal("post")),
   },
   handler: async (ctx, args) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) throw new Error("Not authenticated");
+
     // Vérifier si le favori existe déjà
     const existing = await ctx.db
       .query("bookmarks")
       .withIndex("by_user_resource", (q) =>
-        q.eq("userId", args.userId).eq("resourceId", args.resourceId),
+        q.eq("userId", user._id).eq("resourceId", args.resourceId),
       )
       .unique();
 
@@ -47,7 +53,7 @@ export const toggleBookmark = mutation({
     }
 
     await ctx.db.insert("bookmarks", {
-      userId: args.userId,
+      userId: user._id,
       resourceId: args.resourceId,
       resourceType: args.resourceType,
     });

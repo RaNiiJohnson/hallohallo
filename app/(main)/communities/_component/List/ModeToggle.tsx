@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
-import { ArrowDownNarrowWide, ArrowUpNarrowWide, Flame, Shuffle } from "lucide-react";
+import { ArrowDownNarrowWide, ArrowUpNarrowWide, Flame, Shuffle, Bookmark } from "lucide-react";
 import { SortMode } from "./types";
 
 const FILTERS: { mode: SortMode; label: string; icon: React.ElementType }[] = [
@@ -10,6 +10,7 @@ const FILTERS: { mode: SortMode; label: string; icon: React.ElementType }[] = [
   { mode: "oldest", label: "Ancien", icon: ArrowUpNarrowWide },
   { mode: "recent", label: "Récent", icon: ArrowDownNarrowWide },
   { mode: "top", label: "Top", icon: Flame },
+  { mode: "bookmarked", label: "Favoris", icon: Bookmark },
 ];
 
 export function ModeToggle({

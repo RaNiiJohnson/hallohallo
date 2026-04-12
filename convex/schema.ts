@@ -152,8 +152,12 @@ export default defineSchema({
 
   bookmarks: defineTable({
     userId: v.string(),
-    resourceId: v.union(v.id("JobOffer"), v.id("RealestateListing")),
-    resourceType: v.union(v.literal("job"), v.literal("realEstate")),
+    resourceId: v.union(v.id("JobOffer"), v.id("RealestateListing"), v.id("posts")),
+    resourceType: v.union(
+      v.literal("job"),
+      v.literal("realEstate"),
+      v.literal("post"),
+    ),
   })
     .index("by_userId", ["userId"])
     .index("by_user_resource", ["userId", "resourceId"]),

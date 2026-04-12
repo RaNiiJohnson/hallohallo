@@ -8,6 +8,7 @@ import {
 } from "convex/server";
 import { DataModel } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
 import { v } from "convex/values";
 import { authComponent } from "./auth";
 
@@ -20,6 +21,18 @@ export const getListingWithContact = query({
       .unique();
     if (!listing) return null;
 
+    const user = await authComponent.safeGetAuthUser(ctx);
+    let isBookmarked = false;
+    if (user) {
+      const existingBookmark = await ctx.db
+        .query("bookmarks")
+        .withIndex("by_user_resource", (q) =>
+          q.eq("userId", user._id).eq("resourceId", listing._id)
+        )
+        .first();
+      if (existingBookmark) isBookmarked = true;
+    }
+
     // Récupération des informations de contact via l'index
     const contact = await ctx.db
       .query("RealestateContactInfo")
@@ -29,6 +42,7 @@ export const getListingWithContact = query({
     return {
       ...listing,
       contact,
+      isBookmarked,
     };
   },
 });
@@ -61,9 +75,32 @@ export const getListing = query({
     bedrooms: v.optional(v.number()),
     minPrice: v.optional(v.number()),
     maxPrice: v.optional(v.number()),
+    bookmarkedOnly: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const { searchTerm, propertyType, bedrooms, minPrice, maxPrice } = args;
+    const { searchTerm, propertyType, bedrooms, minPrice, maxPrice, bookmarkedOnly } = args;
+    const user = await authComponent.safeGetAuthUser(ctx);
+
+    if (bookmarkedOnly) {
+      if (!user) return { page: [], isDone: true, continueCursor: "" };
+      const bookmarksPage = await ctx.db
+        .query("bookmarks")
+        .withIndex("by_userId", (q) => q.eq("userId", user._id))
+        .filter((q) => q.eq(q.field("resourceType"), "realEstate"))
+        .order("desc")
+        .paginate(args.paginationOpts);
+
+      const enrichedPage = await Promise.all(
+        bookmarksPage.page.map(async (b) => {
+          const listing = await ctx.db.get(b.resourceId as Id<"RealestateListing">);
+          if (!listing) return null;
+          return { ...listing, isBookmarked: true } as typeof listing & { isBookmarked: boolean };
+        })
+      );
+      
+      const filteredPage = enrichedPage.filter((j): j is NonNullable<typeof j> => j !== null);
+      return { ...bookmarksPage, page: filteredPage };
+    }
 
     // Étape 1 : table
     const tableQuery: QueryInitializer<DataModel["RealestateListing"]> =
@@ -110,7 +147,25 @@ export const getListing = query({
     });
 
     // Étape 5 : pagination
-    return filtered.paginate(args.paginationOpts);
+    const results = await filtered.paginate(args.paginationOpts);
+    
+    const enrichedPage = await Promise.all(
+      results.page.map(async (listing) => {
+        let isBookmarked = false;
+        if (user) {
+          const existingBookmark = await ctx.db
+            .query("bookmarks")
+            .withIndex("by_user_resource", (q) =>
+              q.eq("userId", user._id).eq("resourceId", listing._id)
+            )
+            .first();
+          if (existingBookmark) isBookmarked = true;
+        }
+        return { ...listing, isBookmarked };
+      })
+    );
+    
+    return { ...results, page: enrichedPage };
   },
 });
 

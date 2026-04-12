@@ -1,4 +1,5 @@
 "use client";
+import { Id } from "@convex/_generated/dataModel";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +29,7 @@ import { SalaryDisplay } from "../_component/salary";
 import { useQuery } from "convex-helpers/react/cache";
 import { api } from "@convex/_generated/api";
 import { EditJobDialog } from "./_component/editJobDialog";
-import { Preloaded, usePreloadedQuery } from "convex/react";
+import { Preloaded, usePreloadedQuery, useMutation } from "convex/react";
 import { LocationMap } from "@/lib/LocationMap";
 import { ShareButton } from "@/components/ShareButton";
 
@@ -36,6 +37,7 @@ export function JobDetailsPage(props: {
   preloadedJob: Preloaded<typeof api.jobs.getJobWithContact>;
 }) {
   const user = useQuery(api.auth.getCurrentUser);
+  const toggleBookmark = useMutation(api.bookmarks.toggleBookmark);
 
   const jobOffer = usePreloadedQuery(props.preloadedJob);
 
@@ -146,8 +148,16 @@ export function JobDetailsPage(props: {
 
                     <ShareButton text={jobOffer.title} />
 
-                    <Button variant="outline" size="sm">
-                      <Bookmark className="w-4 h-4" />
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className={jobOffer.isBookmarked ? "text-blue-500 border-blue-500/50 hover:bg-blue-500/10" : ""}
+                      onClick={() => {
+                        if (!user) return; // Replace with toast ideally, but simple for now
+                        toggleBookmark({ resourceId: jobOffer._id as Id<"JobOffer">, resourceType: "job" });
+                      }}
+                    >
+                      <Bookmark className={`w-4 h-4 ${jobOffer.isBookmarked ? "fill-current" : ""}`} />
                     </Button>
                   </ButtonGroup>
                 )}

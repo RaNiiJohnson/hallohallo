@@ -56,6 +56,7 @@ export function RealEstatesFilters({
     bedrooms: parseAsInteger.withDefault(0),
     minPrice: parseAsInteger.withDefault(0),
     maxPrice: parseAsInteger.withDefault(0),
+    bookmarkedOnly: parseAsString.withDefault("false"),
   });
 
   const [localSearch, setLocalSearch] = useState(filters.search);
@@ -111,6 +112,7 @@ export function RealEstatesFilters({
       bedrooms: 0,
       minPrice: null,
       maxPrice: null,
+      bookmarkedOnly: "false",
     });
   };
 
@@ -235,8 +237,20 @@ export function RealEstatesFilters({
                       ))}
                       {isAuthenticated && (
                         <Badge
-                          variant="secondary"
+                          variant={
+                            filters.bookmarkedOnly === "true"
+                              ? "default"
+                              : "secondary"
+                          }
                           className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+                          onClick={() =>
+                            setFilters({
+                              bookmarkedOnly:
+                                filters.bookmarkedOnly === "true"
+                                  ? "false"
+                                  : "true",
+                            })
+                          }
                         >
                           Favoris
                         </Badge>
@@ -270,8 +284,16 @@ export function RealEstatesFilters({
           ))}
           {isAuthenticated && (
             <Badge
-              variant="secondary"
+              variant={
+                filters.bookmarkedOnly === "true" ? "default" : "secondary"
+              }
               className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+              onClick={() =>
+                setFilters({
+                  bookmarkedOnly:
+                    filters.bookmarkedOnly === "true" ? "false" : "true",
+                })
+              }
             >
               Favoris
             </Badge>

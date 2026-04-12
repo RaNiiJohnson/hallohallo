@@ -1,6 +1,6 @@
 import { Id } from "@convex/_generated/dataModel";
 
-export type SortMode = "shuffle" | "recent" | "oldest" | "top";
+export type SortMode = "shuffle" | "recent" | "oldest" | "top" | "bookmarked";
 
 export type Post = {
   _id: Id<"posts">;
@@ -14,6 +14,7 @@ export type Post = {
   likesCount: number;
   commentsCount: number;
   userHasLiked: boolean;
+  isBookmarked?: boolean;
   author?: { slug: string; imageUrl?: string | null } | null;
 };
 

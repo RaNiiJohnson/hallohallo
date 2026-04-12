@@ -17,12 +17,17 @@ import { parseAsString, useQueryStates } from "nuqs";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import clsx from "clsx";
+import { useConvexAuth } from "convex/react";
+import { JobBookmarkButton } from "./JobBookmarkButton";
 
 export function JobList() {
+  const { isAuthenticated } = useConvexAuth();
+
   const [filters] = useQueryStates({
     search: parseAsString.withDefault(""),
     type: parseAsString.withDefault(""),
     contract: parseAsString.withDefault(""),
+    bookmarkedOnly: parseAsString.withDefault("false"),
   });
   const {
     results: jobs,
@@ -53,6 +58,7 @@ export function JobList() {
             | "freelance"
             | "scholarship")
         : undefined,
+      bookmarkedOnly: filters.bookmarkedOnly === "true" ? true : undefined,
     },
     { initialNumItems: 5 },
   );
@@ -147,12 +153,12 @@ export function JobList() {
                 <div className="text-xs text-muted-foreground whitespace-nowrap">
                   {getRelativeTime(job._creationTime)}
                 </div>
-                {/* {user && (
-                  // <JobBookmarkButton
-                  //   jobId={job._id}
-                  //   initialIsBookmarked={job.isBookmarked}
-                  // />
-                )} */}
+                {isAuthenticated && (
+                  <JobBookmarkButton
+                    jobId={job._id}
+                    initialBookmark={job.isBookmarked}
+                  />
+                )}
               </div>
             </div>
           </div>

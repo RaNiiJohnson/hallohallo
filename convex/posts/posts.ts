@@ -129,6 +129,7 @@ export const getPostWithMeta = query({
     );
 
     let userHasLiked = false;
+    let isBookmarked = false;
     if (user) {
       const existingLike = await ctx.db
         .query("postLikes")
@@ -136,12 +137,21 @@ export const getPostWithMeta = query({
         .filter((q) => q.eq(q.field("userId"), user._id))
         .first();
       if (existingLike) userHasLiked = true;
+
+      const existingBookmark = await ctx.db
+        .query("bookmarks")
+        .withIndex("by_user_resource", (q) =>
+          q.eq("userId", user._id).eq("resourceId", post._id),
+        )
+        .first();
+      if (existingBookmark) isBookmarked = true;
     }
 
     return {
       ...post,
       likesCount,
       userHasLiked,
+      isBookmarked,
       comments: commentsWithMeta,
       commentsCount,
     };
@@ -182,6 +192,7 @@ export const getShuffledPosts = query({
         ]);
 
         let userHasLiked = false;
+        let isBookmarked = false;
         if (user) {
           const existingLike = await ctx.db
             .query("postLikes")
@@ -189,6 +200,14 @@ export const getShuffledPosts = query({
             .filter((q) => q.eq(q.field("userId"), user._id))
             .first();
           if (existingLike) userHasLiked = true;
+
+          const existingBookmark = await ctx.db
+            .query("bookmarks")
+            .withIndex("by_user_resource", (q) =>
+              q.eq("userId", user._id).eq("resourceId", post._id),
+            )
+            .first();
+          if (existingBookmark) isBookmarked = true;
         }
 
         const author = await ctx.runQuery(
@@ -208,6 +227,7 @@ export const getShuffledPosts = query({
           likesCount,
           commentsCount,
           userHasLiked,
+          isBookmarked,
           author: authorData,
         };
       }),
@@ -258,6 +278,7 @@ export const getSortedPosts = query({
         ]);
 
         let userHasLiked = false;
+        let isBookmarked = false;
         if (user) {
           const existingLike = await ctx.db
             .query("postLikes")
@@ -265,6 +286,14 @@ export const getSortedPosts = query({
             .filter((q) => q.eq(q.field("userId"), user._id))
             .first();
           if (existingLike) userHasLiked = true;
+
+          const existingBookmark = await ctx.db
+            .query("bookmarks")
+            .withIndex("by_user_resource", (q) =>
+              q.eq("userId", user._id).eq("resourceId", post._id),
+            )
+            .first();
+          if (existingBookmark) isBookmarked = true;
         }
 
         const author = await ctx.runQuery(
@@ -284,6 +313,7 @@ export const getSortedPosts = query({
           likesCount,
           commentsCount,
           userHasLiked,
+          isBookmarked,
           author: authorData,
         };
       }),
@@ -343,6 +373,7 @@ export const getSortedByLikes = query({
         ]);
 
         let userHasLiked = false;
+        let isBookmarked = false;
         if (user) {
           const existingLike = await ctx.db
             .query("postLikes")
@@ -350,6 +381,14 @@ export const getSortedByLikes = query({
             .filter((q) => q.eq(q.field("userId"), user._id))
             .first();
           if (existingLike) userHasLiked = true;
+
+          const existingBookmark = await ctx.db
+            .query("bookmarks")
+            .withIndex("by_user_resource", (q) =>
+              q.eq("userId", user._id).eq("resourceId", post._id),
+            )
+            .first();
+          if (existingBookmark) isBookmarked = true;
         }
 
         const author = await ctx.runQuery(
@@ -369,9 +408,84 @@ export const getSortedByLikes = query({
           likesCount,
           commentsCount,
           userHasLiked,
+          isBookmarked,
           author: authorData,
         };
       }),
+    );
+
+    return {
+      posts: posts.filter(
+        (post): post is NonNullable<typeof post> => post !== null,
+      ),
+      hasMore: offset + numItems < count,
+      hasPrevPage: offset > 0,
+      totalCount: count,
+    };
+  },
+});
+
+export const getBookmarkedPosts = query({
+  args: {
+    offset: v.number(),
+    numItems: v.number(),
+  },
+  handler: async (ctx, { offset, numItems }) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) return { posts: [], hasMore: false, hasPrevPage: false, totalCount: 0 };
+
+    const bookmarks = await ctx.db
+      .query("bookmarks")
+      .withIndex("by_userId", (q) => q.eq("userId", user._id))
+      .filter((q) => q.eq(q.field("resourceType"), "post"))
+      .collect();
+
+    const count = bookmarks.length;
+    if (count === 0) return { posts: [], hasMore: false, hasPrevPage: false, totalCount: 0 };
+
+    bookmarks.sort((a, b) => b._creationTime - a._creationTime);
+
+    const pageBookmarks = bookmarks.slice(offset, offset + numItems);
+
+    const posts = await Promise.all(
+      pageBookmarks.map(async (b) => {
+        const post = await ctx.db.get(b.resourceId as Id<"posts">);
+        if (!post) return null;
+
+        const [likesCount, commentsCount] = await Promise.all([
+          postLikesCount.count(ctx, { namespace: post._id }),
+          postCommentsCount.count(ctx, { namespace: post._id }),
+        ]);
+
+        let userHasLiked = false;
+        const existingLike = await ctx.db
+          .query("postLikes")
+          .withIndex("by_postId", (q) => q.eq("postId", post._id))
+          .filter((q) => q.eq(q.field("userId"), user._id))
+          .first();
+        if (existingLike) userHasLiked = true;
+
+        const author = await ctx.runQuery(
+          components.betterAuth.users.getUserById,
+          { id: post.authorId },
+        );
+        let authorData = null;
+        if (author) {
+          const imageUrl = author.image
+            ? await ctx.storage.getUrl(author.image)
+            : null;
+          authorData = { ...author, imageUrl };
+        }
+
+        return {
+          ...post,
+          likesCount,
+          commentsCount,
+          userHasLiked,
+          isBookmarked: true,
+          author: authorData,
+        };
+      })
     );
 
     return {

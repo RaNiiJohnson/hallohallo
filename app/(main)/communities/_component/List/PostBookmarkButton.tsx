@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Heart } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
@@ -9,17 +9,17 @@ import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 
-interface BookmarkButtonProps {
-  listingId: string;
+interface PostBookmarkButtonProps {
+  postId: Id<"posts">;
   initialBookmark?: boolean;
   className?: string;
 }
 
-export const BookmarkButton = ({
-  listingId,
+export const PostBookmarkButton = ({
+  postId,
   initialBookmark = false,
   className,
-}: BookmarkButtonProps) => {
+}: PostBookmarkButtonProps) => {
   const [optimisticIsBookmarked, setOptimisticIsBookmarked] = useOptimistic(
     initialBookmark,
     (_, newState: boolean) => newState,
@@ -39,11 +39,11 @@ export const BookmarkButton = ({
 
       try {
         await toggleBookmark({
-          resourceId: listingId as Id<"RealestateListing">,
-          resourceType: "realEstate",
+          resourceId: postId,
+          resourceType: "post",
         });
         toast.success(
-          newState ? "Offre enregistrée" : "Offre retirée des favoris",
+          newState ? "Post enregistré" : "Post retiré des favoris",
         );
       } catch {
         toast.error("Une erreur est survenue");
@@ -54,18 +54,23 @@ export const BookmarkButton = ({
   return (
     <Button
       variant="ghost"
-      size="icon-sm"
+      size="sm"
       className={cn(
-        "absolute top-2 right-2 rounded-md z-10 bg-white/70 backdrop-blur-sm text-red-500 transition-all group-hover:scale-110 hover:bg-white/90 hover:text-red-600",
+        "group flex items-center gap-1.5 transition-colors h-8 px-2 ml-auto",
+        optimisticIsBookmarked
+          ? "text-blue-500 hover:bg-blue-500/20"
+          : "text-muted-foreground hover:text-foreground hover:bg-muted",
         className,
       )}
       onClick={handleToggle}
     >
-      {optimisticIsBookmarked ? (
-        <Heart className="size-4 fill-current" />
-      ) : (
-        <Heart className="size-4" />
-      )}
+      <Bookmark
+        size={15}
+        className={cn(
+          "transition-transform group-active:scale-95",
+          optimisticIsBookmarked && "fill-current",
+        )}
+      />
       <span className="sr-only">
         {optimisticIsBookmarked ? "Retirer des favoris" : "Ajouter aux favoris"}
       </span>

@@ -1,11 +1,12 @@
 import { getRelativeTime } from "@/lib/date";
-import { Bookmark, CheckIcon, ChevronRight, MessageSquare } from "lucide-react";
+import { CheckIcon, ChevronRight, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Id } from "@convex/_generated/dataModel";
 import { ShareButton } from "@/components/ShareButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Post } from "./types";
+import { PostBookmarkButton } from "./PostBookmarkButton";
 
 export function PostCard({
   post,
@@ -107,16 +108,10 @@ export function PostCard({
           className="group flex items-center gap-1.5 text-muted-foreground hover:text-purple-500 hover:bg-purple-500/10 transition-colors h-8 px-2"
         />
 
-        <Button
-          variant="ghost"
-          size="sm"
-          className="group flex items-center gap-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors h-8 px-2 ml-auto"
-        >
-          <Bookmark
-            size={15}
-            className="transition-transform group-active:scale-95"
-          />
-        </Button>
+        <PostBookmarkButton
+          postId={post._id}
+          initialBookmark={post.isBookmarked}
+        />
       </div>
     </div>
   );

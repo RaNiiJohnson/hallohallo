@@ -23,7 +23,11 @@ export function usePostsQuery(mode: SortMode, offset: number, seed: string) {
     api.posts.posts.getSortedByLikes,
     mode === "top" ? { offset, numItems: PAGE_SIZE } : "skip",
   );
+  const bookmarked = useRicherStableQuery(
+    api.posts.posts.getBookmarkedPosts,
+    mode === "bookmarked" ? { offset, numItems: PAGE_SIZE } : "skip",
+  );
 
-  const dataMap = { shuffle, recent, oldest, top };
+  const dataMap = { shuffle, recent, oldest, top, bookmarked };
   return dataMap[mode];
 }

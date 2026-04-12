@@ -50,6 +50,7 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
     search: parseAsString.withDefault(""),
     type: parseAsString.withDefault("all"),
     contract: parseAsString.withDefault("all"),
+    bookmarkedOnly: parseAsString.withDefault("false"),
   });
 
   // 1. L'unique source de vérité pour l'affichage de l'input
@@ -70,7 +71,12 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
 
   const clearAll = () => {
     setLocalSearch("");
-    setFilters({ search: null, type: "all", contract: "all" });
+    setFilters({
+      search: null,
+      type: "all",
+      contract: "all",
+      bookmarkedOnly: "false",
+    });
   };
 
   return (
@@ -164,12 +170,19 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
                         {isAuthenticated && (
                           <Badge
                             variant={
-                              filters.type === "favorite"
+                              filters.bookmarkedOnly === "true"
                                 ? "default"
-                                : "outline"
+                                : "secondary"
                             }
                             className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
-                            // onClick={() => setFilters({ type: "favorite" })}
+                            onClick={() =>
+                              setFilters({
+                                bookmarkedOnly:
+                                  filters.bookmarkedOnly === "true"
+                                    ? "false"
+                                    : "true",
+                              })
+                            }
                           >
                             Favoris
                           </Badge>
@@ -204,9 +217,16 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
           ))}
           {isAuthenticated && (
             <Badge
-              variant={filters.type === "favorite" ? "default" : "outline"}
+              variant={
+                filters.bookmarkedOnly === "true" ? "default" : "secondary"
+              }
               className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
-              // onClick={() => setFilters({ type: "favorite" })}
+              onClick={() =>
+                setFilters({
+                  bookmarkedOnly:
+                    filters.bookmarkedOnly === "true" ? "false" : "true",
+                })
+              }
             >
               Favoris
             </Badge>

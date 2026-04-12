@@ -1,4 +1,5 @@
 import { mutation, query } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
 import { v } from "convex/values";
 import { authComponent } from "./auth";
 import { paginationOptsValidator } from "convex/server";
@@ -20,7 +21,19 @@ export const getJobWithContact = query({
       .withIndex("by_jobId", (q) => q.eq("jobId", job._id))
       .unique();
 
-    return { ...job, contact };
+    const user = await authComponent.safeGetAuthUser(ctx);
+    let isBookmarked = false;
+    if (user) {
+      const existingBookmark = await ctx.db
+        .query("bookmarks")
+        .withIndex("by_user_resource", (q) =>
+          q.eq("userId", user._id).eq("resourceId", job._id),
+        )
+        .first();
+      if (existingBookmark) isBookmarked = true;
+    }
+
+    return { ...job, contact, isBookmarked };
   },
 });
 
@@ -62,9 +75,34 @@ export const getJobs = query({
         v.literal("apprenticeship"),
       ),
     ),
+    bookmarkedOnly: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const { searchTerm, type, contractType } = args;
+    const { searchTerm, type, contractType, bookmarkedOnly } = args;
+    const user = await authComponent.safeGetAuthUser(ctx);
+
+    if (bookmarkedOnly) {
+      if (!user) {
+        return { page: [], isDone: true, continueCursor: "" };
+      }
+      const bookmarksPage = await ctx.db
+        .query("bookmarks")
+        .withIndex("by_userId", (q) => q.eq("userId", user._id))
+        .filter((q) => q.eq(q.field("resourceType"), "job"))
+        .order("desc")
+        .paginate(args.paginationOpts);
+
+      const enrichedPage = await Promise.all(
+        bookmarksPage.page.map(async (b) => {
+          const job = await ctx.db.get(b.resourceId as Id<"JobOffer">);
+          if (!job) return null;
+          return { ...job, isBookmarked: true } as typeof job & { isBookmarked: boolean };
+        })
+      );
+      
+      const filteredPage = enrichedPage.filter((j): j is NonNullable<typeof j> => j !== null);
+      return { ...bookmarksPage, page: filteredPage };
+    }
 
     // CAS 1 : Recherche textuelle active
     if (searchTerm) {
@@ -78,7 +116,25 @@ export const getJobs = query({
         });
 
       // avant: return await searchResult.collect();
-      return await searchResult.paginate(args.paginationOpts);
+      const results = await searchResult.paginate(args.paginationOpts);
+      
+      const enrichedPage = await Promise.all(
+        results.page.map(async (job) => {
+          let isBookmarked = false;
+          if (user) {
+            const existingBookmark = await ctx.db
+              .query("bookmarks")
+              .withIndex("by_user_resource", (q) =>
+                q.eq("userId", user._id).eq("resourceId", job._id),
+              )
+              .first();
+            if (existingBookmark) isBookmarked = true;
+          }
+          return { ...job, isBookmarked };
+        })
+      );
+
+      return { ...results, page: enrichedPage };
     }
 
     // CAS 2 : Pas de recherche textuelle -> Utilisation des index de filtrage
@@ -106,14 +162,28 @@ export const getJobs = query({
 
     // Filtre manuel si les deux (type ET contract) sont présents sans searchTerm
     // (car Convex ne supporte qu'un seul index à la fois)
+    let pageFiltered = results.page;
     if (type && contractType) {
-      return {
-        ...results,
-        page: results.page.filter((job) => job.contractType === contractType),
-      };
+      pageFiltered = pageFiltered.filter((job) => job.contractType === contractType);
     }
 
-    return results;
+    const enrichedPage = await Promise.all(
+      pageFiltered.map(async (job) => {
+        let isBookmarked = false;
+        if (user) {
+          const existingBookmark = await ctx.db
+            .query("bookmarks")
+            .withIndex("by_user_resource", (q) =>
+              q.eq("userId", user._id).eq("resourceId", job._id),
+            )
+            .first();
+          if (existingBookmark) isBookmarked = true;
+        }
+        return { ...job, isBookmarked };
+      })
+    );
+
+    return { ...results, page: enrichedPage };
   },
 });
 
