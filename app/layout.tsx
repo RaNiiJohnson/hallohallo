@@ -5,6 +5,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
 import { ConvexClientProvider } from "@/web/ConvexClientProvider";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { OfflineIndicator } from "@/components/offline-indicator";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -40,6 +42,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ConvexClientProvider>
+            <OfflineIndicator />
             <NuqsAdapter>{children}</NuqsAdapter>
           </ConvexClientProvider>
           <Toaster closeButton />
