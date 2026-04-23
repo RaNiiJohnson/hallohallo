@@ -56,7 +56,7 @@ export function MainSidebar({
 
   const navItems = [
     { title: t("nav.home"), url: "/", icon: Home },
-    { title: t("nav.community"), url: "/communities", icon: Users },
+    { title: t("nav.communities"), url: "/communities", icon: Users },
     { title: t("nav.opportunities"), url: "/jobs", icon: Briefcase },
     { title: t("nav.housing"), url: "/listing", icon: Building },
   ];
