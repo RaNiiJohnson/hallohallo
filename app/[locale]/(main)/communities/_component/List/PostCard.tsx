@@ -1,6 +1,6 @@
 import { getRelativeTime } from "@/lib/date";
 import { ChevronRight, MessageSquare } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { buttonVariants } from "@/components/ui/button";
 import { Id } from "@convex/_generated/dataModel";
 import { ShareButton } from "@/components/ShareButton";

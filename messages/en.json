@@ -1,0 +1,160 @@
+{
+  "home": {
+    "title": "Our Services",
+    "community": "Community",
+    "opportunities": "Opportunities",
+    "housing": "Housing",
+    "description": "We are a community dedicated to networking between native and diaspora Malagasy in Germany. A platform for exchange and sharing to foster mutual support among young expats from Madagascar.",
+    "login": "Log in",
+    "discover": "Discover",
+    "explore": "Explore",
+    "seeListings": "See listings",
+    "communityDescription": "Connect with other Malagasy in Germany and build lasting bonds within our community.",
+    "opportunitiesDescription": "Find job and training opportunities tailored to your profile and professional ambitions.",
+    "housingDescription": "Share and find housing easily through our trusted network within the community.",
+    "aboutTitle": "About Us",
+    "reviews": {
+      "mission": {
+        "title": "Mission",
+        "titleAccordion": "Our Mission",
+        "description": "Creating a bridge between Malagasy living in Germany and those who stayed home, facilitating integration and the sharing of experiences."
+      },
+      "vision": {
+        "title": "Vision",
+        "titleAccordion": "Our Vision",
+        "description": "Becoming the go-to reference for the Malagasy community in Germany, a space for mutual support and growth."
+      },
+      "values": {
+        "title": "Values",
+        "titleAccordion": "Our Values",
+        "description": "Solidarity, sharing and mutual aid. The strength of the community to overcome the challenges of expatriation together."
+      },
+      "commitment": {
+        "title": "Commitment",
+        "titleAccordion": "Our Commitment",
+        "description": "Offering a practical solution to facilitate the fulfilment of each member, by simplifying daily life and opening up opportunities."
+      },
+      "identity": {
+        "title": "Identity",
+        "titleAccordion": "Our Identity",
+        "description": "Preserving and celebrating Malagasy culture while embracing German diversity, to proudly represent our country."
+      }
+    }
+  },
+  "pricing": {
+    "title": "Choose your plan",
+    "description": "Join the Malagasy community in Germany with the plan that suits you. Start for free and grow as you need.",
+    "free": {
+      "name": "Free",
+      "price": "€0 / month",
+      "cta": "Get started for free",
+      "features": [
+        "Basic profile",
+        "Browse listings",
+        "3 contacts per month",
+        "Access to public events",
+        "Basic search"
+      ]
+    },
+    "pro": {
+      "name": "Pro",
+      "price": "€9 / month",
+      "cta": "Choose Premium",
+      "features": [
+        "Unlimited contacts",
+        "Featured profile",
+        "Advanced filters",
+        "Premium badge",
+        "Access to private events",
+        "Profile statistics",
+        "Priority support"
+      ]
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "description": "Have questions? We are here to help.",
+      "cta": "View FAQ"
+    }
+  },
+  "footer": {
+    "description": "We are a community dedicated to networking between native and diaspora Malagasy in Germany. A platform for exchange and sharing to foster mutual support.",
+    "tagline": "For the Malagasy community.",
+    "nav": {
+      "title": "Navigation",
+      "home": "Home",
+      "community": "Community",
+      "opportunities": "Opportunities",
+      "housing": "Housing",
+      "faq": "FAQ"
+    },
+    "contact": {
+      "title": "Contact",
+      "location": "Germany"
+    },
+    "social": {
+      "title": "Follow us"
+    },
+    "copyright": "All rights reserved."
+  },
+  "localeSwitcher": {
+    "label": "Language",
+    "fr": "French",
+    "en": "English",
+    "de": "German"
+  },
+  "sidebar": {
+    "nav": {
+      "home": "Home",
+      "community": "Community",
+      "opportunities": "Opportunities",
+      "housing": "Housing"
+    },
+    "premium": {
+      "label": "Go Premium",
+      "tooltip": "Go Premium"
+    },
+    "communities": {
+      "label": "Communities",
+      "explore": "Explore all..."
+    },
+    "auth": {
+      "register": "Sign up",
+      "login": "Log in",
+      "profile": "My Profile",
+      "settings": "Settings",
+      "logout": "Log out"
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "description": "Can't find what you're looking for? Contact our",
+    "support": "support team",
+    "descriptionEnd": "or ask your question in the community.",
+    "items": [
+      {
+        "question": "How do I join the Malagasy community in Germany?",
+        "answer": "Simply create a free account on our platform. Once registered, you will have access to all our services: community, job offers and real estate listings. You can also participate in discussions and events organized by the community."
+      },
+      {
+        "question": "How do I post a job offer or apply?",
+        "answer": "Employers can post their job offers for free in the 'Jobs' section. Candidates can browse all available offers and apply directly through the platform. We also facilitate recommendations between community members."
+      },
+      {
+        "question": "Can I offer housing or look for a flatshare?",
+        "answer": "Absolutely! Our 'Housing' section allows you to post rental, flatshare or temporary accommodation listings. It's a great way to help newcomers find housing or share costs with other community members."
+      },
+      {
+        "question": "What types of help can I receive from the community?",
+        "answer": "Our community offers support in many areas: advice on administrative procedures, help with integration, sharing professional experiences, service recommendations, and much more. Mutual aid is at the heart of our mission."
+      },
+      {
+        "question": "Is the platform accessible to Malagasy who stayed in Madagascar?",
+        "answer": "Yes! Our mission is to create a bridge between Malagasy living in Germany and those who stayed in Madagascar. Members back home can also register to share opportunities, maintain cultural ties and facilitate exchanges between the diaspora and the home country."
+      },
+      {
+        "question": "Is my personal data secure?",
+        "answer": "Protecting your data is our priority. We comply with European GDPR and never share your personal information with third parties without your consent. You retain full control over the visibility of your profile and your information."
+      }
+    ]
+  }
+}

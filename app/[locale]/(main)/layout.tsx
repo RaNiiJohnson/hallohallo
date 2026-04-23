@@ -10,12 +10,20 @@ import {
 } from "@/components/ui/sidebar";
 import { MainSidebar } from "@/components/main-sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { setRequestLocale } from "next-intl/server";
+import { Locale } from "@/i18n/routing";
+import LocaleSwitcher from "@/components/locale-switcher";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }>) {
+  const { locale } = await params;
+  setRequestLocale(locale as Locale);
+
   return (
     <SidebarProvider>
       <MainSidebar />
@@ -26,6 +34,7 @@ export default function RootLayout({
             <SidebarTrigger className="-ml-1" />
           </div>
           <div className="flex items-center">
+            <LocaleSwitcher />
             <ThemeToggle />
           </div>
         </header>

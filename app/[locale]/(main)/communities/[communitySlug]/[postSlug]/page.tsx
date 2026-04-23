@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useQuery } from "convex-helpers/react/cache";
 import { useParams, useRouter } from "next/navigation";
 import SkeletonPost from "./skeleton";

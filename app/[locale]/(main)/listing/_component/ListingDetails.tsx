@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ExternalLink, MapPin, X } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { PriceDisplay } from "./price";
 import { ImageCarousel } from "./ImageCarousel";
 import { ListingListItem } from "@/lib/convexTypes";

@@ -1,7 +1,10 @@
-import Link from "next/link";
-import { Heart, Mail, MapPin } from "lucide-react";
+import { Link } from "@/i18n/navigation";
+import { Mail, MapPin } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
-export default function Footer() {
+export default async function Footer() {
+  const t = await getTranslations("footer");
+
   return (
     <footer className="bg-muted/30 border-t mt-16">
       <div className="max-w-6xl mx-auto px-4 py-12">
@@ -15,27 +18,23 @@ export default function Footer() {
               Hallo Hallo
             </Link>
             <p className="text-muted-foreground mb-4 max-w-md">
-              Nous sommes une communauté dédiée aux réseautages entre natif et
-              diaspora Malagasy en Allemagne. Une plateforme d&apos;échange et
-              de partage pour favoriser l&apos;entraide.
+              {t("description")}
             </p>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>Fait avec</span>
-              <Heart className="h-4 w-4 text-red-500" />
-              <span>pour la communauté Malagasy</span>
+              <span>{t("tagline")}</span>
             </div>
           </div>
 
           {/* Navigation */}
           <div>
-            <h3 className="font-semibold mb-4">Navigation</h3>
+            <h3 className="font-semibold mb-4">{t("nav.title")}</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Accueil
+                  {t("nav.home")}
                 </Link>
               </li>
               <li>
@@ -43,7 +42,7 @@ export default function Footer() {
                   href="/communities"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Communauté
+                  {t("nav.community")}
                 </Link>
               </li>
               <li>
@@ -51,7 +50,7 @@ export default function Footer() {
                   href="/jobs"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Opportunités
+                  {t("nav.opportunities")}
                 </Link>
               </li>
               <li>
@@ -59,7 +58,7 @@ export default function Footer() {
                   href="/listing"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Immobilier
+                  {t("nav.housing")}
                 </Link>
               </li>
               <li>
@@ -67,7 +66,7 @@ export default function Footer() {
                   href="/faq"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  FAQ
+                  {t("nav.faq")}
                 </Link>
               </li>
             </ul>
@@ -75,7 +74,7 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="font-semibold mb-4">Contact</h3>
+            <h3 className="font-semibold mb-4">{t("contact.title")}</h3>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2 text-muted-foreground">
                 <Mail className="h-4 w-4" />
@@ -83,12 +82,14 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2 text-muted-foreground">
                 <MapPin className="h-4 w-4" />
-                <span>Allemagne</span>
+                <span>{t("contact.location")}</span>
               </li>
             </ul>
 
             <div className="mt-6">
-              <h4 className="font-semibold mb-2 text-sm">Suivez-nous</h4>
+              <h4 className="font-semibold mb-2 text-sm">
+                {t("social.title")}
+              </h4>
               <div className="flex gap-2">
                 <Link
                   href="#"
@@ -109,7 +110,9 @@ export default function Footer() {
         </div>
 
         <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; 2025 Hallo Hallo. Tous droits réservés.</p>
+          <p>
+            © {new Date().getFullYear()} Hallo Hallo. {t("copyright")}
+          </p>
         </div>
       </div>
     </footer>

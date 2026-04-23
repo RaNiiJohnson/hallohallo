@@ -10,7 +10,7 @@ import {
   CheckIcon,
   ChevronRight,
 } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useConvexAuth } from "convex/react";
 import { CreatePostDialog } from "../_component/dialogs/createPostDialog";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -222,7 +222,11 @@ export default function CommunityClient() {
 
                   <ShareButton
                     text={post.title}
-                    url={typeof window !== "undefined" ? `${window.location.origin}/communities/${community.slug}/${post.slug}` : ""}
+                    url={
+                      typeof window !== "undefined"
+                        ? `${window.location.origin}/communities/${community.slug}/${post.slug}`
+                        : ""
+                    }
                     variant="ghost"
                     className="group flex items-center gap-1.5 text-muted-foreground hover:text-purple-500 hover:bg-purple-500/10 transition-colors h-8 px-2"
                   />

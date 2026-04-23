@@ -5,7 +5,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { JobFilters } from "./_component/jobFilters";
 import { PublishJobDialog } from "./_component/dialogs/publishJobDialog";
 import { JobList } from "./_component/jobList";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useConvexAuth } from "convex/react";
 import { Suspense } from "react";
 import { JobFiltersSkeleton, JobPageSkeleton } from "./_component/skeleton";

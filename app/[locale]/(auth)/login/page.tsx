@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { SigninForm } from "./signin-form";
 import { Button } from "@/components/ui/button";
 import { ArrowLeftIcon } from "lucide-react";

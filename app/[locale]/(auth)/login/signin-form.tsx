@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { authClient } from "@/lib/auth-client";
@@ -51,15 +51,15 @@ export function SigninForm() {
     await authClient.signIn.email({
       email: values.email,
       password: values.password,
-      fetchOptions : {
+      fetchOptions: {
         onSuccess: () => {
-         toast.success("Connexion réussie.") 
-         router.push("/")
+          toast.success("Connexion réussie.");
+          router.push("/");
         },
         onError: () => {
-          toast.error("Connexion échouée.")
-        }
-      }
+          toast.error("Connexion échouée.");
+        },
+      },
     });
   }
 

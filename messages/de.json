@@ -1,0 +1,160 @@
+{
+  "home": {
+    "title": "Unsere Dienstleistungen",
+    "community": "Gemeinschaft",
+    "opportunities": "Möglichkeiten",
+    "housing": "Immobilien",
+    "description": "Wir sind eine Gemeinschaft, die dem Networking zwischen einheimischen und diaspora Malagasy in Deutschland gewidmet ist. Eine Plattform für Austausch und Teilen, um die gegenseitige Unterstützung unter jungen Expats aus Madagaskar zu fördern.",
+    "login": "Anmelden",
+    "discover": "Entdecken",
+    "explore": "Erkunden",
+    "seeListings": "Anzeigen sehen",
+    "communityDescription": "Vernetzen Sie sich mit anderen Malagasy in Deutschland und bauen Sie dauerhafte Bindungen innerhalb unserer Gemeinschaft auf.",
+    "opportunitiesDescription": "Finden Sie Beschäftigungs- und Ausbildungsmöglichkeiten, die auf Ihr Profil und Ihre beruflichen Ambitionen zugeschnitten sind.",
+    "housingDescription": "Teilen und finden Sie Wohnungen ganz einfach über unser vertrauensvolles Netzwerk innerhalb der Gemeinschaft.",
+    "aboutTitle": "Über Uns",
+    "reviews": {
+      "mission": {
+        "title": "Mission",
+        "titleAccordion": "Unsere Mission",
+        "description": "Eine Brücke zwischen den in Deutschland lebenden Malagasy und denen, die in der Heimat geblieben sind, zu bauen und die Integration sowie den Erfahrungsaustausch zu erleichtern."
+      },
+      "vision": {
+        "title": "Vision",
+        "titleAccordion": "Unsere Vision",
+        "description": "Die Referenz für die Malagasy-Gemeinschaft in Deutschland zu werden, ein Raum der gegenseitigen Unterstützung und des gemeinsamen Wachstums."
+      },
+      "values": {
+        "title": "Werte",
+        "titleAccordion": "Unsere Werte",
+        "description": "Solidarität, Teilen und gegenseitige Hilfe. Die Stärke der Gemeinschaft, um gemeinsam die Herausforderungen der Expatriierung zu überwinden."
+      },
+      "commitment": {
+        "title": "Engagement",
+        "titleAccordion": "Unser Engagement",
+        "description": "Eine praktische Lösung anzubieten, um die Entfaltung jedes Mitglieds zu erleichtern, den Alltag zu vereinfachen und Chancen zu eröffnen."
+      },
+      "identity": {
+        "title": "Identität",
+        "titleAccordion": "Unsere Identität",
+        "description": "Die Malagasy-Kultur zu bewahren und zu feiern, während wir die deutsche Vielfalt annehmen, um unser Land stolz zu vertreten."
+      }
+    }
+  },
+  "pricing": {
+    "title": "Wählen Sie Ihren Plan",
+    "description": "Treten Sie der Malagasy-Gemeinschaft in Deutschland mit dem Plan bei, der zu Ihnen passt. Starten Sie kostenlos und wachsen Sie nach Bedarf.",
+    "free": {
+      "name": "Kostenlos",
+      "price": "0€ / Monat",
+      "cta": "Kostenlos starten",
+      "features": [
+        "Basisprofil",
+        "Anzeigen durchsuchen",
+        "3 Kontakte pro Monat",
+        "Zugang zu öffentlichen Veranstaltungen",
+        "Einfache Suche"
+      ]
+    },
+    "pro": {
+      "name": "Pro",
+      "price": "9€ / Monat",
+      "cta": "Premium wählen",
+      "features": [
+        "Unbegrenzte Kontakte",
+        "Hervorgehobenes Profil",
+        "Erweiterte Filter",
+        "Premium-Abzeichen",
+        "Zugang zu privaten Veranstaltungen",
+        "Profilstatistiken",
+        "Prioritätssupport"
+      ]
+    },
+    "faq": {
+      "title": "Häufig gestellte Fragen",
+      "description": "Haben Sie Fragen? Wir sind hier, um zu helfen.",
+      "cta": "FAQ ansehen"
+    }
+  },
+  "footer": {
+    "description": "Wir sind eine Gemeinschaft, die dem Networking zwischen einheimischen und diaspora Malagasy in Deutschland gewidmet ist. Eine Plattform für Austausch und gegenseitige Unterstützung.",
+    "tagline": "Für die Malagasy-Gemeinschaft.",
+    "nav": {
+      "title": "Navigation",
+      "home": "Startseite",
+      "community": "Gemeinschaft",
+      "opportunities": "Möglichkeiten",
+      "housing": "Immobilien",
+      "faq": "FAQ"
+    },
+    "contact": {
+      "title": "Kontakt",
+      "location": "Deutschland"
+    },
+    "social": {
+      "title": "Folgen Sie uns"
+    },
+    "copyright": "Alle Rechte vorbehalten."
+  },
+  "localeSwitcher": {
+    "label": "Sprache",
+    "fr": "Französisch",
+    "en": "Englisch",
+    "de": "Deutsch"
+  },
+  "sidebar": {
+    "nav": {
+      "home": "Startseite",
+      "community": "Gemeinschaft",
+      "opportunities": "Möglichkeiten",
+      "housing": "Immobilien"
+    },
+    "premium": {
+      "label": "Premium werden",
+      "tooltip": "Premium werden"
+    },
+    "communities": {
+      "label": "Gemeinschaften",
+      "explore": "Alle erkunden..."
+    },
+    "auth": {
+      "register": "Registrieren",
+      "login": "Anmelden",
+      "profile": "Mein Profil",
+      "settings": "Einstellungen",
+      "logout": "Abmelden"
+    }
+  },
+  "faq": {
+    "title": "Häufig gestellte Fragen",
+    "description": "Können Sie nicht finden, was Sie suchen? Kontaktieren Sie unser",
+    "support": "Support-Team",
+    "descriptionEnd": "oder stellen Sie Ihre Frage in der Gemeinschaft.",
+    "items": [
+      {
+        "question": "Wie trete ich der Malagasy-Gemeinschaft in Deutschland bei?",
+        "answer": "Erstellen Sie einfach ein kostenloses Konto auf unserer Plattform. Nach der Registrierung haben Sie Zugang zu allen unseren Diensten: Gemeinschaft, Stellenangebote und Immobilienanzeigen. Sie können auch an Diskussionen und Veranstaltungen der Gemeinschaft teilnehmen."
+      },
+      {
+        "question": "Wie veröffentliche ich ein Stellenangebot oder bewerbe mich?",
+        "answer": "Arbeitgeber können ihre Stellenangebote kostenlos im Bereich 'Jobs' veröffentlichen. Bewerber können alle verfügbaren Angebote einsehen und sich direkt über die Plattform bewerben. Wir erleichtern auch Empfehlungen zwischen Gemeinschaftsmitgliedern."
+      },
+      {
+        "question": "Kann ich eine Unterkunft anbieten oder eine WG suchen?",
+        "answer": "Absolut! Unser Bereich 'Immobilien' ermöglicht die Veröffentlichung von Miet-, WG- oder vorübergehenden Unterkunftsanzeigen. Dies ist eine hervorragende Möglichkeit, Neuankömmlingen bei der Wohnungssuche zu helfen oder Kosten mit anderen Gemeinschaftsmitgliedern zu teilen."
+      },
+      {
+        "question": "Welche Arten von Hilfe kann ich von der Gemeinschaft erhalten?",
+        "answer": "Unsere Gemeinschaft bietet Unterstützung in vielen Bereichen: Ratschläge zu Verwaltungsverfahren, Integrationshilfe, Austausch beruflicher Erfahrungen, Dienstleistungsempfehlungen und vieles mehr. Gegenseitige Hilfe steht im Mittelpunkt unserer Mission."
+      },
+      {
+        "question": "Ist die Plattform auch für Malagasy zugänglich, die in Madagaskar geblieben sind?",
+        "answer": "Ja! Unsere Mission ist es, eine Brücke zwischen den in Deutschland lebenden Malagasy und denen zu schaffen, die in Madagaskar geblieben sind. Mitglieder in der Heimat können sich ebenfalls registrieren, um Möglichkeiten zu teilen, kulturelle Bindungen aufrechtzuerhalten und den Austausch zwischen der Diaspora und dem Heimatland zu erleichtern."
+      },
+      {
+        "question": "Sind meine persönlichen Daten sicher?",
+        "answer": "Der Schutz Ihrer Daten hat für uns oberste Priorität. Wir halten die europäische DSGVO ein und geben Ihre persönlichen Informationen niemals ohne Ihre Zustimmung an Dritte weiter. Sie behalten die vollständige Kontrolle über die Sichtbarkeit Ihres Profils und Ihrer Informationen."
+      }
+    ]
+  }
+}

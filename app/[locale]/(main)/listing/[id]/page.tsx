@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Heart } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { notFound, useParams } from "next/navigation";
 import { ShareButton } from "@/components/ShareButton";
 import { PropertyDetails } from "./components/PropertyDetails";
@@ -53,14 +53,23 @@ export default function PropertyPage() {
                 className={`flex items-center gap-2 ${property.isBookmarked ? "text-red-500 hover:text-red-600 bg-red-500/10 hover:bg-red-500/20" : ""}`}
                 onClick={async () => {
                   try {
-                    await toggleBookmark({ resourceId: property._id as Id<"RealestateListing">, resourceType: "realEstate" });
-                    toast.success(property.isBookmarked ? "Retiré des favoris" : "Ajouté aux favoris");
+                    await toggleBookmark({
+                      resourceId: property._id as Id<"RealestateListing">,
+                      resourceType: "realEstate",
+                    });
+                    toast.success(
+                      property.isBookmarked
+                        ? "Retiré des favoris"
+                        : "Ajouté aux favoris",
+                    );
                   } catch {
                     toast.error("Erreur lors de la mise à jour du favori");
                   }
                 }}
               >
-                <Heart className={`h-4 w-4 ${property.isBookmarked ? "fill-current" : ""}`} />
+                <Heart
+                  className={`h-4 w-4 ${property.isBookmarked ? "fill-current" : ""}`}
+                />
                 <span className="max-sm:hidden">Favoris</span>
               </Button>
             )}

@@ -4,7 +4,7 @@ import { useQuery, useMutation, useConvexAuth } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Bell } from "lucide-react";
 import { getRelativeTime } from "@/lib/date";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import {
   Popover,
   PopoverContent,

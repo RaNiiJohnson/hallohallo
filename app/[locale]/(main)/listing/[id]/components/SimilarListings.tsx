@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { PriceDisplay } from "../../_component/price";
 import { useQuery } from "convex-helpers/react/cache";
 import { api } from "@convex/_generated/api";

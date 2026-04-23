@@ -6,7 +6,7 @@ import { useConvexAuth } from "convex/react";
 import { Plus } from "lucide-react";
 import { RealEstatesFilters } from "./_component/listingFilters";
 import { ListingList } from "./_component/List/listingList";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { PublishListingDialog } from "./_component/dialogs/publishListingDialog";
 import { Suspense } from "react";
 import { ListingPageSkeleton } from "./_component/skeleton";

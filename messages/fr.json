@@ -1,0 +1,160 @@
+{
+  "home": {
+    "title": "Nos Services",
+    "community": "Communauté",
+    "opportunities": "Opportunités",
+    "housing": "Immobilier",
+    "description": "Nous sommes une communauté dédiée aux réseautages entre natif et diaspora Malagasy en Allemagne. Une plateforme d'échange et de partage pour favoriser l'entraide entre les jeunes expats de Madagascar.",
+    "login": "Se connecter",
+    "discover": "Découvrir",
+    "explore": "Explorer",
+    "seeListings": "Voir les annonces",
+    "communityDescription": "Connectez-vous avec d'autres Malagasy en Allemagne et créez des liens durables au sein de notre communauté.",
+    "opportunitiesDescription": "Trouvez des opportunités d'emploi et de formation adaptées à votre profil et vos ambitions professionnelles.",
+    "housingDescription": "Partagez et trouvez des logements facilement grâce à notre réseau de confiance au sein de la communauté.",
+    "aboutTitle": "À Propos de Nous",
+    "reviews": {
+      "mission": {
+        "title": "Mission",
+        "titleAccordion": "Notre Mission",
+        "description": "Créer un pont entre les Malagasy vivant en Allemagne et ceux restés au pays, facilitant l'intégration et le partage d'expériences."
+      },
+      "vision": {
+        "title": "Vision",
+        "titleAccordion": "Notre Vision",
+        "description": "Devenir la référence pour la communauté Malagasy en Allemagne, un espace d'entraide et de croissance mutuelle."
+      },
+      "values": {
+        "title": "Valeurs",
+        "titleAccordion": "Nos Valeurs",
+        "description": "Solidarité, partage et entraide. La force de la communauté pour surmonter ensemble les défis de l'expatriation."
+      },
+      "commitment": {
+        "title": "Engagement",
+        "titleAccordion": "Notre Engagement",
+        "description": "Offrir une solution pratique pour faciliter l'épanouissement de chaque membre, en simplifiant son quotidien et en ouvrant des opportunités."
+      },
+      "identity": {
+        "title": "Identité",
+        "titleAccordion": "Notre Identité",
+        "description": "Préserver et célébrer la culture Malagasy tout en embrassant la diversité allemande, pour représenter fièrement notre pays."
+      }
+    }
+  },
+  "pricing": {
+    "title": "Choisissez votre plan",
+    "description": "Rejoignez la communauté Malagasy en Allemagne avec le plan qui vous convient. Commencez gratuitement et évoluez selon vos besoins.",
+    "free": {
+      "name": "Gratuit",
+      "price": "0€ / mois",
+      "cta": "Commencer gratuitement",
+      "features": [
+        "Profil de base",
+        "Consultation des annonces",
+        "3 contacts par mois",
+        "Accès aux événements publics",
+        "Recherche simple"
+      ]
+    },
+    "pro": {
+      "name": "Pro",
+      "price": "9€ / mois",
+      "cta": "Choisir Premium",
+      "features": [
+        "Contacts illimités",
+        "Profil mis en avant",
+        "Filtres avancés",
+        "Badge Premium",
+        "Accès aux événements privés",
+        "Statistiques de profil",
+        "Support prioritaire"
+      ]
+    },
+    "faq": {
+      "title": "Questions fréquentes",
+      "description": "Vous avez des questions ? Nous sommes là pour vous aider.",
+      "cta": "Voir la FAQ"
+    }
+  },
+  "footer": {
+    "description": "Nous sommes une communauté dédiée aux réseautages entre natif et diaspora Malagasy en Allemagne. Une plateforme d'échange et de partage pour favoriser l'entraide.",
+    "tagline": "Pour la communauté Malagasy.",
+    "nav": {
+      "title": "Navigation",
+      "home": "Accueil",
+      "community": "Communauté",
+      "opportunities": "Opportunités",
+      "housing": "Immobilier",
+      "faq": "FAQ"
+    },
+    "contact": {
+      "title": "Contact",
+      "location": "Allemagne"
+    },
+    "social": {
+      "title": "Suivez-nous"
+    },
+    "copyright": "Tous droits réservés."
+  },
+  "localeSwitcher": {
+    "label": "Langue",
+    "fr": "Français",
+    "en": "Anglais",
+    "de": "Allemand"
+  },
+  "sidebar": {
+    "nav": {
+      "home": "Accueil",
+      "community": "Communauté",
+      "opportunities": "Opportunités",
+      "housing": "Immobilier"
+    },
+    "premium": {
+      "label": "Passer au Premium",
+      "tooltip": "Passer au Premium"
+    },
+    "communities": {
+      "label": "Communautés",
+      "explore": "Explorer tout..."
+    },
+    "auth": {
+      "register": "S'inscrire",
+      "login": "Se connecter",
+      "profile": "Mon Profil",
+      "settings": "Paramètres",
+      "logout": "Se déconnecter"
+    }
+  },
+  "faq": {
+    "title": "Questions Fréquentes",
+    "description": "Vous ne trouvez pas ce que vous cherchez ? Contactez notre",
+    "support": "équipe de support",
+    "descriptionEnd": "ou posez votre question dans la communauté.",
+    "items": [
+      {
+        "question": "Comment rejoindre la communauté Malagasy en Allemagne ?",
+        "answer": "Il suffit de créer un compte gratuit sur notre plateforme. Une fois inscrit, vous aurez accès à tous nos services : communauté, offres d'emploi et annonces immobilières. Vous pourrez également participer aux discussions et événements organisés par la communauté."
+      },
+      {
+        "question": "Comment publier une offre d'emploi ou postuler ?",
+        "answer": "Les employeurs peuvent publier gratuitement leurs offres d'emploi dans la section 'Emplois'. Les candidats peuvent consulter toutes les offres disponibles et postuler directement via la plateforme. Nous facilitons aussi les recommandations entre membres de la communauté."
+      },
+      {
+        "question": "Puis-je proposer un logement ou chercher une colocation ?",
+        "answer": "Absolument ! Notre section 'Immobilier' permet de publier des annonces de location, colocation ou hébergement temporaire. C'est un excellent moyen d'aider les nouveaux arrivants à trouver un logement ou de partager les coûts avec d'autres membres de la communauté."
+      },
+      {
+        "question": "Quels types d'aide puis-je recevoir de la communauté ?",
+        "answer": "Notre communauté offre un soutien dans de nombreux domaines : conseils pour les démarches administratives, aide à l'intégration, partage d'expériences professionnelles, recommandations de services, et bien plus. L'entraide est au cœur de notre mission."
+      },
+      {
+        "question": "La plateforme est-elle accessible aux Malagasy restés au pays ?",
+        "answer": "Oui ! Notre mission est de créer un pont entre les Malagasy vivant en Allemagne et ceux restés à Madagascar. Les membres au pays peuvent également s'inscrire pour partager des opportunités, maintenir les liens culturels et faciliter les échanges entre la diaspora et le pays d'origine."
+      },
+      {
+        "question": "Mes données personnelles sont-elles sécurisées ?",
+        "answer": "La protection de vos données est notre priorité. Nous respectons le RGPD européen et ne partageons jamais vos informations personnelles avec des tiers sans votre consentement. Vous gardez le contrôle total sur la visibilité de votre profil et vos informations."
+      }
+    ]
+  }
+}

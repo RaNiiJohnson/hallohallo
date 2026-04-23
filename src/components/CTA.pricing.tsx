@@ -4,7 +4,7 @@ import { Sparkles } from "lucide-react";
 import { MagicCard } from "./ui/magic-card";
 import { RainbowButton } from "./ui/rainbow-button";
 import { useTheme } from "next-themes";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 export default function CTApricing() {
   const { theme } = useTheme();

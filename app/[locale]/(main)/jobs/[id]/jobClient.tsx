@@ -20,7 +20,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { getRelativeTime, formatDateLong } from "@/lib/date";
 import { Separator } from "@/components/ui/separator";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -148,16 +148,25 @@ export function JobDetailsPage(props: {
 
                     <ShareButton text={jobOffer.title} />
 
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
-                      className={jobOffer.isBookmarked ? "text-blue-500 border-blue-500/50 hover:bg-blue-500/10" : ""}
+                      className={
+                        jobOffer.isBookmarked
+                          ? "text-blue-500 border-blue-500/50 hover:bg-blue-500/10"
+                          : ""
+                      }
                       onClick={() => {
                         if (!user) return; // Replace with toast ideally, but simple for now
-                        toggleBookmark({ resourceId: jobOffer._id as Id<"JobOffer">, resourceType: "job" });
+                        toggleBookmark({
+                          resourceId: jobOffer._id as Id<"JobOffer">,
+                          resourceType: "job",
+                        });
                       }}
                     >
-                      <Bookmark className={`w-4 h-4 ${jobOffer.isBookmarked ? "fill-current" : ""}`} />
+                      <Bookmark
+                        className={`w-4 h-4 ${jobOffer.isBookmarked ? "fill-current" : ""}`}
+                      />
                     </Button>
                   </ButtonGroup>
                 )}

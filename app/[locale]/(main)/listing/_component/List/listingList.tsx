@@ -11,7 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Briefcase, MapPin } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useEffect, useState } from "react";
 import { PriceDisplay } from "../price";
 import { BookmarkButton } from "./bookmarkButton";

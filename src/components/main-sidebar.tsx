@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { usePathname } from "next/navigation";
 import { useQuery } from "convex-helpers/react/cache";
 import { api } from "@convex/_generated/api";
@@ -19,7 +19,6 @@ import {
   Settings,
   LogIn,
 } from "lucide-react";
-
 import {
   Sidebar,
   SidebarContent,
@@ -43,13 +42,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Logo } from "@/web/logo";
 import { righteous } from "@/web/fonts";
-
-const navItems = [
-  { title: "Accueil", url: "/", icon: Home },
-  { title: "Communauté", url: "/communities", icon: Users },
-  { title: "Opportunités", url: "/jobs", icon: Briefcase },
-  { title: "Immobilier", url: "/listing", icon: Building },
-];
+import { useTranslations } from "next-intl";
 
 export function MainSidebar({
   ...props
@@ -59,6 +52,14 @@ export function MainSidebar({
   const myCommunities = useQuery(api.communities.getMyCommunities);
   const topCommunities = useQuery(api.communities.getTopCommunities);
   const { isMobile, setOpenMobile } = useSidebar();
+  const t = useTranslations("sidebar");
+
+  const navItems = [
+    { title: t("nav.home"), url: "/", icon: Home },
+    { title: t("nav.community"), url: "/communities", icon: Users },
+    { title: t("nav.opportunities"), url: "/jobs", icon: Briefcase },
+    { title: t("nav.housing"), url: "/listing", icon: Building },
+  ];
 
   const handleLogOut = async () => {
     await authClient.signOut({
@@ -102,7 +103,7 @@ export function MainSidebar({
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton
                     asChild
                     isActive={pathname === item.url}
@@ -125,7 +126,7 @@ export function MainSidebar({
                     asChild
                     isActive={pathname === "/pricing"}
                     className="mt-2 bg-linear-to-r from-purple-500/10 to-pink-500/10 hover:from-purple-500/20 hover:to-pink-500/20 text-purple-600 dark:text-purple-400"
-                    tooltip="Passer au Premium"
+                    tooltip={t("premium.tooltip")}
                   >
                     <Link
                       href="/pricing"
@@ -133,7 +134,7 @@ export function MainSidebar({
                     >
                       <Sparkles className="text-purple-500" />
                       <span className="font-semibold bg-linear-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-                        Passer au Premium
+                        {t("premium.label")}
                       </span>
                     </Link>
                   </SidebarMenuButton>
@@ -144,7 +145,7 @@ export function MainSidebar({
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Communautés</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("communities.label")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <Authenticated>
@@ -188,12 +189,12 @@ export function MainSidebar({
                   isActive={pathname === `/communities/explore`}
                 >
                   <Link
-                    href={`/communities/explore`}
+                    href="/communities/explore"
                     onClick={() => isMobile && setOpenMobile(false)}
                     className="text-muted-foreground mt-2"
                   >
                     <span className="truncate w-full text-center text-sm font-medium">
-                      Explorer tout...
+                      {t("communities.explore")}
                     </span>
                   </Link>
                 </SidebarMenuButton>
@@ -217,12 +218,12 @@ export function MainSidebar({
                   onClick={() => isMobile && setOpenMobile(false)}
                   className="bg-primary text-primary-foreground hover:bg-primary/90 justify-center font-medium"
                 >
-                  S&apos;inscrire
+                  {t("auth.register")}
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild size="lg" tooltip="Se connecter">
+              <SidebarMenuButton asChild size="lg" tooltip={t("auth.login")}>
                 <Link
                   href="/login"
                   onClick={() => isMobile && setOpenMobile(false)}
@@ -230,7 +231,7 @@ export function MainSidebar({
                 >
                   <LogIn className="hidden group-data-[collapsible=icon]:block size-4" />
                   <span className="group-data-[collapsible=icon]:hidden">
-                    Se connecter
+                    {t("auth.login")}
                   </span>
                 </Link>
               </SidebarMenuButton>
@@ -281,7 +282,7 @@ export function MainSidebar({
                         onClick={() => isMobile && setOpenMobile(false)}
                       >
                         <User className="mr-2 size-4" />
-                        Mon Profil
+                        {t("auth.profile")}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -291,7 +292,7 @@ export function MainSidebar({
                         onClick={() => isMobile && setOpenMobile(false)}
                       >
                         <Settings className="mr-2 size-4" />
-                        Paramètres
+                        {t("auth.settings")}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -300,7 +301,7 @@ export function MainSidebar({
                       className="cursor-pointer text-destructive focus:bg-destructive focus:text-destructive-foreground focus:opacity-90"
                     >
                       <LogOut className="mr-2 size-4" />
-                      <span>Se déconnecter</span>
+                      <span>{t("auth.logout")}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

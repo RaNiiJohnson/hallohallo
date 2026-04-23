@@ -2,7 +2,7 @@
 
 import { Briefcase, MapPin, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import {
   jobTypeLabels,
   contractTypeLabels,
