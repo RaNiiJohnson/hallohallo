@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Id } from "@convex/_generated/dataModel";
 import { DeleteConfirmDialog } from "./deleteConfirmDialog";
 import { LikeButton } from "./likeButton";
+import { useTimeTranslations } from "@/hooks/use-time-translations";
 
 export function ReplyItem({
   reply,
@@ -37,6 +38,8 @@ export function ReplyItem({
   const [editContent, setEditContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const timeT = useTimeTranslations();
 
   if (!reply) return null;
 
@@ -87,7 +90,7 @@ export function ReplyItem({
     <div className="ml-8 pl-4 border-l border-border py-2">
       <p className="text-xs text-muted-foreground mb-1">
         <span className="text-primary font-medium">{reply.authorName}</span> •{" "}
-        {getRelativeTime(reply._creationTime)}
+        {getRelativeTime(reply._creationTime, timeT)}
       </p>
 
       {isEditing ? (

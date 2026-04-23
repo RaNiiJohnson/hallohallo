@@ -31,10 +31,15 @@ import { api } from "@convex/_generated/api";
 import { EditJobDialog } from "./_component/editJobDialog";
 import { LocationMap } from "@/lib/LocationMap";
 import { JobDetailsSkeleton } from "../_component/skeleton";
+import { useTimeTranslations } from "@/hooks/use-time-translations";
+import { useLocale } from "next-intl";
 
 export default function JobDetailsPage() {
   const { id } = useParams();
   const user = useQuery(api.auth.getCurrentUser);
+
+  const timeT = useTimeTranslations();
+  const locale = useLocale();
 
   const jobOffer = useQuery(api.jobs.getJobWithContact, { slug: id as string });
 
@@ -98,7 +103,8 @@ export default function JobDetailsPage() {
                   a
                 </>
               )}{" "}
-              publié cette offre {getRelativeTime(jobOffer._creationTime)}
+              publié cette offre{" "}
+              {getRelativeTime(jobOffer._creationTime, timeT)}
             </p>
 
             {/* Divider */}
@@ -181,7 +187,7 @@ export default function JobDetailsPage() {
                       Date de publication
                     </p>
                     <p className="font-semibold">
-                      {formatDateLong(jobOffer._creationTime)}
+                      {formatDateLong(jobOffer._creationTime, locale)}
                     </p>
                   </div>
 
@@ -403,7 +409,7 @@ export default function JobDetailsPage() {
                 <div className="flex items-center justify-between py-3">
                   <span className="text-sm text-muted-foreground">Publié</span>
                   <span className="font-semibold text-sm">
-                    {getRelativeTime(jobOffer._creationTime)}
+                    {getRelativeTime(jobOffer._creationTime, timeT)}
                   </span>
                 </div>
               </div>

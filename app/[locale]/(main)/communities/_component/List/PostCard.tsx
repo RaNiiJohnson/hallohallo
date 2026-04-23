@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Post } from "./types";
 import { PostBookmarkButton } from "./PostBookmarkButton";
 import { LikeButton } from "../likeButton";
+import { useTimeTranslations } from "@/hooks/use-time-translations";
 
 export function PostCard({
   post,
@@ -16,6 +17,8 @@ export function PostCard({
   post: Post;
   onLike: (id: Id<"posts">) => void;
 }) {
+  const timeT = useTimeTranslations();
+
   return (
     <div className="block px-4 py-4 hover:bg-muted/30 transition-colors border-b border-border bg-background max-w-4xl mx-auto">
       <div className="flex sm:flex-row flex-col text-xs text-muted-foreground mb-2">
@@ -57,7 +60,7 @@ export function PostCard({
           </p>
         )}
         <span className="text-xs text-muted-foreground mt-2">
-          {getRelativeTime(post._creationTime ?? "")}
+          {getRelativeTime(post._creationTime, timeT)}
         </span>
       </Link>
 

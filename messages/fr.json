@@ -156,5 +156,39 @@
         "answer": "La protection de vos données est notre priorité. Nous respectons le RGPD européen et ne partageons jamais vos informations personnelles avec des tiers sans votre consentement. Vous gardez le contrôle total sur la visibilité de votre profil et vos informations."
       }
     ]
+  },
+  "communities": {
+    "title": "Communautés"
+  },
+  "sortMode": {
+    "shuffle": "Aléatoire",
+    "oldest": "Ancien",
+    "recent": "Récent",
+    "top": "Top",
+    "bookmarked": "Favoris"
+  },
+  "time": {
+    "now": "maintenant",
+    "instant": "à l'instant",
+    "ago": "il y a",
+    "at": "à",
+    "year": "an",
+    "years": "ans",
+    "month": "mois",
+    "months": "mois",
+    "day": "jour",
+    "days": "jours",
+    "hour": "heure",
+    "hours": "heures",
+    "minute": "minute",
+    "minutes": "minutes",
+    "second": "seconde",
+    "seconds": "secondes",
+    "week": "semaine",
+    "weeks": "semaines"
+  },
+  "common": {
+    "share": "Partager",
+    "availableNow": "Disponible immédiatement"
   }
 }

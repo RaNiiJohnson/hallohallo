@@ -22,6 +22,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useTimeTranslations } from "@/hooks/use-time-translations";
 
 type Community = {
   _id: Id<"communities">;
@@ -48,6 +49,8 @@ function ChatWindow({
   const markAsRead = useMutation(api.messages.markAsRead);
   const me = useQuery(api.communities.getMe);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const timeT = useTimeTranslations();
 
   const { results, loadMore, status } = usePaginatedQuery(
     api.messages.getMessages,
@@ -145,7 +148,7 @@ function ChatWindow({
                 {msg.content}
               </div>
               <span className="text-xs text-muted-foreground mt-0.5 mx-1">
-                {getRelativeTime(msg._creationTime)}
+                {getRelativeTime(msg._creationTime, timeT)}
               </span>
             </div>
           );

@@ -156,5 +156,39 @@
         "answer": "Protecting your data is our priority. We comply with European GDPR and never share your personal information with third parties without your consent. You retain full control over the visibility of your profile and your information."
       }
     ]
+  },
+  "communities": {
+    "title": "Communities"
+  },
+  "sortMode": {
+    "shuffle": "Random",
+    "oldest": "Oldest",
+    "recent": "Recent",
+    "top": "Top",
+    "bookmarked": "Bookmarked"
+  },
+  "time": {
+    "now": "just now",
+    "instant": "just now",
+    "ago": "ago",
+    "at": "at",
+    "year": "year",
+    "years": "years",
+    "month": "month",
+    "months": "months",
+    "day": "day",
+    "days": "days",
+    "hour": "hour",
+    "hours": "hours",
+    "minute": "minute",
+    "minutes": "minutes",
+    "second": "second",
+    "seconds": "seconds",
+    "week": "week",
+    "weeks": "weeks"
+  },
+  "common": {
+    "share": "Share",
+    "availableNow": "Available immediately"
   }
 }

@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import clsx from "clsx";
 import { useConvexAuth } from "convex/react";
 import { JobBookmarkButton } from "./JobBookmarkButton";
+import { useTimeTranslations } from "@/hooks/use-time-translations";
 
 export function JobList() {
   const { isAuthenticated } = useConvexAuth();
@@ -62,6 +63,8 @@ export function JobList() {
     },
     { initialNumItems: 5 },
   );
+
+  const timeT = useTimeTranslations();
 
   if (status === "LoadingFirstPage") {
     return <JobPageSkeleton />;
@@ -151,7 +154,7 @@ export function JobList() {
               {/* Date */}
               <div className="flex flex-col items-end gap-1">
                 <div className="text-xs text-muted-foreground whitespace-nowrap">
-                  {getRelativeTime(job._creationTime)}
+                  {getRelativeTime(job._creationTime, timeT)}
                 </div>
                 {isAuthenticated && (
                   <JobBookmarkButton

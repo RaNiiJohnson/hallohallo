@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { ImageUploadModal } from "./component/ImageUploadModal";
 import { notFound } from "next/navigation";
+import { useLocale } from "next-intl";
+import { formatMonthYear } from "@/lib/date";
 
 export default function UserClient({
   preloadedUser,
@@ -26,6 +28,8 @@ export default function UserClient({
 }) {
   const user = usePreloadedQuery(preloadedUser);
   const currentUser = useQuery(api.auth.getCurrentUser);
+
+  const locale = useLocale();
 
   // Modal states for image uploads - must be before early return
   const [profileImageModalOpen, setProfileImageModalOpen] = useState(false);
@@ -36,15 +40,6 @@ export default function UserClient({
   }
 
   const isOwnProfile = currentUser?.email === user.email;
-
-  // Format date helper
-  const formatDate = (timestamp: number | null | undefined) => {
-    if (!timestamp) return null;
-    return new Date(timestamp).toLocaleDateString("fr-FR", {
-      month: "long",
-      year: "numeric",
-    });
-  };
 
   return (
     <div className="lg:max-w-4xl mx-auto my-4 lg:space-y-4 sm:space-y-2 space-y-1.5 lg:px-0">
@@ -247,7 +242,7 @@ export default function UserClient({
                 </div>
                 <div>
                   <h3 className="font-medium">
-                    Depuis {formatDate(user.arrivalDate)}
+                    Depuis {formatMonthYear(user.arrivalDate, locale)}
                   </h3>
                   {user.company && (
                     <p className="text-sm text-muted-foreground">

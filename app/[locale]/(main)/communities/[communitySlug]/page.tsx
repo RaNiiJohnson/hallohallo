@@ -20,6 +20,7 @@ import { useParams } from "next/navigation";
 import { useQuery } from "convex-helpers/react/cache";
 import SkeletonCommunity from "./skeleton";
 import { ShareButton } from "@/components/ShareButton";
+import { useTimeTranslations } from "@/hooks/use-time-translations";
 
 export default function CommunityClient() {
   const { communitySlug } = useParams();
@@ -36,6 +37,8 @@ export default function CommunityClient() {
   const joinCommunity = useMutation(api.communities.joinCommunity);
   const leaveCommunity = useMutation(api.communities.leaveCommunity);
   const likePost = useMutation(api.posts.likes.likePost);
+
+  const timeT = useTimeTranslations();
 
   if (community === undefined) {
     return <SkeletonCommunity />;
@@ -168,7 +171,7 @@ export default function CommunityClient() {
                     <span className="text-primary hover:underline">
                       {post.authorName}
                     </span>{" "}
-                    • {getRelativeTime(post._creationTime)}
+                    • {getRelativeTime(post._creationTime, timeT)}
                   </p>
                   <h2 className="font-semibold text-foreground text-base leading-snug mb-1">
                     {post.title}

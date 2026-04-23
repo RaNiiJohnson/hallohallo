@@ -12,6 +12,7 @@ import { Id } from "@convex/_generated/dataModel";
 import { DeleteConfirmDialog } from "./deleteConfirmDialog";
 import { LikeButton } from "./likeButton";
 import { ReplyItem } from "./replyItem";
+import { useTimeTranslations } from "@/hooks/use-time-translations";
 
 export function CommentItem({
   comment,
@@ -54,6 +55,8 @@ export function CommentItem({
   const [editContent, setEditContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const timeT = useTimeTranslations();
 
   if (!comment) return null;
 
@@ -125,7 +128,7 @@ export function CommentItem({
         <span className="text-primary font-bold hover:underline cursor-pointer">
           {comment.authorName}
         </span>{" "}
-        • <span>{getRelativeTime(comment._creationTime)}</span>
+        • <span>{getRelativeTime(comment._creationTime, timeT)}</span>
       </p>
 
       {/* Content / Edit mode */}

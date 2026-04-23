@@ -60,7 +60,6 @@ export function ShareButton({
   const trigger = (
     <Button variant={variant} size={size} className={className}>
       <Share2 className="w-4 h-4" />
-      <span className="max-sm:hidden">Partager</span>
     </Button>
   );
 
@@ -74,7 +73,6 @@ export function ShareButton({
         onClick={() => navigator.share({ title: text, text, url: currentUrl })}
       >
         <Share2 className="w-4 h-4" />
-        <span className="max-sm:hidden">Partager</span>
       </Button>
     );
   }

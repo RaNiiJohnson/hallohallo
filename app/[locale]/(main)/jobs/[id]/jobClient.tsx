@@ -32,12 +32,17 @@ import { EditJobDialog } from "./_component/editJobDialog";
 import { Preloaded, usePreloadedQuery, useMutation } from "convex/react";
 import { LocationMap } from "@/lib/LocationMap";
 import { ShareButton } from "@/components/ShareButton";
+import { useTimeTranslations } from "@/hooks/use-time-translations";
+import { useLocale } from "next-intl";
 
 export function JobDetailsPage(props: {
   preloadedJob: Preloaded<typeof api.jobs.getJobWithContact>;
 }) {
   const user = useQuery(api.auth.getCurrentUser);
   const toggleBookmark = useMutation(api.bookmarks.toggleBookmark);
+
+  const timeT = useTimeTranslations();
+  const locale = useLocale();
 
   const jobOffer = usePreloadedQuery(props.preloadedJob);
 
@@ -97,7 +102,8 @@ export function JobDetailsPage(props: {
                   a
                 </>
               )}{" "}
-              publié cette offre {getRelativeTime(jobOffer._creationTime)}
+              publié cette offre{" "}
+              {getRelativeTime(jobOffer._creationTime, timeT)}
             </p>
 
             {/* Divider */}
@@ -196,7 +202,7 @@ export function JobDetailsPage(props: {
                       Date de publication
                     </p>
                     <p className="font-semibold">
-                      {formatDateLong(jobOffer._creationTime)}
+                      {formatDateLong(jobOffer._creationTime, locale)}
                     </p>
                   </div>
 
@@ -418,7 +424,7 @@ export function JobDetailsPage(props: {
                 <div className="flex items-center justify-between py-3">
                   <span className="text-sm text-muted-foreground">Publié</span>
                   <span className="font-semibold text-sm">
-                    {getRelativeTime(jobOffer._creationTime)}
+                    {getRelativeTime(jobOffer._creationTime, timeT)}
                   </span>
                 </div>
               </div>

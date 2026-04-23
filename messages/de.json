@@ -156,5 +156,39 @@
         "answer": "Der Schutz Ihrer Daten hat für uns oberste Priorität. Wir halten die europäische DSGVO ein und geben Ihre persönlichen Informationen niemals ohne Ihre Zustimmung an Dritte weiter. Sie behalten die vollständige Kontrolle über die Sichtbarkeit Ihres Profils und Ihrer Informationen."
       }
     ]
+  },
+  "communities": {
+    "title": "Gemeinschaften"
+  },
+  "sortMode": {
+    "shuffle": "Zufällig",
+    "oldest": "Älteste",
+    "recent": "Neueste",
+    "top": "Top",
+    "bookmarked": "Gespeicherte"
+  },
+  "time": {
+    "now": "gerade eben",
+    "instant": "gerade eben",
+    "ago": "vor",
+    "at": "um",
+    "year": "Jahr",
+    "years": "Jahren",
+    "month": "Monat",
+    "months": "Monaten",
+    "day": "Tag",
+    "days": "Tagen",
+    "hour": "Stunde",
+    "hours": "Stunden",
+    "minute": "Minute",
+    "minutes": "Minuten",
+    "second": "Sekunde",
+    "seconds": "Sekunden",
+    "week": "Woche",
+    "weeks": "Wochen"
+  },
+  "common": {
+    "share": "Teilen",
+    "availableNow": "Sofort verfügbar"
   }
 }

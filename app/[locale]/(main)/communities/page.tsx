@@ -6,9 +6,11 @@ import { CreateCommunityDialog } from "./_component/dialogs/createComDialog";
 import { useConvexAuth } from "convex/react";
 
 import ComList from "./_component/List/comList";
+import { useTranslations } from "next-intl";
 
 export default function Page() {
   const { isAuthenticated, isLoading } = useConvexAuth();
+  const t = useTranslations("communities");
 
   return (
     <div className="min-h-screen bg-background pb-12">
@@ -27,7 +29,7 @@ export default function Page() {
 
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 my-8">
               <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-bold">Communautés</h2>
+                <h2 className="text-2xl font-bold">{t("title")}</h2>
               </div>
               {isAuthenticated && !isLoading && <CreateCommunityDialog />}
             </div>

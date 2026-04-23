@@ -11,6 +11,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useWidget } from "@/components/WidgetContext";
+import { useTimeTranslations } from "@/hooks/use-time-translations";
 
 const notificationIcon: Record<string, string> = {
   new_comment: "💬",
@@ -25,6 +26,7 @@ const notificationIcon: Record<string, string> = {
 export function NotificationWidget() {
   const { isAuthenticated } = useConvexAuth();
   const { activeWidget, openWidget, closeWidget } = useWidget();
+  const timeT = useTimeTranslations();
 
   const isOpen = activeWidget === "notifications";
 
@@ -129,7 +131,7 @@ export function NotificationWidget() {
                         {notif.message}
                       </p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        {getRelativeTime(notif._creationTime)}
+                        {getRelativeTime(notif._creationTime, timeT)}
                       </p>
                     </div>
                     {!notif.read && (

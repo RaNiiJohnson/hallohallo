@@ -1,144 +1,96 @@
-export const formatDate = (date: Date | string | number) => {
-  const dateObj = date instanceof Date ? date : new Date(date);
-
-  const diff = new Date().getTime() - dateObj.getTime();
-  const diffInMinutes = Math.floor(diff / 1000 / 60);
-  const diffInHours = Math.floor(diffInMinutes / 60);
-  const diffInDays = Math.floor(diffInHours / 24);
-  const diffInMonths = Math.floor(diffInDays / 30);
-  const diffInYears = Math.floor(diffInMonths / 12);
-
-  if (diffInYears > 0) {
-    return `il y a ${diffInYears} an${diffInYears > 1 ? "s" : ""}`;
-  }
-  if (diffInMonths > 0) {
-    return `il y a ${diffInMonths} mois`;
-  }
-  if (diffInDays > 0) {
-    return `il y a ${diffInDays} jour${diffInDays > 1 ? "s" : ""}`;
-  }
-  if (diffInHours > 0) {
-    return `il y a ${diffInHours} heure${diffInHours > 1 ? "s" : ""}`;
-  }
-  if (diffInMinutes > 0) {
-    return `il y a ${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""}`;
-  }
-  return "maintenant";
-};
-export const formatProfilDate = (date: Date | string | number) => {
-  const dateObj = date instanceof Date ? date : new Date(date);
-
-  const diff = new Date().getTime() - dateObj.getTime();
-  const diffInMinutes = Math.floor(diff / 1000 / 60);
-  const diffInHours = Math.floor(diffInMinutes / 60);
-  const diffInDays = Math.floor(diffInHours / 24);
-  const diffInMonths = Math.floor(diffInDays / 30);
-  const diffInYears = Math.floor(diffInMonths / 12);
-
-  if (diffInYears > 0 && diffInYears < 2) {
-    return `${diffInYears} an`;
-  }
-  if (diffInYears > 1) {
-    return `${diffInYears} ans`;
-  }
-  if (diffInMonths > 0 && diffInMonths < 2) {
-    return `${diffInMonths} mois`;
-  }
-  if (diffInMonths > 1) {
-    return `${diffInMonths} mois`;
-  }
-  if (diffInDays > 0 && diffInDays < 2) {
-    return `${diffInDays} jour`;
-  }
-  if (diffInDays > 1) {
-    return `${diffInDays} jours`;
-  }
-  if (diffInHours > 0 && diffInHours < 2) {
-    return `${diffInHours} heure`;
-  }
-  if (diffInHours > 1) {
-    return `${diffInHours} heures`;
-  }
-  if (diffInMinutes > 0 && diffInMinutes < 2) {
-    return `${diffInMinutes} minute`;
-  }
-  if (diffInMinutes > 1) {
-    return `${diffInMinutes} minutes`;
-  }
-  return "maintenant";
+// Temps relatif : "il y a 2 jours", "2 days ago", "vor 2 Tagen"
+type TimeTranslations = {
+  now: string;
+  instant: string;
+  ago: string;
+  year: string;
+  years: string;
+  month: string;
+  months: string;
+  day: string;
+  days: string;
+  hour: string;
+  hours: string;
+  minute: string;
+  minutes: string;
+  second: string;
+  seconds: string;
+  week: string;
+  weeks: string;
 };
 
-export const getRelativeTime = (date: Date | string | number) => {
-  const now = new Date();
-  const diffInMs = now.getTime() - new Date(date).getTime();
+const plural = (n: number, singular: string, pluralStr: string) =>
+  n > 1 ? pluralStr : singular;
+
+const formatAgo = (
+  t: TimeTranslations,
+  n: number,
+  singular: string,
+  pluralStr: string,
+) => {
+  const unit = plural(n, singular, pluralStr);
+  if (t.ago === "vor") return `${t.ago} ${n} ${unit}`;
+  if (t.ago === "ago") return `${n} ${unit} ${t.ago}`;
+  return `${t.ago} ${n} ${unit}`;
+};
+
+export const getRelativeTime = (
+  date: Date | string | number,
+  t: TimeTranslations,
+) => {
+  const diffInMs = Date.now() - new Date(date).getTime();
   const diffInSeconds = Math.floor(diffInMs / 1000);
   const diffInMinutes = Math.floor(diffInSeconds / 60);
   const diffInHours = Math.floor(diffInMinutes / 60);
   const diffInDays = Math.floor(diffInHours / 24);
 
-  if (diffInSeconds < 30) {
-    return "à l'instant";
-  }
-  if (diffInSeconds < 60) {
-    return `il y a ${diffInSeconds} secondes`;
-  }
-  if (diffInMinutes < 60) {
-    return `il y a ${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""}`;
-  }
-  if (diffInHours < 24) {
-    return `il y a ${diffInHours} heure${diffInHours > 1 ? "s" : ""}`;
-  }
-  if (diffInDays < 7) {
-    return `il y a ${diffInDays} jour${diffInDays > 1 ? "s" : ""}`;
-  }
+  if (diffInSeconds < 30) return t.instant;
+  if (diffInSeconds < 60)
+    return formatAgo(t, diffInSeconds, t.second, t.seconds);
+  if (diffInMinutes < 60)
+    return formatAgo(t, diffInMinutes, t.minute, t.minutes);
+  if (diffInHours < 24) return formatAgo(t, diffInHours, t.hour, t.hours);
+  if (diffInDays < 7) return formatAgo(t, diffInDays, t.day, t.days);
   if (diffInDays < 30) {
     const weeks = Math.floor(diffInDays / 7);
-    return `il y a ${weeks} semaine${weeks > 1 ? "s" : ""}`;
+    return formatAgo(t, weeks, t.week, t.weeks);
   }
   const months = Math.floor(diffInDays / 30);
-  if (months < 12) {
-    return `il y a ${months} mois`;
-  }
+  if (months < 12) return formatAgo(t, months, t.month, t.months);
   const years = Math.floor(months / 12);
-  return `il y a ${years} an${years > 1 ? "s" : ""}`;
+  return formatAgo(t, years, t.year, t.years);
 };
 
-export const dateParser = (num: Date | string | number) => {
-  let timestamp: number;
-
-  if (num instanceof Date) {
-    // Si num est de type Date, pas besoin de le parser
-    timestamp = num.getTime();
-  } else {
-    // Si num est de type string, le parser
-    timestamp = Date.parse(num.toString());
-  }
-
-  const options: Intl.DateTimeFormatOptions = {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour12: false,
-  };
-
-  const date = new Date(timestamp).toLocaleDateString("fr-FR", options);
-
-  return (
-    date.toString().split(",", 2).join(",") +
-    " " +
-    "à" +
-    " " +
-    date.toString().split(",").slice(2)
-  );
-};
-
-export const formatDateLong = (date: Date | string | number) => {
-  return new Date(date).toLocaleDateString("fr-FR", {
+// Date longue : "12 janvier 2026", "January 12, 2026", "12. Januar 2026"
+export const formatDateLong = (date: Date | string | number, locale: string) =>
+  new Date(date).toLocaleDateString(locale, {
     year: "numeric",
     month: "long",
     day: "numeric",
+  });
+
+// Date avec jour + mois + année — pour les offres d'emploi (fallback = availableNow)
+export const formatDateWithFallback = (
+  date: number | undefined,
+  locale: string,
+  fallback: string,
+) => {
+  if (!date) return fallback;
+  return new Intl.DateTimeFormat(locale, {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(date));
+};
+
+// Date mois + année seulement : "janvier 2026"
+export const formatMonthYear = (
+  timestamp: number | null | undefined,
+  locale: string,
+) => {
+  if (!timestamp) return null;
+  return new Date(timestamp).toLocaleDateString(locale, {
+    month: "long",
+    year: "numeric",
   });
 };

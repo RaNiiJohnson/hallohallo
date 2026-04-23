@@ -24,6 +24,7 @@ import { DeleteConfirmDialog } from "../../_component/deleteConfirmDialog";
 import { LikeButton } from "../../_component/likeButton";
 import { CommentItem } from "../../_component/commentItem";
 import { ShareButton } from "@/components/ShareButton";
+import { useTimeTranslations } from "@/hooks/use-time-translations";
 
 export default function PostClient() {
   const { postSlug, communitySlug } = useParams();
@@ -47,6 +48,8 @@ export default function PostClient() {
   const [editPostContent, setEditPostContent] = useState("");
   const [isSavingPost, setIsSavingPost] = useState(false);
   const [isDeletingPost, setIsDeletingPost] = useState(false);
+
+  const timeT = useTimeTranslations();
 
   if (post === undefined) {
     return <SkeletonPost />;
@@ -151,7 +154,7 @@ export default function PostClient() {
             <span className="text-primary hover:underline cursor-pointer">
               {post.authorName}
             </span>{" "}
-            • {getRelativeTime(post._creationTime)}
+            • {getRelativeTime(post._creationTime, timeT)}
           </p>
 
           {isEditingPost ? (

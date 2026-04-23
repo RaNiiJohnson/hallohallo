@@ -25,6 +25,8 @@ import {
   listingTypeLabels,
 } from "../../_component/forms/listingForm";
 import { LocationMap } from "@/lib/LocationMap";
+import { useLocale, useTranslations } from "next-intl";
+import { formatDateWithFallback } from "@/lib/date";
 
 interface PropertyDetailsProps {
   property: ListingListDetails;
@@ -32,15 +34,8 @@ interface PropertyDetailsProps {
 
 export function PropertyDetails({ property }: PropertyDetailsProps) {
   const [showFullDescription, setShowFullDescription] = useState(false);
-
-  const formatDate = (date: number | undefined) => {
-    if (!date) return "Disponible immédiatement";
-    return new Intl.DateTimeFormat("fr-FR", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    }).format(new Date(date));
-  };
+  const locale = useLocale();
+  const t = useTranslations("common");
 
   return (
     <div className="space-y-8">
@@ -146,7 +141,13 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                 <div className="flex items-center gap-3">
                   <Calendar className="h-5 w-5 text-primary" />
                   <span className="font-medium">Disponible :</span>
-                  <span>{formatDate(property.availableFrom)}</span>
+                  <span>
+                    {formatDateWithFallback(
+                      property.availableFrom,
+                      locale,
+                      t("availableNow"),
+                    )}
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-3">
