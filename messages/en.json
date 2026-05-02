@@ -190,5 +190,114 @@
   "common": {
     "share": "Share",
     "availableNow": "Available immediately"
+  },
+  "jobs": {
+    "hero": {
+      "title": "Your future in Germany starts here",
+      "description": "Au pair, Training, Employment, Volunteering. Find job opportunities tailored to your profile and professional ambitions."
+    },
+    "title": "Opportunities",
+    "cta": {
+      "title": "Do you have an opportunity to share?",
+      "description": "Join hundreds of companies and recruiters who trust our platform to find their future talent."
+    },
+    "publish": "Post a listing",
+    "signIn": "Sign up to publish",
+    "list": {
+      "emptyTitle": "No offers found",
+      "emptyDesc": "Try changing your search criteria or remove some filters",
+      "loadMore": "See more offers",
+      "loading": "Loading...",
+      "allLoaded": "All offers have been loaded"
+    },
+    "filters": {
+      "search": "Search ...",
+      "title": "Filters",
+      "clearAll": "Clear all",
+      "contractType": "Contract type",
+      "allContracts": "All contracts",
+      "allTypes": "All",
+      "bookmarked": "Bookmarked"
+    },
+    "form": {
+      "steps": {
+        "basicInfo": "Basic info",
+        "jobDetails": "Job details",
+        "description": "Description & contact",
+        "extraCriteria": "Extra criteria"
+      },
+      "labels": {
+        "title": "Offer title *",
+        "company": "Company *",
+        "jobType": "Job type *",
+        "contractType": "Contract type *",
+        "city": "City / Location *",
+        "mapPosition": "Map position (optional)",
+        "mapDesc": "Click on the map to pinpoint the exact location of the role. The city will update automatically.",
+        "startDate": "Start date *",
+        "salary": "Salary *",
+        "period": "Period *",
+        "duration": "Duration *",
+        "description": "Description *",
+        "descHint": "Describe the position, missions, and required skills",
+        "certificates": "Required certificates",
+        "certDesc": "Add up to 5 required certificates for this role (optional)."
+      },
+      "placeholders": {
+        "title": "Ex: React Frontend Developer",
+        "company": "Company name",
+        "selectType": "Select type",
+        "selectContract": "Select contract",
+        "city": "Ex: Königstein im Taunus, Hesse",
+        "selectDate": "Select a date",
+        "amount": "Amount",
+        "duration": "Ex: 6 months, 2 years, Open-ended",
+        "description": "Describe the position, missions, required skills...",
+        "cert": "Ex: Driving license B, German B2...",
+        "period": "Period"
+      },
+      "actions": {
+        "addCert": "Add certificate",
+        "prev": "Previous",
+        "next": "Next",
+        "publishing": "Publishing...",
+        "publish": "Publish offer"
+      },
+      "messages": {
+        "success": "Offer created successfully",
+        "error": "Error creating offer",
+        "chars": "characters"
+      }
+    },
+    "details": {
+      "youPosted": "You posted this offer",
+      "postedBy": "posted this offer",
+      "anonymous": "Anonymous",
+      "apply": "Apply",
+      "overview": "Offer overview",
+      "publishedAt": "Published on",
+      "jobType": "Job type",
+      "salary": "Salary",
+      "duration": "Duration",
+      "location": "Location",
+      "contract": "Contract type",
+      "startDate": "Start date",
+      "description": "Job description",
+      "certificates": "Required certificates",
+      "howToApply": "How to apply",
+      "interested": "Interested in this position? Send your application to the contact below.",
+      "contact": "Contact",
+      "companyInfo": "Company information",
+      "companyName": "Company name",
+      "quickSummary": "Quick summary",
+      "published": "Published",
+      "readyToApply": "Ready to apply?",
+      "dontMiss": "Don't miss this opportunity. Apply now!",
+      "applyNow": "Apply now",
+      "backToList": "Back to offers",
+      "breadcrumb": "Opportunities",
+      "you": "You",
+      "have": "have"
+    }
   }
 }

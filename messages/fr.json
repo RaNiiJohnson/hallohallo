@@ -190,5 +190,114 @@
   "common": {
     "share": "Partager",
     "availableNow": "Disponible immédiatement"
+  },
+  "jobs": {
+    "hero": {
+      "title": "Votre avenir en Allemagne commence ici",
+      "description": "Au pair, Formation, Emploi, Volontariat. Trouvez des opportunités d'emploi adaptées à votre profil et vos ambitions professionnelles."
+    },
+    "title": "Opportunités",
+    "cta": {
+      "title": "Vous avez une opportunité à partager ?",
+      "description": "Rejoignez des centaines d'entreprises et recruteurs qui font confiance à notre plateforme pour trouver leurs futurs talents."
+    },
+    "publish": "Publier une offre",
+    "signIn": "S'inscrire pour publier",
+    "list": {
+      "emptyTitle": "Aucune offre trouvée",
+      "emptyDesc": "Essayez de modifier vos critères de recherche ou supprimez certains filtres",
+      "loadMore": "Voir plus d'offres",
+      "loading": "Chargement...",
+      "allLoaded": "Toutes les offres ont été chargées"
+    },
+    "filters": {
+      "search": "Rechercher ...",
+      "title": "Filtres",
+      "clearAll": "Effacer tout",
+      "contractType": "Type de contrat",
+      "allContracts": "Tous les contrats",
+      "allTypes": "Tous",
+      "bookmarked": "Favoris"
+    },
+    "form": {
+      "steps": {
+        "basicInfo": "Informations de base",
+        "jobDetails": "Détails du poste",
+        "description": "Description et contact",
+        "extraCriteria": "Critères supplémentaires"
+      },
+      "labels": {
+        "title": "Titre de l'offre *",
+        "company": "Entreprise *",
+        "jobType": "Type d'offre *",
+        "contractType": "Type de contrat *",
+        "city": "Ville / Localité *",
+        "mapPosition": "Position sur la carte (optionnel)",
+        "mapDesc": "Cliquez sur la carte pour indiquer la position exacte du poste. La ville sera mise à jour automatiquement.",
+        "startDate": "Date de début *",
+        "salary": "Salaire *",
+        "period": "Période *",
+        "duration": "Durée *",
+        "description": "Description *",
+        "descHint": "Décrivez le poste, les missions et les compétences requises",
+        "certificates": "Certificats requis",
+        "certDesc": "Ajoutez jusqu'à 5 certificats requis pour ce poste (optionnel)."
+      },
+      "placeholders": {
+        "title": "Ex: Développeur Frontend React",
+        "company": "Nom de l'entreprise",
+        "selectType": "Sélectionnez le type",
+        "selectContract": "Sélectionnez le contrat",
+        "city": "Ex: Königstein im Taunus, Hesse",
+        "selectDate": "Sélectionner une date",
+        "amount": "Montant",
+        "duration": "Ex: 6 mois, 2 ans, Indéterminée",
+        "description": "Décrivez le poste, les missions, les compétences requises...",
+        "cert": "Ex: Permis B, Allemand B2...",
+        "period": "Période"
+      },
+      "actions": {
+        "addCert": "Ajouter un certificat",
+        "prev": "Précédent",
+        "next": "Suivant",
+        "publishing": "Publication...",
+        "publish": "Publier l'offre"
+      },
+      "messages": {
+        "success": "Offre créée avec succès",
+        "error": "Erreur lors de la création de l'offre",
+        "chars": "caractères"
+      }
+    },
+    "details": {
+      "youPosted": "Vous avez publié cette offre",
+      "postedBy": "a publié cette offre",
+      "anonymous": "Anonyme",
+      "apply": "Postuler",
+      "overview": "Aperçu de l'offre",
+      "publishedAt": "Date de publication",
+      "jobType": "Type d'emploi",
+      "salary": "Salaire",
+      "duration": "Durée",
+      "location": "Localisation",
+      "contract": "Type de contrat",
+      "startDate": "Date de début",
+      "description": "Description du poste",
+      "certificates": "Certificats requis",
+      "howToApply": "Comment postuler",
+      "interested": "Intéressé par ce poste ? Envoyez votre candidature au contact ci-dessous.",
+      "contact": "Contact",
+      "companyInfo": "Informations sur l'entreprise",
+      "companyName": "Nom de l'entreprise",
+      "quickSummary": "Résumé rapide",
+      "published": "Publié",
+      "readyToApply": "Prêt à postuler ?",
+      "dontMiss": "Ne manquez pas cette opportunité. Postulez maintenant !",
+      "applyNow": "Postuler maintenant",
+      "backToList": "Retour aux offres",
+      "breadcrumb": "Opportunités",
+      "you": "Vous",
+      "have": "avez"
+    }
   }
 }

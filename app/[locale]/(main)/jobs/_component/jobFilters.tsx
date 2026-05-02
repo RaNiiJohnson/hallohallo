@@ -24,6 +24,7 @@ import {
 import { useQueryStates, parseAsString } from "nuqs";
 import { useEffect, useState, useTransition } from "react";
 import { useDebounce } from "use-debounce";
+import { useTranslations } from "next-intl";
 
 import {
   jobTypeValues,
@@ -43,6 +44,7 @@ const CONTRACT_TYPES = contractTypeValues.map((value) => ({
 }));
 
 export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
+  const t = useTranslations("jobs");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, startTransition] = useTransition();
 
@@ -86,7 +88,7 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
         <div className="flex gap-4">
           <InputGroup>
             <InputGroupInput
-              placeholder="Rechercher ..."
+              placeholder={t("filters.search")}
               className="pl-10"
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
@@ -99,13 +101,13 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
                 <PopoverTrigger asChild>
                   <InputGroupButton variant="outline">
                     <Filter className="h-4 w-4" />
-                    <span className="hidden sm:inline">Filtres</span>
+                    <span className="hidden sm:inline">{t("filters.title")}</span>
                   </InputGroupButton>
                 </PopoverTrigger>
                 <PopoverContent className="w-[400px] p-4" align="end">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-medium">Filtres</h3>
+                      <h3 className="font-medium">{t("filters.title")}</h3>
                       <Button
                         onClick={clearAll}
                         variant="ghost"
@@ -113,14 +115,14 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
                         className="text-muted-foreground hover:text-foreground h-auto p-0"
                       >
                         <X className="h-4 w-4 mr-1" />
-                        Effacer tout
+                        {t("filters.clearAll")}
                       </Button>
                     </div>
 
                     <div className="space-y-4">
                       <div>
                         <label className="text-sm font-medium mb-2 block">
-                          Type de contrat
+                          {t("filters.contractType")}
                         </label>
                         <Select
                           value={filters.contract}
@@ -129,11 +131,11 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
                           }
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Tous les contrats" />
+                            <SelectValue placeholder={t("filters.allContracts")} />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="all">
-                              Tous les contrats
+                              {t("filters.allContracts")}
                             </SelectItem>
                             {CONTRACT_TYPES.map((type) => (
                               <SelectItem key={type.value} value={type.value}>
@@ -151,7 +153,7 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
                           className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
                           onClick={() => setFilters({ type: "all" })}
                         >
-                          Tous
+                          {t("filters.allTypes")}
                         </Badge>
                         {JOB_TYPES.map((type) => (
                           <Badge
@@ -184,7 +186,7 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
                               })
                             }
                           >
-                            Favoris
+                            {t("filters.bookmarked")}
                           </Badge>
                         )}
                       </div>
@@ -203,7 +205,7 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
             className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
             onClick={() => setFilters({ type: "all" })}
           >
-            Tous
+            {t("filters.allTypes")}
           </Badge>
           {JOB_TYPES.map((type) => (
             <Badge
@@ -228,7 +230,7 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
                 })
               }
             >
-              Favoris
+              {t("filters.bookmarked")}
             </Badge>
           )}
         </div>

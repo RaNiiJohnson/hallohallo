@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useFieldArray, useForm, FieldPath } from "react-hook-form";
 import * as z from "zod";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 import {
   Field,
@@ -139,6 +140,7 @@ interface JobOfferFormProps {
 }
 
 export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
+  const t = useTranslations("jobs");
   const createJob = useMutation(api.jobs.createJob);
   const [currentStep, setCurrentStep] = useState(1);
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -169,10 +171,10 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
   const progress = (currentStep / totalSteps) * 100;
 
   const stepTitles = [
-    "Informations de base",
-    "Détails du poste",
-    "Description et contact",
-    "Critères supplémentaires",
+    t("form.steps.basicInfo"),
+    t("form.steps.jobDetails"),
+    t("form.steps.description"),
+    t("form.steps.extraCriteria"),
   ];
 
   const nextStep = async () => {
@@ -231,11 +233,11 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
         salary: Number(data.salary),
         salaryPeriod: data.salaryPeriod,
       });
-      toast.success("Offre créée avec succès");
+      toast.success(t("form.messages.success"));
       form.reset();
       onSuccess?.();
     } catch {
-      toast.success("Erreur lors de la création de l'offre");
+      toast.error(t("form.messages.error"));
     }
   };
 
@@ -272,13 +274,13 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="job-title">
-                  Titre de l&apos;offre *
+                  {t("form.labels.title")}
                 </FieldLabel>
                 <Input
                   {...field}
                   id="job-title"
                   aria-invalid={fieldState.invalid}
-                  placeholder="Ex: Développeur Frontend React"
+                  placeholder={t("form.placeholders.title")}
                   autoComplete="off"
                 />
                 {fieldState.invalid && (
@@ -293,12 +295,12 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="job-company">Entreprise *</FieldLabel>
+                <FieldLabel htmlFor="job-company">{t("form.labels.company")}</FieldLabel>
                 <Input
                   {...field}
                   id="job-company"
                   aria-invalid={fieldState.invalid}
-                  placeholder="Nom de l'entreprise"
+                  placeholder={t("form.placeholders.company")}
                   autoComplete="off"
                 />
                 {fieldState.invalid && (
@@ -313,13 +315,13 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="job-type">Type d&apos;offre *</FieldLabel>
+                <FieldLabel htmlFor="job-type">{t("form.labels.jobType")}</FieldLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger
                     id="job-type"
                     aria-invalid={fieldState.invalid}
                   >
-                    <SelectValue placeholder="Sélectionnez le type" />
+                    <SelectValue placeholder={t("form.placeholders.selectType")} />
                   </SelectTrigger>
                   <SelectContent>
                     {jobTypeValues.map((type) => (
@@ -347,14 +349,14 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="job-contract">
-                  Type de contrat *
+                  {t("form.labels.contractType")}
                 </FieldLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger
                     id="job-contract"
                     aria-invalid={fieldState.invalid}
                   >
-                    <SelectValue placeholder="Sélectionnez le contrat" />
+                    <SelectValue placeholder={t("form.placeholders.selectContract")} />
                   </SelectTrigger>
                   <SelectContent>
                     {contractTypeValues.map((contract) => (
@@ -376,12 +378,12 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="job-city">Ville / Localité *</FieldLabel>
+                <FieldLabel htmlFor="job-city">{t("form.labels.city")}</FieldLabel>
                 <Input
                   {...field}
                   id="job-city"
                   aria-invalid={fieldState.invalid}
-                  placeholder="Ex: Königstein im Taunus, Hesse"
+                  placeholder={t("form.placeholders.city")}
                   autoComplete="off"
                 />
                 {fieldState.invalid && (
@@ -397,10 +399,9 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             control={form.control}
             render={({ field }) => (
               <Field>
-                <FieldLabel>Position sur la carte (optionnel)</FieldLabel>
+                <FieldLabel>{t("form.labels.mapPosition")}</FieldLabel>
                 <FieldDescription>
-                  Cliquez sur la carte pour indiquer la position exacte du
-                  poste. La ville sera mise à jour automatiquement.
+                  {t("form.labels.mapDesc")}
                 </FieldDescription>
                 <LocationPicker
                   value={field.value}
@@ -422,7 +423,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
               return (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="job-start-date">
-                    Date de début *
+                    {t("form.labels.startDate")}
                   </FieldLabel>
                   <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                     <PopoverTrigger asChild>
@@ -438,7 +439,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
                               month: "long",
                               year: "numeric",
                             })
-                          : "Sélectionner une date"}
+                          : t("form.placeholders.selectDate")}
                         <CalendarIcon className="h-4 w-4 opacity-50" />
                       </Button>
                     </PopoverTrigger>
@@ -474,14 +475,14 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field className="flex-1" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="job-salary">Salaire *</FieldLabel>
+                  <FieldLabel htmlFor="job-salary">{t("form.labels.salary")}</FieldLabel>
                   <Input
                     {...field}
                     id="job-salary"
                     type="number"
                     min="0"
                     aria-invalid={fieldState.invalid}
-                    placeholder="Montant"
+                    placeholder={t("form.placeholders.amount")}
                     autoComplete="off"
                   />
                   {fieldState.invalid && (
@@ -496,13 +497,13 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field className="w-[180px]" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="salary-period">Période *</FieldLabel>
+                  <FieldLabel htmlFor="salary-period">{t("form.labels.period")}</FieldLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger
                       id="salary-period"
                       aria-invalid={fieldState.invalid}
                     >
-                      <SelectValue placeholder="Période" />
+                      <SelectValue placeholder={t("form.placeholders.period")} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="month">€/mois</SelectItem>
@@ -523,12 +524,12 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="job-duration">Durée *</FieldLabel>
+                <FieldLabel htmlFor="job-duration">{t("form.labels.duration")}</FieldLabel>
                 <Input
                   {...field}
                   id="job-duration"
                   aria-invalid={fieldState.invalid}
-                  placeholder="Ex: 6 mois, 2 ans, Indéterminée"
+                  placeholder={t("form.placeholders.duration")}
                   autoComplete="off"
                 />
                 {fieldState.invalid && (
@@ -548,24 +549,24 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="job-description">Description *</FieldLabel>
+                <FieldLabel htmlFor="job-description">{t("form.labels.description")}</FieldLabel>
                 <InputGroup>
                   <InputGroupTextarea
                     {...field}
                     id="job-description"
-                    placeholder="Décrivez le poste, les missions, les compétences requises..."
+                    placeholder={t("form.placeholders.description")}
                     rows={6}
                     className="min-h-32 resize-none"
                     aria-invalid={fieldState.invalid}
                   />
                   <InputGroupAddon align="block-end">
                     <InputGroupText className="tabular-nums">
-                      {field.value.length} caractères
+                      {field.value.length} {t("form.messages.chars")}
                     </InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
                 <FieldDescription>
-                  Décrivez le poste, les missions et les compétences requises
+                  {t("form.labels.descHint")}
                 </FieldDescription>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
@@ -577,9 +578,9 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
 
         {/* Step 4 */}
         <FieldSet className={`gap-4 ${currentStep !== 4 ? "hidden" : ""}`}>
-          <FieldLegend variant="label">Certificats requis</FieldLegend>
+          <FieldLegend variant="label">{t("form.labels.certificates")}</FieldLegend>
           <FieldDescription>
-            Ajoutez jusqu&apos;à 5 certificats requis pour ce poste (optionnel).
+            {t("form.labels.certDesc")}
           </FieldDescription>
           <FieldGroup className="gap-4">
             {fields.map((field, index) => (
@@ -598,7 +599,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
                           {...controllerField}
                           id={`certificate-${index}`}
                           aria-invalid={fieldState.invalid}
-                          placeholder="Ex: Permis B, Allemand B2..."
+                          placeholder={t("form.placeholders.cert")}
                           type="text"
                           autoComplete="off"
                         />
@@ -629,7 +630,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
               onClick={() => append({ certificate: "" })}
               disabled={fields.length >= 5}
             >
-              Ajouter un certificat
+              {t("form.actions.addCert")}
             </Button>
           </FieldGroup>
           {form.formState.errors.certificates?.root && (
@@ -648,7 +649,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
           className="flex items-center gap-2"
         >
           <ChevronLeft className="h-4 w-4" />
-          Précédent
+          {t("form.actions.prev")}
         </Button>
 
         {currentStep < totalSteps ? (
@@ -657,7 +658,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             onClick={nextStep}
             className="flex items-center gap-2"
           >
-            Suivant
+            {t("form.actions.next")}
             <ChevronRight className="h-4 w-4" />
           </Button>
         ) : (
@@ -667,7 +668,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             disabled={form.formState.isSubmitting}
             className="flex items-center gap-2"
           >
-            {form.formState.isSubmitting ? "Publication..." : "Publier l'offre"}
+            {form.formState.isSubmitting ? t("form.actions.publishing") : t("form.actions.publish")}
           </Button>
         )}
       </Field>

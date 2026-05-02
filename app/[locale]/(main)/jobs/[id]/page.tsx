@@ -32,7 +32,7 @@ import { EditJobDialog } from "./_component/editJobDialog";
 import { LocationMap } from "@/lib/LocationMap";
 import { JobDetailsSkeleton } from "../_component/skeleton";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 export default function JobDetailsPage() {
   const { id } = useParams();
@@ -40,6 +40,7 @@ export default function JobDetailsPage() {
 
   const timeT = useTimeTranslations();
   const locale = useLocale();
+  const t = useTranslations("jobs");
 
   const jobOffer = useQuery(api.jobs.getJobWithContact, { slug: id as string });
 
@@ -64,7 +65,7 @@ export default function JobDetailsPage() {
               href="/jobs"
               className="hover:text-foreground transition-colors"
             >
-              Opportunités
+              {t("details.breadcrumb")}
             </Link>
             <span>
               <ChevronRight className="w-4 h-4" />
@@ -92,18 +93,17 @@ export default function JobDetailsPage() {
             <p className="text-sm sm:text-base text-muted-foreground mb-6">
               {isAuthor ? (
                 <>
-                  <span className="font-semibold text-foreground">Vous</span>{" "}
-                  avez
+                  <span className="font-semibold text-foreground">{t("details.you")}</span>{" "}
+                  {t("details.have")}
                 </>
               ) : (
                 <>
                   <span className="font-semibold text-foreground">
-                    {jobOffer.authorName || "Anonyme"}
+                    {jobOffer.authorName || t("details.anonymous")}
                   </span>{" "}
-                  a
                 </>
               )}{" "}
-              publié cette offre{" "}
+              {t("details.postedBy")}{" "}
               {getRelativeTime(jobOffer._creationTime, timeT)}
             </p>
 
@@ -150,7 +150,7 @@ export default function JobDetailsPage() {
                     >
                       <a href={`mailto:${jobOffer.contact}`}>
                         <Mail className="w-4 h-4" />
-                        Postuler
+                        {t("details.apply")}
                       </a>
                     </Button>
 
@@ -177,14 +177,14 @@ export default function JobDetailsPage() {
               <div className="p-4 border-b">
                 <h2 className="text-xl font-semibold flex items-center gap-2">
                   <FileText className="w-5 h-5" />
-                  Aperçu de l&apos;offre
+                  {t("details.overview")}
                 </h2>
               </div>
               <div className="p-4">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
-                      Date de publication
+                      {t("details.publishedAt")}
                     </p>
                     <p className="font-semibold">
                       {formatDateLong(jobOffer._creationTime, locale)}
@@ -193,7 +193,7 @@ export default function JobDetailsPage() {
 
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
-                      Type d&apos;emploi
+                      {t("details.jobType")}
                     </p>
                     <Badge variant="secondary" className="font-semibold">
                       {jobOffer.type}
@@ -201,7 +201,7 @@ export default function JobDetailsPage() {
                   </div>
 
                   <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Salaire</p>
+                    <p className="text-sm text-muted-foreground">{t("details.salary")}</p>
                     <SalaryDisplay salary={jobOffer.salary} />{" "}
                     <span className="text-primary text-xs font-normal">
                       /{salaryPeriodLabels[jobOffer.salaryPeriod]}
@@ -209,20 +209,20 @@ export default function JobDetailsPage() {
                   </div>
 
                   <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Durée</p>
+                    <p className="text-sm text-muted-foreground">{t("details.duration")}</p>
                     <p className="font-semibold">{jobOffer.duration}</p>
                   </div>
 
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
-                      Localisation
+                      {t("details.location")}
                     </p>
                     <p className="font-semibold">{jobOffer.city}</p>
                   </div>
 
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
-                      Type de contrat
+                      {t("details.contract")}
                     </p>
                     <Badge variant="outline" className="font-semibold">
                       {jobOffer.contractType}
@@ -231,7 +231,7 @@ export default function JobDetailsPage() {
 
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
-                      Date de début
+                      {t("details.startDate")}
                     </p>
                     <p className="font-semibold">{jobOffer.startDate}</p>
                   </div>
@@ -242,7 +242,7 @@ export default function JobDetailsPage() {
             {/* Job Description */}
             <div className="bg-card dark:bg-card/35 border rounded-lg shadow-sm">
               <div className="p-4 border-b">
-                <h2 className="text-xl font-semibold">Description du poste</h2>
+                <h2 className="text-xl font-semibold">{t("details.description")}</h2>
               </div>
               <div className="p-4">
                 <div className="prose prose-sm sm:prose-base max-w-none dark:prose-invert">
@@ -264,7 +264,7 @@ export default function JobDetailsPage() {
                 <div className="p-4 border-b">
                   <h2 className="text-xl font-semibold flex items-center gap-2">
                     <Award className="w-5 h-5" />
-                    Certificats requis
+                    {t("details.certificates")}
                   </h2>
                 </div>
                 <div className="p-4">
@@ -286,10 +286,9 @@ export default function JobDetailsPage() {
             {/* Contact Information */}
             <div className="bg-primary/5 border border-primary/20 rounded-lg shadow-sm">
               <div className="p-4 border-b border-primary/20">
-                <h2 className="text-xl font-semibold">Comment postuler</h2>
+                <h2 className="text-xl font-semibold">{t("details.howToApply")}</h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Intéressé par ce poste ? Envoyez votre candidature au contact
-                  ci-dessous.
+                  {t("details.interested")}
                 </p>
               </div>
               <div className="p-4">
@@ -299,7 +298,7 @@ export default function JobDetailsPage() {
                   </div>
                   <div className="space-y-1 flex-1 min-w-0">
                     <p className="text-xs text-muted-foreground uppercase tracking-wide">
-                      Contact
+                      {t("details.contact")}
                     </p>
                     <a
                       href={`mailto:${jobOffer.contact}`}
@@ -319,7 +318,7 @@ export default function JobDetailsPage() {
             <div className="bg-card dark:bg-card/35 border rounded-lg shadow-sm">
               <div className="p-4 border-b">
                 <h2 className="text-xl font-semibold">
-                  Informations sur l&apos;entreprise
+                  {t("details.companyInfo")}
                 </h2>
               </div>
               <div className="p-4">
@@ -329,7 +328,7 @@ export default function JobDetailsPage() {
                   </div>
                   <div className="space-y-1 flex-1 min-w-0">
                     <p className="font-semibold text-lg">
-                      {jobOffer.company || "Nom de l&apos;entreprise"}
+                      {jobOffer.company || t("details.companyName")}
                     </p>
                     <p className="text-sm text-muted-foreground">
                       {jobOffer.city}
@@ -366,7 +365,7 @@ export default function JobDetailsPage() {
             {/* Quick Summary */}
             <div className="bg-muted/30 border rounded-lg shadow-sm">
               <div className="p-4 border-b">
-                <h2 className="text-xl font-semibold">Résumé rapide</h2>
+                <h2 className="text-xl font-semibold">{t("details.quickSummary")}</h2>
               </div>
               <div className="p-4 space-y-3">
                 <div className="flex flex-wrap gap-2 mb-4">
@@ -392,14 +391,14 @@ export default function JobDetailsPage() {
                 </div>
 
                 <div className="flex items-center justify-between py-3 border-b">
-                  <span className="text-sm text-muted-foreground">Durée</span>
+                  <span className="text-sm text-muted-foreground">{t("details.duration")}</span>
                   <span className="font-semibold text-sm">
                     {jobOffer.duration}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between py-3 border-b">
-                  <span className="text-sm text-muted-foreground">Salaire</span>
+                  <span className="text-sm text-muted-foreground">{t("details.salary")}</span>
                   <SalaryDisplay salary={jobOffer.salary} />
                   <span className="text-primary text-xs font-normal">
                     /{salaryPeriodLabels[jobOffer.salaryPeriod]}
@@ -407,7 +406,7 @@ export default function JobDetailsPage() {
                 </div>
 
                 <div className="flex items-center justify-between py-3">
-                  <span className="text-sm text-muted-foreground">Publié</span>
+                  <span className="text-sm text-muted-foreground">{t("details.published")}</span>
                   <span className="font-semibold text-sm">
                     {getRelativeTime(jobOffer._creationTime, timeT)}
                   </span>
@@ -418,9 +417,9 @@ export default function JobDetailsPage() {
             {/* Apply CTA */}
             <div className="bg-primary text-primary-foreground border rounded-lg shadow-sm">
               <div className="p-4">
-                <h3 className="font-bold text-lg mb-2">Prêt à postuler ?</h3>
+                <h3 className="font-bold text-lg mb-2">{t("details.readyToApply")}</h3>
                 <p className="text-sm text-primary-foreground/90 mb-4">
-                  Ne manquez pas cette opportunité. Postulez maintenant !
+                  {t("details.dontMiss")}
                 </p>
                 <Button
                   variant="secondary"
@@ -428,7 +427,7 @@ export default function JobDetailsPage() {
                   size="lg"
                   asChild
                 >
-                  <a href={`mailto:${jobOffer.contact}`}>Postuler maintenant</a>
+                  <a href={`mailto:${jobOffer.contact}`}>{t("details.applyNow")}</a>
                 </Button>
               </div>
             </div>
@@ -440,7 +439,7 @@ export default function JobDetailsPage() {
           <Button variant="outline" asChild>
             <Link href="/jobs" className="gap-2">
               <ArrowLeft className="w-4 h-4" />
-              Retour aux offres
+              {t("details.backToList")}
             </Link>
           </Button>
         </div>

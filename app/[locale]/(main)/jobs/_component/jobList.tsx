@@ -20,9 +20,11 @@ import clsx from "clsx";
 import { useConvexAuth } from "convex/react";
 import { JobBookmarkButton } from "./JobBookmarkButton";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
+import { useTranslations } from "next-intl";
 
 export function JobList() {
   const { isAuthenticated } = useConvexAuth();
+  const t = useTranslations("jobs");
 
   const [filters] = useQueryStates({
     search: parseAsString.withDefault(""),
@@ -76,10 +78,9 @@ export function JobList() {
           <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
             <Briefcase className="h-8 w-8 text-muted-foreground" />
           </div>
-          <h3 className="text-xl font-semibold mb-2">Aucune offre trouvée</h3>
+          <h3 className="text-xl font-semibold mb-2">{t("list.emptyTitle")}</h3>
           <p className="text-muted-foreground mb-6">
-            Essayez de modifier vos critères de recherche ou supprimez certains
-            filtres
+            {t("list.emptyDesc")}
           </p>
         </div>
       </div>
@@ -90,7 +91,7 @@ export function JobList() {
     if (status === "CanLoadMore") {
       loadMore(1);
     } else {
-      toast.info("Toutes les offres ont été chargées");
+      toast.info(t("list.allLoaded"));
     }
   }
 
@@ -174,7 +175,7 @@ export function JobList() {
           "cursor-not-allowed opacity-50": status !== "CanLoadMore",
         })}
       >
-        {status === "LoadingMore" ? "Chargement..." : "Voir plus d'offres"}
+        {status === "LoadingMore" ? t("list.loading") : t("list.loadMore")}
       </Button>
     </div>
   );

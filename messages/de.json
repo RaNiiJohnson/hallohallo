@@ -190,5 +190,114 @@
   "common": {
     "share": "Teilen",
     "availableNow": "Sofort verfügbar"
+  },
+  "jobs": {
+    "hero": {
+      "title": "Ihre Zukunft in Deutschland beginnt hier",
+      "description": "Au-pair, Ausbildung, Beschäftigung, Freiwilligenarbeit. Finden Sie Stellenangebote, die zu Ihrem Profil und Ihren beruflichen Ambitionen passen."
+    },
+    "title": "Möglichkeiten",
+    "cta": {
+      "title": "Haben Sie eine Gelegenheit zu teilen?",
+      "description": "Schließen Sie sich Hunderten von Unternehmen und Recruitern an, die unserer Plattform vertrauen, um ihre zukünftigen Talente zu finden."
+    },
+    "publish": "Angebot veröffentlichen",
+    "signIn": "Registrieren zum Veröffentlichen",
+    "list": {
+      "emptyTitle": "Keine Angebote gefunden",
+      "emptyDesc": "Versuchen Sie, Ihre Suchkriterien zu ändern oder entfernen Sie einige Filter",
+      "loadMore": "Weitere Angebote ansehen",
+      "loading": "Wird geladen...",
+      "allLoaded": "Alle Angebote wurden geladen"
+    },
+    "filters": {
+      "search": "Suchen ...",
+      "title": "Filter",
+      "clearAll": "Alles löschen",
+      "contractType": "Vertragsart",
+      "allContracts": "Alle Verträge",
+      "allTypes": "Alle",
+      "bookmarked": "Gespeicherte"
+    },
+    "form": {
+      "steps": {
+        "basicInfo": "Grundlegende Informationen",
+        "jobDetails": "Stellendetails",
+        "description": "Beschreibung und Kontakt",
+        "extraCriteria": "Zusätzliche Kriterien"
+      },
+      "labels": {
+        "title": "Titel des Angebots *",
+        "company": "Unternehmen *",
+        "jobType": "Art des Angebots *",
+        "contractType": "Vertragsart *",
+        "city": "Stadt / Ort *",
+        "mapPosition": "Kartenposition (optional)",
+        "mapDesc": "Klicken Sie auf die Karte, um die genaue Position der Stelle anzugeben. Die Stadt wird automatisch aktualisiert.",
+        "startDate": "Startdatum *",
+        "salary": "Gehalt *",
+        "period": "Zeitraum *",
+        "duration": "Dauer *",
+        "description": "Beschreibung *",
+        "descHint": "Beschreiben Sie die Position, die Aufgaben und die erforderlichen Fähigkeiten",
+        "certificates": "Erforderliche Zertifikate",
+        "certDesc": "Fügen Sie bis zu 5 erforderliche Zertifikate für diese Stelle hinzu (optional)."
+      },
+      "placeholders": {
+        "title": "Z.B.: Frontend-Entwickler React",
+        "company": "Name des Unternehmens",
+        "selectType": "Wählen Sie den Typ",
+        "selectContract": "Vertrag auswählen",
+        "city": "Z.B.: Königstein im Taunus, Hessen",
+        "selectDate": "Datum auswählen",
+        "amount": "Betrag",
+        "duration": "Z.B.: 6 Monate, 2 Jahre, Unbefristet",
+        "description": "Beschreiben Sie die Position, die Aufgaben, die erforderlichen Fähigkeiten...",
+        "cert": "Z.B.: Führerschein B, Deutsch B2...",
+        "period": "Zeitraum"
+      },
+      "actions": {
+        "addCert": "Zertifikat hinzufügen",
+        "prev": "Zurück",
+        "next": "Weiter",
+        "publishing": "Veröffentlichen...",
+        "publish": "Angebot veröffentlichen"
+      },
+      "messages": {
+        "success": "Angebot erfolgreich erstellt",
+        "error": "Fehler beim Erstellen des Angebots",
+        "chars": "Zeichen"
+      }
+    },
+    "details": {
+      "youPosted": "Sie haben dieses Angebot veröffentlicht",
+      "postedBy": "hat dieses Angebot veröffentlicht",
+      "anonymous": "Anonym",
+      "apply": "Bewerben",
+      "overview": "Stellenübersicht",
+      "publishedAt": "Veröffentlichungsdatum",
+      "jobType": "Art der Beschäftigung",
+      "salary": "Gehalt",
+      "duration": "Dauer",
+      "location": "Ort",
+      "contract": "Vertragsart",
+      "startDate": "Startdatum",
+      "description": "Stellenbeschreibung",
+      "certificates": "Erforderliche Zertifikate",
+      "howToApply": "So bewerben Sie sich",
+      "interested": "Interessiert an dieser Stelle? Senden Sie Ihre Bewerbung an den untenstehenden Kontakt.",
+      "contact": "Kontakt",
+      "companyInfo": "Unternehmensinformationen",
+      "companyName": "Unternehmensname",
+      "quickSummary": "Kurze Zusammenfassung",
+      "published": "Veröffentlicht",
+      "readyToApply": "Bereit zur Bewerbung?",
+      "dontMiss": "Verpassen Sie diese Gelegenheit nicht. Bewerben Sie sich jetzt!",
+      "applyNow": "Jetzt bewerben",
+      "backToList": "Zurück zu den Angeboten",
+      "breadcrumb": "Möglichkeiten",
+      "you": "Sie",
+      "have": "haben"
+    }
   }
 }
