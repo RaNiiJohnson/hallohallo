@@ -10,14 +10,16 @@ import { Link } from "@/i18n/navigation";
 import { PublishListingDialog } from "./_component/dialogs/publishListingDialog";
 import { Suspense } from "react";
 import { ListingPageSkeleton } from "./_component/skeleton";
+import { useTranslations } from "next-intl";
 
 export default function ListingPageContent() {
   const { isAuthenticated } = useConvexAuth();
+  const t = useTranslations("listing");
   return (
     <div className="min-h-screen bg-background pb-12">
       <HeroSection
-        title="Immobilier"
-        subtitle="Trouvez votre logement ou partagez le vôtre avec la communauté"
+        title={t("hero.title")}
+        subtitle={t("hero.subtitle")}
         backgroundImage="/images/real-estate-bg.png"
       />
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -33,14 +35,14 @@ export default function ListingPageContent() {
 
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 my-8">
               <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-bold">Immobilier</h2>
+                <h2 className="text-2xl font-bold">{t("list.title")}</h2>
               </div>
               {isAuthenticated && (
                 <PublishListingDialog
                   trigger={
                     <Button className="flex items-center gap-2">
                       <Plus className="h-4 w-4" />
-                      <span>Publier une annonce</span>
+                      <span>{t("list.publish")}</span>
                     </Button>
                   }
                 />
@@ -51,20 +53,18 @@ export default function ListingPageContent() {
         </div>
         <div className="text-center flex flex-col items-center mt-16 p-8 bg-card border rounded-xl shadow-sm">
           <h3 className="text-2xl font-bold mb-4">
-            Vous avez un bien immobilier à proposer ?
+            {t("cta.title")}
           </h3>
           <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-            Rejoignez des centaines de propriétaires qui font confiance à notre
-            plateforme pour proposer leurs biens immobiliers et trouver leurs
-            futurs locataires.
+            {t("cta.desc")}
           </p>
           {isAuthenticated ? (
             <PublishListingDialog
-              trigger={<Button size="lg">Publier une annonce</Button>}
+              trigger={<Button size="lg">{t("cta.publish")}</Button>}
             />
           ) : (
             <Link href="/register" className={buttonVariants({ size: "lg" })}>
-              S&apos;inscrire pour publier
+              {t("cta.registerToPublish")}
             </Link>
           )}
         </div>

@@ -1,0 +1,190 @@
+{
+  "hero": {
+    "title": "Real Estate",
+    "subtitle": "Find your home or share yours with the community"
+  },
+  "list": {
+    "title": "Real Estate",
+    "publish": "Publish an ad",
+    "emptyTitle": "No listings found",
+    "emptyDesc": "Try modifying your search criteria or clear some filters",
+    "loadMore": "Load more",
+    "loading": "Loading...",
+    "allLoaded": "All listings have been loaded.",
+    "allLoadedToast": "All listings have been loaded",
+    "dialogDesc": "Real estate listing details",
+    "loadMoreBtn": "See more listings"
+  },
+  "cta": {
+    "title": "Do you have a property to offer?",
+    "desc": "Join hundreds of owners who trust our platform to offer their real estate and find their future tenants.",
+    "publish": "Publish an ad",
+    "registerToPublish": "Register to publish"
+  },
+  "filters": {
+    "search": "Search...",
+    "title": "Filters",
+    "clearAll": "Clear all",
+    "propertyType": "Property type",
+    "allTypes": "All types",
+    "listingMode": "Listing mode",
+    "allModes": "All modes",
+    "bookmarked": "Saved",
+    "advanced": "Advanced filters",
+    "all": "All",
+    "bedrooms": "Bedrooms",
+    "bedroomsAll": "All",
+    "bedrooms1": "1 bedroom",
+    "bedrooms2": "2 bedrooms",
+    "bedrooms3": "3 bedrooms",
+    "bedrooms4": "4+ bedrooms",
+    "minPrice": "Min price (€)",
+    "maxPrice": "Max price (€)"
+  },
+  "dialogs": {
+    "publish": {
+      "title": "Publish a listing",
+      "desc": "Fill out the form below to showcase your property."
+    },
+    "delete": {
+      "title": "Delete listing?",
+      "desc": "This action cannot be undone. The listing will be permanently deleted.",
+      "cancel": "Cancel",
+      "confirm": "Delete listing"
+    }
+  },
+  "form": {
+    "progress": {
+      "step": "Step {current} of {total}",
+      "completed": "{progress}% completed"
+    },
+    "steps": {
+      "type": "Property type",
+      "location": "Location",
+      "mainInfo": "Main info",
+      "conditions": "Conditions",
+      "media": "Media"
+    },
+    "labels": {
+      "title": "Listing title *",
+      "propertyType": "Property type *",
+      "listingMode": "Listing mode *",
+      "city": "City / Location *",
+      "mapPosition": "Map position (optional)",
+      "mapDesc": "Click on the map to pinpoint the property. The city will update automatically.",
+      "priceRent": "Monthly rent *",
+      "priceSale": "Sale price *",
+      "area": "Area *",
+      "bedrooms": "Bedrooms *",
+      "bathrooms": "Bathrooms *",
+      "floor": "Floor *",
+      "deposit": "Deposit",
+      "charges": "Additional charges",
+      "pets": "Pets allowed",
+      "availableFrom": "Available from",
+      "description": "Description *",
+      "descHint": "A good description increases your chances of finding a tenant quickly.",
+      "photos": "Property photos",
+      "photosDesc": "Add up to {maxFiles} photos (max {maxSize}MB each)",
+      "photosAdded": "Added photos ({count})"
+    },
+    "placeholders": {
+      "title": "E.g. Bright 3-bedroom apartment, downtown",
+      "selectType": "Select property type",
+      "selectMode": "Rent or sale",
+      "city": "E.g. Königstein im Taunus, Hesse",
+      "price": "E.g. 850",
+      "area": "E.g. 65",
+      "bedrooms": "E.g. 3",
+      "bathrooms": "E.g. 1",
+      "floor": "E.g. 2",
+      "deposit": "E.g. 1700",
+      "charges": "E.g. 150",
+      "selectDate": "Select a date",
+      "description": "Describe the property: general condition, amenities, brightness, proximity to transport..."
+    },
+    "validation": {
+      "titleReq": "Title is required",
+      "cityReq": "City is required",
+      "priceReq": "Price is required",
+      "areaReq": "Area is required",
+      "bedroomsReq": "Bedrooms required",
+      "bathroomsReq": "Bathrooms required",
+      "floorReq": "Floor is required",
+      "descMin": "Description must be at least 10 characters long"
+    },
+    "messages": {
+      "success": "Listing published successfully!",
+      "error": "Error while publishing the listing",
+      "imageUploadError": "Error uploading image",
+      "chars": "characters"
+    },
+    "actions": {
+      "addPhoto": "Add",
+      "prev": "Previous",
+      "next": "Next",
+      "publish": "Publish listing",
+      "publishing": "Publishing..."
+    }
+  },
+  "labels": {
+    "listingTypes": {
+      "room": "Room",
+      "apartment": "Apartment",
+      "house": "House",
+      "studio": "Studio",
+      "shared": "Shared living"
+    },
+    "listingModes": {
+      "rent": "For rent",
+      "sale": "For sale"
+    }
+  },
+  "details": {
+    "published": "Published on",
+    "updated": "Updated on",
+    "area": "Area",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "floor": "Floor {floor}",
+    "deposit": "Deposit",
+    "charges": "Charges",
+    "petsAllowed": "Allowed",
+    "petsNotAllowed": "Pets not allowed",
+    "availableFrom": "Available from",
+    "description": "Description",
+    "location": "Location",
+    "contact": "Contact owner",
+    "seeDetails": "See full details",
+    "backBtn": "Back to listings",
+    "bookmarkAdd": "Added to bookmarks",
+    "bookmarkRemove": "Removed from bookmarks",
+    "bookmarkError": "Error updating bookmark",
+    "bookmarkBtn": "Save",
+    "featuresTitle": "Features",
+    "level": "Level",
+    "available": "Available:",
+    "pets": "Pets:",
+    "petsDenied": "Not allowed",
+    "descTitle": "Description",
+    "seeMore": "See more",
+    "seeLess": "See less",
+    "locationTitle": "Location",
+    "extrasTitle": "Amenities",
+    "contactTitle": "Contact",
+    "anonymous": "Anonymous",
+    "ownerRole": "Owner",
+    "call": "Call",
+    "sendMessage": "Send message",
+    "contactOwner": "Contact owner",
+    "phone": "Phone:",
+    "email": "Email:"
+  },
+  "similar": {
+    "title": "Similar listings",
+    "seeAll": "See all listings",
+    "photos": "{count} photos",
+    "emptyMsg": "Not enough similar listings in this area?",
+    "emptyBtn": "Discover all listings"
+  }
+}

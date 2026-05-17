@@ -25,21 +25,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
 import { useDebounce } from "use-debounce";
+import { useTranslations } from "next-intl";
+import { listingTypeValues } from "./forms/listingForm";
 
-const LISTING_TYPES = [
-  { value: "apartment", label: "Appartement" },
-  { value: "house", label: "Maison" },
-  { value: "studio", label: "Studio" },
-  { value: "shared", label: "Colocation" },
-  { value: "room", label: "Chambre" },
-];
-
-const BEDROOMS_OPTIONS = [
-  { value: "1", label: "1 chambre" },
-  { value: "2", label: "2 chambres" },
-  { value: "3", label: "3 chambres" },
-  { value: "4", label: "4+ chambres" },
-];
+const BEDROOMS_OPTIONS = ["1", "2", "3", "4"] as const;
 
 export function RealEstatesFilters({
   isAuthenticated,
@@ -48,6 +37,7 @@ export function RealEstatesFilters({
 }) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, startTransition] = useTransition();
+  const t = useTranslations("listing");
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const [filters, setFilters] = useQueryStates({
@@ -123,7 +113,7 @@ export function RealEstatesFilters({
         <div className="flex gap-4">
           <InputGroup>
             <InputGroupInput
-              placeholder="Rechercher..."
+              placeholder={t("filters.search")}
               className="pl-10"
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
@@ -136,7 +126,7 @@ export function RealEstatesFilters({
                 <PopoverTrigger asChild>
                   <InputGroupButton variant="outline">
                     <Filter className="h-4 w-4" />
-                    <span className="hidden sm:inline">Filtres</span>
+                    <span className="hidden sm:inline">{t("filters.title")}</span>
 
                     <Badge
                       variant="secondary"
@@ -150,7 +140,7 @@ export function RealEstatesFilters({
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-center justify-between">
-                      <h3 className="font-medium">Filtres avancés</h3>
+                      <h3 className="font-medium">{t("filters.advanced")}</h3>
 
                       <Button
                         variant="ghost"
@@ -159,14 +149,14 @@ export function RealEstatesFilters({
                         onClick={clearAll}
                       >
                         <X className="h-4 w-4 mr-1" />
-                        Effacer tout
+                        {t("filters.clearAll")}
                       </Button>
                     </div>
 
                     <div className="space-y-4">
                       <div>
                         <label className="text-sm font-medium mb-2 block">
-                          Nombre de chambres
+                          {t("filters.bedrooms")}
                         </label>
                         <Select
                           value={filters.bedrooms.toString()}
@@ -175,16 +165,16 @@ export function RealEstatesFilters({
                           }}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Toutes" />
+                            <SelectValue placeholder={t("filters.bedroomsAll")} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value={"0"}>Toutes</SelectItem>
+                            <SelectItem value={"0"}>{t("filters.bedroomsAll")}</SelectItem>
                             {BEDROOMS_OPTIONS.map((option) => (
                               <SelectItem
-                                key={option.value}
-                                value={option.value}
+                                key={option}
+                                value={option}
                               >
-                                {option.label}
+                                {t(`filters.bedrooms${option}` as Parameters<typeof t>[0])}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -194,7 +184,7 @@ export function RealEstatesFilters({
                     <div className="grid grid-cols-2 gap-2">
                       <div>
                         <label className="text-sm font-medium mb-2 block">
-                          Prix min (€)
+                          {t("filters.minPrice")}
                         </label>
                         <Input
                           type="number"
@@ -205,7 +195,7 @@ export function RealEstatesFilters({
                       </div>
                       <div>
                         <label className="text-sm font-medium mb-2 block">
-                          Prix max (€)
+                          {t("filters.maxPrice")}
                         </label>
                         <Input
                           type="number"
@@ -221,18 +211,18 @@ export function RealEstatesFilters({
                         className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
                         onClick={() => setFilters({ type: "all" })}
                       >
-                        Tous
+                        {t("filters.all")}
                       </Badge>
-                      {LISTING_TYPES.map((type) => (
+                      {listingTypeValues.map((type) => (
                         <Badge
-                          key={type.value}
+                          key={type}
                           variant={
-                            filters.type === type.value ? "default" : "outline"
+                            filters.type === type ? "default" : "outline"
                           }
                           className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
-                          onClick={() => setFilters({ type: type.value })}
+                          onClick={() => setFilters({ type: type })}
                         >
-                          {type.label}
+                          {t(`labels.listingTypes.${type}` as Parameters<typeof t>[0])}
                         </Badge>
                       ))}
                       {isAuthenticated && (
@@ -252,7 +242,7 @@ export function RealEstatesFilters({
                             })
                           }
                         >
-                          Favoris
+                          {t("filters.bookmarked")}
                         </Badge>
                       )}
                     </div>
@@ -270,16 +260,16 @@ export function RealEstatesFilters({
             className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
             onClick={() => setFilters({ type: "all" })}
           >
-            Tous
+            {t("filters.all")}
           </Badge>
-          {LISTING_TYPES.map((type) => (
+          {listingTypeValues.map((type) => (
             <Badge
-              key={type.value}
-              variant={filters.type === type.value ? "default" : "outline"}
+              key={type}
+              variant={filters.type === type ? "default" : "outline"}
               className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
-              onClick={() => setFilters({ type: type.value })}
+              onClick={() => setFilters({ type: type })}
             >
-              {type.label}
+              {t(`labels.listingTypes.${type}` as Parameters<typeof t>[0])}
             </Badge>
           ))}
           {isAuthenticated && (
@@ -295,7 +285,7 @@ export function RealEstatesFilters({
                 })
               }
             >
-              Favoris
+              {t("filters.bookmarked")}
             </Badge>
           )}
         </div>

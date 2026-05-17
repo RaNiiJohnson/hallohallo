@@ -14,10 +14,12 @@ import { useMutation, useConvexAuth } from "convex/react";
 import { toast } from "sonner";
 import { Id } from "@convex/_generated/dataModel";
 import { api } from "@convex/_generated/api";
+import { useTranslations } from "next-intl";
 
 export default function PropertyPage() {
   const params = useParams<{ id: string }>();
   const { isAuthenticated } = useConvexAuth();
+  const t = useTranslations("listing");
   const toggleBookmark = useMutation(api.bookmarks.toggleBookmark);
 
   const property = useQuery(api.listings.getListingWithContact, {
@@ -39,7 +41,7 @@ export default function PropertyPage() {
         <Link href="/listing">
           <Button variant="ghost" className="flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
-            Retour aux annonces
+            {t("details.backBtn")}
           </Button>
         </Link>
 
@@ -59,18 +61,18 @@ export default function PropertyPage() {
                     });
                     toast.success(
                       property.isBookmarked
-                        ? "Retiré des favoris"
-                        : "Ajouté aux favoris",
+                        ? t("details.bookmarkRemove")
+                        : t("details.bookmarkAdd"),
                     );
                   } catch {
-                    toast.error("Erreur lors de la mise à jour du favori");
+                    toast.error(t("details.bookmarkError"));
                   }
                 }}
               >
                 <Heart
                   className={`h-4 w-4 ${property.isBookmarked ? "fill-current" : ""}`}
                 />
-                <span className="max-sm:hidden">Favoris</span>
+                <span className="max-sm:hidden">{t("details.bookmarkBtn")}</span>
               </Button>
             )}
           </ButtonGroup>

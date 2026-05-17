@@ -9,7 +9,7 @@ import { PriceDisplay } from "../../_component/price";
 import { useQuery } from "convex-helpers/react/cache";
 import { api } from "@convex/_generated/api";
 import { ListingListDetails } from "@/lib/convexTypes";
-import { listingTypeLabels } from "../../_component/forms/listingForm";
+import { useTranslations } from "next-intl";
 
 export function SimilarListings({
   slug,
@@ -18,6 +18,7 @@ export function SimilarListings({
   slug: string;
   property: ListingListDetails;
 }) {
+  const t = useTranslations("listing");
   const properties = useQuery(api.listings.getSimilarRealEstateListings, {
     excludeSlug: slug,
     city: property.city,
@@ -36,9 +37,9 @@ export function SimilarListings({
   return (
     <section className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Annonces similaires</h2>
+        <h2 className="text-2xl font-bold">{t("similar.title")}</h2>
         <Link href="listing">
-          <Button variant="outline">Voir toutes les annonces</Button>
+          <Button variant="outline">{t("similar.seeAll")}</Button>
         </Link>
       </div>
 
@@ -58,13 +59,13 @@ export function SimilarListings({
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <Badge className="absolute top-2 left-2 z-10">
-                {listingTypeLabels[list.propertyType]}
+                {t(`labels.listingTypes.${list.propertyType}` as Parameters<typeof t>[0])}
               </Badge>
 
               {/* Indicateur de photos multiples */}
               {list.images && list.images.length > 1 && (
                 <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-md z-10">
-                  {list.images.length} photos
+                  {t("similar.photos", { count: list.images.length })}
                 </div>
               )}
 
@@ -90,10 +91,10 @@ export function SimilarListings({
       {properties.length < 3 && (
         <div className="text-center py-8">
           <p className="text-muted-foreground mb-4">
-            Pas assez d&apos;annonces similaires dans cette zone ?
+            {t("similar.emptyMsg")}
           </p>
           <Link href="/listing">
-            <Button variant="outline">Découvrir toutes nos annonces</Button>
+            <Button variant="outline">{t("similar.emptyBtn")}</Button>
           </Link>
         </div>
       )}

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import * as z from "zod";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 import {
@@ -59,7 +60,7 @@ import { LocationPicker } from "@/lib/LocationPicker";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import imageCompression from "browser-image-compression";
 
-const listingTypeValues = [
+export const listingTypeValues = [
   "room",
   "apartment",
   "house",
@@ -67,62 +68,44 @@ const listingTypeValues = [
   "shared",
 ] as const;
 
-const listingModeValues = ["rent", "sale"] as const;
-
-export const listingTypeLabels: Record<
-  (typeof listingTypeValues)[number],
-  string
-> = {
-  room: "Chambre",
-  apartment: "Appartement",
-  house: "Maison",
-  studio: "Studio",
-  shared: "Colocation",
-};
-
-export const listingModeLabels: Record<
-  (typeof listingModeValues)[number],
-  string
-> = {
-  rent: "À louer",
-  sale: "À vendre",
-};
-
-const formSchema = z.object({
-  title: z.string().min(1, "Le titre est requis"),
-  propertyType: z.enum(listingTypeValues),
-  listingMode: z.enum(listingModeValues),
-  location: z
-    .object({
-      lat: z.number(),
-      lng: z.number(),
-    })
-    .optional(),
-  city: z.string().min(1, "La ville est requise"),
-  price: z.string().min(1, "Le prix est requis"),
-  charges: z.string().optional(),
-  deposit: z.string().optional(),
-  area: z.string().min(1, "La surface est requise"),
-  bathrooms: z.string().min(1, "Le nombre de salles de bain est requis"),
-  bedrooms: z.string().min(1, "Le nombre de chambres est requis"),
-  floor: z.string().min(1, "L'étage est requis"),
-  pets: z.boolean(),
-  images: z.array(z.object({ publicId: z.string(), secureUrl: z.string() })),
-  description: z
-    .string()
-    .min(10, "La description doit contenir au moins 10 caractères"),
-  extras: z.array(z.string()).optional(),
-  availableFrom: z.string().optional(),
-});
+export const listingModeValues = ["rent", "sale"] as const;
 
 interface ListingFormProps {
   onSuccess?: () => void;
 }
 
 export function ListingForm({ onSuccess }: ListingFormProps) {
+  const t = useTranslations("listing");
   const { upload } = useCloudinaryUpload(api.cloudinary.upload);
 
   const createListing = useMutation(api.listings.createListing);
+
+  const formSchema = z.object({
+    title: z.string().min(1, t("form.validation.titleReq")),
+    propertyType: z.enum(listingTypeValues),
+    listingMode: z.enum(listingModeValues),
+    location: z
+      .object({
+        lat: z.number(),
+        lng: z.number(),
+      })
+      .optional(),
+    city: z.string().min(1, t("form.validation.cityReq")),
+    price: z.string().min(1, t("form.validation.priceReq")),
+    charges: z.string().optional(),
+    deposit: z.string().optional(),
+    area: z.string().min(1, t("form.validation.areaReq")),
+    bathrooms: z.string().min(1, t("form.validation.bathroomsReq")),
+    bedrooms: z.string().min(1, t("form.validation.bedroomsReq")),
+    floor: z.string().min(1, t("form.validation.floorReq")),
+    pets: z.boolean(),
+    images: z.array(z.object({ publicId: z.string(), secureUrl: z.string() })),
+    description: z
+      .string()
+      .min(10, t("form.validation.descMin")),
+    extras: z.array(z.string()).optional(),
+    availableFrom: z.string().optional(),
+  });
 
   const [currentStep, setCurrentStep] = useState(1);
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -177,11 +160,11 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
   const progress = (currentStep / totalSteps) * 100;
 
   const stepTitles = [
-    "Type du bien",
-    "Localisation",
-    "Informations principales",
-    "Conditions",
-    "Contenu & médias",
+    t("form.steps.type"),
+    t("form.steps.location"),
+    t("form.steps.mainInfo"),
+    t("form.steps.conditions"),
+    t("form.steps.media"),
   ];
 
   const nextStep = async () => {
@@ -286,12 +269,12 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
         images,
       });
 
-      toast.success("Annonce publiée avec succès !");
+      toast.success(t("form.messages.success"));
       form.reset();
       setCurrentStep(1);
       onSuccess?.();
     } catch {
-      toast.error("Erreur lors de la publication de l'annonce");
+      toast.error(t("form.messages.error"));
     }
   }
 
@@ -304,9 +287,9 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
       <div className="space-y-2">
         <div className="flex justify-between text-sm text-muted-foreground">
           <span>
-            Étape {currentStep} sur {totalSteps}
+            {t("form.progress.step", { current: currentStep, total: totalSteps })}
           </span>
-          <span>{Math.round(progress)}% complété</span>
+          <span>{t("form.progress.completed", { progress: Math.round(progress) })}</span>
         </div>
         <Progress value={progress} className="w-full" />
         <h3 className="text-lg font-medium">{stepTitles[currentStep - 1]}</h3>
@@ -331,13 +314,13 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="listing-title">
-                  Titre de l&apos;annonce *
+                  {t("form.labels.title")}
                 </FieldLabel>
                 <Input
                   {...field}
                   id="listing-title"
                   aria-invalid={fieldState.invalid}
-                  placeholder="Ex: Appartement 3 pièces lumineux, centre-ville"
+                  placeholder={t("form.placeholders.title")}
                   autoComplete="off"
                 />
                 {fieldState.invalid && (
@@ -352,18 +335,18 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="propertyType">Type de bien *</FieldLabel>
+                <FieldLabel htmlFor="propertyType">{t("form.labels.propertyType")}</FieldLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger
                     id="propertyType"
                     aria-invalid={fieldState.invalid}
                   >
-                    <SelectValue placeholder="Sélectionnez le type de bien" />
+                    <SelectValue placeholder={t("form.placeholders.selectType")} />
                   </SelectTrigger>
                   <SelectContent>
                     {listingTypeValues.map((type) => (
                       <SelectItem key={type} value={type}>
-                        {listingTypeLabels[type]}
+                        {t(`labels.listingTypes.${type}` as Parameters<typeof t>[0])}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -381,19 +364,19 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="listingMode">
-                  Mode d&apos;annonce *
+                  {t("form.labels.listingMode")}
                 </FieldLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger
                     id="listingMode"
                     aria-invalid={fieldState.invalid}
                   >
-                    <SelectValue placeholder="Location ou vente" />
+                    <SelectValue placeholder={t("form.placeholders.selectMode")} />
                   </SelectTrigger>
                   <SelectContent>
                     {listingModeValues.map((mode) => (
                       <SelectItem key={mode} value={mode}>
-                        {listingModeLabels[mode]}
+                        {t(`labels.listingModes.${mode}` as Parameters<typeof t>[0])}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -415,12 +398,12 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="city">Ville / Localité *</FieldLabel>
+                <FieldLabel htmlFor="city">{t("form.labels.city")}</FieldLabel>
                 <Input
                   {...field}
                   id="city"
                   aria-invalid={fieldState.invalid}
-                  placeholder="Ex: Königstein im Taunus, Hesse"
+                  placeholder={t("form.placeholders.city")}
                   autoComplete="off"
                 />
                 {fieldState.invalid && (
@@ -436,10 +419,9 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             control={form.control}
             render={({ field }) => (
               <Field>
-                <FieldLabel>Position sur la carte (optionnel)</FieldLabel>
+                <FieldLabel>{t("form.labels.mapPosition")}</FieldLabel>
                 <FieldDescription>
-                  Cliquez sur la carte pour indiquer la position exacte du bien.
-                  La ville sera mise à jour automatiquement.
+                  {t("form.labels.mapDesc")}
                 </FieldDescription>
                 <LocationPicker
                   value={field.value}
@@ -462,8 +444,8 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="price">
                   {listingMode === "sale"
-                    ? "Prix de vente *"
-                    : "Loyer mensuel *"}
+                    ? t("form.labels.priceSale")
+                    : t("form.labels.priceRent")}
                 </FieldLabel>
                 <InputGroup>
                   <Input
@@ -472,7 +454,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                     type="number"
                     min="0"
                     aria-invalid={fieldState.invalid}
-                    placeholder="Ex: 850"
+                    placeholder={t("form.placeholders.price")}
                     autoComplete="off"
                   />
                   <InputGroupAddon align="inline-end">
@@ -491,7 +473,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="area">Surface *</FieldLabel>
+                <FieldLabel htmlFor="area">{t("form.labels.area")}</FieldLabel>
                 <InputGroup>
                   <Input
                     {...field}
@@ -499,7 +481,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                     type="number"
                     min="0"
                     aria-invalid={fieldState.invalid}
-                    placeholder="Ex: 65"
+                    placeholder={t("form.placeholders.area")}
                     autoComplete="off"
                   />
                   <InputGroupAddon align="inline-end">
@@ -519,14 +501,14 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="bedrooms">Chambres *</FieldLabel>
+                  <FieldLabel htmlFor="bedrooms">{t("form.labels.bedrooms")}</FieldLabel>
                   <Input
                     {...field}
                     id="bedrooms"
                     type="number"
                     min="0"
                     aria-invalid={fieldState.invalid}
-                    placeholder="Ex: 3"
+                    placeholder={t("form.placeholders.bedrooms")}
                     autoComplete="off"
                   />
                   {fieldState.invalid && (
@@ -541,14 +523,14 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="bathrooms">Sdb *</FieldLabel>
+                  <FieldLabel htmlFor="bathrooms">{t("form.labels.bathrooms")}</FieldLabel>
                   <Input
                     {...field}
                     id="bathrooms"
                     type="number"
                     min="0"
                     aria-invalid={fieldState.invalid}
-                    placeholder="Ex: 1"
+                    placeholder={t("form.placeholders.bathrooms")}
                     autoComplete="off"
                   />
                   {fieldState.invalid && (
@@ -563,14 +545,14 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="floor">Étage *</FieldLabel>
+                  <FieldLabel htmlFor="floor">{t("form.labels.floor")}</FieldLabel>
                   <Input
                     {...field}
                     id="floor"
                     type="number"
                     min="0"
                     aria-invalid={fieldState.invalid}
-                    placeholder="Ex: 2"
+                    placeholder={t("form.placeholders.floor")}
                     autoComplete="off"
                   />
                   {fieldState.invalid && (
@@ -591,7 +573,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="deposit">Caution</FieldLabel>
+                    <FieldLabel htmlFor="deposit">{t("form.labels.deposit")}</FieldLabel>
                     <InputGroup>
                       <Input
                         {...field}
@@ -599,7 +581,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                         type="number"
                         min="0"
                         aria-invalid={fieldState.invalid}
-                        placeholder="Ex: 1700"
+                        placeholder={t("form.placeholders.deposit")}
                         autoComplete="off"
                       />
                       <InputGroupAddon align="inline-end">
@@ -618,7 +600,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="charges">Charges</FieldLabel>
+                    <FieldLabel htmlFor="charges">{t("form.labels.charges")}</FieldLabel>
                     <InputGroup>
                       <Input
                         {...field}
@@ -626,7 +608,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                         type="number"
                         min="0"
                         aria-invalid={fieldState.invalid}
-                        placeholder="Ex: 150"
+                        placeholder={t("form.placeholders.charges")}
                         autoComplete="off"
                       />
                       <InputGroupAddon align="inline-end">
@@ -654,7 +636,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                     onCheckedChange={field.onChange}
                   />
                   <FieldLabel htmlFor="pets" className="cursor-pointer">
-                    Animaux de compagnie autorisés
+                    {t("form.labels.pets")}
                   </FieldLabel>
                 </div>
               </Field>
@@ -672,7 +654,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
               return (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="availableFrom">
-                    Disponible à partir du
+                    {t("form.labels.availableFrom")}
                   </FieldLabel>
                   <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                     <PopoverTrigger asChild>
@@ -688,7 +670,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                               month: "long",
                               year: "numeric",
                             })
-                          : "Sélectionner une date"}
+                          : t("form.placeholders.selectDate")}
                         <CalendarIcon className="h-4 w-4 opacity-50" />
                       </Button>
                     </PopoverTrigger>
@@ -729,26 +711,25 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="listing-description">
-                  Description *
+                  {t("form.labels.description")}
                 </FieldLabel>
                 <InputGroup>
                   <InputGroupTextarea
                     {...field}
                     id="listing-description"
-                    placeholder="Décrivez le bien : état général, équipements, luminosité, proximité transports et commerces…"
+                    placeholder={t("form.placeholders.description")}
                     rows={6}
                     className="min-h-32 resize-none"
                     aria-invalid={fieldState.invalid}
                   />
                   <InputGroupAddon align="block-end">
                     <InputGroupText className="tabular-nums">
-                      {field.value.length} caractères
+                      {field.value.length} {t("form.messages.chars")}
                     </InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
                 <FieldDescription>
-                  Une bonne description augmente vos chances de trouver un
-                  locataire rapidement
+                  {t("form.labels.descHint")}
                 </FieldDescription>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
@@ -931,7 +912,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
           className="flex items-center gap-2"
         >
           <ChevronLeft className="h-4 w-4" />
-          Précédent
+          {t("form.actions.prev")}
         </Button>
 
         {currentStep < totalSteps ? (
@@ -940,7 +921,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             onClick={nextStep}
             className="flex items-center gap-2"
           >
-            Suivant
+            {t("form.actions.next")}
             <ChevronRight className="h-4 w-4" />
           </Button>
         ) : (
@@ -951,8 +932,8 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             className="flex items-center gap-2"
           >
             {form.formState.isSubmitting
-              ? "Publication..."
-              : "Publier l'annonce"}
+              ? t("form.actions.publishing")
+              : t("form.actions.publish")}
           </Button>
         )}
       </Field>

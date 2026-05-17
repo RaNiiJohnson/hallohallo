@@ -12,12 +12,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { ListingForm } from "../forms/listingForm";
+import { useTranslations } from "next-intl";
 
 interface PublishListingDialogProps {
   trigger?: React.ReactNode;
 }
 
 export function PublishListingDialog({ trigger }: PublishListingDialogProps) {
+  const t = useTranslations("listing");
   const [open, setOpen] = useState(false);
 
   const handleSuccess = () => {
@@ -30,15 +32,15 @@ export function PublishListingDialog({ trigger }: PublishListingDialogProps) {
         {trigger || (
           <Button className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            <span>Publier une annonce</span>
+            <span>{t("list.publish")}</span>
           </Button>
         )}
       </DialogTrigger>
       <Activity mode={open ? "visible" : "hidden"}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Publier une annonce</DialogTitle>
-            <DialogDescription></DialogDescription>
+            <DialogTitle>{t("dialogs.publish.title")}</DialogTitle>
+            <DialogDescription>{t("dialogs.publish.desc")}</DialogDescription>
           </DialogHeader>
           <ListingForm onSuccess={handleSuccess} />
         </DialogContent>

@@ -24,9 +24,10 @@ import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import clsx from "clsx";
-import { listingTypeLabels } from "../forms/listingForm";
+import { useTranslations } from "next-intl";
 
 export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
+  const t = useTranslations("listing");
   const [filters] = useQueryStates({
     search: parseAsString.withDefault(""),
     type: parseAsString.withDefault(""),
@@ -114,10 +115,9 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
           <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
             <Briefcase className="h-8 w-8 text-muted-foreground" />
           </div>
-          <h3 className="text-xl font-semibold mb-2">Aucune annonce trouvée</h3>
+          <h3 className="text-xl font-semibold mb-2">{t("list.emptyTitle")}</h3>
           <p className="text-muted-foreground mb-6">
-            Essayez de modifier vos critères de recherche ou supprimez certains
-            filtres
+            {t("list.emptyDesc")}
           </p>
         </div>
       </div>
@@ -128,7 +128,7 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
     if (status === "CanLoadMore") {
       loadMore(3);
     } else {
-      toast.info("Toutes les offres ont été chargées");
+      toast.info(t("list.allLoadedToast"));
     }
   }
 
@@ -174,7 +174,7 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <Badge className="absolute top-2 left-2 z-10">
-                {listingTypeLabels[list.propertyType]}
+                {t(`labels.listingTypes.${list.propertyType}` as Parameters<typeof t>[0])}
               </Badge>
 
               {isAuthenticated && (
@@ -234,7 +234,7 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
           <DialogHeader>
             <DialogTitle>{dialogListing?.title}</DialogTitle>
             <DialogDescription>
-              Détails de l&apos;annonce immobilière
+              {t("list.dialogDesc")}
             </DialogDescription>
           </DialogHeader>
           {dialogListing && <ListingDetailsContent listing={dialogListing} />}
@@ -247,7 +247,7 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
           "cursor-not-allowed opacity-50": status !== "CanLoadMore",
         })}
       >
-        {status === "LoadingMore" ? "Chargement..." : "Voir plus d'annonces"}
+        {status === "LoadingMore" ? t("list.loading") : t("list.loadMoreBtn")}
       </Button>
     </div>
   );

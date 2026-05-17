@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { PriceDisplay } from "./price";
 import { ImageCarousel } from "./ImageCarousel";
 import { ListingListItem } from "@/lib/convexTypes";
+import { useTranslations } from "next-intl";
 
 export function ListingDetails({
   listing,
@@ -16,6 +17,8 @@ export function ListingDetails({
   onClose: () => void;
   showCloseButton?: boolean;
 }) {
+  const t = useTranslations("listing");
+
   return (
     <div className="bg-card border rounded-xl p-6 shadow-lg">
       {showCloseButton && (
@@ -43,7 +46,7 @@ export function ListingDetails({
         <Link href={`/listing/${listing.slug}`} className="block mt-4">
           <Button className="w-full flex items-center gap-2">
             <ExternalLink className="size-4" />
-            Voir tous les détails
+            {t("details.seeDetails")}
           </Button>
         </Link>
       </div>
@@ -57,6 +60,8 @@ export function ListingDetailsContent({
 }: {
   listing: ListingListItem;
 }) {
+  const t = useTranslations("listing");
+
   return (
     <div className="space-y-4">
       {/* Carrousel d'images */}
@@ -71,7 +76,7 @@ export function ListingDetailsContent({
         />
         {listing.deposit !== undefined && listing.listingMode === "rent" && (
           <div className="text-sm text-muted-foreground">
-            Caution : <PriceDisplay price={listing.deposit} />
+            {t("details.deposit")} : <PriceDisplay price={listing.deposit} />
           </div>
         )}
       </div>
@@ -86,7 +91,7 @@ export function ListingDetailsContent({
       <Link href={`/listing/${listing.slug}`} className="block mt-4">
         <Button className="w-full flex items-center gap-2">
           <ExternalLink className="size-4" />
-          Voir tous les détails
+          {t("details.seeDetails")}
         </Button>
       </Link>
     </div>

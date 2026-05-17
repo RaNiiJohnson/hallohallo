@@ -1,0 +1,190 @@
+{
+  "hero": {
+    "title": "Immobilier",
+    "subtitle": "Trouvez votre logement ou partagez le vôtre avec la communauté"
+  },
+  "list": {
+    "title": "Immobilier",
+    "publish": "Publier une annonce",
+    "emptyTitle": "Aucune annonce trouvée",
+    "emptyDesc": "Essayez de modifier vos critères de recherche ou supprimez certains filtres",
+    "loadMore": "Charger plus",
+    "loading": "Chargement...",
+    "allLoaded": "Toutes les annonces ont été chargées.",
+    "allLoadedToast": "Toutes les offres ont été chargées",
+    "dialogDesc": "Détails de l'annonce immobilière",
+    "loadMoreBtn": "Voir plus d'annonces"
+  },
+  "cta": {
+    "title": "Vous avez un bien immobilier à proposer ?",
+    "desc": "Rejoignez des centaines de propriétaires qui font confiance à notre plateforme pour proposer leurs biens immobiliers et trouver leurs futurs locataires.",
+    "publish": "Publier une annonce",
+    "registerToPublish": "S'inscrire pour publier"
+  },
+  "filters": {
+    "search": "Rechercher...",
+    "title": "Filtres",
+    "clearAll": "Effacer tout",
+    "propertyType": "Type de bien",
+    "allTypes": "Tous les types",
+    "listingMode": "Mode d'annonce",
+    "allModes": "Tous les modes",
+    "bookmarked": "Favoris",
+    "advanced": "Filtres avancés",
+    "all": "Tous",
+    "bedrooms": "Nombre de chambres",
+    "bedroomsAll": "Toutes",
+    "bedrooms1": "1 chambre",
+    "bedrooms2": "2 chambres",
+    "bedrooms3": "3 chambres",
+    "bedrooms4": "4+ chambres",
+    "minPrice": "Prix min (€)",
+    "maxPrice": "Prix max (€)"
+  },
+  "dialogs": {
+    "publish": {
+      "title": "Publier une annonce",
+      "desc": "Remplissez le formulaire ci-dessous pour proposer votre bien immobilier."
+    },
+    "delete": {
+      "title": "Supprimer l'annonce ?",
+      "desc": "Cette action est irréversible. L'annonce sera définitivement supprimée.",
+      "cancel": "Annuler",
+      "confirm": "Supprimer l'annonce"
+    }
+  },
+  "form": {
+    "progress": {
+      "step": "Étape {current} sur {total}",
+      "completed": "{progress}% complété"
+    },
+    "steps": {
+      "type": "Type du bien",
+      "location": "Localisation",
+      "mainInfo": "Informations principales",
+      "conditions": "Conditions",
+      "media": "Contenu & médias"
+    },
+    "labels": {
+      "title": "Titre de l'annonce *",
+      "propertyType": "Type de bien *",
+      "listingMode": "Mode d'annonce *",
+      "city": "Ville / Localité *",
+      "mapPosition": "Position sur la carte (optionnel)",
+      "mapDesc": "Cliquez sur la carte pour indiquer la position exacte du bien. La ville sera mise à jour automatiquement.",
+      "priceRent": "Loyer mensuel *",
+      "priceSale": "Prix de vente *",
+      "area": "Surface *",
+      "bedrooms": "Chambres *",
+      "bathrooms": "Sdb *",
+      "floor": "Étage *",
+      "deposit": "Caution",
+      "charges": "Charges",
+      "pets": "Animaux de compagnie autorisés",
+      "availableFrom": "Disponible à partir du",
+      "description": "Description *",
+      "descHint": "Une bonne description augmente vos chances de trouver un locataire rapidement.",
+      "photos": "Photos du bien",
+      "photosDesc": "Ajoutez jusqu'à {maxFiles} photos (max. {maxSize}MB chacune)",
+      "photosAdded": "Photos ajoutées ({count})"
+    },
+    "placeholders": {
+      "title": "Ex: Appartement 3 pièces lumineux, centre-ville",
+      "selectType": "Sélectionnez le type de bien",
+      "selectMode": "Location ou vente",
+      "city": "Ex: Königstein im Taunus, Hesse",
+      "price": "Ex: 850",
+      "area": "Ex: 65",
+      "bedrooms": "Ex: 3",
+      "bathrooms": "Ex: 1",
+      "floor": "Ex: 2",
+      "deposit": "Ex: 1700",
+      "charges": "Ex: 150",
+      "selectDate": "Sélectionner une date",
+      "description": "Décrivez le bien : état général, équipements, luminosité, proximité transports et commerces…"
+    },
+    "validation": {
+      "titleReq": "Le titre est requis",
+      "cityReq": "La ville est requise",
+      "priceReq": "Le prix est requis",
+      "areaReq": "La surface est requise",
+      "bedroomsReq": "Le nombre de chambres est requis",
+      "bathroomsReq": "Le nombre de salles de bain est requis",
+      "floorReq": "L'étage est requis",
+      "descMin": "La description doit contenir au moins 10 caractères"
+    },
+    "messages": {
+      "success": "Annonce publiée avec succès !",
+      "error": "Erreur lors de la publication de l'annonce",
+      "imageUploadError": "Erreur lors de l'upload de l'image",
+      "chars": "caractères"
+    },
+    "actions": {
+      "addPhoto": "Ajouter",
+      "prev": "Précédent",
+      "next": "Suivant",
+      "publish": "Publier l'annonce",
+      "publishing": "Publication..."
+    }
+  },
+  "labels": {
+    "listingTypes": {
+      "room": "Chambre",
+      "apartment": "Appartement",
+      "house": "Maison",
+      "studio": "Studio",
+      "shared": "Colocation"
+    },
+    "listingModes": {
+      "rent": "À louer",
+      "sale": "À vendre"
+    }
+  },
+  "details": {
+    "published": "Publié le",
+    "updated": "Mis à jour le",
+    "area": "Surface",
+    "bedrooms": "Chambres",
+    "bathrooms": "Salles de bain",
+    "floor": "Étage {floor}",
+    "deposit": "Caution",
+    "charges": "Charges",
+    "petsAllowed": "Acceptés",
+    "petsNotAllowed": "Animaux non acceptés",
+    "availableFrom": "Disponible à partir du",
+    "description": "Description",
+    "location": "Localisation",
+    "contact": "Contacter le propriétaire",
+    "seeDetails": "Voir tous les détails",
+    "backBtn": "Retour aux annonces",
+    "bookmarkAdd": "Ajouté aux favoris",
+    "bookmarkRemove": "Retiré des favoris",
+    "bookmarkError": "Erreur lors de la mise à jour du favori",
+    "bookmarkBtn": "Favoris",
+    "featuresTitle": "Caractéristiques",
+    "level": "Niveau",
+    "available": "Disponible :",
+    "pets": "Animaux :",
+    "petsDenied": "Non acceptés",
+    "descTitle": "Description",
+    "seeMore": "Voir plus",
+    "seeLess": "Voir moins",
+    "locationTitle": "Localisation",
+    "extrasTitle": "Équipements et services",
+    "contactTitle": "Contact",
+    "anonymous": "Anonyme",
+    "ownerRole": "Propriétaire",
+    "call": "Appeler",
+    "sendMessage": "Envoyer un message",
+    "contactOwner": "Contacter le propriétaire",
+    "phone": "Téléphone :",
+    "email": "Email :"
+  },
+  "similar": {
+    "title": "Annonces similaires",
+    "seeAll": "Voir toutes les annonces",
+    "photos": "{count} photos",
+    "emptyMsg": "Pas assez d'annonces similaires dans cette zone ?",
+    "emptyBtn": "Découvrir toutes nos annonces"
+  }
+}
