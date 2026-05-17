@@ -74,6 +74,21 @@
       "success": "Offer created successfully",
       "error": "Error creating offer",
       "chars": "characters"
+    },
+    "progress": {
+      "step": "Step {current} of {total}",
+      "completed": "{progress}% completed"
+    },
+    "validation": {
+      "titleReq": "The title is required",
+      "cityReq": "The city is required",
+      "durationReq": "The duration is required",
+      "startDateReq": "The start date is required",
+      "companyReq": "The company is required",
+      "descMin": "The description must contain at least 10 characters",
+      "certMin": "Add at least one certificate.",
+      "certMax": "You can add up to 5 certificates.",
+      "salaryReq": "The salary is required"
     }
   },
   "details": {
@@ -105,5 +120,47 @@
     "breadcrumb": "Opportunities",
     "you": "You",
     "have": "have"
+  },
+  "dialogs": {
+    "edit": {
+      "trigger": "Edit details",
+      "title": "Edit job offer",
+      "description": "Update the information of your offer"
+    },
+    "delete": {
+      "trigger": "Delete",
+      "title": "Delete offer",
+      "description": "Are you sure you want to delete this offer?",
+      "cancel": "Cancel",
+      "submiting": "Deleting...",
+      "successToast": "Offer deleted successfully",
+      "errorToast": "Error deleting the offer"
+    }
+  },
+  "labels": {
+    "jobTypes": {
+      "auPair": "Au pair",
+      "training": "Training",
+      "voluntary": "Voluntary",
+      "internship": "Internship",
+      "miniJob": "Mini-job",
+      "job": "Job",
+      "freelance": "Freelance",
+      "scholarship": "Scholarship"
+    },
+    "contracts": {
+      "CDI": "Permanent",
+      "CDD": "Fixed-term",
+      "FSJ/FOJ/BFD": "FSJ/FOJ/BFD",
+      "fullTime": "Full time",
+      "partTime": "Part time",
+      "freelance": "Freelance",
+      "apprenticeship": "Apprenticeship"
+    },
+    "salaryPeriods": {
+      "hour": "hour",
+      "month": "month",
+      "year": "year"
+    }
   }
 }

@@ -74,6 +74,21 @@
       "success": "Offre créée avec succès",
       "error": "Erreur lors de la création de l'offre",
       "chars": "caractères"
+    },
+    "progress": {
+      "step": "Étape {current} sur {total}",
+      "completed": "{progress}% complété"
+    },
+    "validation": {
+      "titleReq": "Le titre est requis",
+      "cityReq": "La ville est requise",
+      "durationReq": "La durée est requise",
+      "startDateReq": "La date de début est requise",
+      "companyReq": "L'entreprise est requise",
+      "descMin": "La description doit contenir au moins 10 caractères",
+      "certMin": "Ajoutez au moins un certificat.",
+      "certMax": "Vous pouvez ajouter jusqu'à 5 certificats.",
+      "salaryReq": "Le salaire est requis"
     }
   },
   "details": {
@@ -105,5 +120,47 @@
     "breadcrumb": "Opportunités",
     "you": "Vous",
     "have": "avez"
+  },
+  "dialogs": {
+    "edit": {
+      "trigger": "Modifier les détails",
+      "title": "Modifier l'offre d'emploi",
+      "description": "Mettez à jour les informations de votre offre"
+    },
+    "delete": {
+      "trigger": "Supprimer",
+      "title": "Supprimer l'offre",
+      "description": "Voulez-vous vraiment supprimer cette offre ?",
+      "cancel": "Annuler",
+      "submiting": "Suppression...",
+      "successToast": "Offre supprimée avec succès",
+      "errorToast": "Erreur lors de la suppression de l'offre"
+    }
+  },
+  "labels": {
+    "jobTypes": {
+      "auPair": "Au pair",
+      "training": "Formation",
+      "voluntary": "Volontariat",
+      "internship": "Stage",
+      "miniJob": "Mini-job",
+      "job": "Emploi",
+      "freelance": "Freelance",
+      "scholarship": "Bourse d'étude"
+    },
+    "contracts": {
+      "CDI": "CDI",
+      "CDD": "CDD",
+      "FSJ/FOJ/BFD": "FSJ/FOJ/BFD",
+      "fullTime": "Temps plein",
+      "partTime": "Temps partiel",
+      "freelance": "Freelance",
+      "apprenticeship": "Apprentissage"
+    },
+    "salaryPeriods": {
+      "hour": "heure",
+      "month": "mois",
+      "year": "année"
+    }
   }
 }

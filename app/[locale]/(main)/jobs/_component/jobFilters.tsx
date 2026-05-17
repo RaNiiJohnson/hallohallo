@@ -28,20 +28,8 @@ import { useTranslations } from "next-intl";
 
 import {
   jobTypeValues,
-  jobTypeLabels,
   contractTypeValues,
-  contractTypeLabels,
 } from "./forms/jobOfferForm";
-
-const JOB_TYPES = jobTypeValues.map((value) => ({
-  value,
-  label: jobTypeLabels[value],
-}));
-
-const CONTRACT_TYPES = contractTypeValues.map((value) => ({
-  value,
-  label: contractTypeLabels[value],
-}));
 
 export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
   const t = useTranslations("jobs");
@@ -137,9 +125,9 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
                             <SelectItem value="all">
                               {t("filters.allContracts")}
                             </SelectItem>
-                            {CONTRACT_TYPES.map((type) => (
-                              <SelectItem key={type.value} value={type.value}>
-                                {type.label}
+                            {contractTypeValues.map((type) => (
+                              <SelectItem key={type} value={type}>
+                                {t(`labels.contracts.${type}` as Parameters<typeof t>[0])}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -155,18 +143,18 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
                         >
                           {t("filters.allTypes")}
                         </Badge>
-                        {JOB_TYPES.map((type) => (
+                        {jobTypeValues.map((type) => (
                           <Badge
-                            key={type.value}
+                            key={type}
                             variant={
-                              filters.type === type.value
+                              filters.type === type
                                 ? "default"
                                 : "outline"
                             }
                             className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
-                            onClick={() => setFilters({ type: type.value })}
+                            onClick={() => setFilters({ type })}
                           >
-                            {type.label}
+                            {t(`labels.jobTypes.${type}` as Parameters<typeof t>[0])}
                           </Badge>
                         ))}
                         {isAuthenticated && (
@@ -207,14 +195,14 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
           >
             {t("filters.allTypes")}
           </Badge>
-          {JOB_TYPES.map((type) => (
+          {jobTypeValues.map((type) => (
             <Badge
-              key={type.value}
-              variant={filters.type === type.value ? "default" : "outline"}
+              key={type}
+              variant={filters.type === type ? "default" : "outline"}
               className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
-              onClick={() => setFilters({ type: type.value })}
+              onClick={() => setFilters({ type })}
             >
-              {type.label}
+              {t(`labels.jobTypes.${type}` as Parameters<typeof t>[0])}
             </Badge>
           ))}
           {isAuthenticated && (

@@ -17,10 +17,12 @@ import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 import { useTransition } from "react";
+import { useTranslations } from "next-intl";
 
 function DeleteJobDialog({ jobId }: { jobId: Id<"JobOffer"> }) {
   const deleteJob = useMutation(api.jobs.deleteJob);
   const [isPending, startTransition] = useTransition();
+  const t = useTranslations("jobs.dialogs.delete");
 
   const router = useRouter();
   async function handleDelete() {
@@ -28,10 +30,10 @@ function DeleteJobDialog({ jobId }: { jobId: Id<"JobOffer"> }) {
       startTransition(() => {
         deleteJob({ id: jobId });
       });
-      toast.success("Offre supprimée avec succès");
+      toast.success(t("successToast"));
       router.push("/jobs");
     } catch {
-      toast.error("Erreur lors de la suppression de l'offre");
+      toast.error(t("errorToast"));
     }
   }
 
@@ -40,19 +42,19 @@ function DeleteJobDialog({ jobId }: { jobId: Id<"JobOffer"> }) {
       <DialogTrigger asChild>
         <Button size="sm" variant="destructive">
           <Trash className="size-4" />
-          Supprimer
+          {t("trigger")}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Supprimer l&apos;offre</DialogTitle>
+          <DialogTitle>{t("title")}</DialogTitle>
           <DialogDescription>
-            Voulez-vous vraiment supprimer cette offre ?
+            {t("description")}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Annuler</Button>
+            <Button variant="outline">{t("cancel")}</Button>
           </DialogClose>
           <DialogClose asChild>
             <Button
@@ -63,11 +65,11 @@ function DeleteJobDialog({ jobId }: { jobId: Id<"JobOffer"> }) {
               {isPending ? (
                 <>
                   <Loader2 className="size-4 animate-spin mr-2" />
-                  Suppression...
+                  {t("submiting")}
                 </>
               ) : (
                 <>
-                  <Trash className="size-4" /> Supprimer
+                  <Trash className="size-4" /> {t("trigger")}
                 </>
               )}
             </Button>

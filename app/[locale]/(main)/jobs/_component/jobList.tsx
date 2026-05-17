@@ -3,11 +3,6 @@
 import { Briefcase, MapPin, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@/i18n/navigation";
-import {
-  jobTypeLabels,
-  contractTypeLabels,
-  salaryPeriodLabels,
-} from "./forms/jobOfferForm";
 import { getRelativeTime } from "@/lib/date";
 import { SalaryDisplay } from "./salary";
 import { JobPageSkeleton } from "./skeleton";
@@ -114,7 +109,7 @@ export function JobList() {
                     className="text-foreground"
                   />
                   <span className="text-primary text-xs font-normal">
-                    /{salaryPeriodLabels[job.salaryPeriod]}
+                    /{t(`labels.salaryPeriods.${job.salaryPeriod}` as Parameters<typeof t>[0])}
                   </span>
                 </div>
 
@@ -127,8 +122,7 @@ export function JobList() {
                   <div className="flex items-center gap-1">
                     <Briefcase className="h-4 w-4" />
                     <span>
-                      {jobTypeLabels[job.type as keyof typeof jobTypeLabels] ??
-                        job.type}
+                      {t(`labels.jobTypes.${job.type}` as Parameters<typeof t>[0]) ?? job.type}
                     </span>
                   </div>
                 </div>
@@ -139,9 +133,7 @@ export function JobList() {
                     variant="secondary"
                     className="bg-secondary/50 hover:bg-secondary/70 text-xs font-normal"
                   >
-                    {contractTypeLabels[
-                      job.contractType as keyof typeof contractTypeLabels
-                    ] ?? job.contractType}
+                    {t(`labels.contracts.${job.contractType}` as Parameters<typeof t>[0]) ?? job.contractType}
                   </Badge>
                   {job.duration && (
                     <Badge variant="outline" className="text-xs font-normal">

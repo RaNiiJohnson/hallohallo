@@ -74,6 +74,21 @@
       "success": "Angebot erfolgreich erstellt",
       "error": "Fehler beim Erstellen des Angebots",
       "chars": "Zeichen"
+    },
+    "progress": {
+      "step": "Schritt {current} von {total}",
+      "completed": "{progress}% abgeschlossen"
+    },
+    "validation": {
+      "titleReq": "Der Titel ist erforderlich",
+      "cityReq": "Die Stadt ist erforderlich",
+      "durationReq": "Die Dauer ist erforderlich",
+      "startDateReq": "Das Startdatum ist erforderlich",
+      "companyReq": "Das Unternehmen ist erforderlich",
+      "descMin": "Die Beschreibung muss mindestens 10 Zeichen enthalten",
+      "certMin": "Fügen Sie mindestens ein Zertifikat hinzu.",
+      "certMax": "Sie können bis zu 5 Zertifikate hinzufügen.",
+      "salaryReq": "Das Gehalt ist erforderlich"
     }
   },
   "details": {
@@ -105,5 +120,47 @@
     "breadcrumb": "Möglichkeiten",
     "you": "Sie",
     "have": "haben"
+  },
+  "dialogs": {
+    "edit": {
+      "trigger": "Details bearbeiten",
+      "title": "Stellenangebot bearbeiten",
+      "description": "Aktualisieren Sie die Informationen Ihres Angebots"
+    },
+    "delete": {
+      "trigger": "Löschen",
+      "title": "Angebot löschen",
+      "description": "Möchten Sie dieses Angebot wirklich löschen?",
+      "cancel": "Abbrechen",
+      "submiting": "Wird gelöscht...",
+      "successToast": "Angebot erfolgreich gelöscht",
+      "errorToast": "Fehler beim Löschen des Angebots"
+    }
+  },
+  "labels": {
+    "jobTypes": {
+      "auPair": "Au-pair",
+      "training": "Ausbildung",
+      "voluntary": "Freiwilligendienst",
+      "internship": "Praktikum",
+      "miniJob": "Minijob",
+      "job": "Job",
+      "freelance": "Freiberuflich",
+      "scholarship": "Stipendium"
+    },
+    "contracts": {
+      "CDI": "Unbefristet",
+      "CDD": "Befristet",
+      "FSJ/FOJ/BFD": "FSJ/FOJ/BFD",
+      "fullTime": "Vollzeit",
+      "partTime": "Teilzeit",
+      "freelance": "Freiberuflich",
+      "apprenticeship": "Lehre"
+    },
+    "salaryPeriods": {
+      "hour": "Stunde",
+      "month": "Monat",
+      "year": "Jahr"
+    }
   }
 }

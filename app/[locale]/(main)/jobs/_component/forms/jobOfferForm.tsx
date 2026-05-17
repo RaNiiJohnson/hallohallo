@@ -69,71 +69,7 @@ export const contractTypeValues = [
   "apprenticeship",
 ] as const;
 
-export const jobTypeLabels: Record<(typeof jobTypeValues)[number], string> = {
-  auPair: "Au pair",
-  training: "Formation",
-  voluntary: "Volontariat",
-  internship: "Stage",
-  miniJob: "Mini-job",
-  job: "Emploi",
-  freelance: "Freelance",
-  scholarship: "Bourse d'étude",
-};
-
-export const contractTypeLabels: Record<
-  (typeof contractTypeValues)[number],
-  string
-> = {
-  CDI: "CDI",
-  CDD: "CDD",
-  "FSJ/FOJ/BFD": "FSJ/FOJ/BFD",
-  fullTime: "Temps plein",
-  partTime: "Temps partiel",
-  freelance: "Freelance",
-  apprenticeship: "Apprentissage",
-};
-
-const salaryPeriodValues = ["hour", "month", "year"] as const;
-
-export const salaryPeriodLabels: Record<
-  (typeof salaryPeriodValues)[number],
-  string
-> = {
-  hour: "heure",
-  month: "mois",
-  year: "année",
-};
-
-const formSchema = z.object({
-  title: z.string().min(1, "Le titre est requis"),
-  type: z.enum(jobTypeValues),
-  location: z
-    .object({
-      lat: z.number(),
-      lng: z.number(),
-    })
-    .optional(),
-  contractType: z.enum(contractTypeValues),
-  city: z.string().min(1, "La ville est requise"),
-  duration: z.string().min(1, "La durée est requise"),
-  startDate: z.string().min(1, "La date de début est requise"),
-  company: z.string().min(1, "L'entreprise est requise"),
-  description: z
-    .string()
-    .min(10, "La description doit contenir au moins 10 caractères"),
-  certificates: z
-    .array(
-      z.object({
-        certificate: z.string(),
-      }),
-    )
-    .min(1, "Ajoutez au moins un certificat.")
-    .max(5, "Vous pouvez ajouter jusqu'à 5 certificats."),
-  salary: z.string().min(1, "Le salaire est requis"),
-  salaryPeriod: z.enum(salaryPeriodValues),
-});
-
-type FormSchema = z.infer<typeof formSchema>;
+export const salaryPeriodValues = ["hour", "month", "year"] as const;
 
 interface JobOfferFormProps {
   onSuccess?: () => void;
@@ -145,7 +81,38 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [calendarOpen, setCalendarOpen] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const formSchema = z.object({
+    title: z.string().min(1, t("form.validation.titleReq")),
+    type: z.enum(jobTypeValues),
+    location: z
+      .object({
+        lat: z.number(),
+        lng: z.number(),
+      })
+      .optional(),
+    contractType: z.enum(contractTypeValues),
+    city: z.string().min(1, t("form.validation.cityReq")),
+    duration: z.string().min(1, t("form.validation.durationReq")),
+    startDate: z.string().min(1, t("form.validation.startDateReq")),
+    company: z.string().min(1, t("form.validation.companyReq")),
+    description: z
+      .string()
+      .min(10, t("form.validation.descMin")),
+    certificates: z
+      .array(
+        z.object({
+          certificate: z.string(),
+        }),
+      )
+      .min(1, t("form.validation.certMin"))
+      .max(5, t("form.validation.certMax")),
+    salary: z.string().min(1, t("form.validation.salaryReq")),
+    salaryPeriod: z.enum(salaryPeriodValues),
+  });
+
+  type FormSchema = z.infer<typeof formSchema>;
+
+  const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
@@ -247,9 +214,9 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
       <div className="space-y-2">
         <div className="flex justify-between text-sm text-muted-foreground">
           <span>
-            Étape {currentStep} sur {totalSteps}
+            {t("form.progress.step", { current: currentStep, total: totalSteps })}
           </span>
-          <span>{Math.round(progress)}% complété</span>
+          <span>{t("form.progress.completed", { progress: Math.round(progress) })}</span>
         </div>
         <Progress value={progress} className="w-full" />
         <h3 className="text-lg font-medium">{stepTitles[currentStep - 1]}</h3>
@@ -326,7 +293,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
                   <SelectContent>
                     {jobTypeValues.map((type) => (
                       <SelectItem key={type} value={type}>
-                        {jobTypeLabels[type]}
+                        {t(`labels.jobTypes.${type}` as Parameters<typeof t>[0])}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -361,7 +328,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
                   <SelectContent>
                     {contractTypeValues.map((contract) => (
                       <SelectItem key={contract} value={contract}>
-                        {contractTypeLabels[contract]}
+                        {t(`labels.contracts.${contract}` as Parameters<typeof t>[0])}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -506,9 +473,9 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
                       <SelectValue placeholder={t("form.placeholders.period")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="month">€/mois</SelectItem>
-                      <SelectItem value="year">€/an</SelectItem>
-                      <SelectItem value="hour">€/heure</SelectItem>
+                      <SelectItem value="month">€/{t("labels.salaryPeriods.month")}</SelectItem>
+                      <SelectItem value="year">€/{t("labels.salaryPeriods.year")}</SelectItem>
+                      <SelectItem value="hour">€/{t("labels.salaryPeriods.hour")}</SelectItem>
                     </SelectContent>
                   </Select>
                   {fieldState.invalid && (

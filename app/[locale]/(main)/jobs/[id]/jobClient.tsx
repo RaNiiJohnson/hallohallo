@@ -4,11 +4,6 @@ import { Id } from "@convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  jobTypeLabels,
-  contractTypeLabels,
-  salaryPeriodLabels,
-} from "../_component/forms/jobOfferForm";
-import {
   ArrowLeft,
   MapPin,
   Building2,
@@ -121,7 +116,7 @@ export function JobDetailsPage(props: {
                 {/* Role */}
                 <div className="flex items-center gap-2">
                   <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground/60" />
-                  <span className="font-medium">{jobOffer.contractType}</span>
+                  <span className="font-medium">{t(`labels.contracts.${jobOffer.contractType}` as Parameters<typeof t>[0]) ?? jobOffer.contractType}</span>
                 </div>
 
                 {/* Location */}
@@ -211,7 +206,7 @@ export function JobDetailsPage(props: {
                       {t("details.jobType")}
                     </p>
                     <Badge variant="secondary" className="font-semibold">
-                      {jobOffer.type}
+                      {t(`labels.jobTypes.${jobOffer.type}` as Parameters<typeof t>[0]) ?? jobOffer.type}
                     </Badge>
                   </div>
 
@@ -219,7 +214,7 @@ export function JobDetailsPage(props: {
                     <p className="text-sm text-muted-foreground">{t("details.salary")}</p>
                     <SalaryDisplay salary={jobOffer.salary} />{" "}
                     <span className="text-primary text-xs font-normal">
-                      /{salaryPeriodLabels[jobOffer.salaryPeriod]}
+                      /{t(`labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<typeof t>[0])}
                     </span>
                   </div>
 
@@ -240,7 +235,7 @@ export function JobDetailsPage(props: {
                       {t("details.contract")}
                     </p>
                     <Badge variant="outline" className="font-semibold">
-                      {jobOffer.contractType}
+                      {t(`labels.contracts.${jobOffer.contractType}` as Parameters<typeof t>[0]) ?? jobOffer.contractType}
                     </Badge>
                   </div>
 
@@ -385,16 +380,12 @@ export function JobDetailsPage(props: {
               <div className="p-4 space-y-3">
                 <div className="flex flex-wrap gap-2 mb-4">
                   <Badge variant="secondary" className="font-semibold">
-                    {jobTypeLabels[
-                      jobOffer.type as keyof typeof jobTypeLabels
-                    ] ?? jobOffer.type}
+                    {t(`labels.jobTypes.${jobOffer.type}` as Parameters<typeof t>[0]) ?? jobOffer.type}
                   </Badge>
                   <div className="flex items-center text-muted-foreground bg-muted px-2.5 py-0.5 rounded-md">
                     <Briefcase className="w-4 h-4 mr-1.5" />
                     <span className="font-semibold text-sm">
-                      {contractTypeLabels[
-                        jobOffer.contractType as keyof typeof contractTypeLabels
-                      ] ?? jobOffer.contractType}
+                      {t(`labels.contracts.${jobOffer.contractType}` as Parameters<typeof t>[0]) ?? jobOffer.contractType}
                     </span>
                   </div>
                   <div className="flex items-center text-muted-foreground bg-muted px-2.5 py-0.5 rounded-md">
@@ -416,7 +407,7 @@ export function JobDetailsPage(props: {
                   <span className="text-sm text-muted-foreground">{t("details.salary")}</span>
                   <SalaryDisplay salary={jobOffer.salary} />
                   <span className="text-primary text-xs font-normal">
-                    /{salaryPeriodLabels[jobOffer.salaryPeriod]}
+                    /{t(`labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<typeof t>[0])}
                   </span>
                 </div>
 
