@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Id } from "@convex/_generated/dataModel";
 import { CreatePostForm } from "../forms/createPostForm";
+import { useTranslations } from "next-intl";
 
 interface CreatePostDialogProps {
   communityId: Id<"communities">;
@@ -24,6 +25,7 @@ export function CreatePostDialog({
   trigger,
 }: CreatePostDialogProps) {
   const [open, setOpen] = useState(false);
+  const t = useTranslations("communities.dialogs.createPost");
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -35,15 +37,15 @@ export function CreatePostDialog({
             className="flex items-center gap-2"
           >
             <Plus className="h-4 w-4" />
-            <span>Créer un post</span>
+            <span>{t("trigger")}</span>
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Créer un post</DialogTitle>
+          <DialogTitle>{t("title")}</DialogTitle>
           <DialogDescription>
-            Partagez quelque chose avec la communauté
+            {t("description")}
           </DialogDescription>
         </DialogHeader>
         <CreatePostForm

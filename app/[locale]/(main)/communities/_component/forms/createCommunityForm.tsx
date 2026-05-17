@@ -29,28 +29,9 @@ import { toast } from "sonner";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const privacyValues = ["public", "private", "secret"] as const;
-
-const privacyLabels: Record<(typeof privacyValues)[number], string> = {
-  public: "Public — visible par tous",
-  private: "Privé — visible mais accès sur invitation",
-  secret: "Secret — invisible et accès sur invitation",
-};
-
-const formSchema = z.object({
-  name: z
-    .string()
-    .min(3, "Le nom doit contenir au moins 3 caractères")
-    .max(60, "Le nom ne peut pas dépasser 60 caractères"),
-  description: z
-    .string()
-    .min(10, "La description doit contenir au moins 10 caractères")
-    .max(200, "La description ne peut pas dépasser 200 caractères"),
-  privacy: z.enum(privacyValues),
-});
-
-type FormSchema = z.infer<typeof formSchema>;
 
 interface CreateCommunityFormProps {
   onSuccess?: () => void;
@@ -59,6 +40,18 @@ interface CreateCommunityFormProps {
 export function CreateCommunityForm({ onSuccess }: CreateCommunityFormProps) {
   const router = useRouter();
   const createCommunity = useMutation(api.communities.createCommunty);
+  const t = useTranslations("communities.forms.createCommunity");
+
+  const formSchema = z.object({
+    name: z.string().min(3, t("errorNameMin")).max(60, t("errorNameMax")),
+    description: z
+      .string()
+      .min(10, t("errorDescMin"))
+      .max(200, t("errorDescMax")),
+    privacy: z.enum(privacyValues),
+  });
+
+  type FormSchema = z.infer<typeof formSchema>;
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -76,12 +69,12 @@ export function CreateCommunityForm({ onSuccess }: CreateCommunityFormProps) {
         description: data.description,
         privacy: data.privacy,
       });
-      toast.success("Communauté créée avec succès !");
+      toast.success(t("successToast"));
       form.reset();
       onSuccess?.();
       router.push(`/communities/${slug}`);
     } catch {
-      toast.error("Erreur lors de la création de la communauté");
+      toast.error(t("errorToast"));
     }
   };
 
@@ -104,13 +97,13 @@ export function CreateCommunityForm({ onSuccess }: CreateCommunityFormProps) {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="community-name">
-                  Nom de la communauté *
+                  {t("nameLabel")}
                 </FieldLabel>
                 <Input
                   {...field}
                   id="community-name"
                   aria-invalid={fieldState.invalid}
-                  placeholder="Ex: Francophones en Allemagne"
+                  placeholder={t("namePlaceholder")}
                   autoComplete="off"
                 />
                 {fieldState.invalid && (
@@ -127,13 +120,13 @@ export function CreateCommunityForm({ onSuccess }: CreateCommunityFormProps) {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="community-description">
-                  Description *
+                  {t("descLabel")}
                 </FieldLabel>
                 <InputGroup>
                   <InputGroupTextarea
                     {...field}
                     id="community-description"
-                    placeholder="Décrivez le but et le thème de votre communauté..."
+                    placeholder={t("descPlaceholder")}
                     rows={4}
                     className="min-h-24 resize-none"
                     aria-invalid={fieldState.invalid}
@@ -158,19 +151,21 @@ export function CreateCommunityForm({ onSuccess }: CreateCommunityFormProps) {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="community-privacy">
-                  Visibilité *
+                  {t("privacyLabel")}
                 </FieldLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger
                     id="community-privacy"
                     aria-invalid={fieldState.invalid}
                   >
-                    <SelectValue placeholder="Choisir la visibilité" />
+                    <SelectValue placeholder={t("privacyPlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
                     {privacyValues.map((privacy) => (
                       <SelectItem key={privacy} value={privacy}>
-                        {privacyLabels[privacy]}
+                        {t(
+                          `privacy${privacy.charAt(0).toUpperCase() + privacy.slice(1)}` as const,
+                        )}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -191,9 +186,7 @@ export function CreateCommunityForm({ onSuccess }: CreateCommunityFormProps) {
         disabled={form.formState.isSubmitting}
         className="w-full"
       >
-        {form.formState.isSubmitting
-          ? "Création en cours..."
-          : "Créer la communauté"}
+        {form.formState.isSubmitting ? t("submiting") : t("submit")}
       </Button>
     </div>
   );

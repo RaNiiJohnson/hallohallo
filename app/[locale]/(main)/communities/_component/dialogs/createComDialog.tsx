@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { CreateCommunityForm } from "../forms/createCommunityForm";
+import { useTranslations } from "next-intl";
 
 interface CreateCommunityDialogProps {
   trigger?: React.ReactNode;
@@ -19,6 +20,7 @@ interface CreateCommunityDialogProps {
 
 export function CreateCommunityDialog({ trigger }: CreateCommunityDialogProps) {
   const [open, setOpen] = useState(false);
+  const t = useTranslations("communities.dialogs.createCommunity");
 
   const handleSuccess = () => {
     setOpen(false);
@@ -30,15 +32,15 @@ export function CreateCommunityDialog({ trigger }: CreateCommunityDialogProps) {
         {trigger || (
           <Button className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            <span>Créer une communauté</span>
+            <span>{t("trigger")}</span>
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Créer une communauté</DialogTitle>
+          <DialogTitle>{t("title")}</DialogTitle>
           <DialogDescription>
-            Créez un espace d&apos;échange autour d&apos;un thème commun
+            {t("description")}
           </DialogDescription>
         </DialogHeader>
         <CreateCommunityForm onSuccess={handleSuccess} />

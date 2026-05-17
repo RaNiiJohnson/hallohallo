@@ -22,18 +22,7 @@ import { toast } from "sonner";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
-
-const formSchema = z.object({
-  title: z
-    .string()
-    .min(3, "Le titre doit contenir au moins 3 caractères")
-    .max(100, "Le titre ne peut pas dépasser 100 caractères"),
-  content: z
-    .string()
-    .min(10, "Le contenu doit contenir au moins 10 caractères"),
-});
-
-type FormSchema = z.infer<typeof formSchema>;
+import { useTranslations } from "next-intl";
 
 interface CreatePostFormProps {
   communityId: Id<"communities">;
@@ -45,6 +34,19 @@ export function CreatePostForm({
   onSuccess,
 }: CreatePostFormProps) {
   const createPost = useMutation(api.posts.posts.createPost);
+  const t = useTranslations("communities.forms.createPost");
+
+  const formSchema = z.object({
+    title: z
+      .string()
+      .min(3, t("errorTitleMin"))
+      .max(100, t("errorTitleMax")),
+    content: z
+      .string()
+      .min(10, t("errorContentMin")),
+  });
+
+  type FormSchema = z.infer<typeof formSchema>;
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -61,11 +63,11 @@ export function CreatePostForm({
         content: data.content,
         communityId,
       });
-      toast.success("Post créé avec succès !");
+      toast.success(t("successToast"));
       form.reset();
       onSuccess?.();
     } catch {
-      toast.error("Erreur lors de la création du post");
+      toast.error(t("errorToast"));
     }
   };
 
@@ -87,12 +89,12 @@ export function CreatePostForm({
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="post-title">Titre *</FieldLabel>
+                <FieldLabel htmlFor="post-title">{t("titleLabel")}</FieldLabel>
                 <Input
                   {...field}
                   id="post-title"
                   aria-invalid={fieldState.invalid}
-                  placeholder="Un titre accrocheur..."
+                  placeholder={t("titlePlaceholder")}
                   autoComplete="off"
                 />
                 {fieldState.invalid && (
@@ -108,19 +110,19 @@ export function CreatePostForm({
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="post-content">Contenu *</FieldLabel>
+                <FieldLabel htmlFor="post-content">{t("contentLabel")}</FieldLabel>
                 <InputGroup>
                   <InputGroupTextarea
                     {...field}
                     id="post-content"
-                    placeholder="Exprimez-vous..."
+                    placeholder={t("contentPlaceholder")}
                     rows={5}
                     className="min-h-32 resize-none"
                     aria-invalid={fieldState.invalid}
                   />
                   <InputGroupAddon align="block-end">
                     <InputGroupText className="tabular-nums">
-                      {field.value.length} caractères
+                      {field.value.length} {t("characters")}
                     </InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
@@ -139,7 +141,7 @@ export function CreatePostForm({
         disabled={form.formState.isSubmitting}
         className="w-full"
       >
-        {form.formState.isSubmitting ? "Publication..." : "Publier"}
+        {form.formState.isSubmitting ? t("submiting") : t("submit")}
       </Button>
     </div>
   );

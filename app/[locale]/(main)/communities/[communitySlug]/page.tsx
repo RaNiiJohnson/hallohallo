@@ -21,6 +21,7 @@ import { useQuery } from "convex-helpers/react/cache";
 import SkeletonCommunity from "./skeleton";
 import { ShareButton } from "@/components/ShareButton";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
+import { useTranslations } from "next-intl";
 
 export default function CommunityClient() {
   const { communitySlug } = useParams();
@@ -39,35 +40,36 @@ export default function CommunityClient() {
   const likePost = useMutation(api.posts.likes.likePost);
 
   const timeT = useTimeTranslations();
+  const t = useTranslations("communities.community");
 
   if (community === undefined) {
     return <SkeletonCommunity />;
   }
 
   if (community === null) {
-    return <p className="text-muted-foreground p-8">Communauté introuvable.</p>;
+    return <p className="text-muted-foreground p-8">{t("notFound")}</p>;
   }
 
   const handleLike = async (postId: Id<"posts">) => {
-    if (!isAuthenticated) return toast.error("Connectez-vous pour liker");
+    if (!isAuthenticated) return toast.error(t("loginToLike"));
     await likePost({ postId });
   };
 
   const handleJoin = async () => {
     try {
       await joinCommunity({ communityId: community._id });
-      toast.success(`Vous avez rejoint  ${community.name} !`);
+      toast.success(t("joined", { name: community.name }));
     } catch {
-      toast.error("Erreur lors de l'adhésion");
+      toast.error(t("joinError"));
     }
   };
 
   const handleLeave = async () => {
     try {
       await leaveCommunity({ communityId: community._id });
-      toast.success(`Vous avez quitté  ${community.name}`);
+      toast.success(t("left", { name: community.name }));
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : "Erreur";
+      const message = e instanceof Error ? e.message : t("error");
       toast.error(message);
     }
   };
@@ -80,7 +82,7 @@ export default function CommunityClient() {
           href="/communities"
           className="hover:text-foreground transition-colors"
         >
-          Communautés
+          {t("breadcrumbs")}
         </Link>
         <span>
           <ChevronRight className="w-4 h-4" />
@@ -105,9 +107,9 @@ export default function CommunityClient() {
             <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
                 <Users size={12} />
-                {community.membersCount ?? 0} membres
+                {community.membersCount ?? 0} {t("members")}
               </span>
-              <span>{community.postsCount ?? 0} posts</span>
+              <span>{community.postsCount ?? 0} {t("posts")}</span>
             </div>
             <div className="flex items-center gap-2 mt-4">
               {isAuthenticated && (
@@ -122,13 +124,13 @@ export default function CommunityClient() {
                             size="sm"
                             onClick={handleLeave}
                           >
-                            Quitter
+                            {t("leave")}
                           </Button>
                         )}
                       </>
                     ) : (
                       <Button size="sm" onClick={handleJoin}>
-                        Rejoindre
+                        {t("join")}
                       </Button>
                     )
                   ) : null}
@@ -143,14 +145,14 @@ export default function CommunityClient() {
           {community.posts.length === 0 ? (
             <div className="text-center py-16 bg-background rounded-xl">
               <p className="text-muted-foreground mb-4">
-                Aucun post pour le moment.
+                {t("emptyPosts")}
               </p>
               {isAuthenticated && isMember && (
                 <CreatePostDialog
                   communityId={community._id}
                   trigger={
                     <span className="text-primary hover:underline cursor-pointer text-sm">
-                      Soyez le premier à publier →
+                      {t("firstToPost")}
                     </span>
                   }
                 />

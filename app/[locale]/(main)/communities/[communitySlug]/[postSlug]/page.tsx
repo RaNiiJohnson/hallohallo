@@ -25,6 +25,7 @@ import { LikeButton } from "../../_component/likeButton";
 import { CommentItem } from "../../_component/commentItem";
 import { ShareButton } from "@/components/ShareButton";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
+import { useTranslations } from "next-intl";
 
 export default function PostClient() {
   const { postSlug, communitySlug } = useParams();
@@ -50,20 +51,22 @@ export default function PostClient() {
   const [isDeletingPost, setIsDeletingPost] = useState(false);
 
   const timeT = useTimeTranslations();
+  const t = useTranslations("communities.post");
+  const tc = useTranslations("communities.community");
 
   if (post === undefined) {
     return <SkeletonPost />;
   }
 
   if (post === null) {
-    return <p className="text-muted-foreground p-8">Post introuvable.</p>;
+    return <p className="text-muted-foreground p-8">{t("notFound")}</p>;
   }
 
   const currentUserId = me?._id;
   const isPostOwner = currentUserId && post.authorId === currentUserId;
 
   const handleLikePost = async () => {
-    if (!isAuthenticated) return toast.error("Connectez-vous pour liker");
+    if (!isAuthenticated) return toast.error(tc("loginToLike"));
     await likePost({ postId: post._id });
   };
 
@@ -73,9 +76,9 @@ export default function PostClient() {
     try {
       await addComment({ postId: post._id, content: commentContent });
       setCommentContent("");
-      toast.success("Commentaire ajouté !");
+      toast.success(t("commentAdded"));
     } catch {
-      toast.error("Erreur lors de l'ajout du commentaire");
+      toast.error(t("commentError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -103,9 +106,9 @@ export default function PostClient() {
         content: editPostContent,
       });
       setIsEditingPost(false);
-      toast.success("Post modifié !");
+      toast.success(t("postUpdated"));
     } catch {
-      toast.error("Erreur lors de la modification du post");
+      toast.error(t("updateError"));
     } finally {
       setIsSavingPost(false);
     }
@@ -115,10 +118,10 @@ export default function PostClient() {
     setIsDeletingPost(true);
     try {
       await deletePost({ postId: post._id });
-      toast.success("Post supprimé !");
+      toast.success(t("postDeleted"));
       router.push(`/communities/${communitySlug}`);
     } catch {
-      toast.error("Erreur lors de la suppression du post");
+      toast.error(t("deleteError"));
     } finally {
       setIsDeletingPost(false);
     }
@@ -133,7 +136,7 @@ export default function PostClient() {
           href="/communities"
           className="hover:text-foreground transition-colors"
         >
-          Communautés
+          {t("breadcrumbs")}
         </Link>
         <span>
           <ChevronRight className="w-4 h-4" />
@@ -163,7 +166,7 @@ export default function PostClient() {
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
                 className="text-xl font-bold"
-                placeholder="Titre du post"
+                placeholder={t("editTitlePlaceholder")}
                 autoFocus
               />
               <Textarea
@@ -171,7 +174,7 @@ export default function PostClient() {
                 onChange={(e) => setEditPostContent(e.target.value)}
                 rows={5}
                 className="resize-none text-sm"
-                placeholder="Contenu du post..."
+                placeholder={t("editContentPlaceholder")}
               />
               <div className="flex gap-2">
                 <Button
@@ -182,10 +185,10 @@ export default function PostClient() {
                   {isSavingPost ? (
                     <>
                       <Loader2 className="size-4 animate-spin mr-2" />
-                      Enregistrement...
+                      {t("saving")}
                     </>
                   ) : (
-                    "Enregistrer"
+                    t("save")
                   )}
                 </Button>
                 <Button
@@ -193,7 +196,7 @@ export default function PostClient() {
                   variant="ghost"
                   onClick={handleCancelEditPost}
                 >
-                  Annuler
+                  {t("cancel")}
                 </Button>
               </div>
             </div>
@@ -270,8 +273,8 @@ export default function PostClient() {
                 </Button>
 
                 <DeleteConfirmDialog
-                  title="Supprimer le post"
-                  description="Voulez-vous vraiment supprimer ce post et tous ses commentaires ? Cette action est irréversible."
+                  title={t("deleteTitle")}
+                  description={t("deleteDescription")}
                   onConfirm={handleDeletePost}
                   isPending={isDeletingPost}
                   trigger={
@@ -293,12 +296,12 @@ export default function PostClient() {
         {isAuthenticated && (
           <div className="bg-background px-4 py-2 border-b border-border space-y-3">
             <p className="text-sm font-medium text-foreground">
-              Ajouter un commentaire
+              {t("addComment")}
             </p>
             <Textarea
               value={commentContent}
               onChange={(e) => setCommentContent(e.target.value)}
-              placeholder="Exprimez-vous..."
+              placeholder={t("commentPlaceholder")}
               rows={3}
               className="resize-none text-sm bg-transparent border-border focus-visible:ring-1"
             />
@@ -309,7 +312,7 @@ export default function PostClient() {
                 size="sm"
                 className="rounded-full px-6"
               >
-                {isSubmitting ? "Envoi..." : "Commenter"}
+                {isSubmitting ? t("sending") : t("comment")}
               </Button>
             </div>
           </div>
@@ -318,8 +321,7 @@ export default function PostClient() {
         {/* Comments */}
         <div className="space-y-0 px-4 mt-4">
           <h2 className="text-sm font-semibold text-foreground mb-4">
-            {validComments.length} commentaire
-            {validComments.length > 1 ? "s" : ""}
+            {validComments.length === 1 ? t("commentsCount", { count: 1 }) : t("commentsCountPlural", { count: validComments.length })}
           </h2>
           {validComments.map((comment) => (
             <CommentItem

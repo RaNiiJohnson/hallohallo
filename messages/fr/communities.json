@@ -1,3 +1,89 @@
 {
-  "title": "Communautés"
+  "title": "Communautés",
+  "dialogs": {
+    "createCommunity": {
+      "trigger": "Créer une communauté",
+      "title": "Créer une communauté",
+      "description": "Créez un espace d'échange autour d'un thème commun"
+    },
+    "createPost": {
+      "trigger": "Créer un post",
+      "title": "Créer un post",
+      "description": "Partagez quelque chose avec la communauté"
+    }
+  },
+  "forms": {
+    "createCommunity": {
+      "errorNameMin": "Le nom doit contenir au moins 3 caractères",
+      "errorNameMax": "Le nom ne peut pas dépasser 60 caractères",
+      "errorDescMin": "La description doit contenir au moins 10 caractères",
+      "errorDescMax": "La description ne peut pas dépasser 200 caractères",
+      "privacyPublic": "Public — visible par tous",
+      "privacyPrivate": "Privé — visible mais accès sur invitation",
+      "privacySecret": "Secret — invisible et accès sur invitation",
+      "successToast": "Communauté créée avec succès !",
+      "errorToast": "Erreur lors de la création de la communauté",
+      "nameLabel": "Nom de la communauté *",
+      "namePlaceholder": "Ex: Francophones en Allemagne",
+      "descLabel": "Description *",
+      "descPlaceholder": "Décrivez le but et le thème de votre communauté...",
+      "privacyLabel": "Visibilité *",
+      "privacyPlaceholder": "Choisir la visibilité",
+      "submiting": "Création en cours...",
+      "submit": "Créer la communauté"
+    },
+    "createPost": {
+      "errorTitleMin": "Le titre doit contenir au moins 3 caractères",
+      "errorTitleMax": "Le titre ne peut pas dépasser 100 caractères",
+      "errorContentMin": "Le contenu doit contenir au moins 10 caractères",
+      "successToast": "Post créé avec succès !",
+      "errorToast": "Erreur lors de la création du post",
+      "titleLabel": "Titre *",
+      "titlePlaceholder": "Un titre accrocheur...",
+      "contentLabel": "Contenu *",
+      "contentPlaceholder": "Exprimez-vous...",
+      "submiting": "Publication...",
+      "submit": "Publier",
+      "characters": "caractères"
+    }
+  },
+  "community": {
+    "notFound": "Communauté introuvable.",
+    "loginToLike": "Connectez-vous pour liker",
+    "joined": "Vous avez rejoint {name} !",
+    "joinError": "Erreur lors de l'adhésion",
+    "left": "Vous avez quitté {name}",
+    "error": "Erreur",
+    "breadcrumbs": "Communautés",
+    "members": "membres",
+    "posts": "posts",
+    "leave": "Quitter",
+    "join": "Rejoindre",
+    "emptyPosts": "Aucun post pour le moment.",
+    "firstToPost": "Soyez le premier à publier →",
+    "admin": "Admin"
+  },
+  "post": {
+    "notFound": "Post introuvable.",
+    "commentAdded": "Commentaire ajouté !",
+    "commentError": "Erreur lors de l'ajout du commentaire",
+    "postUpdated": "Post modifié !",
+    "updateError": "Erreur lors de la modification du post",
+    "postDeleted": "Post supprimé !",
+    "deleteError": "Erreur lors de la suppression du post",
+    "breadcrumbs": "Communautés",
+    "editTitlePlaceholder": "Titre du post",
+    "editContentPlaceholder": "Contenu du post...",
+    "saving": "Enregistrement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "deleteTitle": "Supprimer le post",
+    "deleteDescription": "Voulez-vous vraiment supprimer ce post et tous ses commentaires ? Cette action est irréversible.",
+    "addComment": "Ajouter un commentaire",
+    "commentPlaceholder": "Exprimez-vous...",
+    "sending": "Envoi...",
+    "comment": "Commenter",
+    "commentsCount": "{count} commentaire",
+    "commentsCountPlural": "{count} commentaires"
+  }
 }

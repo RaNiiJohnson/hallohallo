@@ -1,3 +1,89 @@
 {
-  "title": "Gemeinschaften"
+  "title": "Gemeinschaften",
+  "dialogs": {
+    "createCommunity": {
+      "trigger": "Community erstellen",
+      "title": "Community erstellen",
+      "description": "Erstellen Sie einen Diskussionsraum rund um ein gemeinsames Thema"
+    },
+    "createPost": {
+      "trigger": "Post erstellen",
+      "title": "Post erstellen",
+      "description": "Teilen Sie etwas mit der Community"
+    }
+  },
+  "forms": {
+    "createCommunity": {
+      "errorNameMin": "Der Name muss mindestens 3 Zeichen enthalten",
+      "errorNameMax": "Der Name darf 60 Zeichen nicht überschreiten",
+      "errorDescMin": "Die Beschreibung muss mindestens 10 Zeichen enthalten",
+      "errorDescMax": "Die Beschreibung darf 200 Zeichen nicht überschreiten",
+      "privacyPublic": "Öffentlich — für alle sichtbar",
+      "privacyPrivate": "Privat — sichtbar, aber nur auf Einladung",
+      "privacySecret": "Geheim — verborgen und nur auf Einladung",
+      "successToast": "Community erfolgreich erstellt!",
+      "errorToast": "Fehler beim Erstellen der Community",
+      "nameLabel": "Name der Community *",
+      "namePlaceholder": "Z. B.: Expats in Deutschland",
+      "descLabel": "Beschreibung *",
+      "descPlaceholder": "Beschreiben Sie das Ziel und Thema Ihrer Community...",
+      "privacyLabel": "Sichtbarkeit *",
+      "privacyPlaceholder": "Sichtbarkeit wählen",
+      "submiting": "Wird erstellt...",
+      "submit": "Community erstellen"
+    },
+    "createPost": {
+      "errorTitleMin": "Der Titel muss mindestens 3 Zeichen lang sein",
+      "errorTitleMax": "Der Titel darf 100 Zeichen nicht überschreiten",
+      "errorContentMin": "Der Inhalt muss mindestens 10 Zeichen lang sein",
+      "successToast": "Post erfolgreich erstellt!",
+      "errorToast": "Fehler beim Erstellen des Posts",
+      "titleLabel": "Titel *",
+      "titlePlaceholder": "Ein einprägsamer Titel...",
+      "contentLabel": "Inhalt *",
+      "contentPlaceholder": "Drücken Sie sich aus...",
+      "submiting": "Wird veröffentlicht...",
+      "submit": "Veröffentlichen",
+      "characters": "Zeichen"
+    }
+  },
+  "community": {
+    "notFound": "Community nicht gefunden.",
+    "loginToLike": "Zum Liken anmelden",
+    "joined": "Sie sind {name} beigetreten!",
+    "joinError": "Fehler beim Beitritt",
+    "left": "Sie haben {name} verlassen",
+    "error": "Fehler",
+    "breadcrumbs": "Communities",
+    "members": "Mitglieder",
+    "posts": "Posts",
+    "leave": "Verlassen",
+    "join": "Beitreten",
+    "emptyPosts": "Noch keine Posts.",
+    "firstToPost": "Seien Sie der Erste, der postet →",
+    "admin": "Admin"
+  },
+  "post": {
+    "notFound": "Post nicht gefunden.",
+    "commentAdded": "Kommentar hinzugefügt!",
+    "commentError": "Fehler beim Hinzufügen des Kommentars",
+    "postUpdated": "Post aktualisiert!",
+    "updateError": "Fehler beim Aktualisieren des Posts",
+    "postDeleted": "Post gelöscht!",
+    "deleteError": "Fehler beim Löschen des Posts",
+    "breadcrumbs": "Communities",
+    "editTitlePlaceholder": "Titel des Posts",
+    "editContentPlaceholder": "Inhalt des Posts...",
+    "saving": "Wird gespeichert...",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "deleteTitle": "Post löschen",
+    "deleteDescription": "Möchten Sie diesen Post und alle Kommentare wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "addComment": "Kommentar hinzufügen",
+    "commentPlaceholder": "Drücken Sie sich aus...",
+    "sending": "Wird gesendet...",
+    "comment": "Kommentieren",
+    "commentsCount": "{count} Kommentar",
+    "commentsCountPlural": "{count} Kommentare"
+  }
 }
