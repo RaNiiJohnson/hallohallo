@@ -1,0 +1,23 @@
+{
+  "nav": {
+    "home": "Home",
+    "communities": "communities",
+    "opportunities": "Opportunities",
+    "housing": "Housing"
+  },
+  "premium": {
+    "label": "Go Premium",
+    "tooltip": "Go Premium"
+  },
+  "communities": {
+    "label": "Communities",
+    "explore": "Explore all..."
+  },
+  "auth": {
+    "register": "Sign up",
+    "login": "Log in",
+    "profile": "My Profile",
+    "settings": "Settings",
+    "logout": "Log out"
+  }
+}

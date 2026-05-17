@@ -1,0 +1,23 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "communities": "Communautés",
+    "opportunities": "Opportunités",
+    "housing": "Immobilier"
+  },
+  "premium": {
+    "label": "Passer au Premium",
+    "tooltip": "Passer au Premium"
+  },
+  "communities": {
+    "label": "Communautés",
+    "explore": "Explorer tout..."
+  },
+  "auth": {
+    "register": "S'inscrire",
+    "login": "Se connecter",
+    "profile": "Mon Profil",
+    "settings": "Paramètres",
+    "logout": "Se déconnecter"
+  }
+}

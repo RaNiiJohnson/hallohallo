@@ -1,0 +1,23 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "communities": "Gemeinschaften",
+    "opportunities": "Möglichkeiten",
+    "housing": "Immobilien"
+  },
+  "premium": {
+    "label": "Premium werden",
+    "tooltip": "Premium werden"
+  },
+  "communities": {
+    "label": "Gemeinschaften",
+    "explore": "Alle erkunden..."
+  },
+  "auth": {
+    "register": "Registrieren",
+    "login": "Anmelden",
+    "profile": "Mein Profil",
+    "settings": "Einstellungen",
+    "logout": "Abmelden"
+  }
+}

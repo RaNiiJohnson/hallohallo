@@ -1,0 +1,42 @@
+{
+  "title": "Nos Services",
+  "community": "Communauté",
+  "opportunities": "Opportunités",
+  "housing": "Immobilier",
+  "description": "Nous sommes une communauté dédiée aux réseautages entre natif et diaspora Malagasy en Allemagne. Une plateforme d'échange et de partage pour favoriser l'entraide entre les jeunes expats de Madagascar.",
+  "login": "Se connecter",
+  "discover": "Découvrir",
+  "explore": "Explorer",
+  "seeListings": "Voir les annonces",
+  "communityDescription": "Connectez-vous avec d'autres Malagasy en Allemagne et créez des liens durables au sein de notre communauté.",
+  "opportunitiesDescription": "Trouvez des opportunités d'emploi et de formation adaptées à votre profil et vos ambitions professionnelles.",
+  "housingDescription": "Partagez et trouvez des logements facilement grâce à notre réseau de confiance au sein de la communauté.",
+  "aboutTitle": "À Propos de Nous",
+  "reviews": {
+    "mission": {
+      "title": "Mission",
+      "titleAccordion": "Notre Mission",
+      "description": "Créer un pont entre les Malagasy vivant en Allemagne et ceux restés au pays, facilitant l'intégration et le partage d'expériences."
+    },
+    "vision": {
+      "title": "Vision",
+      "titleAccordion": "Notre Vision",
+      "description": "Devenir la référence pour la communauté Malagasy en Allemagne, un espace d'entraide et de croissance mutuelle."
+    },
+    "values": {
+      "title": "Valeurs",
+      "titleAccordion": "Nos Valeurs",
+      "description": "Solidarité, partage et entraide. La force de la communauté pour surmonter ensemble les défis de l'expatriation."
+    },
+    "commitment": {
+      "title": "Engagement",
+      "titleAccordion": "Notre Engagement",
+      "description": "Offrir une solution pratique pour faciliter l'épanouissement de chaque membre, en simplifiant son quotidien et en ouvrant des opportunités."
+    },
+    "identity": {
+      "title": "Identité",
+      "titleAccordion": "Notre Identité",
+      "description": "Préserver et célébrer la culture Malagasy tout en embrassant la diversité allemande, pour représenter fièrement notre pays."
+    }
+  }
+}

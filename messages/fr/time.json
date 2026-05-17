@@ -1,0 +1,20 @@
+{
+  "now": "maintenant",
+  "instant": "à l'instant",
+  "ago": "il y a",
+  "at": "à",
+  "year": "an",
+  "years": "ans",
+  "month": "mois",
+  "months": "mois",
+  "day": "jour",
+  "days": "jours",
+  "hour": "heure",
+  "hours": "heures",
+  "minute": "minute",
+  "minutes": "minutes",
+  "second": "seconde",
+  "seconds": "secondes",
+  "week": "semaine",
+  "weeks": "semaines"
+}

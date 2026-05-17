@@ -1,0 +1,20 @@
+{
+  "description": "Wir sind eine Gemeinschaft, die dem Networking zwischen einheimischen und diaspora Malagasy in Deutschland gewidmet ist. Eine Plattform für Austausch und gegenseitige Unterstützung.",
+  "tagline": "Für die Malagasy-Gemeinschaft.",
+  "nav": {
+    "title": "Navigation",
+    "home": "Startseite",
+    "community": "Gemeinschaft",
+    "opportunities": "Möglichkeiten",
+    "housing": "Immobilien",
+    "faq": "FAQ"
+  },
+  "contact": {
+    "title": "Kontakt",
+    "location": "Deutschland"
+  },
+  "social": {
+    "title": "Folgen Sie uns"
+  },
+  "copyright": "Alle Rechte vorbehalten."
+}

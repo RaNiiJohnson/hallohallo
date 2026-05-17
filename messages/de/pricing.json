@@ -1,0 +1,35 @@
+{
+  "title": "Wählen Sie Ihren Plan",
+  "description": "Treten Sie der Malagasy-Gemeinschaft in Deutschland mit dem Plan bei, der zu Ihnen passt. Starten Sie kostenlos und wachsen Sie nach Bedarf.",
+  "free": {
+    "name": "Kostenlos",
+    "price": "0€ / Monat",
+    "cta": "Kostenlos starten",
+    "features": [
+      "Basisprofil",
+      "Anzeigen durchsuchen",
+      "3 Kontakte pro Monat",
+      "Zugang zu öffentlichen Veranstaltungen",
+      "Einfache Suche"
+    ]
+  },
+  "pro": {
+    "name": "Pro",
+    "price": "9€ / Monat",
+    "cta": "Premium wählen",
+    "features": [
+      "Unbegrenzte Kontakte",
+      "Hervorgehobenes Profil",
+      "Erweiterte Filter",
+      "Premium-Abzeichen",
+      "Zugang zu privaten Veranstaltungen",
+      "Profilstatistiken",
+      "Prioritätssupport"
+    ]
+  },
+  "faq": {
+    "title": "Häufig gestellte Fragen",
+    "description": "Haben Sie Fragen? Wir sind hier, um zu helfen.",
+    "cta": "FAQ ansehen"
+  }
+}

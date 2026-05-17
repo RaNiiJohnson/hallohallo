@@ -1,0 +1,35 @@
+{
+  "title": "Choose your plan",
+  "description": "Join the Malagasy community in Germany with the plan that suits you. Start for free and grow as you need.",
+  "free": {
+    "name": "Free",
+    "price": "€0 / month",
+    "cta": "Get started for free",
+    "features": [
+      "Basic profile",
+      "Browse listings",
+      "3 contacts per month",
+      "Access to public events",
+      "Basic search"
+    ]
+  },
+  "pro": {
+    "name": "Pro",
+    "price": "€9 / month",
+    "cta": "Choose Premium",
+    "features": [
+      "Unlimited contacts",
+      "Featured profile",
+      "Advanced filters",
+      "Premium badge",
+      "Access to private events",
+      "Profile statistics",
+      "Priority support"
+    ]
+  },
+  "faq": {
+    "title": "Frequently asked questions",
+    "description": "Have questions? We are here to help.",
+    "cta": "View FAQ"
+  }
+}

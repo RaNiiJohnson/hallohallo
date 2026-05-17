@@ -1,0 +1,20 @@
+{
+  "description": "We are a community dedicated to networking between native and diaspora Malagasy in Germany. A platform for exchange and sharing to foster mutual support.",
+  "tagline": "For the Malagasy community.",
+  "nav": {
+    "title": "Navigation",
+    "home": "Home",
+    "community": "Community",
+    "opportunities": "Opportunities",
+    "housing": "Housing",
+    "faq": "FAQ"
+  },
+  "contact": {
+    "title": "Contact",
+    "location": "Germany"
+  },
+  "social": {
+    "title": "Follow us"
+  },
+  "copyright": "All rights reserved."
+}
