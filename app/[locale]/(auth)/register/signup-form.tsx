@@ -19,46 +19,32 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-
-// const roleOptions = [
-//   {
-//     value: "CANDIDATE",
-//     label: "Candidat à l'emploi ou à la recherche d'un logement",
-//   },
-//   {
-//     value: "RECRUITER",
-//     label: "Responsable du recrutement",
-//   },
-//   {
-//     value: "OWNER",
-//     label: "Propriétaire de biens immobiliers",
-//   },
-// ];
-
-const SignupFormSchema = z
-  .object({
-    name: z.string().min(2, {
-      message: "Le nom doit contenir au moins 2 caractères.",
-    }),
-    email: z.email({
-      message: "Adresse email invalide.",
-    }),
-    // company: z.optional(z.string()),
-    // roles: z.string(),
-    password: z.string().min(8, {
-      message: "Le mot de passe doit contenir au moins 8 caractères.",
-    }),
-    passwordConfirmation: z
-      .string()
-      .min(1, { message: "Le mot de passe de confirmation est requis." }),
-  })
-  .refine((data) => data.password === data.passwordConfirmation, {
-    message: "Les mots de passe ne correspondent pas.",
-    path: ["passwordConfirmation"],
-  });
+import { useTranslations } from "next-intl";
 
 export function SignupForm() {
   const router = useRouter();
+  const t = useTranslations("auth.register.form");
+  const tToast = useTranslations("auth.register.toast");
+
+  const SignupFormSchema = z
+    .object({
+      name: z.string().min(2, {
+        message: t("nameError"),
+      }),
+      email: z.email({
+        message: t("emailError"),
+      }),
+      password: z.string().min(8, {
+        message: t("passwordError"),
+      }),
+      passwordConfirmation: z
+        .string()
+        .min(1, { message: t("confirmPasswordError") }),
+    })
+    .refine((data) => data.password === data.passwordConfirmation, {
+      message: t("passwordMismatch"),
+      path: ["passwordConfirmation"],
+    });
 
   const form = useForm<z.infer<typeof SignupFormSchema>>({
     resolver: zodResolver(SignupFormSchema),
@@ -80,7 +66,7 @@ export function SignupForm() {
       name: values.name,
       fetchOptions: {
         onSuccess: () => {
-          toast.success("Inscription réussie.");
+          toast.success(tToast("success"));
           router.push("/");
         },
         onError: (error) => {
@@ -99,11 +85,11 @@ export function SignupForm() {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nom</FormLabel>
+                <FormLabel>{t("name")}</FormLabel>
                 <FormControl>
                   <Input
                     type="text"
-                    placeholder="Dupont"
+                    placeholder={t("namePlaceholder")}
                     className="h-11"
                     {...field}
                   />
@@ -117,11 +103,11 @@ export function SignupForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t("email")}</FormLabel>
                 <FormControl>
                   <Input
                     type="email"
-                    placeholder="nom@exemple.com"
+                    placeholder={t("emailPlaceholder")}
                     className="h-11"
                     {...field}
                   />
@@ -136,11 +122,11 @@ export function SignupForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Mot de passe</FormLabel>
+                <FormLabel>{t("password")}</FormLabel>
                 <FormControl>
                   <PasswordInput
                     autoComplete="new-password"
-                    placeholder="Entrez votre mot de passe"
+                    placeholder={t("passwordPlaceholder")}
                     className="h-11"
                     {...field}
                   />
@@ -154,11 +140,11 @@ export function SignupForm() {
             name="passwordConfirmation"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Confirmer le mot de passe</FormLabel>
+                <FormLabel>{t("confirmPassword")}</FormLabel>
                 <FormControl>
                   <PasswordInput
                     autoComplete="new-password"
-                    placeholder="Confirmer votre mot de passe"
+                    placeholder={t("confirmPasswordPlaceholder")}
                     className="h-11"
                     {...field}
                   />
@@ -171,10 +157,10 @@ export function SignupForm() {
             {isSubmitting ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                Création du compte...
+                {t("submitting")}
               </>
             ) : (
-              "Créer un compte"
+              t("submit")
             )}
           </Button>
         </form>

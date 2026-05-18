@@ -1,15 +1,20 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { SignupForm } from "./signup-form";
 import { Button } from "@/components/ui/button";
 import { ArrowLeftIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
-export default async function SignupPage() {
+export default function SignupPage() {
+  const t = useTranslations("auth.register");
+
   return (
     <div>
       <Button variant="outline" className="absolute top-4 left-4">
         <Link href="/" className="flex items-center">
-          <ArrowLeftIcon className="mr-2 h-4 w-4" /> Retour
+          <ArrowLeftIcon className="mr-2 h-4 w-4" /> {t("back")}
         </Link>
       </Button>
       <div className="min-h-screen flex items-center justify-center p-4">
@@ -17,7 +22,7 @@ export default async function SignupPage() {
           <CardHeader className="space-y-4 pb-8 text-center">
             <div className="space-y-2">
               <CardTitle className="text-2xl font-bold">
-                Créez votre compte
+                {t("title")}
               </CardTitle>
             </div>
           </CardHeader>
@@ -25,12 +30,12 @@ export default async function SignupPage() {
             <SignupForm />
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                Vous avez déjà un compte ?{" "}
+                {t("hasAccount")}{" "}
                 <Link
                   href="/login"
                   className="font-medium text-primary hover:underline"
                 >
-                  Se connecter
+                  {t("login")}
                 </Link>
               </p>
             </div>

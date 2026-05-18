@@ -21,19 +21,22 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-
-const SignInFormSchema = z.object({
-  email: z.email({
-    message: "Adresse e-mail invalide.",
-  }),
-  password: z.string().min(8, {
-    message: "Le mot de passe doit contenir au moins 8 caractères.",
-  }),
-  rememberMe: z.boolean().optional(),
-});
+import { useTranslations } from "next-intl";
 
 export function SigninForm() {
   const router = useRouter();
+  const t = useTranslations("auth.login.form");
+  const tToast = useTranslations("auth.login.toast");
+
+  const SignInFormSchema = z.object({
+    email: z.email({
+      message: t("emailError"),
+    }),
+    password: z.string().min(8, {
+      message: t("passwordError"),
+    }),
+    rememberMe: z.boolean().optional(),
+  });
 
   const form = useForm<z.infer<typeof SignInFormSchema>>({
     resolver: zodResolver(SignInFormSchema),
@@ -53,11 +56,11 @@ export function SigninForm() {
       password: values.password,
       fetchOptions: {
         onSuccess: () => {
-          toast.success("Connexion réussie.");
+          toast.success(tToast("success"));
           router.push("/");
         },
         onError: () => {
-          toast.error("Connexion échouée.");
+          toast.error(tToast("error"));
         },
       },
     });
@@ -72,11 +75,11 @@ export function SigninForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t("email")}</FormLabel>
                 <FormControl>
                   <Input
                     type="email"
-                    placeholder="nom@exemple.com"
+                    placeholder={t("emailPlaceholder")}
                     className="h-11"
                     {...field}
                   />
@@ -91,18 +94,18 @@ export function SigninForm() {
             render={({ field }) => (
               <FormItem>
                 <div className="flex items-center justify-between">
-                  <FormLabel>Mot de passe</FormLabel>
+                  <FormLabel>{t("password")}</FormLabel>
                   <Link
                     className="text-sm text-primary hover:underline"
                     href="/auth/forget-password"
                   >
-                    Mot de passe oublié ?
+                    {t("forgotPassword")}
                   </Link>
                 </div>
                 <FormControl>
                   <PasswordInput
                     autoComplete="current-password"
-                    placeholder="Entrez votre mot de passe"
+                    placeholder={t("passwordPlaceholder")}
                     className="h-11"
                     {...field}
                   />
@@ -122,7 +125,7 @@ export function SigninForm() {
                     onCheckedChange={field.onChange}
                   />
                 </FormControl>
-                <FormLabel>Se souvenir de moi</FormLabel>
+                <FormLabel>{t("rememberMe")}</FormLabel>
               </FormItem>
             )}
           />
@@ -131,10 +134,10 @@ export function SigninForm() {
             {isSubmitting ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                Connexion en cours...
+                {t("submitting")}
               </>
             ) : (
-              "Se connecter"
+              t("submit")
             )}
           </Button>
         </form>
