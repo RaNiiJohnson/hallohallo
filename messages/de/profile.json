@@ -1,0 +1,63 @@
+{
+  "coverAlt": "Titelbild",
+  "editCover": "Titelbild bearbeiten",
+  "profileAlt": "Profilbild",
+  "editProfile": "Profilbild bearbeiten",
+  "serviceProvider": "Dienstleister",
+  "editProfileButton": "Profil bearbeiten",
+  "about": "Über mich",
+  "experience": "Erfahrung",
+  "yearsExperience": "{count} Jahre Erfahrung",
+  "roles": "Rollen",
+  "since": "Seit {date}",
+  "at": "bei {company}",
+  "skills": "Fähigkeiten",
+  "journey": "Werdegang",
+  "contactInfo": "Kontaktinformationen",
+  "email": "E-Mail",
+  "visibleOnProfile": "Auf dem Profil sichtbar",
+  "hidden": "Verborgen",
+  "profileVisibility": "Profilsichtbarkeit",
+  "publicProfile": "Öffentliches Profil",
+  "privateProfile": "Privates Profil",
+  "edit": "Bearbeiten",
+  "status": {
+    "lookingForJob": "Offen für Möglichkeiten",
+    "onSabbatical": "Im Sabbatjahr",
+    "inactive": "Inaktives Profil"
+  },
+  "emptyState": {
+    "title": "Profil vervollständigen",
+    "description": "Fügen Sie weitere Informationen hinzu, damit andere Sie besser kennenlernen können.",
+    "button": "Profil bearbeiten"
+  },
+  "notFound": {
+    "title": "Profil nicht gefunden",
+    "description": "Dieses Profil existiert nicht oder wurde gelöscht.",
+    "backButton": "Zurück zu den Communitys"
+  },
+  "upload": {
+    "profileTitle": "Profilbild bearbeiten",
+    "coverTitle": "Titelbild bearbeiten",
+    "profileDesc": "Wählen Sie ein Foto, das Sie repräsentiert",
+    "coverDesc": "Fügen Sie ein Titelbild hinzu, um Ihr Profil zu personalisieren",
+    "changeImage": "Bild ändern",
+    "uploadImage": "Bild hochladen",
+    "change": "Ändern",
+    "dragDrop": "Bild hierher ziehen und ablegen",
+    "clickToSelect": "oder klicken zum Auswählen",
+    "maxSize": "PNG, JPG, GIF bis zu 5MB",
+    "removeImage": "Bild entfernen",
+    "preview": "Vorschau",
+    "currentImage": "Aktuelles Bild",
+    "currentImageAlt": "Aktuelles Bild",
+    "cancel": "Abbrechen",
+    "sending": "Wird hochgeladen...",
+    "save": "Speichern",
+    "toast": {
+      "success": "Bild erfolgreich aktualisiert",
+      "uploadError": "Bild konnte nicht hochgeladen werden",
+      "error": "Beim Hochladen ist ein Fehler aufgetreten"
+    }
+  }
+}

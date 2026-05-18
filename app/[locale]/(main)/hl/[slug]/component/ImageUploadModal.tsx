@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 type ImageType = "profile" | "cover";
 
@@ -40,6 +41,7 @@ export function ImageUploadModal({
 }: ImageUploadModalProps) {
   const generateUploadUrl = useMutation(api.upload.generateUploadUrl);
   const updateUser = useMutation(api.users.updateUser);
+  const t = useTranslations("profile.upload");
 
   const [isPending, startTransition] = useTransition();
 
@@ -80,7 +82,7 @@ export function ImageUploadModal({
 
         if (!uploadRes.ok) {
           console.error("Upload failed", await uploadRes.text());
-          toast.error("Échec du téléchargement de l'image");
+          toast.error(t("toast.uploadError"));
           return;
         }
 
@@ -98,7 +100,7 @@ export function ImageUploadModal({
           patch: patchData,
         });
 
-        toast.success("Image mise à jour avec succès");
+        toast.success(t("toast.success"));
 
         // Clean up and close
         clearFiles();
@@ -106,7 +108,7 @@ export function ImageUploadModal({
         onSuccess?.();
       } catch (error) {
         console.error("Upload error:", error);
-        toast.error("Une erreur est survenue lors du téléchargement");
+        toast.error(t("toast.error"));
       }
     });
   };
@@ -119,12 +121,8 @@ export function ImageUploadModal({
   };
 
   const isProfileImage = imageType === "profile";
-  const title = isProfileImage
-    ? "Modifier la photo de profil"
-    : "Modifier la photo de couverture";
-  const description = isProfileImage
-    ? "Choisissez une photo qui vous représente"
-    : "Ajoutez une image de couverture pour personnaliser votre profil";
+  const title = isProfileImage ? t("profileTitle") : t("coverTitle");
+  const description = isProfileImage ? t("profileDesc") : t("coverDesc");
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -143,7 +141,7 @@ export function ImageUploadModal({
             role="button"
             tabIndex={0}
             aria-label={
-              previewUrl ? "Changer l'image" : "Télécharger une image"
+              previewUrl ? t("changeImage") : t("uploadImage")
             }
             className={cn(
               "relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all duration-200 cursor-pointer",
@@ -170,7 +168,7 @@ export function ImageUploadModal({
               <>
                 <Image
                   src={previewUrl}
-                  alt="Aperçu"
+                  alt={t("preview")}
                   className={cn(
                     "w-full h-full object-cover",
                     isProfileImage ? "rounded-full" : "rounded-xl",
@@ -187,7 +185,7 @@ export function ImageUploadModal({
                 >
                   <div className="text-center text-white">
                     <Upload className="mx-auto size-8 mb-2" />
-                    <span className="text-sm font-medium">Changer</span>
+                    <span className="text-sm font-medium">{t("change")}</span>
                   </div>
                 </div>
                 {/* Remove button */}
@@ -198,7 +196,7 @@ export function ImageUploadModal({
                     removeFile(files[0]?.id);
                   }}
                   className="absolute -top-2 -right-2 p-1.5 rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors shadow-lg"
-                  aria-label="Supprimer l'image"
+                  aria-label={t("removeImage")}
                 >
                   <X className="size-4" />
                 </button>
@@ -209,13 +207,13 @@ export function ImageUploadModal({
                   <ImageIcon className="size-8 text-primary" />
                 </div>
                 <p className="text-sm font-medium mb-1">
-                  Glissez-déposez une image ici
+                  {t("dragDrop")}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  ou cliquez pour sélectionner
+                  {t("clickToSelect")}
                 </p>
                 <p className="text-xs text-muted-foreground mt-2">
-                  PNG, JPG, GIF jusqu&apos;à 5MB
+                  {t("maxSize")}
                 </p>
               </div>
             )}
@@ -227,7 +225,7 @@ export function ImageUploadModal({
           {!previewUrl && currentImageUrl && (
             <div className="text-center">
               <p className="text-sm text-muted-foreground mb-2">
-                Image actuelle
+                {t("currentImage")}
               </p>
               <div
                 className={cn(
@@ -239,7 +237,7 @@ export function ImageUploadModal({
               >
                 <Image
                   src={currentImageUrl}
-                  alt="Image actuelle"
+                  alt={t("currentImageAlt")}
                   className="w-full h-full object-cover"
                   width={100}
                   height={300}
@@ -265,7 +263,7 @@ export function ImageUploadModal({
             onClick={handleClose}
             disabled={isPending}
           >
-            Annuler
+            {t("cancel")}
           </Button>
           <Button
             type="button"
@@ -276,12 +274,12 @@ export function ImageUploadModal({
             {isPending ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />
-                Envoi...
+                {t("sending")}
               </>
             ) : (
               <>
                 <Upload className="mr-2 size-4" />
-                Enregistrer
+                {t("save")}
               </>
             )}
           </Button>

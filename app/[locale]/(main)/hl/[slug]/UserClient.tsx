@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { ImageUploadModal } from "./component/ImageUploadModal";
 import { notFound } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { formatMonthYear } from "@/lib/date";
 
 export default function UserClient({
@@ -30,6 +30,7 @@ export default function UserClient({
   const currentUser = useQuery(api.auth.getCurrentUser);
 
   const locale = useLocale();
+  const t = useTranslations("profile");
 
   // Modal states for image uploads - must be before early return
   const [profileImageModalOpen, setProfileImageModalOpen] = useState(false);
@@ -49,7 +50,7 @@ export default function UserClient({
         <div className="relative">
           <Image
             src={user.coverImageUrl || "/default-cover.jpg"}
-            alt="Photo de couverture"
+            alt={t("coverAlt")}
             height={200}
             width={800}
             priority
@@ -61,7 +62,7 @@ export default function UserClient({
               type="button"
               onClick={() => setCoverImageModalOpen(true)}
               className="absolute top-3 right-3 bg-card/80 backdrop-blur-sm p-2 rounded-full hover:bg-card transition-colors"
-              title="Modifier la photo de couverture"
+              title={t("editCover")}
             >
               <Pencil className="size-4" />
             </button>
@@ -74,7 +75,7 @@ export default function UserClient({
             <div className="relative inline-block">
               <Image
                 src={user.imageUrl || "/random-user.png"}
-                alt={user.name || "Photo de profil"}
+                alt={user.name || t("profileAlt")}
                 height={140}
                 width={140}
                 className="size-28 sm:size-36 object-cover rounded-full border-4 border-card"
@@ -85,7 +86,7 @@ export default function UserClient({
                   type="button"
                   onClick={() => setProfileImageModalOpen(true)}
                   className="absolute bottom-1 right-1 bg-primary p-2 rounded-full hover:bg-primary/90 transition-colors"
-                  title="Modifier la photo de profil"
+                  title={t("editProfile")}
                 >
                   <Pencil className="size-3.5 text-primary-foreground" />
                 </button>
@@ -117,19 +118,13 @@ export default function UserClient({
                     {user.industry}
                   </span>
                 )}
-                {/* {user.lastActiveAt && getRelativeTime(user.lastActiveAt) && (
-                  <span className="flex items-center gap-1.5 text-primary">
-                    <Clock className="size-4" />
-                    {getRelativeTime(user.lastActiveAt)}
-                  </span>
-                )} */}
               </div>
 
               {/* Service Provider Badge */}
               {user.isServiceProvider && (
                 <span className="inline-flex items-center gap-1.5 mt-3 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
                   <Sparkles className="size-4" />
-                  Prestataire de services
+                  {t("serviceProvider")}
                 </span>
               )}
             </div>
@@ -138,7 +133,7 @@ export default function UserClient({
             {isOwnProfile && (
               <div className="flex gap-2">
                 <button className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium hover:bg-primary/90 transition-colors">
-                  Modifier le profil
+                  {t("editProfileButton")}
                 </button>
               </div>
             )}
@@ -161,11 +156,11 @@ export default function UserClient({
       {user.bio && (
         <section className="bg-card lg:rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">À propos</h2>
+            <h2 className="text-xl font-semibold">{t("about")}</h2>
             {isOwnProfile && (
               <button
                 className="p-2 hover:bg-accent rounded-full transition-colors"
-                title="Modifier"
+                title={t("edit")}
               >
                 <Pencil className="size-4" />
               </button>
@@ -181,11 +176,11 @@ export default function UserClient({
       {(user.experienceYears || user.roles?.length || user.arrivalDate) && (
         <section className="bg-card lg:rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Expérience</h2>
+            <h2 className="text-xl font-semibold">{t("experience")}</h2>
             {isOwnProfile && (
               <button
                 className="p-2 hover:bg-accent rounded-full transition-colors"
-                title="Modifier"
+                title={t("edit")}
               >
                 <Pencil className="size-4" />
               </button>
@@ -201,7 +196,7 @@ export default function UserClient({
                 </div>
                 <div>
                   <h3 className="font-medium">
-                    {user.experienceYears} ans d&apos;expérience
+                    {t("yearsExperience", { count: user.experienceYears })}
                   </h3>
                   {user.field && (
                     <p className="text-sm text-muted-foreground">
@@ -219,7 +214,7 @@ export default function UserClient({
                   <GraduationCap className="size-5 text-muted-foreground" />
                 </div>
                 <div>
-                  <h3 className="font-medium">Rôles</h3>
+                  <h3 className="font-medium">{t("roles")}</h3>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {user.roles?.map((role: string, index: number) => (
                       <span
@@ -242,11 +237,11 @@ export default function UserClient({
                 </div>
                 <div>
                   <h3 className="font-medium">
-                    Depuis {formatMonthYear(user.arrivalDate, locale)}
+                    {t("since", { date: formatMonthYear(user.arrivalDate!, locale) as string })}
                   </h3>
                   {user.company && (
                     <p className="text-sm text-muted-foreground">
-                      chez {user.company}
+                      {t("at", { company: user.company })}
                     </p>
                   )}
                 </div>
@@ -260,11 +255,11 @@ export default function UserClient({
       {user.skills && user.skills.length > 0 && (
         <section className="bg-card lg:rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Compétences</h2>
+            <h2 className="text-xl font-semibold">{t("skills")}</h2>
             {isOwnProfile && (
               <button
                 className="p-2 hover:bg-accent rounded-full transition-colors"
-                title="Modifier"
+                title={t("edit")}
               >
                 <Pencil className="size-4" />
               </button>
@@ -287,11 +282,11 @@ export default function UserClient({
       {user.journey && user.journey.length > 0 && (
         <section className="bg-card lg:rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Parcours</h2>
+            <h2 className="text-xl font-semibold">{t("journey")}</h2>
             {isOwnProfile && (
               <button
                 className="p-2 hover:bg-accent rounded-full transition-colors"
-                title="Modifier"
+                title={t("edit")}
               >
                 <Pencil className="size-4" />
               </button>
@@ -316,10 +311,10 @@ export default function UserClient({
       {isOwnProfile && (
         <section className="bg-card lg:rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Informations de contact</h2>
+            <h2 className="text-xl font-semibold">{t("contactInfo")}</h2>
             <button
               className="p-2 hover:bg-accent rounded-full transition-colors"
-              title="Modifier"
+              title={t("edit")}
             >
               <Pencil className="size-4" />
             </button>
@@ -329,10 +324,10 @@ export default function UserClient({
             <div className="flex items-center gap-3">
               <Mail className="size-5 text-muted-foreground" />
               <div>
-                <p className="text-sm text-muted-foreground">Email</p>
+                <p className="text-sm text-muted-foreground">{t("email")}</p>
                 <p className="font-medium">{user.email}</p>
                 <p className="text-xs text-muted-foreground">
-                  {user.showEmail ? "Visible sur le profil" : "Masqué"}
+                  {user.showEmail ? t("visibleOnProfile") : t("hidden")}
                 </p>
               </div>
             </div>
@@ -342,10 +337,10 @@ export default function UserClient({
               <Globe className="size-5 text-muted-foreground" />
               <div>
                 <p className="text-sm text-muted-foreground">
-                  Visibilité du profil
+                  {t("profileVisibility")}
                 </p>
                 <p className="font-medium">
-                  {user.isPublic ? "Profil public" : "Profil privé"}
+                  {user.isPublic ? t("publicProfile") : t("privateProfile")}
                 </p>
               </div>
             </div>
@@ -368,11 +363,11 @@ export default function UserClient({
             />
             <span className="font-medium">
               {user.status === "looking_for_job"
-                ? "Ouvert aux opportunités"
+                ? t("status.lookingForJob")
                 : user.status === "on_sabbatical"
-                  ? "En sabbatique"
+                  ? t("status.onSabbatical")
                   : user.status === "inactive"
-                    ? "Profil inactif"
+                    ? t("status.inactive")
                     : user.status}
             </span>
           </div>
@@ -390,14 +385,13 @@ export default function UserClient({
                 <Pencil className="size-8 text-primary" />
               </div>
               <h3 className="text-lg font-semibold mb-2">
-                Complétez votre profil
+                {t("emptyState.title")}
               </h3>
               <p className="text-muted-foreground mb-4">
-                Ajoutez plus d&apos;informations pour que les autres puissent
-                mieux vous connaître.
+                {t("emptyState.description")}
               </p>
               <button className="px-6 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium hover:bg-primary/90 transition-colors">
-                Modifier le profil
+                {t("emptyState.button")}
               </button>
             </div>
           </section>

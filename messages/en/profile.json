@@ -1,0 +1,63 @@
+{
+  "coverAlt": "Cover photo",
+  "editCover": "Edit cover photo",
+  "profileAlt": "Profile photo",
+  "editProfile": "Edit profile photo",
+  "serviceProvider": "Service provider",
+  "editProfileButton": "Edit profile",
+  "about": "About",
+  "experience": "Experience",
+  "yearsExperience": "{count} years of experience",
+  "roles": "Roles",
+  "since": "Since {date}",
+  "at": "at {company}",
+  "skills": "Skills",
+  "journey": "Journey",
+  "contactInfo": "Contact information",
+  "email": "Email",
+  "visibleOnProfile": "Visible on profile",
+  "hidden": "Hidden",
+  "profileVisibility": "Profile visibility",
+  "publicProfile": "Public profile",
+  "privateProfile": "Private profile",
+  "edit": "Edit",
+  "status": {
+    "lookingForJob": "Open to opportunities",
+    "onSabbatical": "On sabbatical",
+    "inactive": "Inactive profile"
+  },
+  "emptyState": {
+    "title": "Complete your profile",
+    "description": "Add more information so others can get to know you better.",
+    "button": "Edit profile"
+  },
+  "notFound": {
+    "title": "Profile not found",
+    "description": "This profile doesn't exist or has been deleted.",
+    "backButton": "Back to communities"
+  },
+  "upload": {
+    "profileTitle": "Edit profile photo",
+    "coverTitle": "Edit cover photo",
+    "profileDesc": "Choose a photo that represents you",
+    "coverDesc": "Add a cover image to personalize your profile",
+    "changeImage": "Change image",
+    "uploadImage": "Upload an image",
+    "change": "Change",
+    "dragDrop": "Drag and drop an image here",
+    "clickToSelect": "or click to select",
+    "maxSize": "PNG, JPG, GIF up to 5MB",
+    "removeImage": "Remove image",
+    "preview": "Preview",
+    "currentImage": "Current image",
+    "currentImageAlt": "Current image",
+    "cancel": "Cancel",
+    "sending": "Uploading...",
+    "save": "Save",
+    "toast": {
+      "success": "Image updated successfully",
+      "uploadError": "Failed to upload image",
+      "error": "An error occurred while uploading"
+    }
+  }
+}

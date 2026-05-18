@@ -1,0 +1,63 @@
+{
+  "coverAlt": "Photo de couverture",
+  "editCover": "Modifier la photo de couverture",
+  "profileAlt": "Photo de profil",
+  "editProfile": "Modifier la photo de profil",
+  "serviceProvider": "Prestataire de services",
+  "editProfileButton": "Modifier le profil",
+  "about": "À propos",
+  "experience": "Expérience",
+  "yearsExperience": "{count} ans d'expérience",
+  "roles": "Rôles",
+  "since": "Depuis {date}",
+  "at": "chez {company}",
+  "skills": "Compétences",
+  "journey": "Parcours",
+  "contactInfo": "Informations de contact",
+  "email": "Email",
+  "visibleOnProfile": "Visible sur le profil",
+  "hidden": "Masqué",
+  "profileVisibility": "Visibilité du profil",
+  "publicProfile": "Profil public",
+  "privateProfile": "Profil privé",
+  "edit": "Modifier",
+  "status": {
+    "lookingForJob": "Ouvert aux opportunités",
+    "onSabbatical": "En sabbatique",
+    "inactive": "Profil inactif"
+  },
+  "emptyState": {
+    "title": "Complétez votre profil",
+    "description": "Ajoutez plus d'informations pour que les autres puissent mieux vous connaître.",
+    "button": "Modifier le profil"
+  },
+  "notFound": {
+    "title": "Profil introuvable",
+    "description": "Ce profil n'existe pas ou a été supprimé.",
+    "backButton": "Retour aux communautés"
+  },
+  "upload": {
+    "profileTitle": "Modifier la photo de profil",
+    "coverTitle": "Modifier la photo de couverture",
+    "profileDesc": "Choisissez une photo qui vous représente",
+    "coverDesc": "Ajoutez une image de couverture pour personnaliser votre profil",
+    "changeImage": "Changer l'image",
+    "uploadImage": "Télécharger une image",
+    "change": "Changer",
+    "dragDrop": "Glissez-déposez une image ici",
+    "clickToSelect": "ou cliquez pour sélectionner",
+    "maxSize": "PNG, JPG, GIF jusqu'à 5MB",
+    "removeImage": "Supprimer l'image",
+    "preview": "Aperçu",
+    "currentImage": "Image actuelle",
+    "currentImageAlt": "Image actuelle",
+    "cancel": "Annuler",
+    "sending": "Envoi...",
+    "save": "Enregistrer",
+    "toast": {
+      "success": "Image mise à jour avec succès",
+      "uploadError": "Échec du téléchargement de l'image",
+      "error": "Une erreur est survenue lors du téléchargement"
+    }
+  }
+}
