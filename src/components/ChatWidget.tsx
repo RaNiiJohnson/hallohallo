@@ -23,6 +23,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type Community = {
   _id: Id<"communities">;
@@ -88,15 +95,15 @@ function ChatWindow({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-border bg-card shrink-0">
+      <div className="flex items-center gap-2 px-4 py-3 sm:px-3 sm:py-2 border-b border-border bg-card shrink-0">
         <button
           onClick={onBack}
-          className="text-muted-foreground hover:text-foreground transition-colors"
+          className="text-muted-foreground hover:text-foreground transition-colors p-1 -ml-1 sm:p-0 sm:ml-0"
         >
-          <ChevronLeft size={16} />
+          <ChevronLeft className="size-5 sm:size-4" />
         </button>
-        <div className="flex items-center gap-2 flex-1">
-          <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="w-7 h-7 sm:w-6 sm:h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0">
             {community.name[0]}
           </div>
           <span className="text-sm font-semibold text-foreground truncate">
@@ -111,9 +118,9 @@ function ChatWindow({
         </button>
         <button
           onClick={onClose}
-          className="text-muted-foreground hover:text-foreground transition-colors"
+          className="text-muted-foreground hover:text-foreground transition-colors p-1 -mr-1 sm:p-0 sm:mr-0"
         >
-          <X size={14} />
+          <X className="size-5 sm:size-4" />
         </button>
       </div>
 
@@ -197,7 +204,7 @@ function CommunityList({
 }) {
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-card shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 sm:px-3 sm:py-2 border-b border-border bg-card shrink-0">
         <span className="text-sm font-semibold text-foreground">
           Mes communautés
         </span>
@@ -210,9 +217,9 @@ function CommunityList({
           </button>
           <button
             onClick={onClose}
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors p-1 -mr-1 sm:p-0 sm:mr-0"
           >
-            <X size={14} />
+            <X className="size-5 sm:size-4" />
           </button>
         </div>
       </div>
@@ -228,7 +235,7 @@ function CommunityList({
               <button
                 key={community._id}
                 onClick={() => onSelect(community)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 hover:bg-muted transition-colors text-left ${
+                className={`w-full flex items-center gap-3.5 px-4 py-3.5 sm:px-3 sm:py-2.5 hover:bg-muted transition-colors text-left ${
                   hasUnread ? "bg-primary/5" : ""
                 }`}
               >
@@ -269,6 +276,7 @@ export function ChatWidget() {
   const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(
     null,
   );
+  const isMobile = useIsMobile();
 
   const isOpen = activeWidget === "chat";
 
@@ -290,30 +298,17 @@ export function ChatWidget() {
     setSelectedCommunity(null);
   }, [closeWidget]);
 
-  // Lock body scroll on mobile when open
-  useEffect(() => {
-    if (isOpen) {
-      const isMobile = window.matchMedia("(max-width: 639px)").matches;
-      if (isMobile) document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
-
   // History back to close on mobile
   useEffect(() => {
-    if (isOpen) window.history.pushState({ chatOpen: true }, "");
+    if (isOpen && isMobile) window.history.pushState({ chatOpen: true }, "");
     const handlePopState = () => {
-      if (isOpen) {
+      if (isOpen && isMobile) {
         handleClose();
       }
     };
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, [isOpen, handleClose]);
+  }, [isOpen, isMobile, handleClose]);
 
   if (!isAuthenticated || !communities) return null;
 
@@ -345,21 +340,39 @@ export function ChatWidget() {
   };
 
   return (
-    <>
-      {/* Mobile fullscreen panel (manual since Popover doesn't do fullscreen cleanly) */}
-      {isOpen && (
-        <div className="sm:hidden fixed inset-0 z-50 bg-background flex flex-col data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2">
-          {content}
-        </div>
-      )}
+    <div className="fixed bottom-4 right-4 z-50">
+      {isMobile ? (
+        <>
+          {!isOpen && (
+            <button
+              onClick={() => openWidget("chat")}
+              className="relative w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:bg-primary/90 transition-colors"
+            >
+              <MessageCircle size={18} />
+              {hasAnyUnread && (
+                <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-destructive rounded-full border-2 border-background" />
+              )}
+            </button>
+          )}
 
-      {/* Desktop Popover */}
-      <div className="fixed bottom-4 right-4 z-50">
+          <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+            <SheetContent
+              side="bottom"
+              className="h-[85vh] p-0 flex flex-col rounded-t-2xl overflow-hidden border-t border-border bg-background"
+              showCloseButton={false}
+            >
+              <SheetTitle className="sr-only">Chat</SheetTitle>
+              <SheetDescription className="sr-only">
+                Messagerie des communautés
+              </SheetDescription>
+              {content}
+            </SheetContent>
+          </Sheet>
+        </>
+      ) : (
         <Popover open={isOpen} onOpenChange={handleOpenChange}>
           <PopoverTrigger asChild>
-            <button
-              className={`relative w-12 h-12 rounded-full text-primary-foreground flex items-center justify-center shadow-lg transition-colors sm:flex bg-primary hover:bg-primary/90`}
-            >
+            <button className="relative w-12 h-12 rounded-full text-primary-foreground flex items-center justify-center shadow-lg transition-colors sm:flex bg-primary hover:bg-primary/90">
               <MessageCircle size={18} />
               {hasAnyUnread && (
                 <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-destructive rounded-full border-2 border-background" />
@@ -381,16 +394,12 @@ export function ChatWidget() {
             side="top"
             align="end"
             sideOffset={8}
-            className={`hidden sm:flex p-0 rounded-xl border border-border shadow-xl overflow-hidden max-h-[85vh] flex-col ${
-              isFullscreen
-                ? "fixed inset-4 w-auto max-w-none h-auto z-60"
-                : "w-80 h-96"
-            }`}
+            className="hidden sm:flex p-0 rounded-xl border border-border shadow-xl overflow-hidden max-h-[85vh] flex-col w-80 h-96"
           >
             {content}
           </PopoverContent>
         </Popover>
-      </div>
-    </>
+      )}
+    </div>
   );
 }
