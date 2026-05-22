@@ -36,7 +36,7 @@ export default function LocaleSwitcherSelect({ defaultValue }: Props) {
 
   return (
     <Select
-      defaultValue={defaultValue}
+      value={defaultValue}
       onValueChange={onValueChange}
       disabled={isPending}
     >
@@ -46,7 +46,7 @@ export default function LocaleSwitcherSelect({ defaultValue }: Props) {
       <SelectContent>
         {routing.locales.map((locale) => (
           <SelectItem key={locale} value={locale}>
-            {t(locale)}
+            {typeof t === "function" ? t(locale) || locale : locale}
           </SelectItem>
         ))}
       </SelectContent>
