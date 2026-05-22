@@ -122,6 +122,10 @@
     "have": "haben"
   },
   "dialogs": {
+    "publish": {
+      "title": "Angebot veröffentlichen",
+      "desc": "Teilen Sie eine Stellenanzeige mit der Community"
+    },
     "edit": {
       "trigger": "Details bearbeiten",
       "title": "Stellenangebot bearbeiten",

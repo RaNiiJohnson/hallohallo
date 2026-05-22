@@ -122,6 +122,10 @@
     "have": "avez"
   },
   "dialogs": {
+    "publish": {
+      "title": "Publier une offre d'emploi",
+      "desc": "Partagez une opportunité d'emploi avec la communauté"
+    },
     "edit": {
       "trigger": "Modifier les détails",
       "title": "Modifier l'offre d'emploi",

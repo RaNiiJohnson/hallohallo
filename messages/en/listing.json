@@ -124,7 +124,17 @@
       "prev": "Previous",
       "next": "Next",
       "publish": "Publish listing",
-      "publishing": "Publishing..."
+      "publishing": "Publishing...",
+      "removeExtra": "Remove {extra}"
+    },
+    "aria": {
+      "uploadImages": "Upload images",
+      "removeImage": "Remove image: {name}"
+    },
+
+    "labels_extra": {
+      "extras": "Extras / Amenities",
+      "extrasDesc": "Add property amenities and perks (e.g. Parking, Balcony, Cellar, Elevator...)"
     }
   },
   "labels": {

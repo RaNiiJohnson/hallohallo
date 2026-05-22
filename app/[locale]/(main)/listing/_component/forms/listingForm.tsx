@@ -100,9 +100,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
     floor: z.string().min(1, t("form.validation.floorReq")),
     pets: z.boolean(),
     images: z.array(z.object({ publicId: z.string(), secureUrl: z.string() })),
-    description: z
-      .string()
-      .min(10, t("form.validation.descMin")),
+    description: z.string().min(10, t("form.validation.descMin")),
     extras: z.array(z.string()).optional(),
     availableFrom: z.string().optional(),
   });
@@ -287,9 +285,14 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
       <div className="space-y-2">
         <div className="flex justify-between text-sm text-muted-foreground">
           <span>
-            {t("form.progress.step", { current: currentStep, total: totalSteps })}
+            {t("form.progress.step", {
+              current: currentStep,
+              total: totalSteps,
+            })}
           </span>
-          <span>{t("form.progress.completed", { progress: Math.round(progress) })}</span>
+          <span>
+            {t("form.progress.completed", { progress: Math.round(progress) })}
+          </span>
         </div>
         <Progress value={progress} className="w-full" />
         <h3 className="text-lg font-medium">{stepTitles[currentStep - 1]}</h3>
@@ -335,18 +338,26 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="propertyType">{t("form.labels.propertyType")}</FieldLabel>
+                <FieldLabel htmlFor="propertyType">
+                  {t("form.labels.propertyType")}
+                </FieldLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger
                     id="propertyType"
                     aria-invalid={fieldState.invalid}
                   >
-                    <SelectValue placeholder={t("form.placeholders.selectType")} />
+                    <SelectValue
+                      placeholder={t("form.placeholders.selectType")}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {listingTypeValues.map((type) => (
                       <SelectItem key={type} value={type}>
-                        {t(`labels.listingTypes.${type}` as Parameters<typeof t>[0])}
+                        {t(
+                          `labels.listingTypes.${type}` as Parameters<
+                            typeof t
+                          >[0],
+                        )}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -371,12 +382,18 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                     id="listingMode"
                     aria-invalid={fieldState.invalid}
                   >
-                    <SelectValue placeholder={t("form.placeholders.selectMode")} />
+                    <SelectValue
+                      placeholder={t("form.placeholders.selectMode")}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {listingModeValues.map((mode) => (
                       <SelectItem key={mode} value={mode}>
-                        {t(`labels.listingModes.${mode}` as Parameters<typeof t>[0])}
+                        {t(
+                          `labels.listingModes.${mode}` as Parameters<
+                            typeof t
+                          >[0],
+                        )}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -420,9 +437,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             render={({ field }) => (
               <Field>
                 <FieldLabel>{t("form.labels.mapPosition")}</FieldLabel>
-                <FieldDescription>
-                  {t("form.labels.mapDesc")}
-                </FieldDescription>
+                <FieldDescription>{t("form.labels.mapDesc")}</FieldDescription>
                 <LocationPicker
                   value={field.value}
                   onChange={field.onChange}
@@ -501,7 +516,9 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="bedrooms">{t("form.labels.bedrooms")}</FieldLabel>
+                  <FieldLabel htmlFor="bedrooms">
+                    {t("form.labels.bedrooms")}
+                  </FieldLabel>
                   <Input
                     {...field}
                     id="bedrooms"
@@ -523,7 +540,9 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="bathrooms">{t("form.labels.bathrooms")}</FieldLabel>
+                  <FieldLabel htmlFor="bathrooms">
+                    {t("form.labels.bathrooms")}
+                  </FieldLabel>
                   <Input
                     {...field}
                     id="bathrooms"
@@ -545,7 +564,9 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="floor">{t("form.labels.floor")}</FieldLabel>
+                  <FieldLabel htmlFor="floor">
+                    {t("form.labels.floor")}
+                  </FieldLabel>
                   <Input
                     {...field}
                     id="floor"
@@ -573,7 +594,9 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="deposit">{t("form.labels.deposit")}</FieldLabel>
+                    <FieldLabel htmlFor="deposit">
+                      {t("form.labels.deposit")}
+                    </FieldLabel>
                     <InputGroup>
                       <Input
                         {...field}
@@ -600,7 +623,9 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="charges">{t("form.labels.charges")}</FieldLabel>
+                    <FieldLabel htmlFor="charges">
+                      {t("form.labels.charges")}
+                    </FieldLabel>
                     <InputGroup>
                       <Input
                         {...field}
@@ -728,9 +753,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                     </InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
-                <FieldDescription>
-                  {t("form.labels.descHint")}
-                </FieldDescription>
+                <FieldDescription>{t("form.labels.descHint")}</FieldDescription>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -740,10 +763,9 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
 
           {/* Image Upload */}
           <Field>
-            <FieldLabel>Photos du bien</FieldLabel>
+            <FieldLabel>{t("form.labels.photos")}</FieldLabel>
             <FieldDescription>
-              Ajoutez jusqu&apos;à {maxFiles} photos (max. {maxSizeMB}MB
-              chacune)
+              {t("form.labels.photosDesc", { maxFiles, maxSize: maxSizeMB })}
             </FieldDescription>
             <div
               className="relative flex min-h-52 flex-col items-center not-data-files:justify-center overflow-hidden rounded-xl border border-input border-dashed p-4 transition-colors has-[input:focus]:border-ring has-[input:focus]:ring-[3px] has-[input:focus]:ring-ring/50 data-[dragging=true]:bg-accent/50"
@@ -756,14 +778,14 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             >
               <input
                 {...getInputProps()}
-                aria-label="Télécharger des images"
+                aria-label={t("form.aria.uploadImages")}
                 className="sr-only"
               />
               {files.length > 0 ? (
                 <div className="flex w-full flex-col gap-3">
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="truncate font-medium text-sm">
-                      Photos ajoutées ({files.length})
+                      {t("form.labels.photosAdded", { count: files.length })}
                     </h3>
                     <Button
                       type="button"
@@ -776,7 +798,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                         aria-hidden="true"
                         className="-ms-0.5 size-3.5 opacity-60"
                       />
-                      Ajouter
+                      {t("form.actions.addPhoto")}
                     </Button>
                   </div>
 
@@ -796,7 +818,9 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                         />
                         <Button
                           type="button"
-                          aria-label="Supprimer l'image"
+                          aria-label={t("form.aria.removeImage", {
+                            name: file.file.name,
+                          })}
                           className="-top-2 -right-2 absolute size-6 z-10 rounded-full border-2 border-background shadow-none focus-visible:border-background"
                           onClick={() => removeFile(file.id)}
                           size="icon"
@@ -816,10 +840,13 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                     <ImageIcon className="size-4 opacity-60" />
                   </div>
                   <p className="mb-1.5 font-medium text-sm">
-                    Glissez vos photos ici
+                    {t("form.placeholders.photosDrop")}
                   </p>
                   <p className="text-muted-foreground text-xs">
-                    PNG, JPG ou WebP (max. {maxSizeMB}MB)
+                    {t("form.labels.photosDesc", {
+                      maxFiles,
+                      maxSize: maxSizeMB,
+                    })}
                   </p>
                   <Button
                     type="button"
@@ -831,7 +858,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                       aria-hidden="true"
                       className="-ms-1 opacity-60"
                     />
-                    Sélectionner des images
+                    {t("form.actions.addPhoto")}
                   </Button>
                 </div>
               )}
@@ -850,11 +877,8 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
 
           {/* Extras */}
           <Field>
-            <FieldLabel>Extras / Équipements</FieldLabel>
-            <FieldDescription>
-              Ajoutez les équipements et atouts du bien (ex: Parking, Balcon,
-              Cave, Ascenseur…)
-            </FieldDescription>
+            <FieldLabel>{t("form.labels.extras")}</FieldLabel>
+            <FieldDescription>{t("form.labels.extrasDesc")}</FieldDescription>
             <div className="flex gap-2">
               <Input
                 value={extraInput}
@@ -865,7 +889,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                     addExtra();
                   }
                 }}
-                placeholder="Ex: Parking, Balcon, Cave…"
+                placeholder={t("form.placeholders.extras")}
                 autoComplete="off"
               />
               <Button
@@ -890,7 +914,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                       type="button"
                       onClick={() => removeExtra(index)}
                       className="ml-1 rounded-full hover:bg-muted-foreground/20 p-0.5"
-                      aria-label={`Supprimer ${extra}`}
+                      aria-label={t("form.actions.removeExtra", { extra })}
                     >
                       <XIcon className="size-3" />
                     </button>

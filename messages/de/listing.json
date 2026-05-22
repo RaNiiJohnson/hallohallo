@@ -124,7 +124,17 @@
       "prev": "Zurück",
       "next": "Weiter",
       "publish": "Anzeige aufgeben",
-      "publishing": "Veröffentliche..."
+      "publishing": "Veröffentliche...",
+      "removeExtra": "Entfernen {extra}"
+    },
+    "aria": {
+      "uploadImages": "Bilder hochladen",
+      "removeImage": "Bild entfernen: {name}"
+    },
+
+    "labels_extra": {
+      "extras": "Extras / Ausstattung",
+      "extrasDesc": "Fügen Sie Ausstattungsmerkmale und Vorteile der Immobilie hinzu (z. B. Parkplatz, Balkon, Keller, Aufzug...)"
     }
   },
   "labels": {

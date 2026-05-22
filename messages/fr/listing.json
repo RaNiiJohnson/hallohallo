@@ -101,7 +101,9 @@
       "deposit": "Ex: 1700",
       "charges": "Ex: 150",
       "selectDate": "Sélectionner une date",
-      "description": "Décrivez le bien : état général, équipements, luminosité, proximité transports et commerces…"
+      "description": "Décrivez le bien : état général, équipements, luminosité, proximité transports et commerces…",
+      "photosDrop": "Glissez vos photos ici",
+      "extras": "Ex: Parking, Balcon, Cave..."
     },
     "validation": {
       "titleReq": "Le titre est requis",
@@ -124,7 +126,16 @@
       "prev": "Précédent",
       "next": "Suivant",
       "publish": "Publier l'annonce",
-      "publishing": "Publication..."
+      "publishing": "Publication...",
+      "removeExtra": "Supprimer {extra}"
+    },
+    "aria": {
+      "uploadImages": "Télécharger des images",
+      "removeImage": "Supprimer l'image : {name}"
+    },
+    "labels_extra": {
+      "extras": "Extras / Équipements",
+      "extrasDesc": "Ajoutez les équipements et atouts du bien (ex: Parking, Balcon, Cave, Ascenseur...)"
     }
   },
   "labels": {

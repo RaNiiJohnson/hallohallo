@@ -122,6 +122,10 @@
     "have": "have"
   },
   "dialogs": {
+    "publish": {
+      "title": "Publish job offer",
+      "desc": "Share a job opportunity with the community"
+    },
     "edit": {
       "trigger": "Edit details",
       "title": "Edit job offer",

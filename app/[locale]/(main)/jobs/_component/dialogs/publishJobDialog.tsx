@@ -1,6 +1,7 @@
 "use client";
 
 import { Activity, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +20,7 @@ interface PublishJobDialogProps {
 
 export function PublishJobDialog({ trigger }: PublishJobDialogProps) {
   const [open, setOpen] = useState(false);
+  const t = useTranslations("jobs");
 
   const handleSuccess = () => {
     setOpen(false);
@@ -30,16 +32,16 @@ export function PublishJobDialog({ trigger }: PublishJobDialogProps) {
         {trigger || (
           <Button className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            <span>Publier une offre</span>
+            <span>{t("publish")}</span>
           </Button>
         )}
       </DialogTrigger>
       <Activity mode={open ? "visible" : "hidden"}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Publier une offre d&apos;emploi</DialogTitle>
+            <DialogTitle>{t("dialogs.publish.title")}</DialogTitle>
             <DialogDescription>
-              Partagez une opportunité d&apos;emploi avec la communauté
+              {t("dialogs.publish.desc")}
             </DialogDescription>
           </DialogHeader>
           <JobOfferForm onSuccess={handleSuccess} />
