@@ -40,9 +40,7 @@ export function PublishJobDialog({ trigger }: PublishJobDialogProps) {
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{t("dialogs.publish.title")}</DialogTitle>
-            <DialogDescription>
-              {t("dialogs.publish.desc")}
-            </DialogDescription>
+            <DialogDescription>{t("dialogs.publish.desc")}</DialogDescription>
           </DialogHeader>
           <JobOfferForm onSuccess={handleSuccess} />
         </DialogContent>
