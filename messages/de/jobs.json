@@ -3,7 +3,7 @@
     "title": "Ihre Zukunft in Deutschland beginnt hier",
     "description": "Au-pair, Ausbildung, Beschäftigung, Freiwilligenarbeit. Finden Sie Stellenangebote, die zu Ihrem Profil und Ihren beruflichen Ambitionen passen."
   },
-  "title": "Möglichkeiten",
+  "title": "Stellenangebote",
   "cta": {
     "title": "Haben Sie eine Gelegenheit zu teilen?",
     "description": "Schließen Sie sich Hunderten von Unternehmen und Recruitern an, die unserer Plattform vertrauen, um ihre zukünftigen Talente zu finden."
@@ -117,7 +117,7 @@
     "dontMiss": "Verpassen Sie diese Gelegenheit nicht. Bewerben Sie sich jetzt!",
     "applyNow": "Jetzt bewerben",
     "backToList": "Zurück zu den Angeboten",
-    "breadcrumb": "Möglichkeiten",
+    "breadcrumb": "Stellenangebote",
     "you": "Sie",
     "have": "haben"
   },
