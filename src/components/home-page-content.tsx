@@ -119,82 +119,87 @@ export function HomePageContent({ children }: Props) {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
             {/* Communauté */}
-            <Card className="flex flex-col dark:bg-card/35 h-full">
-              <CardHeader>
-                <CardTitle className="text-xl">{t("community")}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  {t("communityDescription")}
-                </p>
-              </CardContent>
-              <CardFooter className="mt-auto pt-4 w-full">
-                <Button
-                  asChild
-                  variant="ghost"
-                  className="w-full justify-start pl-0 hover:bg-transparent hover:text-primary group"
-                >
-                  <Link
-                    href="/communities"
-                    className="inline-flex items-center gap-2"
+            <Link
+              href="/communities"
+              className="cursor-pointer transition group"
+            >
+              <Card className="flex flex-col dark:bg-card/35 h-full">
+                <CardHeader>
+                  <CardTitle className="text-xl">{t("community")}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">
+                    {t("communityDescription")}
+                  </p>
+                </CardContent>
+                <CardFooter className="mt-auto pt-4 w-full">
+                  <Button
+                    asChild
+                    variant="ghost"
+                    className="w-full justify-start pl-0 hover:bg-transparent group-hover:text-primary"
                   >
-                    {t("discover")}
-                    <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </Button>
-              </CardFooter>
-            </Card>
+                    <div className="inline-flex items-center gap-2">
+                      {t("discover")}
+                      <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </div>
+                  </Button>
+                </CardFooter>
+              </Card>
+            </Link>
 
             {/* Opportunités */}
-            <Card className="flex flex-col dark:bg-card/35 h-full">
-              <CardHeader>
-                <CardTitle className="text-xl">{t("opportunities")}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  {t("opportunitiesDescription")}
-                </p>
-              </CardContent>
-              <CardFooter className="mt-auto pt-4 w-full">
-                <Button
-                  asChild
-                  variant="ghost"
-                  className="w-full justify-start pl-0 hover:bg-transparent hover:text-primary group"
-                >
-                  <Link href="/jobs" className="inline-flex items-center gap-2">
-                    {t("explore")}
-                    <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </Button>
-              </CardFooter>
-            </Card>
+            <Link href="/jobs" className="cursor-pointer transition group">
+              <Card className="flex flex-col dark:bg-card/35 h-full">
+                <CardHeader>
+                  <CardTitle className="text-xl">
+                    {t("opportunities")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">
+                    {t("opportunitiesDescription")}
+                  </p>
+                </CardContent>
+                <CardFooter className="mt-auto pt-4 w-full">
+                  <Button
+                    asChild
+                    variant="ghost"
+                    className="w-full justify-start pl-0 hover:bg-transparent group-hover:text-primary"
+                  >
+                    <div className="inline-flex items-center gap-2">
+                      {t("explore")}
+                      <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </div>
+                  </Button>
+                </CardFooter>
+              </Card>
+            </Link>
 
             {/* Immobilier */}
-            <Card className="flex flex-col dark:bg-card/35 h-full">
-              <CardHeader>
-                <CardTitle className="text-xl">{t("housing")}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  {t("housingDescription")}
-                </p>
-              </CardContent>
-              <CardFooter className="mt-auto pt-4 w-full">
-                <Button
-                  asChild
-                  variant="ghost"
-                  className="w-full justify-start pl-0 hover:bg-transparent hover:text-primary group"
-                >
-                  <Link
-                    href="/listing"
-                    className="inline-flex items-center gap-2"
+            <Link href="/listing" className="cursor-pointer transition group">
+              <Card className="flex flex-col dark:bg-card/35 h-full">
+                <CardHeader>
+                  <CardTitle className="text-xl">{t("housing")}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">
+                    {t("housingDescription")}
+                  </p>
+                </CardContent>
+                <CardFooter className="mt-auto pt-4 w-full">
+                  <Button
+                    asChild
+                    variant="ghost"
+                    className="w-full justify-start pl-0 hover:bg-transparent group-hover:text-primary"
                   >
-                    {t("seeListings")}
-                    <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </Button>
-              </CardFooter>
-            </Card>
+                    <div className="inline-flex items-center gap-2">
+                      {t("seeListings")}
+                      <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </div>
+                  </Button>
+                </CardFooter>
+              </Card>
+            </Link>
           </div>
         </div>
       </section>
@@ -210,7 +215,6 @@ export function HomePageContent({ children }: Props) {
           <div className="grid md:grid-cols-2 gap-6">
             {reviews.slice(0, 4).map((review) => {
               const IconComponent = iconMap[review.icon];
-
               return (
                 <Item key={review.icon} variant="default">
                   <ItemMedia variant="icon">
