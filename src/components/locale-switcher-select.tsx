@@ -44,7 +44,7 @@ export default function LocaleSwitcherSelect() {
         <SelectValue />
       </SelectTrigger>
 
-      <SelectContent>
+      <SelectContent position="popper">
         {routing.locales.map((locale) => (
           <SelectItem key={locale} value={locale}>
             {t(locale) || locale}
