@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Emplois - Hallo Hallo",
-  description: "Trouvez l'opportunité idéale pour votre projet de vie.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("common");
+  return {
+    title: t("jobsTitle"),
+    description: t("jobsDescription"),
+  };
+}
+
 export default function JobsLayout({
   children,
 }: Readonly<{

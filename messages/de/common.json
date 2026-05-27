@@ -1,5 +1,11 @@
 {
   "share": "Teilen",
   "availableNow": "Sofort verfügbar",
-  "checkConnection": "Sie sind derzeit offline."
+  "checkConnection": "Sie sind derzeit offline.",
+  "realEstateTitle": "Immobilien - Hallo Hallo",
+  "realEstateDescription": "Finden Sie Ihr Zuhause oder teilen Sie es mit der Gemeinschaft",
+  "jobsTitle": "Jobs - Hallo Hallo",
+  "jobsDescription": "Finden Sie Ihren Job oder teilen Sie ihn mit der Gemeinschaft",
+  "communityTitle": "Community - Hallo Hallo",
+  "communityDescription": "Finden Sie Ihre Community oder teilen Sie sie mit der Gemeinschaft"
 }

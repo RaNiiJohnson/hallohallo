@@ -4,12 +4,12 @@ import { getTranslations } from "next-intl/server";
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("common");
   return {
-    title: t("realEstateTitle"),
-    description: t("realEstateDescription"),
+    title: t("communityTitle"),
+    description: t("communityDescription"),
   };
 }
 
-export default function JobsLayout({
+export default function CommunitiesLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
