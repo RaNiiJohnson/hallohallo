@@ -12,6 +12,7 @@ import {
 import { Geist, Geist_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
+import { getToken } from "@/lib/auth-server";
 import "../globals.css";
 import "flag-icons/css/flag-icons.min.css";
 
@@ -49,6 +50,7 @@ export default async function RootLayout({
   const { locale } = await params;
   setRequestLocale(locale as Locale);
   const messages = await getMessages();
+  const token = await getToken();
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -62,7 +64,7 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <ConvexClientProvider>
+            <ConvexClientProvider initialToken={token}>
               <OfflineIndicator />
               <NuqsAdapter>{children}</NuqsAdapter>
             </ConvexClientProvider>
