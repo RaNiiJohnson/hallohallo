@@ -1,18 +1,18 @@
 import { ChatWidget } from "@/components/ChatWidget";
 import Footer from "@/components/footer";
+import LocaleSwitcher from "@/components/locale-switcher";
+import { MainSidebar } from "@/components/main-sidebar";
 import { NotificationWidget } from "@/components/notificationBell";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { WidgetProvider } from "@/components/WidgetContext";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
-  SidebarProvider,
   SidebarInset,
+  SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { MainSidebar } from "@/components/main-sidebar";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { setRequestLocale } from "next-intl/server";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { WidgetProvider } from "@/components/WidgetContext";
 import { Locale } from "@/i18n/routing";
-import LocaleSwitcher from "@/components/locale-switcher";
+import { setRequestLocale } from "next-intl/server";
 
 export default async function RootLayout({
   children,
@@ -33,7 +33,7 @@ export default async function RootLayout({
           <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center gap-1">
             <LocaleSwitcher />
             <ThemeToggle />
           </div>
