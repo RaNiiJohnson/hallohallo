@@ -1,14 +1,18 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "../globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "sonner";
-import { ConvexClientProvider } from "@/web/ConvexClientProvider";
-import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { OfflineIndicator } from "@/components/offline-indicator";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Locale, routing } from "@/i18n/routing";
+import { ConvexClientProvider } from "@/web/ConvexClientProvider";
+import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages, setRequestLocale } from "next-intl/server";
-import { routing, Locale } from "@/i18n/routing";
+import {
+  getMessages,
+  getTranslations,
+  setRequestLocale,
+} from "next-intl/server";
+import { Geist, Geist_Mono } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Toaster } from "sonner";
+import "../globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,14 +24,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Hallo Hallo - Communauté Malagasy en Allemagne",
-  description:
-    "Plateforme d'échange et de partage pour favoriser l'entraide entre les jeunes expats Malagasy en Allemagne. Emplois, logements, communauté.",
-  icons: {
-    icon: "/logo.svg",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("common");
+  return {
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+    icons: {
+      icon: "/logo.svg",
+    },
+  };
+}
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
