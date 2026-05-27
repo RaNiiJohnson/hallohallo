@@ -33,6 +33,61 @@ export const sendMessage = mutation({
   },
 });
 
+export const editMessage = mutation({
+  args: {
+    id: v.id("communityMessages"),
+    communityId: v.id("communities"),
+    content: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) throw new Error("Not authenticated");
+
+    const member = await ctx.db
+      .query("communityMembers")
+      .withIndex("by_userId", (q) => q.eq("userId", user._id))
+      .filter((q) => q.eq(q.field("communityId"), args.communityId))
+      .first();
+
+    if (!member) throw new Error("Not a member");
+
+    const message = await ctx.db.get(args.id);
+    if (!message) throw new Error("Message not found");
+
+    if (message.authorId !== user._id) throw new Error("Not authorized");
+
+    await ctx.db.patch(args.id, {
+      content: args.content,
+    });
+  },
+});
+
+export const deleteMessage = mutation({
+  args: {
+    id: v.id("communityMessages"),
+    communityId: v.id("communities"),
+  },
+  handler: async (ctx, args) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) throw new Error("Not authenticated");
+
+    const member = await ctx.db
+      .query("communityMembers")
+      .withIndex("by_userId", (q) => q.eq("userId", user._id))
+      .filter((q) => q.eq(q.field("communityId"), args.communityId))
+      .first();
+
+    if (!member) throw new Error("Not a member");
+
+    const message = await ctx.db.get(args.id);
+    if (!message) throw new Error("Message not found");
+
+    if (message.authorId !== user._id) throw new Error("Not authorized");
+
+    await ctx.db.delete(args.id);
+  },
+});
+
 export const markAsRead = mutation({
   args: { communityId: v.id("communities") },
   handler: async (ctx, args) => {
