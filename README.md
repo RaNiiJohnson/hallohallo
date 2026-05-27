@@ -104,32 +104,6 @@ pnpm build
 # Démarrer en production
 pnpm start
 
-```
-
-## 🏗️ Structure du projet
-
-```text
-hallohallo/
-├── app/                    # App Router (Next.js)
-│   ├── api/               # Routes API
-│   ├── (main)/            # Layout principal
-│   │   ├── community/     # Section communauté
-│   │   ├── jobs/          # Gestion des offres d'emploi (Opportunités)
-│   │   ├── listing/       # Annonces immobilières
-│   │   └── ...
-│   └── ...
-├── convex/                 # Backend Convex (Schema, Fonctions, Auth)
-│   ├── betterAuth/        # Configuration Better Auth
-│   ├── schema.ts          # Schéma de la base de données
-│   └── ...
-├── src/
-│   ├── components/        # Composants réutilisables
-│   ├── lib/              # Utilitaires et configurations
-│   └── ...
-├── public/                 # Assets statiques
-└── ...
-```
-
 ## 🎯 Notre Mission
 
 **Créer un pont entre les Malagasy vivant en Allemagne et ceux restés au pays, facilitant l'intégration et le partage d'expériences.**
@@ -154,3 +128,4 @@ Les contributions sont les bienvenues ! N'hésitez pas à :
 ---
 
 **Hallo Hallo** - Ensemble, construisons une communauté forte ! 🇲🇬❤️🇩🇪
+```

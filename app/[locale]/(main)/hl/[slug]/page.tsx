@@ -1,7 +1,7 @@
 import { api } from "@convex/_generated/api";
 import { fetchQuery, preloadQuery } from "convex/nextjs";
-import UserClient from "./UserClient";
 import { Metadata } from "next";
+import UserClient from "./UserClient";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -9,7 +9,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const user = await fetchQuery(api.users.getUserBySlug, {
+  const user = await fetchQuery(api.auth.users.getUserBySlug, {
     slug,
   });
 
@@ -27,6 +27,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function UserPage({ params }: Props) {
   const { slug } = await params;
-  const user = await preloadQuery(api.users.getUserBySlug, { slug });
+  const user = await preloadQuery(api.auth.users.getUserBySlug, { slug });
   return <UserClient preloadedUser={user} />;
 }

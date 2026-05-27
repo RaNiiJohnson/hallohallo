@@ -20,7 +20,7 @@ import { useTransition } from "react";
 import { useTranslations } from "next-intl";
 
 function DeleteJobDialog({ jobId }: { jobId: Id<"JobOffer"> }) {
-  const deleteJob = useMutation(api.jobs.deleteJob);
+  const deleteJob = useMutation(api.jobs.mutations.deleteJob);
   const [isPending, startTransition] = useTransition();
   const t = useTranslations("jobs.dialogs.delete");
 
@@ -48,9 +48,7 @@ function DeleteJobDialog({ jobId }: { jobId: Id<"JobOffer"> }) {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("title")}</DialogTitle>
-          <DialogDescription>
-            {t("description")}
-          </DialogDescription>
+          <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>

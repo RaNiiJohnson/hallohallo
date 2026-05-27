@@ -1,8 +1,18 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -10,26 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@/components/ui/input-group";
-import { useQueryStates, parseAsString } from "nuqs";
+import { Filter, Search, X } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { parseAsString, useQueryStates } from "nuqs";
 import { useEffect, useState, useTransition } from "react";
 import { useDebounce } from "use-debounce";
-import { useTranslations } from "next-intl";
 
-import {
-  jobTypeValues,
-  contractTypeValues,
-} from "./forms/jobOfferForm";
+import { contractTypeValues, jobTypeValues } from "./forms/jobOfferForm";
 
 export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
   const t = useTranslations("jobs");
@@ -89,7 +86,9 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
                 <PopoverTrigger asChild>
                   <InputGroupButton variant="outline">
                     <Filter className="h-4 w-4" />
-                    <span className="hidden sm:inline">{t("filters.title")}</span>
+                    <span className="hidden sm:inline">
+                      {t("filters.title")}
+                    </span>
                   </InputGroupButton>
                 </PopoverTrigger>
                 <PopoverContent className="w-[400px] p-4" align="end">
@@ -119,7 +118,9 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
                           }
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder={t("filters.allContracts")} />
+                            <SelectValue
+                              placeholder={t("filters.allContracts")}
+                            />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="all">
@@ -127,7 +128,11 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
                             </SelectItem>
                             {contractTypeValues.map((type) => (
                               <SelectItem key={type} value={type}>
-                                {t(`labels.contracts.${type}` as Parameters<typeof t>[0])}
+                                {t(
+                                  `labels.contracts.${type}` as Parameters<
+                                    typeof t
+                                  >[0],
+                                )}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -147,14 +152,16 @@ export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
                           <Badge
                             key={type}
                             variant={
-                              filters.type === type
-                                ? "default"
-                                : "outline"
+                              filters.type === type ? "default" : "outline"
                             }
                             className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
                             onClick={() => setFilters({ type })}
                           >
-                            {t(`labels.jobTypes.${type}` as Parameters<typeof t>[0])}
+                            {t(
+                              `labels.jobTypes.${type}` as Parameters<
+                                typeof t
+                              >[0],
+                            )}
                           </Badge>
                         ))}
                         {isAuthenticated && (

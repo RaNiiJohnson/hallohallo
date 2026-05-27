@@ -1,43 +1,45 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { ShareButton } from "@/components/ShareButton";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
+import { Separator } from "@/components/ui/separator";
+import { useTimeTranslations } from "@/hooks/use-time-translations";
+import { Link } from "@/i18n/navigation";
+import { formatDateLong, getRelativeTime } from "@/lib/date";
+import { LocationMap } from "@/lib/LocationMap";
+import { api } from "@convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
 import {
   ArrowLeft,
-  MapPin,
-  Building2,
-  Mail,
-  Briefcase,
-  FileText,
   Award,
   Bookmark,
+  Briefcase,
+  Building2,
   ChevronRight,
+  FileText,
+  Mail,
+  MapPin,
 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { notFound, useParams } from "next/navigation";
-import { Link } from "@/i18n/navigation";
-import { getRelativeTime, formatDateLong } from "@/lib/date";
-import { ShareButton } from "@/components/ShareButton";
-import { Separator } from "@/components/ui/separator";
-import { ButtonGroup } from "@/components/ui/button-group";
 import DeleteJobDialog from "../_component/dialogs/deleteJobDialog";
 import { SalaryDisplay } from "../_component/salary";
-import { useQuery } from "convex-helpers/react/cache";
-import { api } from "@convex/_generated/api";
-import { EditJobDialog } from "./_component/editJobDialog";
-import { LocationMap } from "@/lib/LocationMap";
 import { JobDetailsSkeleton } from "../_component/skeleton";
-import { useTimeTranslations } from "@/hooks/use-time-translations";
-import { useLocale, useTranslations } from "next-intl";
+import { EditJobDialog } from "./_component/editJobDialog";
 
 export default function JobDetailsPage() {
   const { id } = useParams();
-  const user = useQuery(api.auth.getCurrentUser);
+  const user = useQuery(api.auth.auth.getCurrentUser);
 
   const timeT = useTimeTranslations();
   const locale = useLocale();
   const t = useTranslations("jobs");
 
-  const jobOffer = useQuery(api.jobs.getJobWithContact, { slug: id as string });
+  const jobOffer = useQuery(api.jobs.queries.getJobWithContact, {
+    slug: id as string,
+  });
 
   if (jobOffer === undefined) {
     return <JobDetailsSkeleton />;
@@ -119,7 +121,13 @@ export default function JobDetailsPage() {
                 {/* Role */}
                 <div className="flex items-center gap-2">
                   <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground/60" />
-                  <span className="font-medium">{t(`labels.contracts.${jobOffer.contractType}` as Parameters<typeof t>[0]) ?? jobOffer.contractType}</span>
+                  <span className="font-medium">
+                    {t(
+                      `labels.contracts.${jobOffer.contractType}` as Parameters<
+                        typeof t
+                      >[0],
+                    ) ?? jobOffer.contractType}
+                  </span>
                 </div>
 
                 {/* Location */}
@@ -193,7 +201,11 @@ export default function JobDetailsPage() {
                       {t("details.jobType")}
                     </p>
                     <Badge variant="secondary" className="font-semibold">
-                      {t(`labels.jobTypes.${jobOffer.type}` as Parameters<typeof t>[0]) ?? jobOffer.type}
+                      {t(
+                        `labels.jobTypes.${jobOffer.type}` as Parameters<
+                          typeof t
+                        >[0],
+                      ) ?? jobOffer.type}
                     </Badge>
                   </div>
 
@@ -203,7 +215,12 @@ export default function JobDetailsPage() {
                     </p>
                     <SalaryDisplay salary={jobOffer.salary} />{" "}
                     <span className="text-primary text-xs font-normal">
-                      /{t(`labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<typeof t>[0])}
+                      /
+                      {t(
+                        `labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<
+                          typeof t
+                        >[0],
+                      )}
                     </span>
                   </div>
 
@@ -226,7 +243,11 @@ export default function JobDetailsPage() {
                       {t("details.contract")}
                     </p>
                     <Badge variant="outline" className="font-semibold">
-                      {t(`labels.contracts.${jobOffer.contractType}` as Parameters<typeof t>[0]) ?? jobOffer.contractType}
+                      {t(
+                        `labels.contracts.${jobOffer.contractType}` as Parameters<
+                          typeof t
+                        >[0],
+                      ) ?? jobOffer.contractType}
                     </Badge>
                   </div>
 
@@ -377,12 +398,20 @@ export default function JobDetailsPage() {
               <div className="p-4 space-y-3">
                 <div className="flex flex-wrap gap-2 mb-4">
                   <Badge variant="secondary" className="font-semibold">
-                    {t(`labels.jobTypes.${jobOffer.type}` as Parameters<typeof t>[0]) ?? jobOffer.type}
+                    {t(
+                      `labels.jobTypes.${jobOffer.type}` as Parameters<
+                        typeof t
+                      >[0],
+                    ) ?? jobOffer.type}
                   </Badge>
                   <div className="flex items-center text-muted-foreground bg-muted px-2.5 py-0.5 rounded-md">
                     <Briefcase className="w-4 h-4 mr-1.5" />
                     <span className="font-semibold text-sm">
-                      {t(`labels.contracts.${jobOffer.contractType}` as Parameters<typeof t>[0]) ?? jobOffer.contractType}
+                      {t(
+                        `labels.contracts.${jobOffer.contractType}` as Parameters<
+                          typeof t
+                        >[0],
+                      ) ?? jobOffer.contractType}
                     </span>
                   </div>
                   <div className="flex items-center text-muted-foreground bg-muted px-2.5 py-0.5 rounded-md">
@@ -408,7 +437,12 @@ export default function JobDetailsPage() {
                   </span>
                   <SalaryDisplay salary={jobOffer.salary} />
                   <span className="text-primary text-xs font-normal">
-                    /{t(`labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<typeof t>[0])}
+                    /
+                    {t(
+                      `labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<
+                        typeof t
+                      >[0],
+                    )}
                   </span>
                 </div>
 

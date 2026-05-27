@@ -1,17 +1,17 @@
 "use client";
 
-import { useMutation, useConvexAuth } from "convex/react";
-import { api } from "@convex/_generated/api";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { getRelativeTime } from "@/lib/date";
+import { api } from "@convex/_generated/api";
+import { Id } from "@convex/_generated/dataModel";
+import { useConvexAuth, useMutation } from "convex/react";
 import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Id } from "@convex/_generated/dataModel";
 import { DeleteConfirmDialog } from "./deleteConfirmDialog";
 import { LikeButton } from "./likeButton";
-import { useTimeTranslations } from "@/hooks/use-time-translations";
 
 export function ReplyItem({
   reply,
@@ -29,9 +29,9 @@ export function ReplyItem({
   } | null;
   currentUserId?: string;
 }) {
-  const likeReply = useMutation(api.posts.likes.likeReply);
-  const updateReply = useMutation(api.posts.comments.updateReply);
-  const deleteReply = useMutation(api.posts.comments.deleteReply);
+  const likeReply = useMutation(api.posts.likes.mutations.likeReply);
+  const updateReply = useMutation(api.posts.comments.mutations.updateReply);
+  const deleteReply = useMutation(api.posts.comments.mutations.deleteReply);
   const { isAuthenticated } = useConvexAuth();
 
   const [isEditing, setIsEditing] = useState(false);

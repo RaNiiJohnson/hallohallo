@@ -1,24 +1,13 @@
 "use client";
 
-import * as React from "react";
-import { Link } from "@/i18n/navigation";
-import { usePathname } from "next/navigation";
-import { useQuery } from "convex-helpers/react/cache";
-import { api } from "@convex/_generated/api";
-import { Authenticated, Unauthenticated } from "convex/react";
-import { authClient } from "@/lib/auth-client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  Home,
-  Users,
-  Briefcase,
-  Building,
-  Sparkles,
-  LogOut,
-  ChevronsUpDown,
-  User,
-  Settings,
-  LogIn,
-} from "lucide-react";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -32,25 +21,36 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Logo } from "@/web/logo";
+import { Link } from "@/i18n/navigation";
+import { authClient } from "@/lib/auth-client";
 import { righteous } from "@/web/fonts";
+import { Logo } from "@/web/logo";
+import { api } from "@convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
+import { Authenticated, Unauthenticated } from "convex/react";
+import {
+  Briefcase,
+  Building,
+  ChevronsUpDown,
+  Home,
+  LogIn,
+  LogOut,
+  Settings,
+  Sparkles,
+  User,
+  Users,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
+import * as React from "react";
 
 export function MainSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
-  const user = useQuery(api.auth.getCurrentUser);
-  const myCommunities = useQuery(api.communities.getMyCommunities);
-  const topCommunities = useQuery(api.communities.getTopCommunities);
+  const user = useQuery(api.auth.auth.getCurrentUser);
+  const myCommunities = useQuery(api.communities.queries.getMyCommunities);
+  const topCommunities = useQuery(api.communities.queries.getTopCommunities);
   const { isMobile, setOpenMobile } = useSidebar();
   const t = useTranslations("sidebar");
 

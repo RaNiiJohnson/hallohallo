@@ -1,28 +1,28 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Heart } from "lucide-react";
-import { Link } from "@/i18n/navigation";
-import { notFound, useParams } from "next/navigation";
 import { ShareButton } from "@/components/ShareButton";
-import { PropertyDetails } from "./components/PropertyDetails";
-import { PropertyPageSkeleton } from "../_component/skeleton";
+import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
-import { useQuery } from "convex-helpers/react/cache";
-import { SimilarListings } from "./components/SimilarListings";
-import { useMutation, useConvexAuth } from "convex/react";
-import { toast } from "sonner";
-import { Id } from "@convex/_generated/dataModel";
+import { Link } from "@/i18n/navigation";
 import { api } from "@convex/_generated/api";
+import { Id } from "@convex/_generated/dataModel";
+import { useQuery } from "convex-helpers/react/cache";
+import { useConvexAuth, useMutation } from "convex/react";
+import { ArrowLeft, Heart } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { notFound, useParams } from "next/navigation";
+import { toast } from "sonner";
+import { PropertyPageSkeleton } from "../_component/skeleton";
+import { PropertyDetails } from "./components/PropertyDetails";
+import { SimilarListings } from "./components/SimilarListings";
 
 export default function PropertyPage() {
   const params = useParams<{ id: string }>();
   const { isAuthenticated } = useConvexAuth();
   const t = useTranslations("listing");
-  const toggleBookmark = useMutation(api.bookmarks.toggleBookmark);
+  const toggleBookmark = useMutation(api.bookmarks.mutations.toggleBookmark);
 
-  const property = useQuery(api.listings.getListingWithContact, {
+  const property = useQuery(api.listings.queries.getListingWithContact, {
     slug: params.id,
   });
 
@@ -72,7 +72,9 @@ export default function PropertyPage() {
                 <Heart
                   className={`h-4 w-4 ${property.isBookmarked ? "fill-current" : ""}`}
                 />
-                <span className="max-sm:hidden">{t("details.bookmarkBtn")}</span>
+                <span className="max-sm:hidden">
+                  {t("details.bookmarkBtn")}
+                </span>
               </Button>
             )}
           </ButtonGroup>

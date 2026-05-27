@@ -1,33 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { formatMonthYear } from "@/lib/date";
 import { api } from "@convex/_generated/api";
-import { Preloaded, usePreloadedQuery } from "convex/react";
 import { useQuery } from "convex-helpers/react/cache";
-import Image from "next/image";
+import { Preloaded, usePreloadedQuery } from "convex/react";
 import {
-  MapPin,
-  Building2,
   Briefcase,
+  Building2,
   Calendar,
   Globe,
-  Mail,
-  Sparkles,
   GraduationCap,
+  Mail,
+  MapPin,
   Pencil,
+  Sparkles,
 } from "lucide-react";
-import { ImageUploadModal } from "./component/ImageUploadModal";
-import { notFound } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { formatMonthYear } from "@/lib/date";
+import Image from "next/image";
+import { notFound } from "next/navigation";
+import { useState } from "react";
+import { ImageUploadModal } from "./component/ImageUploadModal";
 
 export default function UserClient({
   preloadedUser,
 }: {
-  preloadedUser: Preloaded<typeof api.users.getUserBySlug>;
+  preloadedUser: Preloaded<typeof api.auth.users.getUserBySlug>;
 }) {
   const user = usePreloadedQuery(preloadedUser);
-  const currentUser = useQuery(api.auth.getCurrentUser);
+  const currentUser = useQuery(api.auth.auth.getCurrentUser);
 
   const locale = useLocale();
   const t = useTranslations("profile");
@@ -237,7 +237,12 @@ export default function UserClient({
                 </div>
                 <div>
                   <h3 className="font-medium">
-                    {t("since", { date: formatMonthYear(user.arrivalDate!, locale) as string })}
+                    {t("since", {
+                      date: formatMonthYear(
+                        user.arrivalDate!,
+                        locale,
+                      ) as string,
+                    })}
                   </h3>
                   {user.company && (
                     <p className="text-sm text-muted-foreground">

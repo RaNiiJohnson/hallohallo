@@ -8,7 +8,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { communitySlug } = await params;
-  const community = await fetchQuery(api.communities.getCommunity, {
+  const community = await fetchQuery(api.communities.queries.getCommunity, {
     slug: communitySlug,
   });
 
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const title = `${community.name} | Hallo Hallo`;
-  const description = community.description?.substring(0, 160) || "Communauté sur HalloHallo";
+  const description = community.description?.substring(0, 160) || "";
 
   return {
     title,

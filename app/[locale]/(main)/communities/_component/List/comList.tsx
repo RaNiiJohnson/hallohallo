@@ -1,23 +1,23 @@
 "use client";
 
-import { useMutation, useConvexAuth } from "convex/react";
-import { toast } from "sonner";
-import { Id } from "@convex/_generated/dataModel";
-import { useState } from "react";
-import { parseAsString, parseAsInteger, useQueryStates } from "nuqs";
 import { api } from "@convex/_generated/api";
+import { Id } from "@convex/_generated/dataModel";
+import { useConvexAuth, useMutation } from "convex/react";
+import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
+import { useState } from "react";
+import { toast } from "sonner";
 
-import { SortMode, PAGE_SIZE } from "./types";
 import { ComListSkeleton } from "./ComListSkeleton";
 import { EmptyCommunities } from "./EmptyCommunities";
 import { ModeToggle } from "./ModeToggle";
 import { PostCard } from "./PostCard";
 import { PostPagination } from "./PostPagination";
+import { PAGE_SIZE, SortMode } from "./types";
 import { usePostsQuery } from "./usePostsQuery";
 
 export default function ComList() {
   const { isAuthenticated } = useConvexAuth();
-  const likePost = useMutation(api.posts.likes.likePost);
+  const likePost = useMutation(api.posts.likes.mutations.likePost);
   const [seed] = useState(() => crypto.randomUUID());
 
   const [filters, setFilters] = useQueryStates({

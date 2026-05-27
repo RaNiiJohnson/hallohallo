@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 
+import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldError,
@@ -17,12 +18,11 @@ import {
   InputGroupText,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
+import { useMutation } from "convex/react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 interface CreatePostFormProps {
   communityId: Id<"communities">;
@@ -33,17 +33,12 @@ export function CreatePostForm({
   communityId,
   onSuccess,
 }: CreatePostFormProps) {
-  const createPost = useMutation(api.posts.posts.createPost);
+  const createPost = useMutation(api.posts.mutations.createPost);
   const t = useTranslations("communities.forms.createPost");
 
   const formSchema = z.object({
-    title: z
-      .string()
-      .min(3, t("errorTitleMin"))
-      .max(100, t("errorTitleMax")),
-    content: z
-      .string()
-      .min(10, t("errorContentMin")),
+    title: z.string().min(3, t("errorTitleMin")).max(100, t("errorTitleMax")),
+    content: z.string().min(10, t("errorContentMin")),
   });
 
   type FormSchema = z.infer<typeof formSchema>;
@@ -110,7 +105,9 @@ export function CreatePostForm({
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="post-content">{t("contentLabel")}</FieldLabel>
+                <FieldLabel htmlFor="post-content">
+                  {t("contentLabel")}
+                </FieldLabel>
                 <InputGroup>
                   <InputGroupTextarea
                     {...field}

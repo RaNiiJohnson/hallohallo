@@ -8,7 +8,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const listing = await fetchQuery(api.listings.getListingMetadata, {
+  const listing = await fetchQuery(api.listings.queries.getListingMetadata, {
     slug: id,
   });
 
@@ -19,7 +19,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const title = `${listing.title} | Hallo Hallo`;
-  const description = listing.description?.substring(0, 160) || "Annonce immobilière sur HalloHallo";
+  const description =
+    listing.description?.substring(0, 160) ||
+    "Annonce immobilière sur HalloHallo";
   const imageUrl = listing.images?.[0]?.secureUrl;
 
   return {

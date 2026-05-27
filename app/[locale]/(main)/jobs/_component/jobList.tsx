@@ -1,21 +1,21 @@
 "use client";
 
-import { Briefcase, MapPin, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { Link } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
+import { api } from "@convex/_generated/api";
+import clsx from "clsx";
+import { usePaginatedQuery } from "convex-helpers/react/cache";
+import { useConvexAuth } from "convex/react";
+import { Briefcase, Clock, MapPin } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { parseAsString, useQueryStates } from "nuqs";
+import { toast } from "sonner";
+import { JobBookmarkButton } from "./JobBookmarkButton";
 import { SalaryDisplay } from "./salary";
 import { JobPageSkeleton } from "./skeleton";
-import { api } from "@convex/_generated/api";
-import { usePaginatedQuery } from "convex-helpers/react/cache";
-import { parseAsString, useQueryStates } from "nuqs";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import clsx from "clsx";
-import { useConvexAuth } from "convex/react";
-import { JobBookmarkButton } from "./JobBookmarkButton";
-import { useTimeTranslations } from "@/hooks/use-time-translations";
-import { useTranslations } from "next-intl";
 
 export function JobList() {
   const { isAuthenticated } = useConvexAuth();
@@ -32,7 +32,7 @@ export function JobList() {
     status,
     loadMore,
   } = usePaginatedQuery(
-    api.jobs.getJobs,
+    api.jobs.queries.getJobs,
     {
       searchTerm: filters.search,
       contractType: filters.contract
@@ -74,9 +74,7 @@ export function JobList() {
             <Briefcase className="h-8 w-8 text-muted-foreground" />
           </div>
           <h3 className="text-xl font-semibold mb-2">{t("list.emptyTitle")}</h3>
-          <p className="text-muted-foreground mb-6">
-            {t("list.emptyDesc")}
-          </p>
+          <p className="text-muted-foreground mb-6">{t("list.emptyDesc")}</p>
         </div>
       </div>
     );
@@ -109,7 +107,12 @@ export function JobList() {
                     className="text-foreground"
                   />
                   <span className="text-primary text-xs font-normal">
-                    /{t(`labels.salaryPeriods.${job.salaryPeriod}` as Parameters<typeof t>[0])}
+                    /
+                    {t(
+                      `labels.salaryPeriods.${job.salaryPeriod}` as Parameters<
+                        typeof t
+                      >[0],
+                    )}
                   </span>
                 </div>
 
@@ -122,7 +125,11 @@ export function JobList() {
                   <div className="flex items-center gap-1">
                     <Briefcase className="h-4 w-4" />
                     <span>
-                      {t(`labels.jobTypes.${job.type}` as Parameters<typeof t>[0]) ?? job.type}
+                      {t(
+                        `labels.jobTypes.${job.type}` as Parameters<
+                          typeof t
+                        >[0],
+                      ) ?? job.type}
                     </span>
                   </div>
                 </div>
@@ -133,7 +140,11 @@ export function JobList() {
                     variant="secondary"
                     className="bg-secondary/50 hover:bg-secondary/70 text-xs font-normal"
                   >
-                    {t(`labels.contracts.${job.contractType}` as Parameters<typeof t>[0]) ?? job.contractType}
+                    {t(
+                      `labels.contracts.${job.contractType}` as Parameters<
+                        typeof t
+                      >[0],
+                    ) ?? job.contractType}
                   </Badge>
                   {job.duration && (
                     <Badge variant="outline" className="text-xs font-normal">

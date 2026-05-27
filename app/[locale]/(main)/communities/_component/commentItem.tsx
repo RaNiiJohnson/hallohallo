@@ -1,49 +1,30 @@
 "use client";
 
-import { useMutation, useConvexAuth } from "convex/react";
-import { api } from "@convex/_generated/api";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { getRelativeTime } from "@/lib/date";
+import { api } from "@convex/_generated/api";
+import { useConvexAuth, useMutation } from "convex/react";
 import { ChevronDown, ChevronUp, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Id } from "@convex/_generated/dataModel";
 import { DeleteConfirmDialog } from "./deleteConfirmDialog";
 import { LikeButton } from "./likeButton";
+import { Comment } from "./List/types";
 import { ReplyItem } from "./replyItem";
-import { useTimeTranslations } from "@/hooks/use-time-translations";
 
 export function CommentItem({
   comment,
   currentUserId,
 }: {
-  comment: {
-    _id: Id<"postComments">;
-    _creationTime: number;
-    authorId?: string;
-    authorName?: string;
-    content: string;
-    likes: { userId: string }[];
-    likesCount: number;
-    userHasLiked?: boolean;
-    replies: ({
-      _id: Id<"postCommentReplies">;
-      _creationTime: number;
-      authorId?: string;
-      authorName?: string;
-      content: string;
-      likes: { userId: string }[];
-      likesCount: number;
-      userHasLiked?: boolean;
-    } | null)[];
-  } | null;
+  comment: Comment | null;
   currentUserId?: string;
 }) {
-  const likeComment = useMutation(api.posts.likes.likeComment);
-  const addReply = useMutation(api.posts.comments.addReply);
-  const updateComment = useMutation(api.posts.comments.updateComment);
-  const deleteComment = useMutation(api.posts.comments.deleteComment);
+  const likeComment = useMutation(api.posts.likes.mutations.likeComment);
+  const addReply = useMutation(api.posts.comments.mutations.addReply);
+  const updateComment = useMutation(api.posts.comments.mutations.updateComment);
+  const deleteComment = useMutation(api.posts.comments.mutations.deleteComment);
   const { isAuthenticated } = useConvexAuth();
 
   const [showReplies, setShowReplies] = useState(false);

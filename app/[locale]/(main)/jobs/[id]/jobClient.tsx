@@ -31,10 +31,10 @@ import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { useLocale, useTranslations } from "next-intl";
 
 export function JobDetailsPage(props: {
-  preloadedJob: Preloaded<typeof api.jobs.getJobWithContact>;
+  preloadedJob: Preloaded<typeof api.jobs.queries.getJobWithContact>;
 }) {
-  const user = useQuery(api.auth.getCurrentUser);
-  const toggleBookmark = useMutation(api.bookmarks.toggleBookmark);
+  const user = useQuery(api.auth.auth.getCurrentUser);
+  const toggleBookmark = useMutation(api.bookmarks.mutations.toggleBookmark);
 
   const timeT = useTimeTranslations();
   const locale = useLocale();
@@ -87,7 +87,9 @@ export function JobDetailsPage(props: {
             <p className="text-sm sm:text-base text-muted-foreground mb-6">
               {isAuthor ? (
                 <>
-                  <span className="font-semibold text-foreground">{t("details.you")}</span>{" "}
+                  <span className="font-semibold text-foreground">
+                    {t("details.you")}
+                  </span>{" "}
                   {t("details.have")}
                 </>
               ) : (
@@ -116,7 +118,13 @@ export function JobDetailsPage(props: {
                 {/* Role */}
                 <div className="flex items-center gap-2">
                   <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground/60" />
-                  <span className="font-medium">{t(`labels.contracts.${jobOffer.contractType}` as Parameters<typeof t>[0]) ?? jobOffer.contractType}</span>
+                  <span className="font-medium">
+                    {t(
+                      `labels.contracts.${jobOffer.contractType}` as Parameters<
+                        typeof t
+                      >[0],
+                    ) ?? jobOffer.contractType}
+                  </span>
                 </div>
 
                 {/* Location */}
@@ -206,20 +214,33 @@ export function JobDetailsPage(props: {
                       {t("details.jobType")}
                     </p>
                     <Badge variant="secondary" className="font-semibold">
-                      {t(`labels.jobTypes.${jobOffer.type}` as Parameters<typeof t>[0]) ?? jobOffer.type}
+                      {t(
+                        `labels.jobTypes.${jobOffer.type}` as Parameters<
+                          typeof t
+                        >[0],
+                      ) ?? jobOffer.type}
                     </Badge>
                   </div>
 
                   <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">{t("details.salary")}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {t("details.salary")}
+                    </p>
                     <SalaryDisplay salary={jobOffer.salary} />{" "}
                     <span className="text-primary text-xs font-normal">
-                      /{t(`labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<typeof t>[0])}
+                      /
+                      {t(
+                        `labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<
+                          typeof t
+                        >[0],
+                      )}
                     </span>
                   </div>
 
                   <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">{t("details.duration")}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {t("details.duration")}
+                    </p>
                     <p className="font-semibold">{jobOffer.duration}</p>
                   </div>
 
@@ -235,7 +256,11 @@ export function JobDetailsPage(props: {
                       {t("details.contract")}
                     </p>
                     <Badge variant="outline" className="font-semibold">
-                      {t(`labels.contracts.${jobOffer.contractType}` as Parameters<typeof t>[0]) ?? jobOffer.contractType}
+                      {t(
+                        `labels.contracts.${jobOffer.contractType}` as Parameters<
+                          typeof t
+                        >[0],
+                      ) ?? jobOffer.contractType}
                     </Badge>
                   </div>
 
@@ -252,7 +277,9 @@ export function JobDetailsPage(props: {
             {/* Job Description */}
             <div className="bg-card dark:bg-card/35 border rounded-lg shadow-sm">
               <div className="p-4 border-b">
-                <h2 className="text-xl font-semibold">{t("details.description")}</h2>
+                <h2 className="text-xl font-semibold">
+                  {t("details.description")}
+                </h2>
               </div>
               <div className="p-4">
                 <div className="prose prose-sm sm:prose-base max-w-none dark:prose-invert">
@@ -296,7 +323,9 @@ export function JobDetailsPage(props: {
             {/* Contact Information */}
             <div className="bg-primary/5 border border-primary/20 rounded-lg shadow-sm">
               <div className="p-4 border-b border-primary/20">
-                <h2 className="text-xl font-semibold">{t("details.howToApply")}</h2>
+                <h2 className="text-xl font-semibold">
+                  {t("details.howToApply")}
+                </h2>
                 <p className="text-sm text-muted-foreground mt-1">
                   {t("details.interested")}
                 </p>
@@ -375,17 +404,27 @@ export function JobDetailsPage(props: {
             {/* Quick Summary */}
             <div className="bg-muted/30 border rounded-lg shadow-sm">
               <div className="p-4 border-b">
-                <h2 className="text-xl font-semibold">{t("details.quickSummary")}</h2>
+                <h2 className="text-xl font-semibold">
+                  {t("details.quickSummary")}
+                </h2>
               </div>
               <div className="p-4 space-y-3">
                 <div className="flex flex-wrap gap-2 mb-4">
                   <Badge variant="secondary" className="font-semibold">
-                    {t(`labels.jobTypes.${jobOffer.type}` as Parameters<typeof t>[0]) ?? jobOffer.type}
+                    {t(
+                      `labels.jobTypes.${jobOffer.type}` as Parameters<
+                        typeof t
+                      >[0],
+                    ) ?? jobOffer.type}
                   </Badge>
                   <div className="flex items-center text-muted-foreground bg-muted px-2.5 py-0.5 rounded-md">
                     <Briefcase className="w-4 h-4 mr-1.5" />
                     <span className="font-semibold text-sm">
-                      {t(`labels.contracts.${jobOffer.contractType}` as Parameters<typeof t>[0]) ?? jobOffer.contractType}
+                      {t(
+                        `labels.contracts.${jobOffer.contractType}` as Parameters<
+                          typeof t
+                        >[0],
+                      ) ?? jobOffer.contractType}
                     </span>
                   </div>
                   <div className="flex items-center text-muted-foreground bg-muted px-2.5 py-0.5 rounded-md">
@@ -397,22 +436,33 @@ export function JobDetailsPage(props: {
                 </div>
 
                 <div className="flex items-center justify-between py-3 border-b">
-                  <span className="text-sm text-muted-foreground">{t("details.duration")}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {t("details.duration")}
+                  </span>
                   <span className="font-semibold text-sm">
                     {jobOffer.duration}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between py-3 border-b">
-                  <span className="text-sm text-muted-foreground">{t("details.salary")}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {t("details.salary")}
+                  </span>
                   <SalaryDisplay salary={jobOffer.salary} />
                   <span className="text-primary text-xs font-normal">
-                    /{t(`labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<typeof t>[0])}
+                    /
+                    {t(
+                      `labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<
+                        typeof t
+                      >[0],
+                    )}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between py-3">
-                  <span className="text-sm text-muted-foreground">{t("details.published")}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {t("details.published")}
+                  </span>
                   <span className="font-semibold text-sm">
                     {getRelativeTime(jobOffer._creationTime, timeT)}
                   </span>
@@ -423,7 +473,9 @@ export function JobDetailsPage(props: {
             {/* Apply CTA */}
             <div className="bg-primary text-primary-foreground border rounded-lg shadow-sm">
               <div className="p-4">
-                <h3 className="font-bold text-lg mb-2">{t("details.readyToApply")}</h3>
+                <h3 className="font-bold text-lg mb-2">
+                  {t("details.readyToApply")}
+                </h3>
                 <p className="text-sm text-primary-foreground/90 mb-4">
                   {t("details.dontMiss")}
                 </p>
@@ -433,7 +485,9 @@ export function JobDetailsPage(props: {
                   size="lg"
                   asChild
                 >
-                  <a href={`mailto:${jobOffer.contact}`}>{t("details.applyNow")}</a>
+                  <a href={`mailto:${jobOffer.contact}`}>
+                    {t("details.applyNow")}
+                  </a>
                 </Button>
               </div>
             </div>

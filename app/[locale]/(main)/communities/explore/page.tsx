@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 export default function ExploreCommunitiesPage() {
   const { results, status, loadMore } = usePaginatedQuery(
-    api.communities.getCommunitiesPreview,
+    api.communities.queries.getCommunitiesPreview,
     {},
     { initialNumItems: 12 },
   );

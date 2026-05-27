@@ -1,13 +1,13 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useOptimistic, useTransition } from "react";
-import { toast } from "sonner";
-import { useMutation } from "convex/react";
+import { cn } from "@/lib/utils";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
+import { useMutation } from "convex/react";
+import { Heart } from "lucide-react";
+import { useOptimistic, useTransition } from "react";
+import { toast } from "sonner";
 
 interface BookmarkButtonProps {
   listingId: string;
@@ -25,7 +25,7 @@ export const BookmarkButton = ({
     (_, newState: boolean) => newState,
   );
 
-  const toggleBookmark = useMutation(api.bookmarks.toggleBookmark);
+  const toggleBookmark = useMutation(api.bookmarks.mutations.toggleBookmark);
   const [, startTransition] = useTransition();
 
   const handleToggle = async (e: React.MouseEvent) => {

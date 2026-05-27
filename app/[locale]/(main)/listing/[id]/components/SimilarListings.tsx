@@ -2,14 +2,14 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin } from "lucide-react";
-import Image from "next/image";
 import { Link } from "@/i18n/navigation";
-import { PriceDisplay } from "../../_component/price";
-import { useQuery } from "convex-helpers/react/cache";
-import { api } from "@convex/_generated/api";
 import { ListingListDetails } from "@/lib/convexTypes";
+import { api } from "@convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
+import { MapPin } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
+import { PriceDisplay } from "../../_component/price";
 
 export function SimilarListings({
   slug,
@@ -19,12 +19,15 @@ export function SimilarListings({
   property: ListingListDetails;
 }) {
   const t = useTranslations("listing");
-  const properties = useQuery(api.listings.getSimilarRealEstateListings, {
-    excludeSlug: slug,
-    city: property.city,
-    propertyType: property.propertyType,
-    limit: 6,
-  });
+  const properties = useQuery(
+    api.listings.queries.getSimilarRealEstateListings,
+    {
+      excludeSlug: slug,
+      city: property.city,
+      propertyType: property.propertyType,
+      limit: 6,
+    },
+  );
 
   if (
     properties === null ||
@@ -59,7 +62,11 @@ export function SimilarListings({
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <Badge className="absolute top-2 left-2 z-10">
-                {t(`labels.listingTypes.${list.propertyType}` as Parameters<typeof t>[0])}
+                {t(
+                  `labels.listingTypes.${list.propertyType}` as Parameters<
+                    typeof t
+                  >[0],
+                )}
               </Badge>
 
               {/* Indicateur de photos multiples */}
@@ -90,9 +97,7 @@ export function SimilarListings({
       {/* Message si peu d'annonces similaires */}
       {properties.length < 3 && (
         <div className="text-center py-8">
-          <p className="text-muted-foreground mb-4">
-            {t("similar.emptyMsg")}
-          </p>
+          <p className="text-muted-foreground mb-4">{t("similar.emptyMsg")}</p>
           <Link href="/listing">
             <Button variant="outline">{t("similar.emptyBtn")}</Button>
           </Link>

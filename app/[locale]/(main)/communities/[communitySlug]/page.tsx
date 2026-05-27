@@ -1,43 +1,42 @@
 "use client";
 
-import { useMutation } from "convex/react";
-import { api } from "@convex/_generated/api";
+import { ShareButton } from "@/components/ShareButton";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { useTimeTranslations } from "@/hooks/use-time-translations";
+import { Link } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
+import { api } from "@convex/_generated/api";
+import { Id } from "@convex/_generated/dataModel";
+import { useQuery } from "convex-helpers/react/cache";
+import { useConvexAuth, useMutation } from "convex/react";
 import {
   Bookmark,
-  MessageSquare,
-  Users,
   CheckIcon,
   ChevronRight,
+  MessageSquare,
+  Users,
 } from "lucide-react";
-import { Link } from "@/i18n/navigation";
-import { useConvexAuth } from "convex/react";
-import { CreatePostDialog } from "../_component/dialogs/createPostDialog";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { toast } from "sonner";
-import { Id } from "@convex/_generated/dataModel";
-import { useParams } from "next/navigation";
-import { useQuery } from "convex-helpers/react/cache";
-import SkeletonCommunity from "./skeleton";
-import { ShareButton } from "@/components/ShareButton";
-import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
+import { toast } from "sonner";
+import { CreatePostDialog } from "../_component/dialogs/createPostDialog";
+import SkeletonCommunity from "./skeleton";
 
 export default function CommunityClient() {
   const { communitySlug } = useParams();
-  const community = useQuery(api.communities.getCommunityWithPosts, {
+  const community = useQuery(api.communities.queries.getCommunityWithPosts, {
     slug: communitySlug as string,
   });
   const { isAuthenticated } = useConvexAuth();
 
   const isMember = useQuery(
-    api.communities.isMember,
+    api.communities.queries.isMember,
     community ? { communityId: community._id } : "skip",
   );
 
-  const joinCommunity = useMutation(api.communities.joinCommunity);
-  const leaveCommunity = useMutation(api.communities.leaveCommunity);
-  const likePost = useMutation(api.posts.likes.likePost);
+  const joinCommunity = useMutation(api.communities.mutations.joinCommunity);
+  const leaveCommunity = useMutation(api.communities.mutations.leaveCommunity);
+  const likePost = useMutation(api.posts.likes.mutations.likePost);
 
   const timeT = useTimeTranslations();
   const t = useTranslations("communities.community");
@@ -109,7 +108,9 @@ export default function CommunityClient() {
                 <Users size={12} />
                 {community.membersCount ?? 0} {t("members")}
               </span>
-              <span>{community.postsCount ?? 0} {t("posts")}</span>
+              <span>
+                {community.postsCount ?? 0} {t("posts")}
+              </span>
             </div>
             <div className="flex items-center gap-2 mt-4">
               {isAuthenticated && (
@@ -144,9 +145,7 @@ export default function CommunityClient() {
         <div className="flex flex-col">
           {community.posts.length === 0 ? (
             <div className="text-center py-16 bg-background rounded-xl">
-              <p className="text-muted-foreground mb-4">
-                {t("emptyPosts")}
-              </p>
+              <p className="text-muted-foreground mb-4">{t("emptyPosts")}</p>
               {isAuthenticated && isMember && (
                 <CreatePostDialog
                   communityId={community._id}

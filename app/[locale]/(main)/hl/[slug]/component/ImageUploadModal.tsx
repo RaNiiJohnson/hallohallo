@@ -1,24 +1,24 @@
 "use client";
 
-import { useTransition } from "react";
-import { useMutation } from "convex/react";
-import { api } from "@convex/_generated/api";
-import { Id } from "@convex/betterAuth/_generated/dataModel";
-import { Camera, Upload, X, Loader2, ImageIcon } from "lucide-react";
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
+import { api } from "@convex/_generated/api";
+import { Id } from "@convex/betterAuth/_generated/dataModel";
+import { useMutation } from "convex/react";
+import { Camera, ImageIcon, Loader2, Upload, X } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
+import { useTransition } from "react";
+import { toast } from "sonner";
 
 type ImageType = "profile" | "cover";
 
@@ -40,7 +40,7 @@ export function ImageUploadModal({
   onSuccess,
 }: ImageUploadModalProps) {
   const generateUploadUrl = useMutation(api.upload.generateUploadUrl);
-  const updateUser = useMutation(api.users.updateUser);
+  const updateUser = useMutation(api.auth.users.updateUser);
   const t = useTranslations("profile.upload");
 
   const [isPending, startTransition] = useTransition();
@@ -140,9 +140,7 @@ export function ImageUploadModal({
           <div
             role="button"
             tabIndex={0}
-            aria-label={
-              previewUrl ? t("changeImage") : t("uploadImage")
-            }
+            aria-label={previewUrl ? t("changeImage") : t("uploadImage")}
             className={cn(
               "relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all duration-200 cursor-pointer",
               isProfileImage
@@ -206,9 +204,7 @@ export function ImageUploadModal({
                 <div className="p-4 rounded-full bg-primary/10 mb-4">
                   <ImageIcon className="size-8 text-primary" />
                 </div>
-                <p className="text-sm font-medium mb-1">
-                  {t("dragDrop")}
-                </p>
+                <p className="text-sm font-medium mb-1">{t("dragDrop")}</p>
                 <p className="text-xs text-muted-foreground">
                   {t("clickToSelect")}
                 </p>

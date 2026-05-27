@@ -1,43 +1,43 @@
 "use client";
 
-import { useMutation, useConvexAuth } from "convex/react";
-import { api } from "@convex/_generated/api";
+import { ShareButton } from "@/components/ShareButton";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useTimeTranslations } from "@/hooks/use-time-translations";
+import { Link } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
+import { api } from "@convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
+import { useConvexAuth, useMutation } from "convex/react";
 import {
   Bookmark,
-  MessageSquare,
   ChevronRight,
+  Loader2,
+  MessageSquare,
   Pencil,
   Trash2,
-  Loader2,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Link } from "@/i18n/navigation";
-import { useQuery } from "convex-helpers/react/cache";
-import { useParams, useRouter } from "next/navigation";
-import SkeletonPost from "./skeleton";
+import { CommentItem } from "../../_component/commentItem";
 import { DeleteConfirmDialog } from "../../_component/deleteConfirmDialog";
 import { LikeButton } from "../../_component/likeButton";
-import { CommentItem } from "../../_component/commentItem";
-import { ShareButton } from "@/components/ShareButton";
-import { useTimeTranslations } from "@/hooks/use-time-translations";
-import { useTranslations } from "next-intl";
+import SkeletonPost from "./skeleton";
 
 export default function PostClient() {
   const { postSlug, communitySlug } = useParams();
   const router = useRouter();
-  const post = useQuery(api.posts.posts.getPostWithMeta, {
+  const post = useQuery(api.posts.queries.getPostWithMeta, {
     slug: postSlug as string,
   });
-  const me = useQuery(api.communities.getMe);
-  const likePost = useMutation(api.posts.likes.likePost);
-  const addComment = useMutation(api.posts.comments.addComment);
-  const updatePost = useMutation(api.posts.posts.updatePost);
-  const deletePost = useMutation(api.posts.posts.deletePost);
+  const me = useQuery(api.communities.queries.getMe);
+  const likePost = useMutation(api.posts.likes.mutations.likePost);
+  const addComment = useMutation(api.posts.comments.mutations.addComment);
+  const updatePost = useMutation(api.posts.mutations.updatePost);
+  const deletePost = useMutation(api.posts.mutations.deletePost);
   const { isAuthenticated } = useConvexAuth();
 
   const [commentContent, setCommentContent] = useState("");
@@ -321,7 +321,9 @@ export default function PostClient() {
         {/* Comments */}
         <div className="space-y-0 px-4 mt-4">
           <h2 className="text-sm font-semibold text-foreground mb-4">
-            {validComments.length === 1 ? t("commentsCount", { count: 1 }) : t("commentsCountPlural", { count: validComments.length })}
+            {validComments.length === 1
+              ? t("commentsCount", { count: 1 })
+              : t("commentsCountPlural", { count: validComments.length })}
           </h2>
           {validComments.map((comment) => (
             <CommentItem

@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,23 +9,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
-import { Briefcase, MapPin } from "lucide-react";
-import Image from "next/image";
 import { Link } from "@/i18n/navigation";
-import { useEffect, useState } from "react";
-import { PriceDisplay } from "../price";
-import { BookmarkButton } from "./bookmarkButton";
-import { ListingDetails, ListingDetailsContent } from "../ListingDetails";
 import { ListingListItem } from "@/lib/convexTypes";
+import { cn } from "@/lib/utils";
 import { api } from "@convex/_generated/api";
-import { usePaginatedQuery } from "convex-helpers/react/cache";
-import { ListingItemsSkeleton, ListingListSkeleton } from "../skeleton";
-import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import clsx from "clsx";
+import { usePaginatedQuery } from "convex-helpers/react/cache";
+import { Briefcase, MapPin } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
+import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { ListingDetails, ListingDetailsContent } from "../ListingDetails";
+import { PriceDisplay } from "../price";
+import { ListingItemsSkeleton, ListingListSkeleton } from "../skeleton";
+import { BookmarkButton } from "./bookmarkButton";
 
 export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
   const t = useTranslations("listing");
@@ -42,7 +42,7 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
     status,
     loadMore,
   } = usePaginatedQuery(
-    api.listings.getListing,
+    api.listings.queries.getListing,
     {
       searchTerm: filters.search,
       propertyType: filters.type
@@ -116,9 +116,7 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
             <Briefcase className="h-8 w-8 text-muted-foreground" />
           </div>
           <h3 className="text-xl font-semibold mb-2">{t("list.emptyTitle")}</h3>
-          <p className="text-muted-foreground mb-6">
-            {t("list.emptyDesc")}
-          </p>
+          <p className="text-muted-foreground mb-6">{t("list.emptyDesc")}</p>
         </div>
       </div>
     );
@@ -174,7 +172,11 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <Badge className="absolute top-2 left-2 z-10">
-                {t(`labels.listingTypes.${list.propertyType}` as Parameters<typeof t>[0])}
+                {t(
+                  `labels.listingTypes.${list.propertyType}` as Parameters<
+                    typeof t
+                  >[0],
+                )}
               </Badge>
 
               {isAuthenticated && (
@@ -233,9 +235,7 @@ export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{dialogListing?.title}</DialogTitle>
-            <DialogDescription>
-              {t("list.dialogDesc")}
-            </DialogDescription>
+            <DialogDescription>{t("list.dialogDesc")}</DialogDescription>
           </DialogHeader>
           {dialogListing && <ListingDetailsContent listing={dialogListing} />}
         </DialogContent>

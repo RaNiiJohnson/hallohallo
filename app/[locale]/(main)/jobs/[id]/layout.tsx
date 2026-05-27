@@ -8,7 +8,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const job = await fetchQuery(api.jobs.getJobMetadata, {
+  const job = await fetchQuery(api.jobs.queries.getJobMetadata, {
     slug: id,
   });
 
@@ -20,7 +20,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const title = `${job.title} | Hallo Hallo`;
   // Limit description to ~160 chars for SEO best practices, removing newlines if necessary
-  const description = job.description?.substring(0, 160) || "Offre d'emploi sur HalloHallo";
+  const description =
+    job.description?.substring(0, 160) || "Offre d'emploi sur HalloHallo";
 
   return {
     title,

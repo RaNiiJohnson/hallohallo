@@ -1,28 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import { useQuery, useMutation, useConvexAuth } from "convex/react";
-import { usePaginatedQuery } from "convex/react";
-import { api } from "@convex/_generated/api";
-import { Id } from "@convex/_generated/dataModel";
-import {
-  MessageCircle,
-  X,
-  Minus,
-  Send,
-  ChevronLeft,
-  Maximize2,
-  Minimize2,
-} from "lucide-react";
-import { getRelativeTime } from "@/lib/date";
-import { toast } from "sonner";
 import { useWidget } from "@/components/WidgetContext";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useTimeTranslations } from "@/hooks/use-time-translations";
 import {
   Sheet,
   SheetContent,
@@ -30,6 +13,27 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useTimeTranslations } from "@/hooks/use-time-translations";
+import { getRelativeTime } from "@/lib/date";
+import { api } from "@convex/_generated/api";
+import { Id } from "@convex/_generated/dataModel";
+import {
+  useConvexAuth,
+  useMutation,
+  usePaginatedQuery,
+  useQuery,
+} from "convex/react";
+import {
+  ChevronLeft,
+  Maximize2,
+  MessageCircle,
+  Minimize2,
+  Minus,
+  Send,
+  X,
+} from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 type Community = {
   _id: Id<"communities">;
@@ -52,15 +56,15 @@ function ChatWindow({
   onToggleFullscreen: () => void;
 }) {
   const [content, setContent] = useState("");
-  const sendMessage = useMutation(api.messages.sendMessage);
-  const markAsRead = useMutation(api.messages.markAsRead);
-  const me = useQuery(api.communities.getMe);
+  const sendMessage = useMutation(api.chat.mutations.sendMessage);
+  const markAsRead = useMutation(api.chat.mutations.markAsRead);
+  const me = useQuery(api.communities.queries.getMe);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const timeT = useTimeTranslations();
 
   const { results, loadMore, status } = usePaginatedQuery(
-    api.messages.getMessages,
+    api.chat.queries.getMessages,
     { communityId: community._id },
     { initialNumItems: 10 },
   );
@@ -281,12 +285,12 @@ export function ChatWidget() {
   const isOpen = activeWidget === "chat";
 
   const communities = useQuery(
-    api.communities.getMyCommunities,
+    api.communities.queries.getMyCommunities,
     isAuthenticated ? {} : "skip",
   );
   const unreadIds =
     useQuery(
-      api.messages.getCommunitiesWithUnread,
+      api.chat.queries.getCommunitiesWithUnread,
       isAuthenticated ? {} : "skip",
     ) ?? [];
 

@@ -8,7 +8,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { postSlug } = await params;
-  const post = await fetchQuery(api.posts.posts.getPostWithMeta, {
+  const post = await fetchQuery(api.posts.queries.getPostWithMeta, {
     slug: postSlug,
   });
 
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const title = `${post.title} | Hallo Hallo`;
-  const description = post.content?.substring(0, 160) || "Publication sur HalloHallo";
+  const description = post.content?.substring(0, 160) || "";
 
   return {
     title,

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 
+import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldError,
@@ -17,7 +18,6 @@ import {
   InputGroupText,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -25,11 +25,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
-import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
-import { useRouter } from "next/navigation";
+import { useMutation } from "convex/react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const privacyValues = ["public", "private", "secret"] as const;
 
@@ -39,7 +39,7 @@ interface CreateCommunityFormProps {
 
 export function CreateCommunityForm({ onSuccess }: CreateCommunityFormProps) {
   const router = useRouter();
-  const createCommunity = useMutation(api.communities.createCommunty);
+  const createCommunity = useMutation(api.communities.mutations.createCommunty);
   const t = useTranslations("communities.forms.createCommunity");
 
   const formSchema = z.object({

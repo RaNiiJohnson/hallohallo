@@ -58,7 +58,7 @@ export function EditJobOfferForm({
   onSuccess,
 }: EditJobOfferFormProps) {
   const t = useTranslations("jobs");
-  const uptdateJob = useMutation(api.jobs.updateJob);
+  const uptdateJob = useMutation(api.jobs.mutations.updateJob);
   const [currentStep, setCurrentStep] = useState(1);
 
   const formSchema = z.object({
