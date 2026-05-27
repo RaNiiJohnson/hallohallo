@@ -124,7 +124,6 @@ export const updateJob = mutation({
 
     await ctx.db.patch("JobOffer", id, {
       ...updateData,
-      updatedAt: Date.now(),
       searchAll: searchAllContent,
     });
   },
