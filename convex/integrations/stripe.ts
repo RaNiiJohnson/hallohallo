@@ -1,5 +1,5 @@
-import { action } from "./_generated/server";
-import { components } from "./_generated/api";
+import { action } from "../_generated/server";
+import { components } from "../_generated/api";
 import { StripeSubscriptions } from "@convex-dev/stripe";
 import { v } from "convex/values";
 

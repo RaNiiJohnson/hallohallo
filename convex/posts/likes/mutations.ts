@@ -1,7 +1,7 @@
-import { mutation } from "../_generated/server";
 import { v } from "convex/values";
-import { authComponent } from "../auth";
-import { postLikesCount, postSortedByLikes } from "../aggregates";
+import { mutation } from "../../_generated/server";
+import { postLikesCount, postSortedByLikes } from "../../aggregates";
+import { authComponent } from "../../auth/auth";
 
 export const likePost = mutation({
   args: { postId: v.id("posts") },

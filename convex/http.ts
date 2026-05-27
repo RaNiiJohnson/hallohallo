@@ -1,5 +1,5 @@
 import { httpRouter } from "convex/server";
-import { authComponent, createAuth } from "./auth";
+import { authComponent, createAuth } from "./auth/auth";
 import { components } from "./_generated/api";
 import { registerRoutes } from "@convex-dev/stripe";
 

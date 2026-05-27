@@ -1,13 +1,13 @@
-import { mutation } from "../_generated/server";
-import { v } from "convex/values";
-import { authComponent } from "../auth";
-import { Triggers } from "convex-helpers/server/triggers";
-import { DataModel } from "../_generated/dataModel";
 import {
   customCtx,
   customMutation,
 } from "convex-helpers/server/customFunctions";
-import { postCommentsCount } from "../aggregates";
+import { Triggers } from "convex-helpers/server/triggers";
+import { v } from "convex/values";
+import { DataModel } from "../../_generated/dataModel";
+import { mutation } from "../../_generated/server";
+import { postCommentsCount } from "../../aggregates";
+import { authComponent } from "../../auth/auth";
 
 const triggers = new Triggers<DataModel>();
 triggers.register("postComments", postCommentsCount.trigger());

@@ -1,9 +1,9 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query } from "../_generated/server";
 import { ConvexError, v } from "convex/values";
-import { components } from "./_generated/api";
+import { components } from "../_generated/api";
 import { authComponent, createAuth } from "./auth";
 import { partial } from "convex-helpers/validators";
-import { User, userValidator } from "./betterAuth/users";
+import { User, userValidator } from "../betterAuth/users";
 
 export type UserWithUrls = Omit<User, "image" | "coverImage"> & {
   imageUrl?: string | null;

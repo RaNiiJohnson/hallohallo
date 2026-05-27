@@ -1,4 +1,3 @@
-import { generatedSlug } from "./../src/lib/utils";
 // convex/listings.ts
 import {
   OrderedQuery,
@@ -6,11 +5,10 @@ import {
   Query,
   QueryInitializer,
 } from "convex/server";
-import { DataModel } from "./_generated/dataModel";
-import { mutation, query } from "./_generated/server";
-import { Id } from "./_generated/dataModel";
 import { v } from "convex/values";
-import { authComponent } from "./auth";
+import { DataModel, Id } from "../_generated/dataModel";
+import { query } from "../_generated/server";
+import { authComponent } from "../auth/auth";
 
 export const getListingWithContact = query({
   args: { slug: v.string() },
@@ -27,7 +25,7 @@ export const getListingWithContact = query({
       const existingBookmark = await ctx.db
         .query("bookmarks")
         .withIndex("by_user_resource", (q) =>
-          q.eq("userId", user._id).eq("resourceId", listing._id)
+          q.eq("userId", user._id).eq("resourceId", listing._id),
         )
         .first();
       if (existingBookmark) isBookmarked = true;
@@ -78,7 +76,14 @@ export const getListing = query({
     bookmarkedOnly: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const { searchTerm, propertyType, bedrooms, minPrice, maxPrice, bookmarkedOnly } = args;
+    const {
+      searchTerm,
+      propertyType,
+      bedrooms,
+      minPrice,
+      maxPrice,
+      bookmarkedOnly,
+    } = args;
     const user = await authComponent.safeGetAuthUser(ctx);
 
     if (bookmarkedOnly) {
@@ -92,13 +97,19 @@ export const getListing = query({
 
       const enrichedPage = await Promise.all(
         bookmarksPage.page.map(async (b) => {
-          const listing = await ctx.db.get(b.resourceId as Id<"RealestateListing">);
+          const listing = await ctx.db.get(
+            b.resourceId as Id<"RealestateListing">,
+          );
           if (!listing) return null;
-          return { ...listing, isBookmarked: true } as typeof listing & { isBookmarked: boolean };
-        })
+          return { ...listing, isBookmarked: true } as typeof listing & {
+            isBookmarked: boolean;
+          };
+        }),
       );
-      
-      const filteredPage = enrichedPage.filter((j): j is NonNullable<typeof j> => j !== null);
+
+      const filteredPage = enrichedPage.filter(
+        (j): j is NonNullable<typeof j> => j !== null,
+      );
       return { ...bookmarksPage, page: filteredPage };
     }
 
@@ -148,7 +159,7 @@ export const getListing = query({
 
     // Étape 5 : pagination
     const results = await filtered.paginate(args.paginationOpts);
-    
+
     const enrichedPage = await Promise.all(
       results.page.map(async (listing) => {
         let isBookmarked = false;
@@ -156,15 +167,15 @@ export const getListing = query({
           const existingBookmark = await ctx.db
             .query("bookmarks")
             .withIndex("by_user_resource", (q) =>
-              q.eq("userId", user._id).eq("resourceId", listing._id)
+              q.eq("userId", user._id).eq("resourceId", listing._id),
             )
             .first();
           if (existingBookmark) isBookmarked = true;
         }
         return { ...listing, isBookmarked };
-      })
+      }),
     );
-    
+
     return { ...results, page: enrichedPage };
   },
 });
@@ -229,64 +240,5 @@ export const getSimilarRealEstateListings = query({
       .take(remaining);
 
     return [...byCity, ...byType];
-  },
-});
-
-export const createListing = mutation({
-  args: {
-    title: v.string(),
-    propertyType: v.union(
-      v.literal("room"),
-      v.literal("apartment"),
-      v.literal("house"),
-      v.literal("studio"),
-      v.literal("shared"),
-    ),
-    listingMode: v.union(v.literal("rent"), v.literal("sale")),
-    location: v.optional(
-      v.object({
-        lat: v.number(),
-        lng: v.number(),
-      }),
-    ),
-    city: v.string(),
-    price: v.number(),
-
-    charges: v.optional(v.number()),
-    deposit: v.optional(v.number()),
-    area: v.number(),
-    bedrooms: v.number(),
-    bathrooms: v.number(),
-    floor: v.number(),
-    pets: v.boolean(),
-    images: v.array(
-      v.object({
-        publicId: v.string(),
-        secureUrl: v.string(),
-      }),
-    ),
-    description: v.string(),
-    extras: v.array(v.string()),
-    availableFrom: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-
-    if (!user) {
-      throw new Error("Not authenticated");
-    }
-
-    const searchAllContent = `${args.title} ${args.propertyType} ${args.listingMode} ${args.city} ${args.description}`;
-
-    const listingId = await ctx.db.insert("RealestateListing", {
-      ...args,
-      slug: generatedSlug(args.title),
-      authorId: user._id,
-      authorName: user.name,
-      updatedAt: Date.now(),
-      searchAll: searchAllContent,
-      currency: "EUR",
-    });
-    return listingId;
   },
 });
