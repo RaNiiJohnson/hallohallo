@@ -14,7 +14,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { getRelativeTime } from "@/lib/date";
 import { Doc, Id } from "@convex/_generated/dataModel";
-import { Copy, Edit2, MoreVertical, Send, Trash, X } from "lucide-react";
+import { Copy, Edit2, Flag, MoreVertical, Send, Trash, X } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { useLongPress } from "./useLongPress";
@@ -55,8 +55,8 @@ export function MessageBubble({
   // Long press for mobile — open the dropdown
   const longPressHandlers = useLongPress(
     useCallback(() => {
-      if (isMe && !isEditing) setDropdownOpen(true);
-    }, [isMe, isEditing]),
+      if (!isEditing) setDropdownOpen(true);
+    }, [isEditing]),
   );
 
   return (
@@ -69,7 +69,7 @@ export function MessageBubble({
 
       <div
         className={`group flex items-center gap-1.5 ${isMe ? "flex-row-reverse" : "flex-row"} max-w-[90%]`}
-        {...(isMe && !isEditing ? longPressHandlers : {})}
+        {...(!isEditing ? longPressHandlers : {})}
       >
         <div
           className={`px-3 py-2 rounded-2xl text-sm wrap-break-word ${
@@ -101,12 +101,12 @@ export function MessageBubble({
               </button>
             </div>
           ) : (
-            <span>{msg.content}</span>
+            <span className="select-none md:select-text">{msg.content}</span>
           )}
         </div>
 
-        {isMe && !isEditing && (
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 sm:block">
+        {!isEditing && (
+          <div className={`opacity-0 group-hover:opacity-100 transition-opacity shrink-0 sm:block ${dropdownOpen ? "opacity-100" : ""}`}>
             {isMobile ? (
               <Sheet open={dropdownOpen} onOpenChange={setDropdownOpen}>
                 <SheetContent side="bottom" className="p-0 rounded-t-2xl max-h-[85vh] border-t border-border bg-background">
@@ -115,17 +115,19 @@ export function MessageBubble({
                     Actions pour le message sélectionné
                   </SheetDescription>
                   <div className="flex flex-col py-4">
-                    <button
-                      onClick={() => {
-                        setDropdownOpen(false);
-                        setEditingMessageId(msg._id);
-                        setEditContent(msg.content);
-                      }}
-                      className="flex items-center gap-3 px-6 py-4 hover:bg-muted transition-colors text-left"
-                    >
-                      <Edit2 size={20} className="text-muted-foreground" />
-                      <span className="text-base font-medium">Modifier le message</span>
-                    </button>
+                    {isMe && (
+                      <button
+                        onClick={() => {
+                          setDropdownOpen(false);
+                          setEditingMessageId(msg._id);
+                          setEditContent(msg.content);
+                        }}
+                        className="flex items-center gap-3 px-6 py-4 hover:bg-muted transition-colors text-left"
+                      >
+                        <Edit2 size={20} className="text-muted-foreground" />
+                        <span className="text-base font-medium">Modifier le message</span>
+                      </button>
+                    )}
                     <button
                       onClick={handleCopy}
                       className="flex items-center gap-3 px-6 py-4 hover:bg-muted transition-colors text-left"
@@ -133,47 +135,72 @@ export function MessageBubble({
                       <Copy size={20} className="text-muted-foreground" />
                       <span className="text-base font-medium">Copier le texte</span>
                     </button>
-                    <button
-                      onClick={() => {
-                        setDropdownOpen(false);
-                        onDeleteRequest(msg._id);
-                      }}
-                      className="flex items-center gap-3 px-6 py-4 hover:bg-muted transition-colors text-left text-destructive"
-                    >
-                      <Trash size={20} />
-                      <span className="text-base font-medium">Supprimer le message</span>
-                    </button>
+                    {isMe ? (
+                      <button
+                        onClick={() => {
+                          setDropdownOpen(false);
+                          onDeleteRequest(msg._id);
+                        }}
+                        className="flex items-center gap-3 px-6 py-4 hover:bg-muted transition-colors text-left text-destructive"
+                      >
+                        <Trash size={20} />
+                        <span className="text-base font-medium">Supprimer le message</span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setDropdownOpen(false);
+                          toast.info("Le signalement sera bientôt disponible.");
+                        }}
+                        className="flex items-center gap-3 px-6 py-4 hover:bg-muted transition-colors text-left text-destructive"
+                      >
+                        <Flag size={20} />
+                        <span className="text-base font-medium">Signaler le message</span>
+                      </button>
+                    )}
                   </div>
                 </SheetContent>
               </Sheet>
             ) : (
               <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
                 <DropdownMenuTrigger asChild>
-                  <button className="p-1 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted">
+                  <button className="p-1 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted outline-none">
                     <MoreVertical size={14} />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setEditingMessageId(msg._id);
-                      setEditContent(msg.content);
-                    }}
-                  >
-                    <Edit2 size={14} className="mr-2" />
-                    Modifier
-                  </DropdownMenuItem>
+                <DropdownMenuContent align={isMe ? "end" : "start"}>
+                  {isMe && (
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setEditingMessageId(msg._id);
+                        setEditContent(msg.content);
+                      }}
+                    >
+                      <Edit2 size={14} className="mr-2" />
+                      Modifier
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={handleCopy}>
                     <Copy size={14} className="mr-2" />
                     Copier
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-destructive focus:text-destructive"
-                    onClick={() => onDeleteRequest(msg._id)}
-                  >
-                    <Trash size={14} className="mr-2" />
-                    Supprimer
-                  </DropdownMenuItem>
+                  {isMe ? (
+                    <DropdownMenuItem
+                      className="text-destructive focus:text-destructive"
+                      onClick={() => onDeleteRequest(msg._id)}
+                    >
+                      <Trash size={14} className="mr-2" />
+                      Supprimer
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem
+                      className="text-destructive focus:text-destructive"
+                      onClick={() => toast.info("Le signalement sera bientôt disponible.")}
+                    >
+                      <Flag size={14} className="mr-2" />
+                      Signaler
+                    </DropdownMenuItem>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
