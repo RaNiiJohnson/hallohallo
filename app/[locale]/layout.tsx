@@ -1,20 +1,16 @@
 import { OfflineIndicator } from "@/components/offline-indicator";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Locale, routing } from "@/i18n/routing";
+import { getToken } from "@/lib/auth-server";
 import { ConvexClientProvider } from "@/web/ConvexClientProvider";
+import "flag-icons/css/flag-icons.min.css";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
-import {
-  getMessages,
-  getTranslations,
-  setRequestLocale,
-} from "next-intl/server";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
-import { getToken } from "@/lib/auth-server";
 import "../globals.css";
-import "flag-icons/css/flag-icons.min.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,10 +23,10 @@ const geistMono = Geist_Mono({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("common");
   return {
-    title: t("metaTitle"),
-    description: t("metaDescription"),
+    title: "Hallo Hallo - Malagasy Community in Germany",
+    description:
+      "Exchange and sharing platform to promote mutual support among young Malagasy expats in Germany. Jobs, housing, community.",
     icons: {
       icon: "/logo.svg",
     },
