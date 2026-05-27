@@ -1,25 +1,25 @@
 "use client";
 
-import { useEffect } from "react";
-import { useQuery, useMutation, useConvexAuth } from "convex/react";
-import { api } from "@convex/_generated/api";
-import { Bell, X } from "lucide-react";
-import { getRelativeTime } from "@/lib/date";
-import { Link } from "@/i18n/navigation";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useWidget } from "@/components/WidgetContext";
-import { useTimeTranslations } from "@/hooks/use-time-translations";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { useWidget } from "@/components/WidgetContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useTimeTranslations } from "@/hooks/use-time-translations";
+import { Link } from "@/i18n/navigation";
+import { getRelativeTime } from "@/lib/date";
+import { api } from "@convex/_generated/api";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
+import { Bell, X } from "lucide-react";
+import { useEffect } from "react";
 
 const notificationIcon: Record<string, string> = {
   new_comment: "💬",
@@ -40,17 +40,17 @@ export function NotificationWidget() {
   const isOpen = activeWidget === "notifications";
 
   const notifications = useQuery(
-    api.notifications.getMyNotifications,
+    api.notifications.queries.getMyNotifications,
     isAuthenticated ? {} : "skip",
   );
 
   const unreadCount = useQuery(
-    api.notifications.getUnreadCount,
+    api.notifications.queries.getUnreadCount,
     isAuthenticated ? {} : "skip",
   );
 
-  const markAllRead = useMutation(api.notifications.markAllRead);
-  const markOneRead = useMutation(api.notifications.markOneRead);
+  const markAllRead = useMutation(api.notifications.mutations.markAllRead);
+  const markOneRead = useMutation(api.notifications.mutations.markOneRead);
 
   // History back to close on mobile
   useEffect(() => {
