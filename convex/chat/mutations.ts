@@ -58,6 +58,7 @@ export const editMessage = mutation({
 
     await ctx.db.patch(args.id, {
       content: args.content,
+      editedAt: Date.now(),
     });
   },
 });

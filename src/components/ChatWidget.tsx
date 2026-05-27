@@ -2,6 +2,20 @@
 
 import { useWidget } from "@/components/WidgetContext";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -16,7 +30,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
-import { Id } from "@convex/_generated/dataModel";
+import { Doc, Id } from "@convex/_generated/dataModel";
 import {
   useConvexAuth,
   useMutation,
@@ -25,20 +39,228 @@ import {
 } from "convex/react";
 import {
   ChevronLeft,
+  Edit2,
   Maximize2,
   MessageCircle,
   Minimize2,
   Minus,
+  MoreVertical,
   Send,
+  Trash,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 type Community = {
   _id: Id<"communities">;
   name: string;
 };
+
+// ─── Long Press Hook ──────────────────────────────────────
+
+function useLongPress(onLongPress: () => void, ms = 500) {
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const movedRef = useRef(false);
+
+  const start = useCallback(() => {
+    movedRef.current = false;
+    timerRef.current = setTimeout(() => {
+      if (!movedRef.current) onLongPress();
+    }, ms);
+  }, [onLongPress, ms]);
+
+  const cancel = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const move = useCallback(() => {
+    movedRef.current = true;
+    cancel();
+  }, [cancel]);
+
+  useEffect(() => cancel, [cancel]);
+
+  return {
+    onTouchStart: start,
+    onTouchEnd: cancel,
+    onTouchMove: move,
+  };
+}
+
+// ─── Delete Confirmation Dialog ───────────────────────────
+
+function DeleteConfirmDialog({
+  open,
+  onOpenChange,
+  onConfirm,
+  isDeleting,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+  isDeleting: boolean;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-xs rounded-xl" showCloseButton={false}>
+        <DialogHeader>
+          <DialogTitle className="text-base">
+            Supprimer le message ?
+          </DialogTitle>
+          <DialogDescription>
+            Cette action est irréversible. Le message sera supprimé pour tout le
+            monde.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex-row gap-2 sm:flex-row">
+          <button
+            onClick={() => onOpenChange(false)}
+            className="flex-1 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+          >
+            Annuler
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isDeleting}
+            className="flex-1 rounded-lg bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90 transition-colors disabled:opacity-50"
+          >
+            {isDeleting ? "..." : "Supprimer"}
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ─── Message Bubble ───────────────────────────────────────
+
+function MessageBubble({
+  msg,
+  isMe,
+  editingMessageId,
+  editContent,
+  setEditingMessageId,
+  setEditContent,
+  handleEditSend,
+  handleEditKeyDown,
+  onDeleteRequest,
+  timeT,
+}: {
+  msg: Doc<"communityMessages">;
+  isMe: boolean;
+  editingMessageId: Id<"communityMessages"> | null;
+  editContent: string;
+  setEditingMessageId: (id: Id<"communityMessages"> | null) => void;
+  setEditContent: (content: string) => void;
+  handleEditSend: () => void;
+  handleEditKeyDown: (e: React.KeyboardEvent) => void;
+  onDeleteRequest: (id: Id<"communityMessages">) => void;
+  timeT: ReturnType<typeof useTimeTranslations>;
+}) {
+  const isEditing = editingMessageId === msg._id;
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  // Long press for mobile — open the dropdown
+  const longPressHandlers = useLongPress(
+    useCallback(() => {
+      if (isMe && !isEditing) setDropdownOpen(true);
+    }, [isMe, isEditing]),
+  );
+
+  return (
+    <div className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}>
+      {!isMe && (
+        <span className="text-xs font-medium text-muted-foreground mb-0.5 ml-1">
+          {msg.authorName ?? "Anonyme"}
+        </span>
+      )}
+
+      <div
+        className={`group flex items-center gap-1.5 ${isMe ? "flex-row-reverse" : "flex-row"} max-w-[90%]`}
+        {...(isMe && !isEditing ? longPressHandlers : {})}
+      >
+        <div
+          className={`px-3 py-2 rounded-2xl text-sm wrap-break-word ${
+            isMe
+              ? "bg-primary text-primary-foreground rounded-br-none"
+              : "bg-muted text-foreground rounded-bl-none"
+          }`}
+        >
+          {isEditing ? (
+            <div className="flex items-center gap-2 min-w-[200px]">
+              <input
+                autoFocus
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                onKeyDown={handleEditKeyDown}
+                className="flex-1 text-sm bg-background text-foreground rounded px-2 py-1 outline-none"
+              />
+              <button
+                onClick={handleEditSend}
+                className="text-primary-foreground hover:opacity-80 shrink-0"
+              >
+                <Send size={14} />
+              </button>
+              <button
+                onClick={() => setEditingMessageId(null)}
+                className="text-primary-foreground hover:opacity-80 shrink-0"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          ) : (
+            <span>{msg.content}</span>
+          )}
+        </div>
+
+        {isMe && !isEditing && (
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 sm:block">
+            <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+              <DropdownMenuTrigger asChild>
+                <button className="p-1 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted">
+                  <MoreVertical size={14} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => {
+                    setEditingMessageId(msg._id);
+                    setEditContent(msg.content);
+                  }}
+                >
+                  <Edit2 size={14} className="mr-2" />
+                  Modifier
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onClick={() => onDeleteRequest(msg._id)}
+                >
+                  <Trash size={14} className="mr-2" />
+                  Supprimer
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center gap-1.5 mt-0.5 mx-1">
+        <span className="text-xs text-muted-foreground">
+          {getRelativeTime(msg._creationTime, timeT)}
+        </span>
+        {msg.editedAt && (
+          <span className="text-xs text-muted-foreground/70 italic">
+            (modifié)
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
 
 // ─── Chat Window ──────────────────────────────────────────
 
@@ -56,7 +278,16 @@ function ChatWindow({
   onToggleFullscreen: () => void;
 }) {
   const [content, setContent] = useState("");
+  const [editingMessageId, setEditingMessageId] =
+    useState<Id<"communityMessages"> | null>(null);
+  const [editContent, setEditContent] = useState("");
+  const [deleteTarget, setDeleteTarget] =
+    useState<Id<"communityMessages"> | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const sendMessage = useMutation(api.chat.mutations.sendMessage);
+  const editMessage = useMutation(api.chat.mutations.editMessage);
+  const deleteMessage = useMutation(api.chat.mutations.deleteMessage);
   const markAsRead = useMutation(api.chat.mutations.markAsRead);
   const me = useQuery(api.communities.queries.getMe);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -69,7 +300,21 @@ function ChatWindow({
     { initialNumItems: 10 },
   );
 
-  const messages = [...results].reverse();
+  const messages = useMemo(() => [...results].reverse(), [results]);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isAtBottom, setIsAtBottom] = useState(true);
+  const [newCount, setNewCount] = useState(0);
+
+  const handleScroll = () => {
+    const el = containerRef.current;
+    if (!el) return;
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
+    setIsAtBottom(atBottom);
+    if (atBottom) setNewCount(0);
+  };
+
+  const lastMessageId = messages[messages.length - 1]?._id;
 
   // Marquer comme lu à l'ouverture
   useEffect(() => {
@@ -77,15 +322,31 @@ function ChatWindow({
   }, [community._id, markAsRead]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.length]);
+    if (!lastMessageId) return;
+
+    const lastMsg = messages[messages.length - 1];
+    const isMe = me?._id === lastMsg.authorId;
+
+    if (isAtBottom || isMe) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      if (isMe) setNewCount(0);
+    } else {
+      setNewCount((c) => c + 1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastMessageId]);
+
+  // ─── Send ───────────────────────────────────────────────
 
   const handleSend = async () => {
     if (!content.trim()) return;
+    const text = content;
+    setContent("");
+
     try {
-      await sendMessage({ communityId: community._id, content });
-      setContent("");
+      await sendMessage({ communityId: community._id, content: text });
     } catch {
+      setContent(text); // Restore on error
       toast.error("Erreur lors de l'envoi");
     }
   };
@@ -97,9 +358,59 @@ function ChatWindow({
     }
   };
 
+  // ─── Edit ───────────────────────────────────────────────
+
+  const handleEditSend = async () => {
+    if (!editContent.trim() || !editingMessageId) return;
+    const prevId = editingMessageId;
+    const prevContent = editContent;
+
+    setEditingMessageId(null);
+    setEditContent("");
+
+    try {
+      await editMessage({
+        id: prevId,
+        communityId: community._id,
+        content: prevContent,
+      });
+    } catch {
+      setEditingMessageId(prevId);
+      setEditContent(prevContent);
+      toast.error("Erreur lors de la modification");
+    }
+  };
+
+  const handleEditKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleEditSend();
+    }
+    if (e.key === "Escape") {
+      setEditingMessageId(null);
+      setEditContent("");
+    }
+  };
+
+  // ─── Delete ─────────────────────────────────────────────
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+
+    try {
+      await deleteMessage({ id: deleteTarget, communityId: community._id });
+      setDeleteTarget(null);
+    } catch {
+      toast.error("Erreur lors de la suppression");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center gap-2 px-4 py-3 sm:px-3 sm:py-2 border-b border-border bg-card shrink-0">
+    <div className="flex flex-col h-full relative">
+      <div className="flex items-center gap-2 px-4 py-3 sm:px-3 sm:py-2 border-b border-border bg-card shrink-0 z-20">
         <button
           onClick={onBack}
           className="text-muted-foreground hover:text-foreground transition-colors p-1 -ml-1 sm:p-0 sm:ml-0"
@@ -128,7 +439,11 @@ function ChatWindow({
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3 space-y-2 overscroll-contain">
+      <div
+        ref={containerRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto p-3 space-y-2 overscroll-contain"
+      >
         {status === "CanLoadMore" && (
           <button
             onClick={() => loadMore(20)}
@@ -140,34 +455,38 @@ function ChatWindow({
         {messages.map((msg) => {
           const isMe = me?._id === msg.authorId;
           return (
-            <div
+            <MessageBubble
               key={msg._id}
-              className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}
-            >
-              {!isMe && (
-                <span className="text-xs font-medium text-muted-foreground mb-0.5 ml-1">
-                  {msg.authorName ?? "Anonyme"}
-                </span>
-              )}
-              <div
-                className={`max-w-[75%] px-3 py-2 rounded-2xl text-sm wrap-break-word ${
-                  isMe
-                    ? "bg-primary text-primary-foreground rounded-br-none"
-                    : "bg-muted text-foreground rounded-bl-none"
-                }`}
-              >
-                {msg.content}
-              </div>
-              <span className="text-xs text-muted-foreground mt-0.5 mx-1">
-                {getRelativeTime(msg._creationTime, timeT)}
-              </span>
-            </div>
+              msg={msg}
+              isMe={isMe}
+              editingMessageId={editingMessageId}
+              editContent={editContent}
+              setEditingMessageId={setEditingMessageId}
+              setEditContent={setEditContent}
+              handleEditSend={handleEditSend}
+              handleEditKeyDown={handleEditKeyDown}
+              onDeleteRequest={setDeleteTarget}
+              timeT={timeT}
+            />
           );
         })}
         <div ref={bottomRef} />
       </div>
 
-      <div className="p-2 border-t border-border bg-card shrink-0">
+      {/* Badge nouveau message */}
+      {!isAtBottom && newCount > 0 && (
+        <button
+          onClick={() => {
+            bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+            setNewCount(0);
+          }}
+          className="absolute bottom-16 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-medium px-3 py-1.5 rounded-full shadow-lg z-10 animate-in fade-in slide-in-from-bottom-2 flex items-center gap-1.5"
+        >
+          ↓ {newCount} nouveau{newCount > 1 ? "x" : ""}
+        </button>
+      )}
+
+      <div className="p-2 border-t border-border bg-card shrink-0 relative z-20">
         <div className="flex items-center gap-2 bg-muted rounded-full px-3 py-1.5">
           <input
             value={content}
@@ -185,6 +504,16 @@ function ChatWindow({
           </button>
         </div>
       </div>
+
+      {/* Delete confirmation dialog */}
+      <DeleteConfirmDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }

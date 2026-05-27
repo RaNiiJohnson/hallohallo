@@ -257,6 +257,7 @@ export default defineSchema({
     authorId: v.string(),
     authorName: v.optional(v.string()),
     content: v.string(),
+    editedAt: v.optional(v.number()),
   }).index("by_communityId", ["communityId"]),
 
   notifications: defineTable({
