@@ -62,7 +62,7 @@ export function MessageBubble({
   return (
     <div className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}>
       {!isMe && (
-        <span className="text-xs font-medium text-muted-foreground mb-0.5 ml-1">
+        <span className="text-xs font-medium text-muted-foreground mb-0.5 ml-1 select-none md:select-text">
           {msg.authorName ?? "Anonyme"}
         </span>
       )}
@@ -106,11 +106,18 @@ export function MessageBubble({
         </div>
 
         {!isEditing && (
-          <div className={`opacity-0 group-hover:opacity-100 transition-opacity shrink-0 sm:block ${dropdownOpen ? "opacity-100" : ""}`}>
+          <div
+            className={`opacity-0 group-hover:opacity-100 transition-opacity shrink-0 sm:block ${dropdownOpen ? "opacity-100" : ""}`}
+          >
             {isMobile ? (
               <Sheet open={dropdownOpen} onOpenChange={setDropdownOpen}>
-                <SheetContent side="bottom" className="p-0 rounded-t-2xl max-h-[85vh] border-t border-border bg-background">
-                  <SheetTitle className="sr-only">Options du message</SheetTitle>
+                <SheetContent
+                  side="bottom"
+                  className="p-0 rounded-t-2xl max-h-[85vh] border-t border-border bg-background"
+                >
+                  <SheetTitle className="sr-only">
+                    Options du message
+                  </SheetTitle>
                   <SheetDescription className="sr-only">
                     Actions pour le message sélectionné
                   </SheetDescription>
@@ -125,7 +132,9 @@ export function MessageBubble({
                         className="flex items-center gap-3 px-6 py-4 hover:bg-muted transition-colors text-left"
                       >
                         <Edit2 size={20} className="text-muted-foreground" />
-                        <span className="text-base font-medium">Modifier le message</span>
+                        <span className="text-base font-medium">
+                          Modifier le message
+                        </span>
                       </button>
                     )}
                     <button
@@ -133,7 +142,9 @@ export function MessageBubble({
                       className="flex items-center gap-3 px-6 py-4 hover:bg-muted transition-colors text-left"
                     >
                       <Copy size={20} className="text-muted-foreground" />
-                      <span className="text-base font-medium">Copier le texte</span>
+                      <span className="text-base font-medium">
+                        Copier le texte
+                      </span>
                     </button>
                     {isMe ? (
                       <button
@@ -144,7 +155,9 @@ export function MessageBubble({
                         className="flex items-center gap-3 px-6 py-4 hover:bg-muted transition-colors text-left text-destructive"
                       >
                         <Trash size={20} />
-                        <span className="text-base font-medium">Supprimer le message</span>
+                        <span className="text-base font-medium">
+                          Supprimer le message
+                        </span>
                       </button>
                     ) : (
                       <button
@@ -155,7 +168,9 @@ export function MessageBubble({
                         className="flex items-center gap-3 px-6 py-4 hover:bg-muted transition-colors text-left text-destructive"
                       >
                         <Flag size={20} />
-                        <span className="text-base font-medium">Signaler le message</span>
+                        <span className="text-base font-medium">
+                          Signaler le message
+                        </span>
                       </button>
                     )}
                   </div>
@@ -195,7 +210,9 @@ export function MessageBubble({
                   ) : (
                     <DropdownMenuItem
                       className="text-destructive focus:text-destructive"
-                      onClick={() => toast.info("Le signalement sera bientôt disponible.")}
+                      onClick={() =>
+                        toast.info("Le signalement sera bientôt disponible.")
+                      }
                     >
                       <Flag size={14} className="mr-2" />
                       Signaler
@@ -209,7 +226,7 @@ export function MessageBubble({
       </div>
 
       <div className="flex items-center gap-1.5 mt-0.5 mx-1">
-        <span className="text-xs text-muted-foreground">
+        <span className="text-xs text-muted-foreground select-none md:select-text">
           {getRelativeTime(msg._creationTime, timeT)}
         </span>
         {msg.editedAt && (
