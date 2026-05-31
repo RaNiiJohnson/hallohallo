@@ -3,9 +3,9 @@
 import { convexTest } from "convex-test";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { api } from "../_generated/api";
+import { Id } from "../_generated/dataModel";
 import schema from "../schema";
 import { modules } from "../test.setup";
-import { Id } from "../_generated/dataModel";
 
 vi.mock("../auth/auth", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../auth/auth")>();

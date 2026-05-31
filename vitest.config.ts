@@ -1,7 +1,8 @@
-import { defineConfig } from "vitest/config";
+import { defaultExclude, defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
+    exclude: [...defaultExclude, ".next", "dist"],
     projects: [
       {
         extends: true,
@@ -15,8 +16,11 @@ export default defineConfig({
         extends: true,
         test: {
           name: "frontend",
-          include: ["**/*.test.{ts,tsx,js,jsx}"],
-          exclude: ["convex/**"],
+          include: [
+            "src/**/*.test.{ts,tsx,js,jsx}",
+            "app/**/*.test.{ts,tsx,js,jsx}",
+          ],
+          exclude: [...defaultExclude, "convex/**"],
           environment: "jsdom",
         },
       },
