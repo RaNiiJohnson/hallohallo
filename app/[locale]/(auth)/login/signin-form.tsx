@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -14,14 +15,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
-import { Link } from "@/i18n/navigation";
 import { PasswordInput } from "@/components/ui/password-input";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Link } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export function SigninForm() {
   const router = useRouter();
@@ -59,8 +59,8 @@ export function SigninForm() {
           toast.success(tToast("success"));
           router.push("/");
         },
-        onError: () => {
-          toast.error(tToast("error"));
+        onError: (error) => {
+          toast.error(error ? error.error.message : tToast("error"));
         },
       },
     });

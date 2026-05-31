@@ -70,7 +70,7 @@ export function SignupForm() {
           router.push("/");
         },
         onError: (error) => {
-          toast.error(error.error.message);
+          toast.error(error ? error.error.message : tToast("error"));
         },
       },
     });

@@ -21,7 +21,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
 import { righteous } from "@/web/fonts";
 import { Logo } from "@/web/logo";
@@ -47,6 +47,7 @@ import { Skeleton } from "./ui/skeleton";
 export function MainSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
+  const router = useRouter();
   const pathname = usePathname();
   const user = useQuery(api.auth.auth.getCurrentUser);
   const myCommunities = useQuery(api.communities.queries.getMyCommunities);
@@ -65,7 +66,7 @@ export function MainSidebar({
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          location.reload();
+          router.push("/login");
         },
       },
     });
