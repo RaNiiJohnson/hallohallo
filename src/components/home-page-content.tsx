@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
+import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import {
   Item,
   ItemContent,
@@ -16,19 +17,19 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
+import { Link } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
+import { useConvexAuth } from "convex/react";
 import {
-  Users,
-  Heart,
+  ArrowRightIcon,
   Globe,
   HandHeart,
+  Heart,
   Sparkles,
-  ArrowRightIcon,
+  Users,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
-import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
-import { useConvexAuth } from "convex/react";
 import { useTranslations } from "next-intl";
+import PricingPage from "./pricing";
 
 type Props = {
   children: React.ReactNode;
@@ -50,7 +51,7 @@ const reviews = [
   { icon: "Sparkles", key: "identity" },
 ] as const;
 
-export function HomePageContent({ children }: Props) {
+export function HomePageContent() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const t = useTranslations("home");
 
@@ -235,7 +236,7 @@ export function HomePageContent({ children }: Props) {
         </div>
       </section>
 
-      {children}
+      <PricingPage />
     </div>
   );
 }

@@ -1,10 +1,12 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 
-export default async function PricingPage() {
-  const t = await getTranslations("pricing");
+export default function PricingPage() {
+  const t = useTranslations("pricing");
 
   const freeFeatures = t.raw("free.features") as string[];
   const proFeatures = t.raw("pro.features") as string[];

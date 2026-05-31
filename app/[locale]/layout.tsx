@@ -64,7 +64,7 @@ export default async function RootLayout({
               <OfflineIndicator />
               <NuqsAdapter>{children}</NuqsAdapter>
             </ConvexClientProvider>
-            <Toaster closeButton />
+            <Toaster closeButton richColors />
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

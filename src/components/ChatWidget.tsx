@@ -18,9 +18,9 @@ import { useConvexAuth, useQuery } from "convex/react";
 import { MessageCircle, Minus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
-import { ChatWindow } from "./chatComponent/ChatWindow";
-import { CommunityList } from "./chatComponent/CommunityList";
-import { Community } from "./chatComponent/types";
+import { ChatWindow } from "./chatComponents/ChatWindow";
+import { CommunityList } from "./chatComponents/CommunityList";
+import { Community } from "./chatComponents/types";
 
 // ─── Chat Widget ──────────────────────────────────────────
 

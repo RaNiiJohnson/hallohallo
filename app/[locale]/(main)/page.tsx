@@ -1,11 +1,10 @@
-import { Suspense } from "react";
-import { setRequestLocale } from "next-intl/server";
 import {
   HomePageContent,
   HomePageSkeleton,
 } from "@/components/home-page-content";
 import { Locale } from "@/i18n/routing";
-import PricingPage from "@/components/pricing";
+import { setRequestLocale } from "next-intl/server";
+import { Suspense } from "react";
 
 export default async function HomePage({
   params,
@@ -17,9 +16,7 @@ export default async function HomePage({
 
   return (
     <Suspense fallback={<HomePageSkeleton />}>
-      <HomePageContent>
-        <PricingPage />
-      </HomePageContent>
+      <HomePageContent />
     </Suspense>
   );
 }
