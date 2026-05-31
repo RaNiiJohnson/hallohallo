@@ -29,7 +29,7 @@ export default async function RootLayout({
       <MainSidebar />
       <SidebarInset>
         {/* Sticky top bar with SidebarTrigger and ThemeToggle */}
-        <header className="sticky top-0 z-40 flex h-10 shrink-0 items-center gap-2 bg-transparent backdrop-blur-sm px-4 justify-between">
+        <header className="sticky  mt-2 top-0 z-40 flex h-12 shrink-0 items-center gap-2 bg-transparent backdrop-blur-sm px-4 justify-between">
           <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
           </div>
