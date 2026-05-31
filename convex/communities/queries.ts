@@ -40,7 +40,8 @@ export const getAllCommunities = query({
 
 export const getTopCommunities = query({
   handler: async (ctx) => {
-    const communities = await ctx.db.query("communities").order("desc").take(5);
+    const communities = await ctx.db.query("communities").order("desc").take(3);
+
     return communities;
   },
 });

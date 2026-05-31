@@ -27,7 +27,7 @@ import { righteous } from "@/web/fonts";
 import { Logo } from "@/web/logo";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
-import { Authenticated, Unauthenticated } from "convex/react";
+import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
 import {
   Briefcase,
   Building,
@@ -36,13 +36,13 @@ import {
   LogIn,
   LogOut,
   Settings,
-  Sparkles,
   User,
   Users,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import * as React from "react";
+import { Skeleton } from "./ui/skeleton";
 
 export function MainSidebar({
   ...props
@@ -119,7 +119,13 @@ export function MainSidebar({
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-
+              {/* <AuthLoading>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="flex-1 h-[25px]" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </AuthLoading>
               <Authenticated>
                 <SidebarMenuItem>
                   <SidebarMenuButton
@@ -139,7 +145,7 @@ export function MainSidebar({
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              </Authenticated>
+              </Authenticated> */}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -148,6 +154,20 @@ export function MainSidebar({
           <SidebarGroupLabel>{t("communities.label")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
+              <AuthLoading>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="size-4 rounded shrink-0" />
+                    <Skeleton className="flex-1 h-4 group-data-[collapsible=icon]:hidden" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="size-4 rounded shrink-0" />
+                    <Skeleton className="flex-1 h-4 group-data-[collapsible=icon]:hidden" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </AuthLoading>
               <Authenticated>
                 {myCommunities?.map((community) => (
                   <SidebarMenuItem key={community?._id}>
@@ -159,7 +179,12 @@ export function MainSidebar({
                         href={`/communities/${community?.slug}`}
                         onClick={() => isMobile && setOpenMobile(false)}
                       >
-                        <span className="truncate">{community?.name}</span>
+                        <div className="flex size-4 shrink-0 items-center justify-center rounded bg-primary/10 text-[10px] font-bold text-primary group-data-[collapsible=icon]:size-4">
+                          {community?.name?.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="truncate group-data-[collapsible=icon]:hidden">
+                          {community?.name}
+                        </span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -176,8 +201,12 @@ export function MainSidebar({
                         href={`/communities/${community.slug}`}
                         onClick={() => isMobile && setOpenMobile(false)}
                       >
-                        <Users className="size-4" />
-                        <span className="truncate">{community.name}</span>
+                        <div className="flex size-4 shrink-0 items-center justify-center rounded bg-primary/10 text-[10px] font-bold text-primary group-data-[collapsible=icon]:size-4">
+                          {community?.name?.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="truncate group-data-[collapsible=icon]:hidden">
+                          {community.name}
+                        </span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -205,34 +234,49 @@ export function MainSidebar({
       </SidebarContent>
 
       <SidebarFooter>
-        <Unauthenticated>
+        <AuthLoading>
           <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton className="mb-1">
+                <Skeleton className="size-10 rounded-full" />
+                <Skeleton className="flex-1 h-10 rounded-full" />
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </AuthLoading>
+        <Unauthenticated>
+          <SidebarMenu className="gap-2 px-2 py-1">
+            {/* Bouton S'inscrire (Principal) */}
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild
-                size="lg"
-                className="group-data-[collapsible=icon]:hidden"
+                size="default"
+                className="bg-primary text-sidebar hover:text-sidebar hover:bg-primary/90 justify-center font-semibold transition-colors group-data-[collapsible=icon]:hidden"
               >
                 <Link
                   href="/register"
                   onClick={() => isMobile && setOpenMobile(false)}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 justify-center font-medium"
                 >
                   {t("auth.register")}
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
+
             <SidebarMenuItem>
-              <SidebarMenuButton asChild size="lg" tooltip={t("auth.login")}>
+              <SidebarMenuButton
+                asChild
+                size="default"
+                tooltip={t("auth.login")}
+                className="variant-outline justify-center font-medium border border-input hover:bg-accent hover:text-accent-foreground group-data-[collapsible=icon]:p-0"
+              >
                 <Link
                   href="/login"
                   onClick={() => isMobile && setOpenMobile(false)}
-                  className="justify-center border border-border mt-1 group-data-[collapsible=icon]:mt-0 group-data-[collapsible=icon]:border-none"
                 >
-                  <LogIn className="hidden group-data-[collapsible=icon]:block size-4" />
                   <span className="group-data-[collapsible=icon]:hidden">
                     {t("auth.login")}
                   </span>
+                  <LogIn className="hidden group-data-[collapsible=icon]:block h-5 w-5" />
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

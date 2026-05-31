@@ -30,10 +30,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import PricingPage from "./pricing";
-
-type Props = {
-  children: React.ReactNode;
-};
+import { Skeleton } from "./ui/skeleton";
 
 const iconMap = {
   Heart,
@@ -68,14 +65,9 @@ export function HomePageContent() {
           </p>
 
           {isLoading ? (
-            <Link
-              href="/"
-              className="z-10 opacity-0 flex items-center justify-center"
-            >
-              <InteractiveHoverButton className="bg-card/90 shadow-sm hover:shadow-xl">
-                ...
-              </InteractiveHoverButton>
-            </Link>
+            <div className="flex items-center justify-center w-full">
+              <Skeleton className="w-[140px] h-[42px] rounded-full border border-muted select-none pointer-events-none" />
+            </div>
           ) : isAuthenticated ? (
             <div className="space-y-4 opacity-100">
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

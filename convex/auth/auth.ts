@@ -1,13 +1,13 @@
 import { createClient, type GenericCtx } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
+import { betterAuth, type BetterAuthOptions } from "better-auth/minimal";
+import { generatedSlug } from "../../src/lib/utils";
 import { components } from "../_generated/api";
 import { DataModel } from "../_generated/dataModel";
 import { query } from "../_generated/server";
-import { betterAuth, type BetterAuthOptions } from "better-auth/minimal";
 import authConfig from "../auth.config";
 import authSchema from "../betterAuth/schema";
 import { UserWithUrls } from "./users";
-import { generatedSlug } from "../../src/lib/utils";
 
 const siteUrl = process.env.SITE_URL!;
 
@@ -161,6 +161,12 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
       // The Convex plugin is required for Convex compatibility
       convex({ authConfig }),
     ],
+    session: {
+      cookieCache: {
+        enabled: true,
+        maxAge: 5 * 60,
+      },
+    },
   } satisfies BetterAuthOptions;
 };
 
