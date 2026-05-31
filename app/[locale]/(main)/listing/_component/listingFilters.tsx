@@ -1,8 +1,19 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -10,22 +21,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { useEffect, useState, useTransition } from "react";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@/components/ui/input-group";
-import { Input } from "@/components/ui/input";
-import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
-import { useDebounce } from "use-debounce";
+import { Filter, Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
+import { useEffect, useState, useTransition } from "react";
+import { useDebounce } from "use-debounce";
 import { listingTypeValues } from "./forms/listingForm";
 
 const BEDROOMS_OPTIONS = ["1", "2", "3", "4"] as const;
@@ -107,7 +107,7 @@ export function RealEstatesFilters({
   };
 
   return (
-    <div className="w-full bg-background sticky top-0 p-2 z-40 ">
+    <div className="p-2">
       <div className="flex flex-col gap-4 max-w-3xl mx-auto">
         {/* Barre de recherche principale */}
         <div className="flex gap-4">
@@ -126,7 +126,9 @@ export function RealEstatesFilters({
                 <PopoverTrigger asChild>
                   <InputGroupButton variant="outline">
                     <Filter className="h-4 w-4" />
-                    <span className="hidden sm:inline">{t("filters.title")}</span>
+                    <span className="hidden sm:inline">
+                      {t("filters.title")}
+                    </span>
 
                     <Badge
                       variant="secondary"
@@ -165,16 +167,21 @@ export function RealEstatesFilters({
                           }}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder={t("filters.bedroomsAll")} />
+                            <SelectValue
+                              placeholder={t("filters.bedroomsAll")}
+                            />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value={"0"}>{t("filters.bedroomsAll")}</SelectItem>
+                            <SelectItem value={"0"}>
+                              {t("filters.bedroomsAll")}
+                            </SelectItem>
                             {BEDROOMS_OPTIONS.map((option) => (
-                              <SelectItem
-                                key={option}
-                                value={option}
-                              >
-                                {t(`filters.bedrooms${option}` as Parameters<typeof t>[0])}
+                              <SelectItem key={option} value={option}>
+                                {t(
+                                  `filters.bedrooms${option}` as Parameters<
+                                    typeof t
+                                  >[0],
+                                )}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -222,7 +229,11 @@ export function RealEstatesFilters({
                           className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
                           onClick={() => setFilters({ type: type })}
                         >
-                          {t(`labels.listingTypes.${type}` as Parameters<typeof t>[0])}
+                          {t(
+                            `labels.listingTypes.${type}` as Parameters<
+                              typeof t
+                            >[0],
+                          )}
                         </Badge>
                       ))}
                       {isAuthenticated && (
