@@ -34,6 +34,7 @@
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
+    "@sholajegede/convex-cascading-deletes": "^0.1.2",
     "@stripe/stripe-js": "^9.7.0",
     "better-auth": "1.6.14",
     "browser-image-compression": "^2.0.2",
@@ -81,7 +82,7 @@
     "vite": "^8.0.16",
     "vitest": "^4.1.8"
   },
-  "packageManager": "pnpm@10.28.1+sha512.7d7dbbca9e99447b7c3bf7a73286afaaf6be99251eb9498baefa7d406892f67b879adb3a1d7e687fc4ccc1a388c7175fbaae567a26ab44d1067b54fcb0d6a316",
+  "packageManager": "pnpm@11.5.1+sha512.93f7b57422ea7068257235b4c16eb60762eb68e1dc23723199cc739043ea9be2c4143274a399d8c6defa2b1176226d9ca1c4b63482d6200c1a8fbaa78c1d1485",
   "pnpm": {
     "overrides": {
       "@types/react": "19.2.14",
