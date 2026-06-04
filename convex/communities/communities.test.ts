@@ -34,11 +34,14 @@ describe("Communities", () => {
   beforeEach(async () => {
     t = convexTest(schema, modules);
 
-    const communityResult = await t.mutation(api.communities.mutations.createCommunty, {
-      name: "Community Name",
-      description: "Community Description",
-      privacy: "public",
-    });
+    const communityResult = await t.mutation(
+      api.communities.mutations.createCommunty,
+      {
+        name: "Community Name",
+        description: "Community Description",
+        privacy: "public",
+      },
+    );
 
     communityId = communityResult.comId;
     communitySlug = communityResult.slug;
@@ -66,7 +69,7 @@ describe("Communities", () => {
   });
 
   it("should delete a community", async () => {
-    await t.mutation(api.communities.mutations.deleteCommunity, {
+    await t.action(api.communities.actions.deleteCommunity, {
       id: communityId,
     });
 
