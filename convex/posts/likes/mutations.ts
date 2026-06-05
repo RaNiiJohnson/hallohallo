@@ -28,6 +28,22 @@ export const likePost = mutation({
       await ctx.db.patch(args.postId, { likesCount: newCount });
       const updatedPost = (await ctx.db.get(args.postId))!;
       await postSortedByLikes.replace(ctx, oldPost, updatedPost);
+      // Remove ghost notification if exists
+      if (post.authorId !== user._id) {
+        const ghostNotifs = await ctx.db
+          .query("notifications")
+          .withIndex("by_userId", (q) => q.eq("userId", post.authorId))
+          .filter((q) =>
+            q.and(
+              q.eq(q.field("type"), "new_like"),
+              q.eq(q.field("fromUserName"), user.name),
+              q.eq(q.field("postSlug"), post.slug)
+            )
+          )
+          .take(1);
+        for (const notif of ghostNotifs) await ctx.db.delete(notif._id);
+      }
+
       return;
     }
 
@@ -78,6 +94,23 @@ export const likeComment = mutation({
 
     if (existing) {
       await ctx.db.delete(existing._id);
+      // Remove ghost notification if exists
+      if (comment.authorId !== user._id) {
+        const post = await ctx.db.get(comment.postId);
+        const ghostNotifs = await ctx.db
+          .query("notifications")
+          .withIndex("by_userId", (q) => q.eq("userId", comment.authorId))
+          .filter((q) =>
+            q.and(
+              q.eq(q.field("type"), "new_comment_like"),
+              q.eq(q.field("fromUserName"), user.name),
+              q.eq(q.field("postSlug"), post?.slug)
+            )
+          )
+          .take(1);
+        for (const notif of ghostNotifs) await ctx.db.delete(notif._id);
+      }
+
       return;
     }
 
@@ -120,6 +153,24 @@ export const likeReply = mutation({
 
     if (existing) {
       await ctx.db.delete(existing._id);
+      // Remove ghost notification if exists
+      if (reply.authorId !== user._id) {
+        const comment = await ctx.db.get(reply.commentId);
+        const post = comment ? await ctx.db.get(comment.postId) : null;
+        const ghostNotifs = await ctx.db
+          .query("notifications")
+          .withIndex("by_userId", (q) => q.eq("userId", reply.authorId))
+          .filter((q) =>
+            q.and(
+              q.eq(q.field("type"), "new_reply_like"),
+              q.eq(q.field("fromUserName"), user.name),
+              q.eq(q.field("postSlug"), post?.slug)
+            )
+          )
+          .take(1);
+        for (const notif of ghostNotifs) await ctx.db.delete(notif._id);
+      }
+
       return;
     }
 

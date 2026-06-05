@@ -63,62 +63,7 @@ export const createPost = mutationWithTriggers({
   },
 });
 
-export const deletePost = mutationWithTriggers({
-  args: { postId: v.id("posts") },
-  handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
 
-    const post = await ctx.db.get(args.postId);
-    if (!post) throw new Error("Post not found");
-    if (post.authorId !== user._id) throw new Error("Not authorized");
-
-    // 1. Likes du post
-    const postLikes = await ctx.db
-      .query("postLikes")
-      .withIndex("by_postId", (q) => q.eq("postId", args.postId))
-      .collect();
-    for (const like of postLikes) await ctx.db.delete(like._id);
-
-    // 2. Commentaires
-    const comments = await ctx.db
-      .query("postComments")
-      .withIndex("by_postId", (q) => q.eq("postId", args.postId))
-      .collect();
-
-    for (const comment of comments) {
-      const commentLikes = await ctx.db
-        .query("postCommentLikes")
-        .withIndex("by_commentId", (q) => q.eq("commentId", comment._id))
-        .collect();
-      for (const like of commentLikes) await ctx.db.delete(like._id);
-
-      const replies = await ctx.db
-        .query("postCommentReplies")
-        .withIndex("by_commentId", (q) => q.eq("commentId", comment._id))
-        .collect();
-
-      for (const reply of replies) {
-        const replyLikes = await ctx.db
-          .query("postCommentReplyLikes")
-          .withIndex("by_replyId", (q) => q.eq("replyId", reply._id))
-          .collect();
-        for (const like of replyLikes) await ctx.db.delete(like._id);
-        await ctx.db.delete(reply._id);
-      }
-
-      await ctx.db.delete(comment._id);
-    }
-
-    // 3. Delete from aggregate tables
-    await postShuffle.delete(ctx, post);
-    await postSortedByDate.delete(ctx, post);
-    await postSortedByLikes.delete(ctx, post);
-
-    // 4. Aggregate + delete du post
-    await ctx.db.delete(args.postId);
-  },
-});
 
 export const updatePost = mutationWithTriggers({
   args: {

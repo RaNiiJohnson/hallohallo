@@ -29,6 +29,7 @@ import type * as listings_mutations from "../listings/mutations.js";
 import type * as listings_queries from "../listings/queries.js";
 import type * as notifications_mutations from "../notifications/mutations.js";
 import type * as notifications_queries from "../notifications/queries.js";
+import type * as posts_actions from "../posts/actions.js";
 import type * as posts_comments_mutations from "../posts/comments/mutations.js";
 import type * as posts_likes_mutations from "../posts/likes/mutations.js";
 import type * as posts_mutations from "../posts/mutations.js";
@@ -64,6 +65,7 @@ declare const fullApi: ApiFromModules<{
   "listings/queries": typeof listings_queries;
   "notifications/mutations": typeof notifications_mutations;
   "notifications/queries": typeof notifications_queries;
+  "posts/actions": typeof posts_actions;
   "posts/comments/mutations": typeof posts_comments_mutations;
   "posts/likes/mutations": typeof posts_likes_mutations;
   "posts/mutations": typeof posts_mutations;

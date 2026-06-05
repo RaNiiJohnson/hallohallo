@@ -71,7 +71,7 @@ describe("Posts", () => {
   });
 
   it("should delete a post", async () => {
-    await t.mutation(api.posts.mutations.deletePost, {
+    await t.action(api.posts.actions.deletePost, {
       postId,
     });
 

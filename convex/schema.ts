@@ -278,5 +278,7 @@ export default defineSchema({
     message: v.optional(v.string()),
   })
     .index("by_userId", ["userId"])
-    .index("by_userId_read", ["userId", "read"]),
+    .index("by_userId_read", ["userId", "read"])
+    .index("by_communitySlug", ["communitySlug"])
+    .index("by_postSlug", ["postSlug"]),
 });

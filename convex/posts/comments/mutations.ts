@@ -83,6 +83,23 @@ export const deleteComment = mutationWithTriggers({
       await ctx.db.delete(reply._id);
     }
 
+    // Remove ghost notification if exists
+    const post = await ctx.db.get(comment.postId);
+    if (post && post.authorId !== user._id) {
+      const ghostNotifs = await ctx.db
+        .query("notifications")
+        .withIndex("by_userId", (q) => q.eq("userId", post.authorId))
+        .filter((q) =>
+          q.and(
+            q.eq(q.field("type"), "new_comment"),
+            q.eq(q.field("fromUserName"), user.name),
+            q.eq(q.field("postSlug"), post.slug)
+          )
+        )
+        .take(1);
+      for (const notif of ghostNotifs) await ctx.db.delete(notif._id);
+    }
+
     await ctx.db.delete(args.commentId);
   },
 });
@@ -174,6 +191,24 @@ export const deleteReply = mutationWithTriggers({
       .withIndex("by_replyId", (q) => q.eq("replyId", args.replyId))
       .collect();
     for (const like of replyLikes) await ctx.db.delete(like._id);
+
+    // Remove ghost notification if exists
+    const comment = await ctx.db.get(reply.commentId);
+    if (comment && comment.authorId !== user._id) {
+      const post = await ctx.db.get(comment.postId);
+      const ghostNotifs = await ctx.db
+        .query("notifications")
+        .withIndex("by_userId", (q) => q.eq("userId", comment.authorId))
+        .filter((q) =>
+          q.and(
+            q.eq(q.field("type"), "new_reply"),
+            q.eq(q.field("fromUserName"), user.name),
+            q.eq(q.field("postSlug"), post?.slug)
+          )
+        )
+        .take(1);
+      for (const notif of ghostNotifs) await ctx.db.delete(notif._id);
+    }
 
     await ctx.db.delete(args.replyId);
   },

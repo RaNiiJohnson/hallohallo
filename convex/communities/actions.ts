@@ -18,7 +18,7 @@ export const _verifyDeleteAuth = internalMutation({
     if (!community) throw new Error("Community not found");
     if (community.authorId !== user._id) throw new Error("Not authorized");
 
-    return { communityId: community._id };
+    return { communityId: community._id, slug: community.slug };
   },
 });
 
@@ -31,11 +31,14 @@ export const deleteCommunity = action({
   args: { id: v.id("communities") },
   handler: async (ctx, args) => {
     // 1. Vérifier l'authentification et l'autorisation
-    await ctx.runMutation(internal.communities.actions._verifyDeleteAuth, {
+    const { slug } = await ctx.runMutation(internal.communities.actions._verifyDeleteAuth, {
       id: args.id,
     });
 
-    // 2. Cascade delete : supprime la communauté et tous les enfants
+    // 2. Nettoyer les notifications liées à ce slug (et aux posts de cette communauté)
+    await ctx.runMutation(internal.notifications.mutations.deleteByCommunity, { slug });
+
+    // 3. Cascade delete : supprime la communauté et tous les enfants
     const counts = await runCascadeDelete(ctx, "communities", args.id);
 
     return counts;
