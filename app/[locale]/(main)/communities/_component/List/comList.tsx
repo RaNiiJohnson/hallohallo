@@ -68,13 +68,15 @@ export default function ComList() {
             ))
           )}
 
-          <PostPagination
-            mode={mode}
-            result={result}
-            currentPage={currentPage}
-            loading={loading}
-            onGoToPage={goToPage}
-          />
+          {result.posts.length > PAGE_SIZE && (
+            <PostPagination
+              mode={mode}
+              result={result}
+              currentPage={currentPage}
+              loading={loading}
+              onGoToPage={goToPage}
+            />
+          )}
         </>
       )}
     </div>
