@@ -9,7 +9,7 @@ import { Link } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
-import { useConvexAuth, useMutation } from "convex/react";
+import { useConvexAuth, useMutation, useAction } from "convex/react";
 import {
   Bookmark,
   ChevronRight,
@@ -37,7 +37,7 @@ export default function PostClient() {
   const likePost = useMutation(api.posts.likes.mutations.likePost);
   const addComment = useMutation(api.posts.comments.mutations.addComment);
   const updatePost = useMutation(api.posts.mutations.updatePost);
-  const deletePost = useMutation(api.posts.mutations.deletePost);
+  const deletePost = useAction(api.posts.actions.deletePost);
   const { isAuthenticated } = useConvexAuth();
 
   const [commentContent, setCommentContent] = useState("");

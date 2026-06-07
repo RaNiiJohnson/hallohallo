@@ -61,7 +61,14 @@
     "join": "Join",
     "emptyPosts": "No posts yet.",
     "firstToPost": "Be the first to post →",
-    "admin": "Admin"
+    "admin": "Admin",
+    "deleteCommunity": "Delete community",
+    "deleteDialogTitle": "Delete this community?",
+    "deleteDialogDescription": "This will permanently delete {name} and all its posts and comments. This action cannot be undone.",
+    "deleteDialogConfirm": "Delete",
+    "cancel": "Cancel",
+    "deleting": "Deleting...",
+    "deletedCommunity": "{name} deleted!"
   },
   "post": {
     "notFound": "Post not found.",

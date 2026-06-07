@@ -61,7 +61,14 @@
     "join": "Rejoindre",
     "emptyPosts": "Aucun post pour le moment.",
     "firstToPost": "Soyez le premier à publier →",
-    "admin": "Admin"
+    "admin": "Admin",
+    "deleteCommunity": "Supprimer la communauté",
+    "deleteDialogTitle": "Supprimer cette communauté ?",
+    "deleteDialogDescription": "Cette action supprimera définitivement {name} ainsi que tous ses posts et commentaires. Elle est irréversible.",
+    "deleteDialogConfirm": "Supprimer",
+    "cancel": "Annuler",
+    "deleting": "Suppression...",
+    "deletedCommunity": "{name} supprimée !"
   },
   "post": {
     "notFound": "Post introuvable.",
