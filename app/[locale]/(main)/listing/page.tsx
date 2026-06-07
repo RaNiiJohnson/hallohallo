@@ -1,9 +1,11 @@
 import { HeroSection } from "@/components/hero-section";
-import { ListingClient } from "./_component/ListingClient";
-import { ListingPageSkeleton } from "./_component/skeleton";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { CTAButton } from "./_component/CTAButton";
+import { ListingList } from "./_component/List/listingList";
+import { ListingActionsBar } from "./_component/ListingActionsBar";
+import { RealEstatesFilters } from "./_component/listingFilters";
+import { ListingPageSkeleton } from "./_component/skeleton";
 
 export default async function ListingPage() {
   const t = await getTranslations("listing");
@@ -15,14 +17,13 @@ export default async function ListingPage() {
         subtitle={t("hero.subtitle")}
         backgroundImage="/images/real-estate-bg.png"
       />
+
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="relative">
-          <div className="flex items-center gap-2 my-8">
-            <h2 className="text-2xl font-bold">{t("list.title")}</h2>
-          </div>
-
           <Suspense fallback={<ListingPageSkeleton />}>
-            <ListingClient />
+            <RealEstatesFilters />
+            <ListingActionsBar />
+            <ListingList />
           </Suspense>
         </div>
 
@@ -31,7 +32,6 @@ export default async function ListingPage() {
           <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
             {t("cta.desc")}
           </p>
-          {/* Le bouton CTA dépend de isAuthenticated → reste dans ListingClient */}
           <Suspense
             fallback={
               <div className="h-11 w-40 bg-muted rounded-md animate-pulse" />

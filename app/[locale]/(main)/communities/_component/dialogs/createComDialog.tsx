@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,10 +9,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { CreateCommunityForm } from "../forms/createCommunityForm";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { CreateCommunityForm } from "../forms/createCommunityForm";
 
 interface CreateCommunityDialogProps {
   trigger?: React.ReactNode;
@@ -32,16 +32,14 @@ export function CreateCommunityDialog({ trigger }: CreateCommunityDialogProps) {
         {trigger || (
           <Button className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            <span>{t("trigger")}</span>
+            <span className="hidden sm:block">{t("trigger")}</span>
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t("title")}</DialogTitle>
-          <DialogDescription>
-            {t("description")}
-          </DialogDescription>
+          <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
         <CreateCommunityForm onSuccess={handleSuccess} />
       </DialogContent>

@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useConvexAuth } from "convex/react";
 import { Filter, Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
@@ -30,11 +31,8 @@ import { listingTypeValues } from "./forms/listingForm";
 
 const BEDROOMS_OPTIONS = ["1", "2", "3", "4"] as const;
 
-export function RealEstatesFilters({
-  isAuthenticated,
-}: {
-  isAuthenticated: boolean;
-}) {
+export function RealEstatesFilters() {
+  const { isAuthenticated } = useConvexAuth();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, startTransition] = useTransition();
   const t = useTranslations("listing");

@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { api } from "@convex/_generated/api";
 import clsx from "clsx";
 import { usePaginatedQuery } from "convex-helpers/react/cache";
+import { useConvexAuth } from "convex/react";
 import { Briefcase, MapPin } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
@@ -26,7 +27,8 @@ import { PriceDisplay } from "../price";
 import { ListingItemsSkeleton, ListingListSkeleton } from "../skeleton";
 import { BookmarkButton } from "./bookmarkButton";
 
-export function ListingList({ isAuthenticated }: { isAuthenticated: boolean }) {
+export function ListingList() {
+  const { isAuthenticated } = useConvexAuth();
   const t = useTranslations("listing");
   const [filters] = useQueryStates({
     search: parseAsString.withDefault(""),

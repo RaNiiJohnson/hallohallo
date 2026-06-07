@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useConvexAuth } from "convex/react";
 import { Filter, Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { parseAsString, useQueryStates } from "nuqs";
@@ -28,7 +29,8 @@ import { useDebounce } from "use-debounce";
 
 import { contractTypeValues, jobTypeValues } from "./forms/jobOfferForm";
 
-export function JobFilters({ isAuthenticated }: { isAuthenticated: boolean }) {
+export function JobFilters() {
+  const { isAuthenticated } = useConvexAuth();
   const t = useTranslations("jobs");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, startTransition] = useTransition();
