@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function ComListSkeleton() {
   return (
-    <div className="flex flex-col gap-4 items-center">
+    <div className="flex flex-col gap-4 items-center px-4">
       {Array.from({ length: 1 }).map((_, i) => (
         <div
           key={i}
