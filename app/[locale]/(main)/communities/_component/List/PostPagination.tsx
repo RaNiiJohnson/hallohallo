@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+"use client";
+
 import {
   Pagination,
   PaginationContent,
@@ -8,7 +9,9 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { SortMode, PostsResult, PAGE_SIZE } from "./types";
+import { useTranslations } from "next-intl";
+import { useMemo } from "react";
+import { PAGE_SIZE, PostsResult, SortMode } from "./types";
 
 // Pagination helper
 function getPageNumbers(currentPage: number, totalPages: number): number[] {
@@ -40,6 +43,7 @@ export function PostPagination({
   loading: boolean;
   onGoToPage: (page: number) => void;
 }) {
+  const t = useTranslations("common");
   const isNumbered = mode !== "shuffle";
   const totalPages = isNumbered ? Math.ceil(result.totalCount / PAGE_SIZE) : 0;
   const visiblePages = useMemo(
@@ -55,6 +59,7 @@ export function PostPagination({
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious
+            label={t("prev")}
             onClick={() => onGoToPage(currentPage - 1)}
             className={
               prevDisabled ? "pointer-events-none opacity-50" : "cursor-pointer"
@@ -83,6 +88,7 @@ export function PostPagination({
 
         <PaginationItem>
           <PaginationNext
+            label={t("next")}
             onClick={() => onGoToPage(currentPage + 1)}
             className={
               nextDisabled ? "pointer-events-none opacity-50" : "cursor-pointer"

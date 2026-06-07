@@ -1,4 +1,6 @@
 {
+  "prev": "Previous",
+  "next": "Next",
   "share": "Share",
   "availableNow": "Available immediately",
   "checkConnection": "You are currently offline.",
