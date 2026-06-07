@@ -1,8 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export default function PricingPage() {
@@ -14,14 +14,12 @@ export default function PricingPage() {
   return (
     <section className="py-16 md:py-32">
       <div className="mx-auto max-w-5xl px-6">
-        <div className="mx-auto max-w-2xl space-y-6 text-center">
-          <h1 className="text-center text-4xl font-semibold lg:text-5xl">
-            {t("title")}
-          </h1>
-          <p>{t("description")}</p>
+        <div className="mx-auto max-w-2xl space-y-2 text-center">
+          <h1 className="text-center text-3xl font-semibold">{t("title")}</h1>
+          <p className="text-accent-foreground">{t("description")}</p>
         </div>
 
-        <div className="mt-8 grid gap-6 md:mt-20 md:grid-cols-5 md:gap-0">
+        <div className="mt-8 grid gap-6 md:grid-cols-5 md:gap-0">
           {/* Free */}
           <div className="rounded-lg flex flex-col justify-between space-y-8 border p-6 md:col-span-2 md:my-2 md:rounded-r-none md:border-r-0 lg:p-10">
             <div className="space-y-4">
@@ -78,15 +76,6 @@ export default function PricingPage() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* FAQ */}
-      <div className="mt-16 text-center">
-        <h3 className="text-2xl font-bold mb-4">{t("faq.title")}</h3>
-        <p className="text-muted-foreground mb-6">{t("faq.description")}</p>
-        <Button asChild variant="outline">
-          <Link href="/faq">{t("faq.cta")}</Link>
-        </Button>
       </div>
     </section>
   );

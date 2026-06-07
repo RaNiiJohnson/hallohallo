@@ -1,3 +1,4 @@
+import { FAQSection } from "@/components/faq-section";
 import {
   HomePageContent,
   HomePageSkeleton,
@@ -15,8 +16,11 @@ export default async function HomePage({
   setRequestLocale(locale as Locale);
 
   return (
-    <Suspense fallback={<HomePageSkeleton />}>
-      <HomePageContent />
-    </Suspense>
+    <>
+      <Suspense fallback={<HomePageSkeleton />}>
+        <HomePageContent />
+        <FAQSection />
+      </Suspense>
+    </>
   );
 }

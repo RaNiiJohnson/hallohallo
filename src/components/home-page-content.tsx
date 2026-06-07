@@ -105,7 +105,7 @@ export function HomePageContent() {
       {/* Services Section */}
       <section className="py-8 sm:py-12 md:py-16 px-4 shrink-0">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl text-center mb-8 font-bold tracking-tight">
+          <h2 className="text-3xl text-center mb-8 font-bold tracking-tight">
             <span className="relative inline-block">
               <span className="relative z-10">{t("title")}</span>
             </span>
@@ -200,7 +200,7 @@ export function HomePageContent() {
       {/* About Us Section */}
       <section className="py-8 sm:py-12 bg-secondary md:py-16 px-4 shrink-0">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-4xl text-center mb-8 font-bold tracking-tight">
+          <h2 className="text-3xl text-center mb-8 font-bold tracking-tight">
             <span className="relative inline-block">
               <span className="relative z-10">{t("aboutTitle")}</span>
             </span>
