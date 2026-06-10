@@ -14,15 +14,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
 import { PasswordInput } from "@/components/ui/password-input";
 import { authClient } from "@/lib/auth-client";
+import { Loader2 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
 
 export function SignupForm() {
   const router = useRouter();
+  const locale = useLocale();
   const t = useTranslations("auth.register.form");
   const tToast = useTranslations("auth.register.toast");
 
@@ -64,10 +65,10 @@ export function SignupForm() {
       email: values.email,
       password: values.password,
       name: values.name,
+      callbackURL: `/${locale}`,
       fetchOptions: {
         onSuccess: () => {
-          toast.success(tToast("success"));
-          router.push("/");
+          router.push("/verify-email?sent=1");
         },
         onError: (error) => {
           toast.error(error ? error.error.message : tToast("error"));
