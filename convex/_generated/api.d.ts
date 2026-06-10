@@ -34,6 +34,7 @@ import type * as posts_comments_mutations from "../posts/comments/mutations.js";
 import type * as posts_likes_mutations from "../posts/likes/mutations.js";
 import type * as posts_mutations from "../posts/mutations.js";
 import type * as posts_queries from "../posts/queries.js";
+import type * as sendEmails from "../sendEmails.js";
 import type * as upload from "../upload.js";
 import type * as utils_clean from "../utils/clean.js";
 
@@ -70,6 +71,7 @@ declare const fullApi: ApiFromModules<{
   "posts/likes/mutations": typeof posts_likes_mutations;
   "posts/mutations": typeof posts_mutations;
   "posts/queries": typeof posts_queries;
+  sendEmails: typeof sendEmails;
   upload: typeof upload;
   "utils/clean": typeof utils_clean;
 }>;
@@ -105,6 +107,7 @@ export declare const components: {
   cloudinary: import("@imaxis/cloudinary-convex/_generated/component.js").ComponentApi<"cloudinary">;
   stripe: import("@convex-dev/stripe/_generated/component.js").ComponentApi<"stripe">;
   convexCascadingDeletes: import("@sholajegede/convex-cascading-deletes/_generated/component.js").ComponentApi<"convexCascadingDeletes">;
+  resend: import("@convex-dev/resend/_generated/component.js").ComponentApi<"resend">;
   aggregateByLikesPosts: import("@convex-dev/aggregate/_generated/component.js").ComponentApi<"aggregateByLikesPosts">;
   aggregateByLikesComments: import("@convex-dev/aggregate/_generated/component.js").ComponentApi<"aggregateByLikesComments">;
   aggregateByComments: import("@convex-dev/aggregate/_generated/component.js").ComponentApi<"aggregateByComments">;
