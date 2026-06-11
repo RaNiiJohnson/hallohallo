@@ -1,11 +1,11 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
-import { SignupForm } from "./signup-form";
-import { Button } from "@/components/ui/button";
 import { ArrowLeftIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { SignupForm } from "./signup-form";
 
 export default function SignupPage() {
   const t = useTranslations("auth.register");
@@ -21,9 +21,7 @@ export default function SignupPage() {
         <Card className="w-full max-w-md shadow-xl border-0 ">
           <CardHeader className="space-y-4 pb-8 text-center">
             <div className="space-y-2">
-              <CardTitle className="text-2xl font-bold">
-                {t("title")}
-              </CardTitle>
+              <CardTitle className="text-2xl font-bold">{t("title")}</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
