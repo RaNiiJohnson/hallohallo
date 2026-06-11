@@ -25,6 +25,6 @@ export const config = {
     "/(fr|en|de)/:path*",
     // Exclure les fichiers statiques
     // Exclude API routes (e.g. NextAuth) and static assets from the middleware
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\.(?:svg|png|jpg|jpeg|gif|webp|html)$).*)",
   ],
 };
