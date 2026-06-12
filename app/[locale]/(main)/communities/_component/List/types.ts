@@ -4,7 +4,7 @@ import type { FunctionReturnType } from "convex/server";
 
 export type SortMode = "shuffle" | "recent" | "oldest" | "top" | "bookmarked";
 
-type PostsResults = NonNullable<
+export type PostsResults = NonNullable<
   FunctionReturnType<typeof api.posts.queries.getSortedPosts>
 >;
 export type Post = PostsResults["posts"][number];

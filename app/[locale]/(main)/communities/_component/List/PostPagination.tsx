@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/pagination";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { PAGE_SIZE, PostsResult, SortMode } from "./types";
+import { PAGE_SIZE, PostsResults, SortMode } from "./types";
 
 // Pagination helper
 function getPageNumbers(currentPage: number, totalPages: number): number[] {
@@ -38,7 +38,7 @@ export function PostPagination({
   onGoToPage,
 }: {
   mode: SortMode;
-  result: PostsResult;
+  result: PostsResults;
   currentPage: number;
   loading: boolean;
   onGoToPage: (page: number) => void;
