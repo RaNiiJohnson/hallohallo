@@ -296,7 +296,7 @@ export function MainSidebar({
                     >
                       <Avatar className="h-8 w-8 rounded-lg">
                         <AvatarImage
-                          src={user.imageUrl || ""}
+                          src={user.image || ""}
                           alt={user.name || ""}
                         />
                         <AvatarFallback className="rounded-lg">

@@ -18,7 +18,6 @@ import { Camera, ImageIcon, Loader2, Upload, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useTransition } from "react";
-import { toast } from "sonner";
 
 type ImageType = "profile" | "cover";
 
@@ -39,7 +38,6 @@ export function ImageUploadModal({
   currentImageUrl,
   onSuccess,
 }: ImageUploadModalProps) {
-  const generateUploadUrl = useMutation(api.upload.generateUploadUrl);
   const updateUser = useMutation(api.auth.users.updateUser);
   const t = useTranslations("profile.upload");
 
@@ -67,50 +65,6 @@ export function ImageUploadModal({
 
   const handleUpload = () => {
     if (!selectedFile) return;
-
-    startTransition(async () => {
-      try {
-        // 1. Get upload URL from Convex
-        const postUrl = await generateUploadUrl();
-
-        // 2. Upload the file
-        const uploadRes = await fetch(postUrl, {
-          method: "POST",
-          headers: { "Content-Type": selectedFile.type },
-          body: selectedFile,
-        });
-
-        if (!uploadRes.ok) {
-          console.error("Upload failed", await uploadRes.text());
-          toast.error(t("toast.uploadError"));
-          return;
-        }
-
-        // 3. Get the storage ID
-        const { storageId } = await uploadRes.json();
-
-        // 4. Update user with the new image
-        const patchData =
-          imageType === "profile"
-            ? { image: storageId }
-            : { coverImage: storageId };
-
-        await updateUser({
-          id: userId,
-          patch: patchData,
-        });
-
-        toast.success(t("toast.success"));
-
-        // Clean up and close
-        clearFiles();
-        onOpenChange(false);
-        onSuccess?.();
-      } catch (error) {
-        console.error("Upload error:", error);
-        toast.error(t("toast.error"));
-      }
-    });
   };
 
   const handleClose = () => {

@@ -1,14 +1,14 @@
-import { getRelativeTime } from "@/lib/date";
-import { ChevronRight, MessageSquare } from "lucide-react";
-import { Link } from "@/i18n/navigation";
-import { buttonVariants } from "@/components/ui/button";
-import { Id } from "@convex/_generated/dataModel";
 import { ShareButton } from "@/components/ShareButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Post } from "./types";
-import { PostBookmarkButton } from "./PostBookmarkButton";
-import { LikeButton } from "../likeButton";
+import { buttonVariants } from "@/components/ui/button";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
+import { Link } from "@/i18n/navigation";
+import { getRelativeTime } from "@/lib/date";
+import { Id } from "@convex/_generated/dataModel";
+import { ChevronRight, MessageSquare } from "lucide-react";
+import { LikeButton } from "../likeButton";
+import { PostBookmarkButton } from "./PostBookmarkButton";
+import { Post } from "./types";
 
 export function PostCard({
   post,
@@ -24,11 +24,11 @@ export function PostCard({
       <div className="flex sm:flex-row flex-col text-xs text-muted-foreground mb-2">
         <div className="flex flex-wrap items-center gap-1">
           <Link
-            href={`/hl/${post.author?.slug}`}
+            href={`/hl/${post.author.slug}`}
             className="flex items-center gap-1"
           >
             <Avatar>
-              <AvatarImage src={post.author?.imageUrl || "/random-user.png"} />
+              <AvatarImage src={post.author.image ?? "/random-user.png"} />
               <AvatarFallback>
                 {post.authorName?.slice(0, 2)?.toUpperCase()}
               </AvatarFallback>
