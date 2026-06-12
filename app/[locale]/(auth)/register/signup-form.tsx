@@ -69,7 +69,7 @@ export function SignupForm() {
       callbackURL: `/${locale}`,
       fetchOptions: {
         onSuccess: () => {
-          router.push("/verify-email?sent=1");
+          router.push("/verify-email");
         },
         onError: (error) => {
           toast.error(error ? error.error.message : tToast("error"));

@@ -5,19 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeftIcon, MailIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect } from "react";
-import { toast } from "sonner";
+import { Suspense } from "react";
 
 function VerifyEmailContent() {
   const t = useTranslations("auth.verifyEmail");
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    if (searchParams.get("sent") === "1") {
-      toast.success(t("toastSent"), { duration: 6000 });
-    }
-  }, [searchParams, t]);
 
   return (
     <div>

@@ -111,7 +111,7 @@ export function SigninForm() {
                   <FormLabel>{t("password")}</FormLabel>
                   <Link
                     className="text-sm text-primary hover:underline"
-                    href="/auth/forget-password"
+                    href="/forgot-password"
                   >
                     {t("forgotPassword")}
                   </Link>
