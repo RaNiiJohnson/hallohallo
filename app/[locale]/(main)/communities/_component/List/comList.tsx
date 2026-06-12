@@ -74,7 +74,7 @@ export default function ComList() {
               result={result}
               currentPage={currentPage}
               loading={loading}
-              onGoToPage={goToPage}
+              onGoToPageAction={goToPage}
             />
           )}
         </>

@@ -35,13 +35,13 @@ export function PostPagination({
   result,
   currentPage,
   loading,
-  onGoToPage,
+  onGoToPageAction,
 }: {
   mode: SortMode;
   result: PostsResults;
   currentPage: number;
   loading: boolean;
-  onGoToPage: (page: number) => void;
+  onGoToPageAction: (page: number) => void;
 }) {
   const t = useTranslations("common");
   const isNumbered = mode !== "shuffle";
@@ -60,7 +60,7 @@ export function PostPagination({
         <PaginationItem>
           <PaginationPrevious
             label={t("prev")}
-            onClick={() => onGoToPage(currentPage - 1)}
+            onClick={() => onGoToPageAction(currentPage - 1)}
             className={
               prevDisabled ? "pointer-events-none opacity-50" : "cursor-pointer"
             }
@@ -77,7 +77,7 @@ export function PostPagination({
               <PaginationItem key={pageNum}>
                 <PaginationLink
                   isActive={pageNum === currentPage}
-                  onClick={() => onGoToPage(pageNum)}
+                  onClick={() => onGoToPageAction(pageNum)}
                   className="cursor-pointer"
                 >
                   {pageNum}
@@ -89,7 +89,7 @@ export function PostPagination({
         <PaginationItem>
           <PaginationNext
             label={t("next")}
-            onClick={() => onGoToPage(currentPage + 1)}
+            onClick={() => onGoToPageAction(currentPage + 1)}
             className={
               nextDisabled ? "pointer-events-none opacity-50" : "cursor-pointer"
             }
