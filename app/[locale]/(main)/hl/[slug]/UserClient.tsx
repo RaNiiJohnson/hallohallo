@@ -49,13 +49,13 @@ export default function UserClient({
         {/* Cover Image */}
         <div className="relative">
           <Image
-            src={user.coverImageUrl || "/default-cover.jpg"}
+            src={user.coverImage || "/default-cover.jpg"}
             alt={t("coverAlt")}
             height={200}
             width={800}
             priority
             className="w-full h-32 sm:h-40 lg:h-48 object-cover"
-            unoptimized={!!user.coverImageUrl}
+            // unoptimized={!!user.coverImage}
           />
           {isOwnProfile && (
             <button
@@ -74,12 +74,12 @@ export default function UserClient({
           <div className="relative -mt-16 sm:-mt-20 mb-4">
             <div className="relative inline-block">
               <Image
-                src={user.imageUrl || "/random-user.png"}
+                src={user.image || "/random-user.png"}
                 alt={user.name || t("profileAlt")}
                 height={140}
                 width={140}
                 className="size-28 sm:size-36 object-cover rounded-full border-4 border-card"
-                unoptimized={!!user.imageUrl}
+                // unoptimized={!!user.imageUrl}
               />
               {isOwnProfile && (
                 <button
@@ -408,14 +408,14 @@ export default function UserClient({
         imageType="profile"
         open={profileImageModalOpen}
         onOpenChange={setProfileImageModalOpen}
-        currentImageUrl={user.imageUrl}
+        currentImageUrl={user.image}
       />
       <ImageUploadModal
         userId={user._id}
         imageType="cover"
         open={coverImageModalOpen}
         onOpenChange={setCoverImageModalOpen}
-        currentImageUrl={user.coverImageUrl}
+        currentImageUrl={user.coverImage}
       />
     </div>
   );
