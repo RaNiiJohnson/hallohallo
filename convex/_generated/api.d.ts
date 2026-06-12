@@ -35,7 +35,6 @@ import type * as posts_likes_mutations from "../posts/likes/mutations.js";
 import type * as posts_mutations from "../posts/mutations.js";
 import type * as posts_queries from "../posts/queries.js";
 import type * as sendEmails from "../sendEmails.js";
-import type * as upload from "../upload.js";
 import type * as utils_clean from "../utils/clean.js";
 
 import type {
@@ -72,7 +71,6 @@ declare const fullApi: ApiFromModules<{
   "posts/mutations": typeof posts_mutations;
   "posts/queries": typeof posts_queries;
   sendEmails: typeof sendEmails;
-  upload: typeof upload;
   "utils/clean": typeof utils_clean;
 }>;
 

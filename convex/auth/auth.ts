@@ -9,7 +9,6 @@ import { query } from "../_generated/server";
 import authConfig from "../auth.config";
 import authSchema from "../betterAuth/schema";
 import { resend } from "../sendEmails";
-import { UserWithUrls } from "./users";
 
 const siteUrl = process.env.SITE_URL!;
 
@@ -150,6 +149,13 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
         clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
       },
     },
+    account: {
+      accountLinking: {
+        enabled: true,
+        trustedProviders: ["google"],
+      },
+    },
+
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: true,
@@ -324,20 +330,11 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
 
 export const getCurrentUser = query({
   args: {},
-  handler: async (ctx): Promise<UserWithUrls | null> => {
+  handler: async (ctx) => {
     const user = await authComponent.safeGetAuthUser(ctx);
 
     if (!user) return null;
-    const [imageUrl, coverImageUrl] = await Promise.all([
-      user.image ? ctx.storage.getUrl(user.image) : Promise.resolve(null),
-      user.coverImage
-        ? ctx.storage.getUrl(user.coverImage)
-        : Promise.resolve(null),
-    ]);
-    return {
-      ...user,
-      imageUrl,
-      coverImageUrl,
-    };
+
+    return user;
   },
 });

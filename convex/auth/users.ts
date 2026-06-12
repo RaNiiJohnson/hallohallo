@@ -1,20 +1,15 @@
-import { mutation, query } from "../_generated/server";
+import { partial } from "convex-helpers/validators";
 import { ConvexError, v } from "convex/values";
 import { components } from "../_generated/api";
+import { mutation, query } from "../_generated/server";
+import { UserType, userValidator } from "../betterAuth/users";
 import { authComponent, createAuth } from "./auth";
-import { partial } from "convex-helpers/validators";
-import { User, userValidator } from "../betterAuth/users";
-
-export type UserWithUrls = Omit<User, "image" | "coverImage"> & {
-  imageUrl?: string | null;
-  coverImageUrl?: string | null;
-};
 
 export const getUserBySlug = query({
   args: { slug: v.string() },
-  handler: async (ctx, { slug }): Promise<UserWithUrls | null> => {
+  handler: async (ctx, { slug }) => {
     // 1. Récupérer l'utilisateur via le composant
-    const user: User = await ctx.runQuery(
+    const user: UserType = await ctx.runQuery(
       components.betterAuth.users.getUserBySlug,
       {
         slug,
@@ -23,18 +18,8 @@ export const getUserBySlug = query({
 
     if (!user) return null;
 
-    // 2. Résoudre les URLs, dans le contexte parent
-    const [imageUrl, coverImageUrl] = await Promise.all([
-      user.image ? ctx.storage.getUrl(user.image) : Promise.resolve(null),
-      user.coverImage
-        ? ctx.storage.getUrl(user.coverImage)
-        : Promise.resolve(null),
-    ]);
-
     return {
       ...user,
-      imageUrl,
-      coverImageUrl,
     };
   },
 });
@@ -43,7 +28,7 @@ export const getAllUsers = query({
   args: {},
   handler: async (ctx) => {
     // 1. Récupérer les users via la query du composant betterAuth
-    const users: User[] = await ctx.runQuery(
+    const users: UserType[] = await ctx.runQuery(
       components.betterAuth.users.getAllUsers,
       {},
     );
@@ -55,22 +40,7 @@ export const getAllUsers = query({
       : users;
 
     // 2. Résoudre les URLs d’images dans ce contexte
-    return Promise.all(
-      filtered.map(async (user) => {
-        const [imageUrl, coverImageUrl] = await Promise.all([
-          user.image ? ctx.storage.getUrl(user.image) : Promise.resolve(null),
-          user.coverImage
-            ? ctx.storage.getUrl(user.coverImage)
-            : Promise.resolve(null),
-        ]);
-
-        return {
-          ...user,
-          imageUrl,
-          coverImageUrl,
-        };
-      }),
-    );
+    return filtered;
   },
 });
 

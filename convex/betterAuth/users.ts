@@ -1,8 +1,8 @@
-import { mutation, query } from "./_generated/server";
-import { v } from "convex/values";
-import schema from "./schema";
 import { partial } from "convex-helpers/validators";
+import { v } from "convex/values";
 import { Doc } from "./_generated/dataModel";
+import { mutation, query } from "./_generated/server";
+import schema from "./schema";
 
 export const getAllUsers = query({
   args: {},
@@ -35,7 +35,7 @@ export const getUserById = query({
 
 export const userValidator = schema.tables.user.validator;
 
-export type User = Doc<"user">;
+export type UserType = Doc<"user">;
 
 export const updateUser = mutation({
   args: {

@@ -12,6 +12,7 @@ import {
   postSortedByLikes,
 } from "../aggregates";
 import { authComponent } from "../auth/auth";
+import { UserType } from "../betterAuth/users";
 
 type AuthUser = Awaited<ReturnType<typeof authComponent.safeGetAuthUser>>;
 
@@ -196,13 +197,6 @@ export const getShuffledPosts = query({
           components.betterAuth.users.getUserById,
           { id: post.authorId },
         );
-        let authorData = null;
-        if (author) {
-          const imageUrl = author.image
-            ? await ctx.storage.getUrl(author.image)
-            : null;
-          authorData = { ...author, imageUrl };
-        }
 
         return {
           ...post,
@@ -210,7 +204,7 @@ export const getShuffledPosts = query({
           commentsCount,
           userHasLiked,
           isBookmarked,
-          author: authorData,
+          author,
         };
       }),
     );
@@ -279,17 +273,10 @@ export const getSortedPosts = query({
           if (existingBookmark) isBookmarked = true;
         }
 
-        const author = await ctx.runQuery(
+        const author: UserType = await ctx.runQuery(
           components.betterAuth.users.getUserById,
           { id: post.authorId },
         );
-        let authorData = null;
-        if (author) {
-          const imageUrl = author.image
-            ? await ctx.storage.getUrl(author.image)
-            : null;
-          authorData = { ...author, imageUrl };
-        }
 
         return {
           ...post,
@@ -297,7 +284,7 @@ export const getSortedPosts = query({
           commentsCount,
           userHasLiked,
           isBookmarked,
-          author: authorData,
+          author,
         };
       }),
     );
@@ -379,13 +366,6 @@ export const getSortedByLikes = query({
           components.betterAuth.users.getUserById,
           { id: post.authorId },
         );
-        let authorData = null;
-        if (author) {
-          const imageUrl = author.image
-            ? await ctx.storage.getUrl(author.image)
-            : null;
-          authorData = { ...author, imageUrl };
-        }
 
         return {
           ...post,
@@ -393,7 +373,7 @@ export const getSortedByLikes = query({
           commentsCount,
           userHasLiked,
           isBookmarked,
-          author: authorData,
+          author,
         };
       }),
     );
@@ -455,13 +435,6 @@ export const getBookmarkedPosts = query({
           components.betterAuth.users.getUserById,
           { id: post.authorId },
         );
-        let authorData = null;
-        if (author) {
-          const imageUrl = author.image
-            ? await ctx.storage.getUrl(author.image)
-            : null;
-          authorData = { ...author, imageUrl };
-        }
 
         return {
           ...post,
@@ -469,7 +442,7 @@ export const getBookmarkedPosts = query({
           commentsCount,
           userHasLiked,
           isBookmarked: true,
-          author: authorData,
+          author,
         };
       }),
     );
