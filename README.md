@@ -1,4 +1,4 @@
-# Hallomada 🇲🇬🇩🇪
+# Hallomada.de 🇲🇬🇩🇪
 
 > La plateforme communautaire des Malagasy en Allemagne
 
