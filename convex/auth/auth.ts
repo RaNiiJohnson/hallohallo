@@ -43,7 +43,6 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     account: {
       accountLinking: {
         enabled: true,
-        trustedProviders: ["google"],
       },
     },
 
