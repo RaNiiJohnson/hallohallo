@@ -106,6 +106,7 @@ export declare const components: {
   stripe: import("@convex-dev/stripe/_generated/component.js").ComponentApi<"stripe">;
   convexCascadingDeletes: import("@sholajegede/convex-cascading-deletes/_generated/component.js").ComponentApi<"convexCascadingDeletes">;
   resend: import("@convex-dev/resend/_generated/component.js").ComponentApi<"resend">;
+  rateLimiter: import("@convex-dev/rate-limiter/_generated/component.js").ComponentApi<"rateLimiter">;
   aggregateByLikesPosts: import("@convex-dev/aggregate/_generated/component.js").ComponentApi<"aggregateByLikesPosts">;
   aggregateByLikesComments: import("@convex-dev/aggregate/_generated/component.js").ComponentApi<"aggregateByLikesComments">;
   aggregateByComments: import("@convex-dev/aggregate/_generated/component.js").ComponentApi<"aggregateByComments">;

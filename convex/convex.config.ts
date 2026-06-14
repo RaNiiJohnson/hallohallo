@@ -1,5 +1,6 @@
 import aggregate from "@convex-dev/aggregate/convex.config.js";
 import migrations from "@convex-dev/migrations/convex.config";
+import rateLimiter from "@convex-dev/rate-limiter/convex.config.js";
 import resend from "@convex-dev/resend/convex.config.js";
 import stripe from "@convex-dev/stripe/convex.config.js";
 import cloudinary from "@imaxis/cloudinary-convex/convex.config";
@@ -13,6 +14,7 @@ app.use(cloudinary);
 app.use(stripe);
 app.use(convexCascadingDeletes);
 app.use(resend);
+app.use(rateLimiter);
 
 app.use(aggregate, { name: "aggregateByLikesPosts" });
 app.use(aggregate, { name: "aggregateByLikesComments" });
