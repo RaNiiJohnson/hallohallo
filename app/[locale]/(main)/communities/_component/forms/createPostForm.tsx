@@ -53,15 +53,22 @@ export function CreatePostForm({
 
   const onSubmit = async (data: FormSchema) => {
     try {
-      await createPost({
+      const result = await createPost({
         title: data.title,
         content: data.content,
         communityId,
       });
+
+      if (typeof result === "object" && result !== null && "retryAfter" in result) {
+        const seconds = Math.ceil(result.retryAfter / 1000);
+        toast.error(t("errorRateLimit", { seconds }));
+        return;
+      }
+
       toast.success(t("successToast"));
       form.reset();
       onSuccess?.();
-    } catch {
+    } catch (error) {
       toast.error(t("errorToast"));
     }
   };

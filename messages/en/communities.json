@@ -38,6 +38,7 @@
       "errorContentMin": "The content must contain at least 10 characters",
       "successToast": "Post created successfully!",
       "errorToast": "Error creating post",
+      "errorRateLimit": "Too many posts! Try again in {seconds} seconds.",
       "titleLabel": "Title *",
       "titlePlaceholder": "A catchy title...",
       "contentLabel": "Content *",

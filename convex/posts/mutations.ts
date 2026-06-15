@@ -16,6 +16,7 @@ import {
   postSortedByLikes,
 } from "../aggregates";
 import { authComponent } from "../auth/auth";
+import { limiter } from "../rateLimits";
 
 // ─── Triggers
 
@@ -39,8 +40,17 @@ export const createPost = mutationWithTriggers({
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) throw new Error("Not authenticated");
 
+    const userId = user._id;
+
     const community = await ctx.db.get(args.communityId);
     if (!community) throw new Error("Community not found");
+
+    const { ok, retryAfter } = await limiter.limit(ctx, "createPostPerUser", {
+      key: userId,
+    });
+    if (!ok) {
+      return { retryAfter };
+    }
 
     const postId = await ctx.db.insert("posts", {
       slug: generatedSlug(args.title),
@@ -62,8 +72,6 @@ export const createPost = mutationWithTriggers({
     return postId;
   },
 });
-
-
 
 export const updatePost = mutationWithTriggers({
   args: {

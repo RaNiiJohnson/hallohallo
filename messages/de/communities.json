@@ -38,6 +38,7 @@
       "errorContentMin": "Der Inhalt muss mindestens 10 Zeichen lang sein",
       "successToast": "Post erfolgreich erstellt!",
       "errorToast": "Fehler beim Erstellen des Posts",
+      "errorRateLimit": "Zu viele Posts! Versuchen Sie es in {seconds} Sekunden erneut.",
       "titleLabel": "Titel *",
       "titlePlaceholder": "Ein einprägsamer Titel...",
       "contentLabel": "Inhalt *",
