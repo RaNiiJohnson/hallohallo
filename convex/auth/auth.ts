@@ -69,7 +69,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
         const t = resetPasswordTranslations[locale];
         const displayName = user.name ?? user.email;
 
-        await resend.sendEmail(ctx as any, {
+        await resend.sendEmail(requireActionCtx(ctx), {
           from: "HalloHallo <noreply@hallomada.de>",
           to: user.email,
           subject: t.subject,
