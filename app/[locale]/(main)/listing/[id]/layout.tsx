@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description =
     listing.description?.substring(0, 160) ||
     "Annonce immobilière sur HalloHallo";
-  const imageUrl = listing.images?.[0]?.secureUrl;
+  const imageUrl = listing.images?.[0]?.url || listing.images?.[0]?.secureUrl;
 
   return {
     title,

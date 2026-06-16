@@ -12,13 +12,15 @@ import {
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 
-interface CloudinaryImage {
-  publicId: string;
-  secureUrl: string;
+interface ListingImage {
+  storageId?: string;
+  publicId?: string;
+  url?: string;
+  secureUrl?: string;
 }
 
 interface ImageCarouselProps {
-  images?: CloudinaryImage[];
+  images?: ListingImage[];
   title: string;
 }
 
@@ -71,10 +73,10 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
         <Carousel setApi={setApi} className="w-full">
           <CarouselContent>
             {allImages.map((image, index) => (
-              <CarouselItem key={image.publicId}>
+              <CarouselItem key={image.storageId || image.publicId || index}>
                 <div className="relative h-80 w-full rounded-xl overflow-hidden bg-muted">
                   <Image
-                    src={image.secureUrl}
+                    src={image.url || image.secureUrl || ""}
                     alt={`${title} - Image ${index + 1}`}
                     fill
                     className="object-cover transition-transform duration-300 hover:scale-105"
@@ -102,7 +104,7 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
           <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
             {allImages.map((image, index) => (
               <button
-                key={image.publicId}
+                key={image.storageId || image.publicId || index}
                 className={cn(
                   "relative shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 cursor-pointer",
                   index === current
@@ -112,7 +114,7 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
                 onClick={() => api?.scrollTo(index)}
               >
                 <Image
-                  src={image.secureUrl}
+                  src={image.url || image.secureUrl || ""}
                   alt={`Miniature ${index + 1}`}
                   fill
                   className="object-cover"

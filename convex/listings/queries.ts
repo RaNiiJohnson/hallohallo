@@ -9,6 +9,30 @@ import { v } from "convex/values";
 import { DataModel, Id } from "../_generated/dataModel";
 import { query } from "../_generated/server";
 import { authComponent } from "../auth/auth";
+import { r2 } from "../integrations/r2";
+
+// Resolve R2 storageId keys to signed URLs.
+// Falls back to the old Cloudinary secureUrl for existing records.
+async function resolveImages(
+  images: Array<{
+    storageId?: string;
+    url?: string;
+    publicId?: string;
+    secureUrl?: string;
+  }>,
+) {
+  return Promise.all(
+    images.map(async (img) => {
+      if (img.storageId) {
+        // r2.getUrl generates a signed URL for the given object key
+        const url = await r2.getUrl(img.storageId);
+        return { ...img, url: url ?? img.secureUrl ?? "" };
+      }
+      // Legacy Cloudinary record: keep secureUrl as url
+      return { ...img, url: img.secureUrl ?? "" };
+    }),
+  );
+}
 
 export const getListingWithContact = query({
   args: { slug: v.string() },
@@ -37,8 +61,11 @@ export const getListingWithContact = query({
       .withIndex("by_listingId", (q) => q.eq("listingId", listing._id))
       .unique(); // Utilise .unique() si une annonce n'a qu'un seul bloc de contact
 
+    const images = await resolveImages(listing.images ?? []);
+
     return {
       ...listing,
+      images,
       contact,
       isBookmarked,
     };
@@ -172,7 +199,8 @@ export const getListing = query({
             .first();
           if (existingBookmark) isBookmarked = true;
         }
-        return { ...listing, isBookmarked };
+        const images = await resolveImages(listing.images ?? []);
+        return { ...listing, images, isBookmarked };
       }),
     );
 
@@ -194,7 +222,8 @@ export const listListingsByCity = query({
           .query("RealestateContactInfo")
           .withIndex("by_listingId", (q) => q.eq("listingId", listing._id))
           .unique();
-        return { ...listing, contact };
+        const images = await resolveImages(listing.images ?? []);
+        return { ...listing, images, contact };
       }),
     );
   },
@@ -239,6 +268,12 @@ export const getSimilarRealEstateListings = query({
       .order("desc")
       .take(remaining);
 
-    return [...byCity, ...byType];
+    const combined = [...byCity, ...byType];
+    return Promise.all(
+      combined.map(async (listing) => {
+        const images = await resolveImages(listing.images ?? []);
+        return { ...listing, images };
+      }),
+    );
   },
 });

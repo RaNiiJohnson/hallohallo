@@ -167,7 +167,7 @@ export function ListingList() {
           >
             <div className="relative h-80 w-full rounded-xl overflow-hidden shadow-xl">
               <Image
-                src={list.images?.[0]?.secureUrl || "/default-cover.jpg"}
+                src={list.images?.[0]?.url || list.images?.[0]?.secureUrl || "/default-cover.jpg"}
                 alt={list.title}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

@@ -40,8 +40,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { fileToBase64 } from "@/lib/utils";
-import { useCloudinaryUpload } from "@imaxis/cloudinary-convex/react";
+
+import { useUploadFile } from "@convex-dev/r2/react";
 import { useMutation } from "convex/react";
 import {
   AlertCircleIcon,
@@ -76,7 +76,7 @@ interface ListingFormProps {
 
 export function ListingForm({ onSuccess }: ListingFormProps) {
   const t = useTranslations("listing");
-  const { upload } = useCloudinaryUpload(api.integrations.cloudinary.upload);
+  const uploadFile = useUploadFile(api.integrations.r2);
 
   const createListing = useMutation(api.listings.mutations.createListing);
 
@@ -99,7 +99,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
     bedrooms: z.string().min(1, t("form.validation.bedroomsReq")),
     floor: z.string().min(1, t("form.validation.floorReq")),
     pets: z.boolean(),
-    images: z.array(z.object({ publicId: z.string(), secureUrl: z.string() })),
+    images: z.array(z.object({ storageId: z.string().optional(), url: z.string().optional(), publicId: z.string().optional(), secureUrl: z.string().optional() })),
     description: z.string().min(10, t("form.validation.descMin")),
     extras: z.array(z.string()).optional(),
     availableFrom: z.string().optional(),
@@ -226,20 +226,20 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             maxWidthOrHeight: 1920,
             useWebWorker: true,
           });
-          const base64 = await fileToBase64(compressedFile);
-          const res = await upload(base64, {
-            folder: "real_estates",
-            tags: ["listing_image"],
-          });
-          if (!res.publicId || !res.secureUrl) {
+
+          // Upload to R2, returns the storageId (object key)
+          const storageId = await uploadFile(compressedFile);
+          if (!storageId) {
             throw new Error("Erreur lors de l'upload de l'image");
           }
-          return { publicId: res.publicId, secureUrl: res.secureUrl };
+
+          // Store storageId — the URL is generated server-side via r2.getUrl in queries
+          return { storageId };
         }
 
         return {
-          publicId: file.file.id,
-          secureUrl: file.file.url,
+          storageId: file.file.id,
+          url: file.file.url,
         };
       });
 

@@ -22,6 +22,7 @@ import type * as communities_mutations from "../communities/mutations.js";
 import type * as communities_queries from "../communities/queries.js";
 import type * as http from "../http.js";
 import type * as integrations_cloudinary from "../integrations/cloudinary.js";
+import type * as integrations_r2 from "../integrations/r2.js";
 import type * as integrations_stripe from "../integrations/stripe.js";
 import type * as jobs_mutations from "../jobs/mutations.js";
 import type * as jobs_queries from "../jobs/queries.js";
@@ -59,6 +60,7 @@ declare const fullApi: ApiFromModules<{
   "communities/queries": typeof communities_queries;
   http: typeof http;
   "integrations/cloudinary": typeof integrations_cloudinary;
+  "integrations/r2": typeof integrations_r2;
   "integrations/stripe": typeof integrations_stripe;
   "jobs/mutations": typeof jobs_mutations;
   "jobs/queries": typeof jobs_queries;

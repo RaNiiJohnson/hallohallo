@@ -103,8 +103,10 @@ export default defineSchema({
 
     images: v.array(
       v.object({
-        publicId: v.string(),
-        secureUrl: v.string(),
+        storageId: v.optional(v.string()),
+        url: v.optional(v.string()),
+        publicId: v.optional(v.string()),
+        secureUrl: v.optional(v.string()),
       }),
     ),
 

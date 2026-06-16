@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import type { CarouselApi } from "@/components/ui/carousel";
 import {
   Carousel,
   CarouselContent,
@@ -8,19 +8,21 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import type { CarouselApi } from "@/components/ui/carousel";
 
-interface CloudinaryImage {
-  publicId: string;
-  secureUrl: string;
+interface ListingImage {
+  storageId?: string;
+  url?: string;
+  publicId?: string;
+  secureUrl?: string;
 }
 
 interface ImageGridProps {
-  images?: CloudinaryImage[];
+  images?: ListingImage[];
   title: string;
 }
 
@@ -123,7 +125,7 @@ export function ImageGrid({ images, title }: ImageGridProps) {
           onClick={() => openFullscreen(0)}
         >
           <Image
-            src={allImages[0].secureUrl}
+            src={allImages[0].url || allImages[0].secureUrl || ""}
             alt={`${title} - Image principale`}
             fill
             className="object-cover"
@@ -135,12 +137,12 @@ export function ImageGrid({ images, title }: ImageGridProps) {
         {/* Images secondaires */}
         {visibleImages.slice(1, 3).map((image, index) => (
           <div
-            key={image.publicId}
+            key={image.storageId || image.publicId || index}
             className="relative cursor-pointer group"
             onClick={() => openFullscreen(index + 1)}
           >
             <Image
-              src={image.secureUrl}
+              src={image.url || image.secureUrl || ""}
               alt={`${title} - Image ${index + 2}`}
               fill
               className="object-cover"
@@ -175,7 +177,7 @@ export function ImageGrid({ images, title }: ImageGridProps) {
 
       {/* Modal plein écran avec Carousel */}
       <Dialog open={isFullscreen} onOpenChange={handleOpenChange}>
-        <DialogContent className="max-w-[95vw] md:max-w-[97vw] max-h-[95vh] p-0 border-0 rounded-none   ">
+        <DialogContent className="max-w-[95vw] md:max-w-[97vw] max-h-[95vh] p-0 border-0 rounded-none">
           <DialogTitle className="sr-only">
             Galerie d&apos;images - {title}
           </DialogTitle>
@@ -203,12 +205,12 @@ export function ImageGrid({ images, title }: ImageGridProps) {
             >
               {allImages.map((image, index) => (
                 <CarouselItem
-                  key={image.publicId}
+                  key={image.storageId || image.publicId || index}
                   className="flex items-center justify-center pl-0"
                 >
                   <div className="relative w-full h-[90vh]">
                     <Image
-                      src={image.secureUrl}
+                      src={image.url || image.secureUrl || ""}
                       alt={`${title} - Image ${index + 1}`}
                       fill
                       className="object-contain"
@@ -243,7 +245,7 @@ export function ImageGrid({ images, title }: ImageGridProps) {
               <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex gap-2 z-10">
                 {allImages.map((image, index) => (
                   <button
-                    key={image.publicId}
+                    key={image.storageId || image.publicId || index}
                     className={cn(
                       "w-3 h-3 rounded-full transition-all duration-200",
                       index === fullscreenIndex
