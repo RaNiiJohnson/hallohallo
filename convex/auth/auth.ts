@@ -1,6 +1,5 @@
 import { createClient, type GenericCtx } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
-import { requireActionCtx } from "@convex-dev/better-auth/utils";
 import { betterAuth, type BetterAuthOptions } from "better-auth/minimal";
 import { GenericActionCtx, GenericDataModel } from "convex/server";
 import { generatedSlug } from "../../src/lib/utils";
@@ -69,7 +68,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
         const t = resetPasswordTranslations[locale];
         const displayName = user.name ?? user.email;
 
-        await resend.sendEmail(requireActionCtx(ctx), {
+        await resend.sendEmail(ctx as any, {
           from: "HalloHallo <noreply@hallomada.de>",
           to: user.email,
           subject: t.subject,
@@ -97,7 +96,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
         const t = emailVerificationTranslations[locale];
         const displayName = user.name ?? user.email;
 
-        await resend.sendEmail(requireActionCtx(ctx), {
+        await resend.sendEmail(ctx as any, {
           from: "HalloHallo <noreply@hallomada.de>",
           to: user.email,
           subject: t.subject,
