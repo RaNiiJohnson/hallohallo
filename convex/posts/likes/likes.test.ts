@@ -39,11 +39,11 @@ describe("Likes", () => {
       privacy: "public",
     });
 
-    postId = await t.mutation(api.posts.mutations.createPost, {
-      title: "Like Post",
-      content: "Content",
+    postId = (await t.mutation(api.posts.mutations.createPost, {
+      title: "Test Post",
+      content: "Test Content",
       communityId: communityResult.comId,
-    });
+    })) as Id<"posts">;
   });
 
   it("should like and unlike a post", async () => {

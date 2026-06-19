@@ -39,11 +39,11 @@ describe("Bookmarks", () => {
       privacy: "public",
     });
 
-    postId = await t.mutation(api.posts.mutations.createPost, {
-      title: "Bookmark Post",
-      content: "Content",
+    postId = (await t.mutation(api.posts.mutations.createPost, {
+      title: "Test Post",
+      content: "Test Content",
       communityId: communityResult.comId,
-    });
+    })) as Id<"posts">;
   });
 
   it("should toggle a bookmark", async () => {

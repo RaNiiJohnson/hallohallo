@@ -40,11 +40,11 @@ describe("Posts", () => {
       privacy: "public",
     });
 
-    postId = await t.mutation(api.posts.mutations.createPost, {
+    postId = (await t.mutation(api.posts.mutations.createPost, {
       title: "Post Title",
       content: "Post Content",
       communityId: communityResult.comId,
-    });
+    })) as Id<"posts">;
 
     const post = await t.run(async (ctx) => await ctx.db.get(postId));
     postSlug = post!.slug;

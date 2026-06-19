@@ -39,11 +39,11 @@ describe("Comments", () => {
       privacy: "public",
     });
 
-    postId = await t.mutation(api.posts.mutations.createPost, {
-      title: "Comment Post",
-      content: "Content",
+    postId = (await t.mutation(api.posts.mutations.createPost, {
+      title: "Test Post",
+      content: "Test Content",
       communityId: communityResult.comId,
-    });
+    })) as Id<"posts">;
   });
 
   it("should add a comment", async () => {
