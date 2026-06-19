@@ -32,6 +32,9 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
             | {
                 data: {
                   arrivalDate?: null | number;
+                  banExpires?: null | number;
+                  banReason?: null | string;
+                  banned?: null | boolean;
                   bio?: null | string;
                   city?: null | string;
                   company?: null | string;
@@ -50,11 +53,12 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   journey?: null | Array<string>;
                   lastActiveAt?: null | number;
                   name: string;
+                  role?: null | string;
                   roles?: null | Array<string>;
                   showEmail?: null | boolean;
                   showPhone?: null | boolean;
                   skills?: null | Array<string>;
-                  slug: string;
+                  slug?: null | string;
                   status?: null | string;
                   updatedAt: number;
                   userId?: null | string;
@@ -65,6 +69,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                 data: {
                   createdAt: number;
                   expiresAt: number;
+                  impersonatedBy?: null | string;
                   ipAddress?: null | string;
                   token: string;
                   updatedAt: number;
@@ -132,6 +137,10 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "role"
+                    | "banned"
+                    | "banReason"
+                    | "banExpires"
                     | "coverImage"
                     | "slug"
                     | "headline"
@@ -187,6 +196,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "ipAddress"
                     | "userAgent"
                     | "userId"
+                    | "impersonatedBy"
                     | "_id";
                   mode?: "sensitive" | "insensitive";
                   operator?:
@@ -345,6 +355,10 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "role"
+                    | "banned"
+                    | "banReason"
+                    | "banExpires"
                     | "coverImage"
                     | "slug"
                     | "headline"
@@ -400,6 +414,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "ipAddress"
                     | "userAgent"
                     | "userId"
+                    | "impersonatedBy"
                     | "_id";
                   mode?: "sensitive" | "insensitive";
                   operator?:
@@ -623,6 +638,9 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                 model: "user";
                 update: {
                   arrivalDate?: null | number;
+                  banExpires?: null | number;
+                  banReason?: null | string;
+                  banned?: null | boolean;
                   bio?: null | string;
                   city?: null | string;
                   company?: null | string;
@@ -641,11 +659,12 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   journey?: null | Array<string>;
                   lastActiveAt?: null | number;
                   name?: string;
+                  role?: null | string;
                   roles?: null | Array<string>;
                   showEmail?: null | boolean;
                   showPhone?: null | boolean;
                   skills?: null | Array<string>;
-                  slug?: string;
+                  slug?: null | string;
                   status?: null | string;
                   updatedAt?: number;
                   userId?: null | string;
@@ -660,6 +679,10 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "role"
+                    | "banned"
+                    | "banReason"
+                    | "banExpires"
                     | "coverImage"
                     | "slug"
                     | "headline"
@@ -708,6 +731,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                 update: {
                   createdAt?: number;
                   expiresAt?: number;
+                  impersonatedBy?: null | string;
                   ipAddress?: null | string;
                   token?: string;
                   updatedAt?: number;
@@ -724,6 +748,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "ipAddress"
                     | "userAgent"
                     | "userId"
+                    | "impersonatedBy"
                     | "_id";
                   mode?: "sensitive" | "insensitive";
                   operator?:
@@ -901,6 +926,9 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                 model: "user";
                 update: {
                   arrivalDate?: null | number;
+                  banExpires?: null | number;
+                  banReason?: null | string;
+                  banned?: null | boolean;
                   bio?: null | string;
                   city?: null | string;
                   company?: null | string;
@@ -919,11 +947,12 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   journey?: null | Array<string>;
                   lastActiveAt?: null | number;
                   name?: string;
+                  role?: null | string;
                   roles?: null | Array<string>;
                   showEmail?: null | boolean;
                   showPhone?: null | boolean;
                   skills?: null | Array<string>;
-                  slug?: string;
+                  slug?: null | string;
                   status?: null | string;
                   updatedAt?: number;
                   userId?: null | string;
@@ -938,6 +967,10 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "role"
+                    | "banned"
+                    | "banReason"
+                    | "banExpires"
                     | "coverImage"
                     | "slug"
                     | "headline"
@@ -986,6 +1019,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                 update: {
                   createdAt?: number;
                   expiresAt?: number;
+                  impersonatedBy?: null | string;
                   ipAddress?: null | string;
                   token?: string;
                   updatedAt?: number;
@@ -1002,6 +1036,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "ipAddress"
                     | "userAgent"
                     | "userId"
+                    | "impersonatedBy"
                     | "_id";
                   mode?: "sensitive" | "insensitive";
                   operator?:
@@ -1186,6 +1221,9 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           id: string;
           patch: {
             arrivalDate?: null | number;
+            banExpires?: null | number;
+            banReason?: null | string;
+            banned?: null | boolean;
             bio?: null | string;
             city?: null | string;
             company?: null | string;
@@ -1204,11 +1242,12 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
             journey?: null | Array<string>;
             lastActiveAt?: null | number;
             name?: string;
+            role?: null | string;
             roles?: null | Array<string>;
             showEmail?: null | boolean;
             showPhone?: null | boolean;
             skills?: null | Array<string>;
-            slug?: string;
+            slug?: null | string;
             status?: null | string;
             updatedAt?: number;
             userId?: null | string;
