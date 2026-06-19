@@ -7,7 +7,7 @@ export async function FAQSection() {
   const items = t.raw("items") as { question: string; answer: string }[];
 
   return (
-    <section className="py-0">
+    <section className="py-20">
       <div className="mx-auto max-w-5xl px-4 md:px-6">
         <div className="flex flex-col gap-10 md:flex-row md:gap-16">
           <div className="md:w-1/3">

@@ -16,14 +16,14 @@
   "pro": {
     "name": "Pro",
     "price": "9€ / Monat",
+    "earlyBirdPrice": "0€ / Monat",
+    "earlyBirdBadge": "Vorerst kostenlos!",
     "cta": "Premium wählen",
     "features": [
-      "Unbegrenzte Kontakte",
-      "Hervorgehobenes Profil",
-      "Erweiterte Filter",
-      "Premium-Abzeichen",
-      "Zugang zu privaten Veranstaltungen",
-      "Profilstatistiken",
+      "Gruppennachrichten",
+      "Unbegrenzte Suche (Jobs & Inserate)",
+      "Zugang zur interaktiven Karte",
+      "Unbegrenzte Kontakte (Jobs & Inserate)",
       "Prioritätssupport"
     ]
   },

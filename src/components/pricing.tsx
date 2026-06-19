@@ -52,10 +52,20 @@ export default function PricingPage() {
             <div className="grid gap-6 sm:grid-cols-2">
               <div className="space-y-4">
                 <div>
-                  <h2 className="font-medium">{t("pro.name")}</h2>
-                  <span className="my-3 block text-2xl font-semibold">
-                    {t("pro.price")}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-medium">{t("pro.name")}</h2>
+                    <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                      {t("pro.earlyBirdBadge")}
+                    </span>
+                  </div>
+                  <div className="my-3 flex items-baseline gap-2">
+                    <span className="text-2xl font-semibold">
+                      {t("pro.earlyBirdPrice")}
+                    </span>
+                    <span className="text-sm font-medium text-muted-foreground line-through decoration-muted-foreground/50">
+                      {t("pro.price")}
+                    </span>
+                  </div>
                 </div>
 
                 <Button asChild className="w-full">

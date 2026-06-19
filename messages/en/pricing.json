@@ -16,14 +16,14 @@
   "pro": {
     "name": "Pro",
     "price": "€9 / month",
+    "earlyBirdPrice": "€0 / month",
+    "earlyBirdBadge": "Free for now!",
     "cta": "Choose Premium",
     "features": [
-      "Unlimited contacts",
-      "Featured profile",
-      "Advanced filters",
-      "Premium badge",
-      "Access to private events",
-      "Profile statistics",
+      "Group messages",
+      "Unlimited search (Jobs & Listings)",
+      "Access to interactive map",
+      "Unlimited contacts (Jobs & Listings)",
       "Priority support"
     ]
   },
