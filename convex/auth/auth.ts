@@ -1,28 +1,22 @@
 import { createClient, type GenericCtx } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
 import { betterAuth, type BetterAuthOptions } from "better-auth/minimal";
-import { GenericActionCtx, GenericDataModel } from "convex/server";
+import { admin } from "better-auth/plugins";
 import { generatedSlug } from "../../src/lib/utils";
 import { components } from "../_generated/api";
 import { DataModel } from "../_generated/dataModel";
 import { query } from "../_generated/server";
 import authConfig from "../auth.config";
 import authSchema from "../betterAuth/schema";
+import { sendEmailVerification, sendResetPasswordEmail } from "../email";
 import { resend } from "../sendEmails";
 import {
   buildResetPasswordEmailHtml,
-  buildVerificationEmailHtml,
   EmailLocale,
-  emailVerificationTranslations,
   resetPasswordTranslations,
 } from "../utils/auth.utils";
 
 const siteUrl = process.env.SITE_URL!;
-
-type ActionCtx = Pick<
-  GenericActionCtx<GenericDataModel>,
-  "runQuery" | "runMutation" | "runAction"
->;
 
 // The component client has methods needed for integrating Convex with Better Auth,
 // as well as helper methods for general use.
@@ -54,25 +48,11 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: true,
-      sendResetPassword: async ({
-        user,
-        url,
-      }: {
-        user: { email: string; name?: string | null };
-        url: string;
-      }) => {
-        const callbackURL = new URL(url).searchParams.get("callbackURL") ?? "/";
-        const localeMatch = callbackURL.match(/^\/(fr|en|de)/);
-        const locale = (localeMatch?.[1] as EmailLocale) ?? "en";
-
-        const t = resetPasswordTranslations[locale];
-        const displayName = user.name ?? user.email;
-
-        await resend.sendEmail(ctx as any, {
-          from: "HalloHallo <noreply@hallomada.de>",
+      sendResetPassword: async ({ user, url }) => {
+        await sendResetPasswordEmail(requireActionCtx(ctx), {
           to: user.email,
-          subject: t.subject,
-          html: buildResetPasswordEmailHtml({ displayName, url, t }),
+          url,
+          name: user.name,
         });
       },
       onPasswordReset: async ({ user }) => {
@@ -81,26 +61,11 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     },
     emailVerification: {
       autoSignInAfterVerification: true,
-      sendVerificationEmail: async ({
-        user,
-        url,
-      }: {
-        user: { email: string; name?: string | null };
-        url: string;
-      }) => {
-        // Extract locale from the callbackURL embedded in the verification URL
-        const callbackURL = new URL(url).searchParams.get("callbackURL") ?? "/";
-        const localeMatch = callbackURL.match(/^\/(fr|en|de)/);
-        const locale = (localeMatch?.[1] as "fr" | "en" | "de") ?? "en";
-
-        const t = emailVerificationTranslations[locale];
-        const displayName = user.name ?? user.email;
-
-        await resend.sendEmail(ctx as any, {
-          from: "HalloHallo <noreply@hallomada.de>",
+      sendVerificationEmail: async ({ user, url }) => {
+        await sendEmailVerification(requireActionCtx(ctx), {
           to: user.email,
-          subject: t.subject,
-          html: buildVerificationEmailHtml({ displayName, url, t }),
+          url,
+          name: user.name,
         });
       },
     },
@@ -233,6 +198,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     plugins: [
       // The Convex plugin is required for Convex compatibility
       convex({ authConfig }),
+      admin(),
     ],
     session: {
       cookieCache: {
