@@ -1,5 +1,6 @@
 import { createClient, type GenericCtx } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
+import { requireActionCtx } from "@convex-dev/better-auth/utils";
 import { betterAuth, type BetterAuthOptions } from "better-auth/minimal";
 import { admin } from "better-auth/plugins";
 import { generatedSlug } from "../../src/lib/utils";
@@ -9,12 +10,6 @@ import { query } from "../_generated/server";
 import authConfig from "../auth.config";
 import authSchema from "../betterAuth/schema";
 import { sendEmailVerification, sendResetPasswordEmail } from "../email";
-import { resend } from "../sendEmails";
-import {
-  buildResetPasswordEmailHtml,
-  EmailLocale,
-  resetPasswordTranslations,
-} from "../utils/auth.utils";
 
 const siteUrl = process.env.SITE_URL!;
 
