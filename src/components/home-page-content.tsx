@@ -57,7 +57,7 @@ export function HomePageContent() {
       {/* Hero Section */}
       <section className="relative w-full flex flex-col items-center justify-center gap-4 py-20 h-auto">
         <div className="text-center p-4 max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-7xl font-bold sm:mb-6 mb-3 pt-20">
+          <h1 className="text-5xl md:text-6xl font-bold sm:mb-6 mb-3 pt-20">
             Hallo Hallo
           </h1>
           <p className="md:text-xl mb-8 text-muted-foreground leading-relaxed">
