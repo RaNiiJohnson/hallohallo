@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
-import { useMutation } from "convex/react";
+import { useConvexAuth, useMutation } from "convex/react";
 import { Bookmark } from "lucide-react";
 import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
@@ -20,6 +20,7 @@ export const PostBookmarkButton = ({
   initialBookmark = false,
   className,
 }: PostBookmarkButtonProps) => {
+  const { isAuthenticated } = useConvexAuth();
   const [optimisticIsBookmarked, setOptimisticIsBookmarked] = useOptimistic(
     initialBookmark,
     (_, newState: boolean) => newState,
@@ -48,6 +49,8 @@ export const PostBookmarkButton = ({
       }
     });
   };
+
+  if (!isAuthenticated) return null;
 
   return (
     <Button

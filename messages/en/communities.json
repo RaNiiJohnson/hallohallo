@@ -69,7 +69,9 @@
     "deleteDialogConfirm": "Delete",
     "cancel": "Cancel",
     "deleting": "Deleting...",
-    "deletedCommunity": "{name} deleted!"
+    "deletedCommunity": "{name} deleted!",
+    "loadMore": "Load more",
+    "loading": "Loading..."
   },
   "post": {
     "notFound": "Post not found.",

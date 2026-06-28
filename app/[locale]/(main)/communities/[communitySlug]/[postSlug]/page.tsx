@@ -9,9 +9,8 @@ import { Link } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
-import { useConvexAuth, useMutation, useAction } from "convex/react";
+import { useAction, useConvexAuth, useMutation } from "convex/react";
 import {
-  Bookmark,
   ChevronRight,
   Loader2,
   MessageSquare,
@@ -25,6 +24,7 @@ import { toast } from "sonner";
 import { CommentItem } from "../../_component/commentItem";
 import { DeleteConfirmDialog } from "../../_component/deleteConfirmDialog";
 import { LikeButton } from "../../_component/likeButton";
+import { PostBookmarkButton } from "../../_component/List/PostBookmarkButton";
 import SkeletonPost from "./skeleton";
 
 export default function PostClient() {
@@ -249,16 +249,10 @@ export default function PostClient() {
               className="group flex items-center gap-1.5 text-muted-foreground hover:text-purple-500 hover:bg-purple-500/10 transition-colors h-8 px-2"
             />
 
-            <Button
-              variant="ghost"
-              size="sm"
-              className="group flex items-center gap-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors h-8 px-2 ml-auto"
-            >
-              <Bookmark
-                size={15}
-                className="transition-transform group-active:scale-95"
-              />
-            </Button>
+            <PostBookmarkButton
+              postId={post._id}
+              initialBookmark={post.isBookmarked}
+            />
 
             {/* Post edit/delete — only for author */}
             {isPostOwner && !isEditingPost && (

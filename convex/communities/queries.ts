@@ -5,6 +5,7 @@ import { query } from "../_generated/server";
 import {
   communityMembersCount,
   communityPostsCount,
+  postCommentsCount,
   postLikesCount,
 } from "../aggregates";
 import { authComponent } from "../auth/auth";
@@ -186,10 +187,94 @@ export const getCommunityWithPosts = query({
   },
 });
 
+export const getCommunityDetails = query({
+  args: { slug: v.string() },
+  handler: async (ctx, { slug }) => {
+    const community = await ctx.db
+      .query("communities")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .unique();
+    if (!community) return null;
+
+    const [membersCount, postsCount] = await Promise.all([
+      communityMembersCount.count(ctx, { namespace: community._id }),
+      communityPostsCount.count(ctx, { namespace: community._id }),
+    ]);
+
+    return {
+      ...community,
+      membersCount,
+      postsCount,
+    };
+  },
+});
+
 export const getMe = query({
   handler: async (ctx) => {
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) return null;
     return user;
+  },
+});
+
+export const getCommunityPosts = query({
+  args: {
+    communitySlug: v.string(),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    const community = await ctx.db
+      .query("communities")
+      .withIndex("by_slug", (q) => q.eq("slug", args.communitySlug))
+      .unique();
+
+    if (!community) {
+      return { page: [], isDone: true, continueCursor: "" };
+    }
+
+    const postsPage = await ctx.db
+      .query("posts")
+      .withIndex("by_communityId", (q) => q.eq("communityId", community._id))
+      .order("desc")
+      .paginate(args.paginationOpts);
+
+    const enrichedPage = await Promise.all(
+      postsPage.page.map(async (post) => {
+        const [likesCount, commentsCount] = await Promise.all([
+          postLikesCount.count(ctx, { namespace: post._id }),
+          postCommentsCount.count(ctx, { namespace: post._id }),
+        ]);
+
+        let userHasLiked = false;
+        let isBookmarked = false;
+        if (user) {
+          const existingLike = await ctx.db
+            .query("postLikes")
+            .withIndex("by_postId", (q) => q.eq("postId", post._id))
+            .filter((q) => q.eq(q.field("userId"), user._id))
+            .first();
+          if (existingLike) userHasLiked = true;
+
+          const existingBookmark = await ctx.db
+            .query("bookmarks")
+            .withIndex("by_user_resource", (q) =>
+              q.eq("userId", user._id).eq("resourceId", post._id),
+            )
+            .first();
+          if (existingBookmark) isBookmarked = true;
+        }
+
+        return {
+          ...post,
+          likesCount,
+          commentsCount,
+          userHasLiked,
+          isBookmarked,
+        };
+      }),
+    );
+
+    return { ...postsPage, page: enrichedPage };
   },
 });

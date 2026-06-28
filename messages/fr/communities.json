@@ -69,7 +69,9 @@
     "deleteDialogConfirm": "Supprimer",
     "cancel": "Annuler",
     "deleting": "Suppression...",
-    "deletedCommunity": "{name} supprimée !"
+    "deletedCommunity": "{name} supprimée !",
+    "loadMore": "Charger plus",
+    "loading": "Chargement..."
   },
   "post": {
     "notFound": "Post introuvable.",

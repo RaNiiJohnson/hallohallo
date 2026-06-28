@@ -1,8 +1,7 @@
 "use client";
 
-import { ShareButton } from "@/components/ShareButton";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -19,19 +18,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { Link } from "@/i18n/navigation";
-import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 import { useQuery } from "convex-helpers/react/cache";
 import { useAction, useConvexAuth, useMutation } from "convex/react";
 import {
-  Bookmark,
-  CheckIcon,
   ChevronDown,
   ChevronRight,
-  MessageSquare,
   Settings2,
   Trash,
   Users,
@@ -42,12 +36,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { CreatePostDialog } from "../_component/dialogs/createPostDialog";
 import SkeletonCommunity from "./skeleton";
+import { CommunityPostList } from "./_components/communityPostList";
 
 export default function CommunityClient() {
   const { communitySlug } = useParams();
   const router = useRouter();
 
-  const community = useQuery(api.communities.queries.getCommunityWithPosts, {
+  const community = useQuery(api.communities.queries.getCommunityDetails, {
     slug: communitySlug as string,
   });
   const { isAuthenticated } = useConvexAuth();
@@ -59,13 +54,11 @@ export default function CommunityClient() {
 
   const joinCommunity = useMutation(api.communities.mutations.joinCommunity);
   const leaveCommunity = useMutation(api.communities.mutations.leaveCommunity);
-  const likePost = useMutation(api.posts.likes.mutations.likePost);
   const deleteCommunity = useAction(api.communities.actions.deleteCommunity);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const timeT = useTimeTranslations();
   const t = useTranslations("communities.community");
 
   if (community === undefined) {
@@ -75,11 +68,6 @@ export default function CommunityClient() {
   if (community === null) {
     return <p className="text-muted-foreground p-8">{t("notFound")}</p>;
   }
-
-  const handleLike = async (postId: Id<"posts">) => {
-    if (!isAuthenticated) return toast.error(t("loginToLike"));
-    await likePost({ postId });
-  };
 
   const handleJoin = async () => {
     try {
@@ -322,114 +310,11 @@ export default function CommunityClient() {
         </DialogContent>
       </Dialog>
       <div className="max-w-4xl mx-auto py-2">
-        <div className="flex flex-col">
-          {community.posts.length === 0 ? (
-            <div className="text-center py-16 bg-background rounded-xl">
-              <p className="text-muted-foreground mb-4">{t("emptyPosts")}</p>
-              {isAuthenticated && isMember && (
-                <CreatePostDialog
-                  communityId={community._id}
-                  trigger={
-                    <span className="text-primary hover:underline cursor-pointer text-sm">
-                      {t("firstToPost")}
-                    </span>
-                  }
-                />
-              )}
-            </div>
-          ) : (
-            community.posts.map((post) => (
-              <article
-                key={post._id}
-                className="block px-4 py-4 hover:bg-muted/30 transition-colors border-b border-border bg-background"
-              >
-                <Link
-                  href={`/communities/${community.slug}/${post.slug}`}
-                  className="block"
-                >
-                  <p className="text-xs text-muted-foreground mb-1">
-                    {" "}
-                    <span className="text-primary hover:underline">
-                      {post.authorName}
-                    </span>{" "}
-                    • {getRelativeTime(post._creationTime, timeT)}
-                  </p>
-                  <h2 className="font-semibold text-foreground text-base leading-snug mb-1">
-                    {post.title}
-                  </h2>
-                  {post.content && (
-                    <p className="text-sm text-foreground/80 line-clamp-6 mb-2 whitespace-pre-wrap">
-                      {post.content}
-                    </p>
-                  )}
-                </Link>
-                <div className="flex items-center gap-1 mt-2">
-                  <Link
-                    href={`/communities/${community.slug}/${post.slug}#comments`}
-                    className={buttonVariants({
-                      variant: "ghost",
-                      size: "sm",
-                      className:
-                        "group flex items-center gap-1.5 text-muted-foreground hover:text-blue-500 hover:bg-blue-500/10 transition-colors h-8 px-2",
-                    })}
-                  >
-                    <MessageSquare
-                      size={15}
-                      className="transition-transform group-active:scale-95"
-                    />
-                    <span className="text-xs font-medium">
-                      {post.commentsCount ?? 0}
-                    </span>
-                  </Link>
-
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={`group flex items-center gap-1.5 transition-colors h-8 px-2 ${
-                      post.userHasLiked
-                        ? "text-green-500  hover:bg-green-500/20"
-                        : "text-muted-foreground hover:text-green-500 hover:bg-green-500/10"
-                    }`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleLike(post._id);
-                    }}
-                  >
-                    <CheckIcon
-                      size={15}
-                      className="transition-transform group-active:scale-95"
-                    />
-                    <span className="text-xs font-medium">
-                      {post.likesCount ?? 0}
-                    </span>
-                  </Button>
-
-                  <ShareButton
-                    text={post.title}
-                    url={
-                      typeof window !== "undefined"
-                        ? `${window.location.origin}/communities/${community.slug}/${post.slug}`
-                        : ""
-                    }
-                    variant="ghost"
-                    className="group flex items-center gap-1.5 text-muted-foreground hover:text-purple-500 hover:bg-purple-500/10 transition-colors h-8 px-2"
-                  />
-
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="group flex items-center gap-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors h-8 px-2 ml-auto"
-                  >
-                    <Bookmark
-                      size={15}
-                      className="transition-transform group-active:scale-95"
-                    />
-                  </Button>
-                </div>
-              </article>
-            ))
-          )}
-        </div>
+        <CommunityPostList 
+          communitySlug={community.slug} 
+          communityId={community._id} 
+          isMember={!!isMember} 
+        />
       </div>
     </div>
   );

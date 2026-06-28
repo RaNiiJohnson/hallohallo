@@ -46,6 +46,15 @@ async function getReplyWithLikes(
   return { ...reply, likes, likesCount: likes.length, userHasLiked };
 }
 
+// Fisher-Yates
+function shuffle<T>(array: T[], rand: Rand): T[] {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(rand.next() * (i + 1));
+    [array[i], array[j]] = [array[j]!, array[i]!];
+  }
+  return array;
+}
+
 async function getCommentWithMeta(
   db: DatabaseReader,
   commentId: Id<"postComments">,
@@ -299,15 +308,6 @@ export const getSortedPosts = query({
     };
   },
 });
-
-// Fisher-Yates
-function shuffle<T>(array: T[], rand: Rand): T[] {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(rand.next() * (i + 1));
-    [array[i], array[j]] = [array[j]!, array[i]!];
-  }
-  return array;
-}
 
 export const getSortedByLikes = query({
   args: {
