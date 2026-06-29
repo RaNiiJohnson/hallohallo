@@ -197,7 +197,9 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     plugins: [
       // The Convex plugin is required for Convex compatibility
       convex({ authConfig }),
-      admin(),
+      admin({
+        adminRoles: ["admin"],
+      }),
     ],
     session: {
       cookieCache: {
