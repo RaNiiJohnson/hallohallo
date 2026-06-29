@@ -18,12 +18,13 @@ import {
   SlidersHorizontal,
   XCircle,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const hasFetched = useRef(false);
 
   const fetchUsers = async () => {
     try {
@@ -49,6 +50,8 @@ export default function UsersPage() {
   };
 
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
     fetchUsers();
   }, []);
 
