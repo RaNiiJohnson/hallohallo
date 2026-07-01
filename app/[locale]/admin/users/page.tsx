@@ -18,17 +18,15 @@ import {
   SlidersHorizontal,
   XCircle,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const hasFetched = useRef(false);
+  const [isPending, startTransition] = useTransition();
 
   const fetchUsers = async () => {
     try {
-      setIsLoading(true);
       const res = await authClient.admin.listUsers({
         query: {
           limit: 50,
@@ -44,36 +42,39 @@ export default function UsersPage() {
       }
     } catch (error) {
       toast.error("Erreur inattendue");
-    } finally {
-      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    if (hasFetched.current) return;
-    hasFetched.current = true;
-    fetchUsers();
+    startTransition(async () => {
+      await fetchUsers();
+    });
   }, []);
 
-  const handleBanUser = async (user: any) => {
-    const isBanned = user.banned;
-    try {
-      if (isBanned) {
-        const res = await authClient.admin.unbanUser({ userId: user.id });
+  const handleBanUser = (user: any) => {
+    startTransition(async () => {
+      const isBanned = user.banned;
+      try {
+        const res = isBanned
+          ? await authClient.admin.unbanUser({ userId: user.id })
+          : await authClient.admin.banUser({
+              userId: user.id,
+              banReason: "Non respect des règles",
+            });
+
         if (res.error) throw res.error;
-        toast.success(`Utilisateur ${user.name} débanni avec succès`);
-      } else {
-        const res = await authClient.admin.banUser({
-          userId: user.id,
-          banReason: "Non respect des règles",
-        });
-        if (res.error) throw res.error;
-        toast.success(`Utilisateur ${user.name} banni avec succès`);
+
+        // Mise à jour locale au lieu de refetch complet
+        setUsers((prev) =>
+          prev.map((u) => (u.id === user.id ? { ...u, banned: !isBanned } : u)),
+        );
+        toast.success(
+          `Utilisateur ${user.name} ${isBanned ? "débanni" : "banni"} avec succès`,
+        );
+      } catch (error: any) {
+        toast.error(error.message || "Erreur lors de l'opération");
       }
-      fetchUsers();
-    } catch (error: any) {
-      toast.error(error.message || "Erreur lors de l'opération");
-    }
+    });
   };
 
   return (
@@ -123,8 +124,10 @@ export default function UsersPage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="[&_tr:last-child]:border-0">
-              {isLoading ? (
+            <tbody
+              className={`[&_tr:last-child]:border-0 transition-opacity duration-200 ${isPending && users.length > 0 ? "opacity-50 pointer-events-none" : ""}`}
+            >
+              {isPending && users.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="p-8 text-center">
                     <div className="flex flex-col items-center justify-center text-muted-foreground">
@@ -202,6 +205,7 @@ export default function UsersPage() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleBanUser(user)}
+                            disabled={isPending}
                             className={
                               user.banned
                                 ? "text-emerald-600 focus:text-emerald-600 focus:bg-emerald-100 dark:focus:bg-emerald-900/20"
