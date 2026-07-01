@@ -21,8 +21,27 @@ import {
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
+export type AdminUser = {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  image?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  role?: string | null;
+  banned?: boolean | null;
+  banReason?: string | null;
+  banExpires?: Date | null;
+  slug?: string | null;
+  city?: string | null;
+  bio?: string | null;
+  phone?: string | null;
+  username?: string | null;
+};
+
 export default function UsersPage() {
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [isPending, startTransition] = useTransition();
 
   const fetchUsers = async () => {
@@ -33,7 +52,7 @@ export default function UsersPage() {
         },
       });
       if (res.data) {
-        setUsers(res.data.users);
+        setUsers(res.data.users as AdminUser[]);
       } else if (res.error) {
         toast.error(
           res.error.message ||
