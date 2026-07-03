@@ -5,6 +5,13 @@ import { mutation, query } from "../_generated/server";
 import { UserType, userValidator } from "../betterAuth/users";
 import { authComponent, createAuth } from "./auth";
 
+type UserWithRole = UserType & {
+  role?: string | undefined;
+  banned: boolean | null;
+  banReason?: (string | null) | undefined;
+  banExpires?: (number | null) | undefined;
+};
+
 export const getUserBySlug = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
@@ -91,7 +98,7 @@ export const listUsers = query({
       query: { limit: 50 },
       headers,
     });
-    return result.users;
+    return result.users as unknown as UserWithRole[];
   },
 });
 
