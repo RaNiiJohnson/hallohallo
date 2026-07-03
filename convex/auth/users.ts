@@ -5,7 +5,8 @@ import { mutation, query } from "../_generated/server";
 import { UserType, userValidator } from "../betterAuth/users";
 import { authComponent, createAuth } from "./auth";
 
-type UserWithRole = UserType & {
+export type UserWithRoleType = UserType & {
+  id: string;
   role?: string | undefined;
   banned: boolean | null;
   banReason?: (string | null) | undefined;
@@ -98,7 +99,7 @@ export const listUsers = query({
       query: { limit: 50 },
       headers,
     });
-    return result.users as unknown as UserWithRole[];
+    return result.users as unknown as UserWithRoleType[];
   },
 });
 

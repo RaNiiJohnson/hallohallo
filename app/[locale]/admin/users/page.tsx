@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Link } from "@/i18n/navigation";
 import { api } from "@convex/_generated/api";
+import { UserWithRoleType } from "@convex/auth/users";
 import { useQuery } from "convex-helpers/react/cache";
 import { useMutation } from "convex/react";
 import {
@@ -29,14 +30,14 @@ export default function UsersPage() {
   const unbanUser = useMutation(api.auth.users.unbanUser);
   const [isPending, startTransition] = useTransition();
 
-  const handleBanUser = (user: any) => {
+  const handleBanUser = (user: UserWithRoleType) => {
     startTransition(async () => {
       try {
         if (user.banned) {
-          await unbanUser({ userId: user._id });
+          await unbanUser({ userId: user.id });
           toast.success(`Utilisateur ${user.name} débanni`);
         } else {
-          await banUser({ userId: user._id });
+          await banUser({ userId: user.id });
           toast.success(`Utilisateur ${user.name} banni`);
         }
         // rien à faire ici : la subscription Convex met déjà `users` à jour
@@ -106,18 +107,13 @@ export default function UsersPage() {
                   </td>
                 </tr>
               ) : users === undefined ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="p-8 text-center text-muted-foreground"
-                  >
-                    Aucun utilisateur trouvé.
-                  </td>
-                </tr>
+                <span className="p-8 text-center text-muted-foreground">
+                  Aucun utilisateur trouvé.
+                </span>
               ) : (
                 users.map((user) => (
                   <tr
-                    key={user._id}
+                    key={user.id ?? user._id}
                     className="border-b transition-colors hover:bg-muted/50"
                   >
                     <td className="p-4 align-middle">
