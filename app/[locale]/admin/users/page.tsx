@@ -9,7 +9,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Link } from "@/i18n/navigation";
-import { authClient } from "@/lib/auth-client";
+import { api } from "@convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
+import { useMutation } from "convex/react";
 import {
   CheckCircle2,
   Loader2,
@@ -18,78 +20,26 @@ import {
   SlidersHorizontal,
   XCircle,
 } from "lucide-react";
-import { useEffect, useState, useTransition } from "react";
+import { useTransition } from "react";
 import { toast } from "sonner";
 
-export type AdminUser = {
-  id: string;
-  name: string;
-  email: string;
-  emailVerified: boolean;
-  image?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  role?: string | null;
-  banned?: boolean | null;
-  banReason?: string | null;
-  banExpires?: Date | null;
-  slug?: string | null;
-  city?: string | null;
-  bio?: string | null;
-  phone?: string | null;
-  username?: string | null;
-};
-
 export default function UsersPage() {
-  const [users, setUsers] = useState<AdminUser[]>([]);
+  const users = useQuery(api.auth.users.listUsers);
+  const banUser = useMutation(api.auth.users.banUser);
+  const unbanUser = useMutation(api.auth.users.unbanUser);
   const [isPending, startTransition] = useTransition();
-
-  const fetchUsers = async () => {
-    try {
-      const res = await authClient.admin.listUsers({
-        query: {
-          limit: 50,
-        },
-      });
-      if (res.data) {
-        setUsers(res.data.users as AdminUser[]);
-      } else if (res.error) {
-        toast.error(
-          res.error.message ||
-            "Erreur lors de la récupération des utilisateurs",
-        );
-      }
-    } catch (error) {
-      toast.error("Erreur inattendue");
-    }
-  };
-
-  useEffect(() => {
-    startTransition(async () => {
-      await fetchUsers();
-    });
-  }, []);
 
   const handleBanUser = (user: any) => {
     startTransition(async () => {
-      const isBanned = user.banned;
       try {
-        const res = isBanned
-          ? await authClient.admin.unbanUser({ userId: user.id })
-          : await authClient.admin.banUser({
-              userId: user.id,
-              banReason: "Non respect des règles",
-            });
-
-        if (res.error) throw res.error;
-
-        // Mise à jour locale au lieu de refetch complet
-        setUsers((prev) =>
-          prev.map((u) => (u.id === user.id ? { ...u, banned: !isBanned } : u)),
-        );
-        toast.success(
-          `Utilisateur ${user.name} ${isBanned ? "débanni" : "banni"} avec succès`,
-        );
+        if (user.banned) {
+          await unbanUser({ userId: user._id });
+          toast.success(`Utilisateur ${user.name} débanni`);
+        } else {
+          await banUser({ userId: user._id });
+          toast.success(`Utilisateur ${user.name} banni`);
+        }
+        // rien à faire ici : la subscription Convex met déjà `users` à jour
       } catch (error: any) {
         toast.error(error.message || "Erreur lors de l'opération");
       }
@@ -144,9 +94,9 @@ export default function UsersPage() {
               </tr>
             </thead>
             <tbody
-              className={`[&_tr:last-child]:border-0 transition-opacity duration-200 ${isPending && users.length > 0 ? "opacity-50 pointer-events-none" : ""}`}
+              className={`[&_tr:last-child]:border-0 transition-opacity duration-200 ${isPending && users && users.length > 0 ? "opacity-50 pointer-events-none" : ""}`}
             >
-              {isPending && users.length === 0 ? (
+              {isPending && users === undefined ? (
                 <tr>
                   <td colSpan={6} className="p-8 text-center">
                     <div className="flex flex-col items-center justify-center text-muted-foreground">
@@ -155,7 +105,7 @@ export default function UsersPage() {
                     </div>
                   </td>
                 </tr>
-              ) : users.length === 0 ? (
+              ) : users === undefined ? (
                 <tr>
                   <td
                     colSpan={6}
@@ -167,7 +117,7 @@ export default function UsersPage() {
               ) : (
                 users.map((user) => (
                   <tr
-                    key={user.id}
+                    key={user._id}
                     className="border-b transition-colors hover:bg-muted/50"
                   >
                     <td className="p-4 align-middle">
