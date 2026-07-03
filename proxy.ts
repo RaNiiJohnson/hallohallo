@@ -7,6 +7,9 @@ const intlProxy = createMiddleware(routing);
 /** Pages inaccessibles si l'utilisateur est déjà connecté */
 const AUTH_ONLY_PAGES = ["/login", "/register", "/verify-email"];
 
+/** Nom du cookie marqueur : "l'utilisateur connecté a déjà été redirigé vers /community" */
+const HOME_REDIRECT_COOKIE = "home_redirected";
+
 export default function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
@@ -16,18 +19,44 @@ export default function proxy(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Rediriger vers l'accueil si l'utilisateur est connecté et tente d'accéder à une page auth
   const bare = pathname.replace(/^\/(fr|en|de)/, "") || "/";
-  if (AUTH_ONLY_PAGES.some((p) => bare.startsWith(p))) {
-    const hasSession =
-      req.cookies.has("better-auth.session_token") ||
-      req.cookies.has("__Secure-better-auth.session_token");
 
+  const hasSession =
+    req.cookies.has("better-auth.session_token") ||
+    req.cookies.has("__Secure-better-auth.session_token");
+
+  const locale = pathname.match(/^\/(fr|en|de)/)?.[1] ?? routing.defaultLocale;
+
+  // Rediriger vers l'accueil si l'utilisateur est connecté et tente d'accéder à une page auth
+  if (AUTH_ONLY_PAGES.some((p) => bare.startsWith(p))) {
     if (hasSession) {
-      const locale =
-        pathname.match(/^\/(fr|en|de)/)?.[1] ?? routing.defaultLocale;
       return NextResponse.redirect(new URL(`/${locale}`, req.url));
     }
+  }
+
+  // Connecté + arrive sur la page d'accueil ("/", "/fr", "/en", "/de")
+  // -> redirection vers /communities UNIQUEMENT lors de la première ouverture du site
+  //    (tant que le cookie marqueur n'est pas présent).
+  if (hasSession && bare === "/") {
+    const alreadyRedirected = req.cookies.has(HOME_REDIRECT_COOKIE);
+
+    if (!alreadyRedirected) {
+      const response = NextResponse.redirect(
+        new URL(`/${locale}/communities`, req.url),
+      );
+
+      // Cookie de session (pas de maxAge/expires) : il expire à la fermeture
+      // du navigateur, donc "première ouverture" redeviendra vrai à layy prochaine session.
+      response.cookies.set(HOME_REDIRECT_COOKIE, "1", {
+        path: "/",
+        sameSite: "lax",
+      });
+
+      return response;
+    }
+
+    // Cookie déjà présent -> on laisse l'utilisateur voir "/" normalement
+    return intlProxy(req);
   }
 
   return intlProxy(req);
