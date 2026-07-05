@@ -124,3 +124,14 @@ export const unbanUser = mutation({
     });
   },
 });
+
+export const deleteUser = mutation({
+  args: { userId: v.string() },
+  handler: async (ctx, args) => {
+    const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
+    await auth.api.removeUser({
+      body: { userId: args.userId },
+      headers,
+    });
+  },
+});

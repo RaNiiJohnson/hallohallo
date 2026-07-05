@@ -28,6 +28,8 @@ export default function UsersPage() {
   const users = useQuery(api.auth.users.listUsers);
   const banUser = useMutation(api.auth.users.banUser);
   const unbanUser = useMutation(api.auth.users.unbanUser);
+  const deleteUser = useMutation(api.auth.users.deleteUser);
+
   const [isPending, startTransition] = useTransition();
 
   const handleBanUser = (user: UserWithRoleType) => {
@@ -41,6 +43,17 @@ export default function UsersPage() {
           toast.success(`Utilisateur ${user.name} banni`);
         }
         // rien à faire ici : la subscription Convex met déjà `users` à jour
+      } catch (error: any) {
+        toast.error(error.message || "Erreur lors de l'opération");
+      }
+    });
+  };
+
+  const handleDeleteUser = (user: UserWithRoleType) => {
+    startTransition(async () => {
+      try {
+        await deleteUser({ userId: user.id });
+        toast.success(`Utilisateur ${user.name} rétiré`);
       } catch (error: any) {
         toast.error(error.message || "Erreur lors de l'opération");
       }
@@ -183,6 +196,12 @@ export default function UsersPage() {
                             }
                           >
                             {user.banned ? "Débannir" : "Bannir"}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleDeleteUser(user)}
+                            disabled={isPending}
+                          >
+                            rétirer
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
