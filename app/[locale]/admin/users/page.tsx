@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import {
   Select,
   SelectContent,
@@ -34,6 +35,7 @@ import {
   CheckCircle2,
   Loader2,
   MoreHorizontal,
+  Plus,
   Search,
   SlidersHorizontal,
   XCircle,
@@ -46,6 +48,7 @@ export default function UsersPage() {
   const banUser = useMutation(api.auth.admin.banUser);
   const unbanUser = useMutation(api.auth.admin.unbanUser);
   const setUseRole = useMutation(api.auth.admin.setUserRole);
+  const createUser = useMutation(api.auth.admin.createUser);
   const deleteUser = useMutation(api.auth.admin.deleteUser);
 
   const [isPending, startTransition] = useTransition();
@@ -55,6 +58,32 @@ export default function UsersPage() {
   const [confirmDelete, setConfirmDelete] = useState<UserWithRoleType | null>(
     null,
   );
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+
+  const handleCreateUser = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const name = formData.get("name") as string;
+    const password = formData.get("password") as string;
+    const role = formData.get("role") as "user" | "admin";
+
+    startTransition(async () => {
+      try {
+        await createUser({
+          userId: crypto.randomUUID(), // Temporaire car BetterAuth gère l'ID, mais requis par le schéma actuel
+          email,
+          name,
+          password,
+          role,
+        });
+        toast.success(`Utilisateur ${name} créé avec succès`);
+        setIsCreateOpen(false);
+      } catch (error: any) {
+        toast.error(error.message || "Erreur lors de la création");
+      }
+    });
+  };
 
   const handleBanUser = (user: UserWithRoleType) => {
     startTransition(async () => {
@@ -108,6 +137,10 @@ export default function UsersPage() {
               Gérez les membres de la plateforme.
             </p>
           </div>
+          <Button onClick={() => setIsCreateOpen(true)} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Ajouter
+          </Button>
         </div>
 
         <div className="flex items-center justify-between gap-4 bg-card p-4 rounded-xl border">
@@ -370,6 +403,73 @@ export default function UsersPage() {
               Oui, supprimer définitivement
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog — Création d'utilisateur */}
+      <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Ajouter un utilisateur</DialogTitle>
+            <DialogDescription>
+              Créez un nouveau compte utilisateur.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleCreateUser} className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Nom complet</label>
+              <Input name="name" required placeholder="John Doe" className="h-11" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Email</label>
+              <Input
+                name="email"
+                type="email"
+                required
+                placeholder="john@example.com"
+                className="h-11"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Mot de passe</label>
+              <PasswordInput
+                name="password"
+                required
+                placeholder="••••••••"
+                minLength={8}
+                className="h-11"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Rôle</label>
+              <Select name="role" defaultValue="user">
+                <SelectTrigger className="h-11">
+                  <SelectValue placeholder="Sélectionnez un rôle" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="user">Utilisateur</SelectItem>
+                  <SelectItem value="admin">Administrateur</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <DialogFooter className="pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="h-11"
+                onClick={() => setIsCreateOpen(false)}
+                disabled={isPending}
+              >
+                Annuler
+              </Button>
+              <Button type="submit" className="h-11" disabled={isPending}>
+                {isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : null}
+                Créer l'utilisateur
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </>

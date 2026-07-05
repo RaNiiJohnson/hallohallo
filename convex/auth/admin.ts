@@ -3,6 +3,7 @@ import { mutation, query } from "../_generated/server";
 import { UserType } from "../betterAuth/users";
 import { authComponent, createAuth } from "./auth";
 import { UserWithRoleType } from "./users";
+import { generatedSlug } from "../../src/lib/utils";
 
 export const listUsers = query({
   args: {},
@@ -52,6 +53,37 @@ export const setUserRole = mutation({
     await auth.api.setRole({
       body: { userId: args.userId, role: args.role },
       headers,
+    });
+  },
+});
+
+export const createUser = mutation({
+  args: {
+    userId: v.string(),
+    email: v.string(),
+    password: v.string(),
+    name: v.string(),
+    role: v.union(
+      v.literal("user"),
+      v.literal("admin"),
+      v.array(v.union(v.literal("user"), v.literal("admin"))),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const { auth } = await authComponent.getAuth(createAuth, ctx);
+    await auth.api.createUser({
+      body: {
+        email: args.email,
+        password: args.password,
+        name: args.name,
+        role: args.role,
+        data: {
+          slug: generatedSlug(args.name),
+          isPublic: true,
+          showEmail: true,
+          showPhone: true,
+        },
+      },
     });
   },
 });
