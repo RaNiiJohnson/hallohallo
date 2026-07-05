@@ -25,10 +25,10 @@ import { useTransition } from "react";
 import { toast } from "sonner";
 
 export default function UsersPage() {
-  const users = useQuery(api.auth.users.listUsers);
-  const banUser = useMutation(api.auth.users.banUser);
-  const unbanUser = useMutation(api.auth.users.unbanUser);
-  const deleteUser = useMutation(api.auth.users.deleteUser);
+  const users = useQuery(api.auth.admin.listUsers);
+  const banUser = useMutation(api.auth.admin.banUser);
+  const unbanUser = useMutation(api.auth.admin.unbanUser);
+  const deleteUser = useMutation(api.auth.admin.deleteUser);
 
   const [isPending, startTransition] = useTransition();
 
