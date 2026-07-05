@@ -107,9 +107,14 @@ export default function UsersPage() {
                   </td>
                 </tr>
               ) : users === undefined ? (
-                <span className="p-8 text-center text-muted-foreground">
-                  Aucun utilisateur trouvé.
-                </span>
+                <tr>
+                  <td colSpan={6} className="p-8 text-center">
+                    <div className="flex flex-col items-center justify-center text-muted-foreground">
+                      <Loader2 className="h-8 w-8 animate-spin mb-4" />
+                      <p>Aucun utilisateur trouvé.</p>
+                    </div>
+                  </td>
+                </tr>
               ) : (
                 users.map((user) => (
                   <tr
