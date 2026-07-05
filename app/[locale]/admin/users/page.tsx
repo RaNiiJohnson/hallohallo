@@ -8,6 +8,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Link } from "@/i18n/navigation";
 import { api } from "@convex/_generated/api";
 import { UserWithRoleType } from "@convex/auth/users";
@@ -28,6 +36,7 @@ export default function UsersPage() {
   const users = useQuery(api.auth.admin.listUsers);
   const banUser = useMutation(api.auth.admin.banUser);
   const unbanUser = useMutation(api.auth.admin.unbanUser);
+  const setUseRole = useMutation(api.auth.admin.setUserRole);
   const deleteUser = useMutation(api.auth.admin.deleteUser);
 
   const [isPending, startTransition] = useTransition();
@@ -45,6 +54,20 @@ export default function UsersPage() {
         // rien à faire ici : la subscription Convex met déjà `users` à jour
       } catch (error: any) {
         toast.error(error.message || "Erreur lors de l'opération");
+      }
+    });
+  };
+
+  const handleSetRole = (
+    user: UserWithRoleType,
+    role: "user" | "admin",
+  ) => {
+    startTransition(async () => {
+      try {
+        await setUseRole({ userId: user.id, role });
+        toast.success(`Rôle de ${user.name} mis à jour : ${role}`);
+      } catch (error: any) {
+        toast.error(error.message || "Erreur lors du changement de rôle");
       }
     });
   };
@@ -169,8 +192,24 @@ export default function UsersPage() {
                         )}
                       </span>
                     </td>
-                    <td className="p-4 align-middle capitalize">
-                      {user.role || "user"}
+                    <td className="p-4 align-middle">
+                      <Select
+                        value={user.role ?? "user"}
+                        onValueChange={(value) =>
+                          handleSetRole(user, value as "user" | "admin")
+                        }
+                        disabled={isPending}
+                      >
+                        <SelectTrigger className="w-28 h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectItem value="user">User</SelectItem>
+                            <SelectItem value="admin">Admin</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
                     </td>
                     <td className="p-4 align-middle text-right">
                       <DropdownMenu>

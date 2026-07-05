@@ -2,14 +2,8 @@ import { v } from "convex/values";
 import { mutation, query } from "../_generated/server";
 import { UserType } from "../betterAuth/users";
 import { authComponent, createAuth } from "./auth";
+import { UserWithRoleType } from "./users";
 
-export type UserWithRoleType = UserType & {
-  id: string;
-  role?: string | undefined;
-  banned: boolean | null;
-  banReason?: (string | null) | undefined;
-  banExpires?: (number | null) | undefined;
-};
 export const listUsers = query({
   args: {},
   handler: async (ctx) => {
