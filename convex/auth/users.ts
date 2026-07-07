@@ -5,6 +5,14 @@ import { mutation, query } from "../_generated/server";
 import { UserType, userValidator } from "../betterAuth/users";
 import { authComponent, createAuth } from "./auth";
 
+export type UserWithRoleType = UserType & {
+  id: string;
+  role?: string | undefined;
+  banned: boolean | null;
+  banReason?: (string | null) | undefined;
+  banExpires?: (number | null) | undefined;
+};
+
 export const getUserBySlug = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
@@ -57,28 +65,5 @@ export const updateUser = mutation({
     }
 
     await ctx.runMutation(components.betterAuth.users.updateUser, args);
-  },
-});
-
-// const updateUser = useMutation(api.users.updateUser);
-// await updateUser({
-//   id: userId,
-//   patch: { city: "Paris", headline: "Dev JS" },
-// });
-
-export const updateUserPassword = mutation({
-  args: {
-    currentPassword: v.string(),
-    newPassword: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
-    await auth.api.changePassword({
-      body: {
-        currentPassword: args.currentPassword,
-        newPassword: args.newPassword,
-      },
-      headers,
-    });
   },
 });

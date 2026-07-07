@@ -9,6 +9,7 @@
  */
 
 import type * as aggregates from "../aggregates.js";
+import type * as auth_admin from "../auth/admin.js";
 import type * as auth_auth from "../auth/auth.js";
 import type * as auth_users from "../auth/users.js";
 import type * as bookmarks_mutations from "../bookmarks/mutations.js";
@@ -48,6 +49,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   aggregates: typeof aggregates;
+  "auth/admin": typeof auth_admin;
   "auth/auth": typeof auth_auth;
   "auth/users": typeof auth_users;
   "bookmarks/mutations": typeof bookmarks_mutations;
