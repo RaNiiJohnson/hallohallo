@@ -10,8 +10,10 @@ const AUTH_ONLY_PAGES = ["/login", "/register", "/verify-email"];
 /** Nom du cookie marqueur : "l'utilisateur connecté a déjà été redirigé vers /community" */
 const HOME_REDIRECT_COOKIE = "home_redirected";
 
-export default function proxy(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  const hostname = req.headers.get("host") || "";
+  const isAdmin = hostname.startsWith("admin.");
 
   // Fix CVE-2026-44573 — bloquer les routes /_next/data sans préfixe de locale
   const dataRouteWithoutLocale = /^\/_next\/data\/[^/]+\/(?!(fr|en|de)\/)/;
@@ -59,6 +61,37 @@ export default function proxy(req: NextRequest) {
     return intlProxy(req);
   }
 
+  if (isAdmin) {
+    // Determine the main domain by removing "admin." from the hostname
+    const mainDomainUrl = req.nextUrl.clone();
+    mainDomainUrl.hostname = hostname.replace(/^admin\./, "");
+
+    if (!hasSession) {
+      mainDomainUrl.pathname = "/login";
+      return NextResponse.redirect(mainDomainUrl);
+    }
+
+    // Use Better Auth's get-session endpoint
+    const sessionRes = await fetch(`${mainDomainUrl.origin}/api/auth/get-session`, {
+      headers: { cookie: req.headers.get("cookie") || "" },
+    });
+
+    if (!sessionRes.ok) {
+      mainDomainUrl.pathname = "/";
+      return NextResponse.redirect(mainDomainUrl);
+    }
+
+    const sessionData = await sessionRes.json();
+    if (sessionData?.user?.role !== "admin") {
+      mainDomainUrl.pathname = "/";
+      return NextResponse.redirect(mainDomainUrl);
+    }
+
+    return NextResponse.rewrite(
+      new URL(`/admin${req.nextUrl.pathname}`, req.url),
+    );
+  }
+
   return intlProxy(req);
 }
 
@@ -71,6 +104,6 @@ export const config = {
     "/(fr|en|de)/:path*",
     // Exclure les fichiers statiques
     // Exclude API routes (e.g. NextAuth) and static assets from the middleware
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\.(?:svg|png|jpg|jpeg|gif|webp|html|xml|txt)$).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|html|xml|txt)$).*)",
   ],
 };
