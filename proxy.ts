@@ -61,6 +61,13 @@ export default async function proxy(req: NextRequest) {
     return intlProxy(req);
   }
 
+  if (!isAdmin && bare.startsWith("/admin")) {
+    const adminUrl = req.nextUrl.clone();
+    // Enlever "www." si présent, et ajouter "admin."
+    adminUrl.hostname = `admin.${hostname.replace(/^www\./, "")}`;
+    return NextResponse.redirect(adminUrl);
+  }
+
   if (isAdmin) {
     // Determine the main domain by removing "admin." from the hostname
     const mainDomainUrl = req.nextUrl.clone();
@@ -72,9 +79,12 @@ export default async function proxy(req: NextRequest) {
     }
 
     // Use Better Auth's get-session endpoint
-    const sessionRes = await fetch(`${mainDomainUrl.origin}/api/auth/get-session`, {
-      headers: { cookie: req.headers.get("cookie") || "" },
-    });
+    const sessionRes = await fetch(
+      `${mainDomainUrl.origin}/api/auth/get-session`,
+      {
+        headers: { cookie: req.headers.get("cookie") || "" },
+      },
+    );
 
     if (!sessionRes.ok) {
       mainDomainUrl.pathname = "/";
