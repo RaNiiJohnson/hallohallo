@@ -82,7 +82,7 @@ export default async function proxy(req: NextRequest) {
       const loginUrl = req.nextUrl.clone();
       if (!isLocalhost) {
         // Determine the main domain by removing "admin." from the hostname
-        loginUrl.hostname = hostname.replace(/^admin\./, "");
+        loginUrl.hostname = hostname.replace(/^admin\./, "www.");
       }
       loginUrl.pathname = "/login";
       return NextResponse.redirect(loginUrl);
