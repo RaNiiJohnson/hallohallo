@@ -78,15 +78,15 @@ export default async function proxy(req: NextRequest) {
   }
 
   if (isAdmin) {
-    if (!hasSession) {
-      const loginUrl = req.nextUrl.clone();
-      if (!isLocalhost) {
-        // Determine the main domain by removing "admin." from the hostname
-        loginUrl.hostname = hostname.replace(/^admin\./, "www.");
-      }
-      loginUrl.pathname = "/login";
-      return NextResponse.redirect(loginUrl);
-    }
+    // if (!hasSession) {
+    //   const loginUrl = req.nextUrl.clone();
+    //   if (!isLocalhost) {
+    //     // Determine the main domain by removing "admin." from the hostname
+    //     loginUrl.hostname = hostname.replace(/^admin\./, "www.");
+    //   }
+    //   loginUrl.pathname = "/login";
+    //   return NextResponse.redirect(loginUrl);
+    // }
 
     // En local, le pathname contient déjà "/admin/...", pas besoin de rewrite
     if (isLocalhost) {
