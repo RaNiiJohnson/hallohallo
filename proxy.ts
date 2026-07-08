@@ -13,15 +13,23 @@ const HOME_REDIRECT_COOKIE = "home_redirected";
 export default async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const hostname = req.headers.get("host") || "";
-  const isAdmin = hostname.startsWith("admin.");
+
+  // En local (localhost / 127.0.0.1), pas de sous-domaine admin.xxx possible
+  // -> on simule "isAdmin" simplement via le préfixe /admin dans le path.
+  const isLocalhost =
+    hostname.startsWith("localhost") || hostname.startsWith("127.0.0.1");
+
+  const bare = pathname.replace(/^\/(fr|en|de)/, "") || "/";
+
+  const isAdmin = isLocalhost
+    ? bare.startsWith("/admin")
+    : hostname.startsWith("admin.");
 
   // Fix CVE-2026-44573 — bloquer les routes /_next/data sans préfixe de locale
   const dataRouteWithoutLocale = /^\/_next\/data\/[^/]+\/(?!(fr|en|de)\/)/;
   if (dataRouteWithoutLocale.test(pathname)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  const bare = pathname.replace(/^\/(fr|en|de)/, "") || "/";
 
   const hasSession =
     req.cookies.has("better-auth.session_token") ||
@@ -48,7 +56,7 @@ export default async function proxy(req: NextRequest) {
       );
 
       // Cookie de session (pas de maxAge/expires) : il expire à la fermeture
-      // du navigateur, donc "première ouverture" redeviendra vrai à layy prochaine session.
+      // du navigateur, donc "première ouverture" redeviendra vrai à la prochaine session.
       response.cookies.set(HOME_REDIRECT_COOKIE, "1", {
         path: "/",
         sameSite: "lax",
@@ -61,7 +69,8 @@ export default async function proxy(req: NextRequest) {
     return intlProxy(req);
   }
 
-  if (!isAdmin && bare.startsWith("/admin")) {
+  // Redirection vers le sous-domaine admin (jamais en local)
+  if (!isLocalhost && !isAdmin && bare.startsWith("/admin")) {
     const adminUrl = req.nextUrl.clone();
     // Enlever "www." si présent, et ajouter "admin."
     adminUrl.hostname = `admin.${hostname.replace(/^www\./, "")}`;
@@ -69,32 +78,19 @@ export default async function proxy(req: NextRequest) {
   }
 
   if (isAdmin) {
-    // Determine the main domain by removing "admin." from the hostname
-    const mainDomainUrl = req.nextUrl.clone();
-    mainDomainUrl.hostname = hostname.replace(/^admin\./, "");
-
     if (!hasSession) {
-      mainDomainUrl.pathname = "/login";
-      return NextResponse.redirect(mainDomainUrl);
+      const loginUrl = req.nextUrl.clone();
+      if (!isLocalhost) {
+        // Determine the main domain by removing "admin." from the hostname
+        loginUrl.hostname = hostname.replace(/^admin\./, "");
+      }
+      loginUrl.pathname = "/login";
+      return NextResponse.redirect(loginUrl);
     }
 
-    // Use Better Auth's get-session endpoint
-    const sessionRes = await fetch(
-      `${mainDomainUrl.origin}/api/auth/get-session`,
-      {
-        headers: { cookie: req.headers.get("cookie") || "" },
-      },
-    );
-
-    if (!sessionRes.ok) {
-      mainDomainUrl.pathname = "/";
-      return NextResponse.redirect(mainDomainUrl);
-    }
-
-    const sessionData = await sessionRes.json();
-    if (sessionData?.user?.role !== "admin") {
-      mainDomainUrl.pathname = "/";
-      return NextResponse.redirect(mainDomainUrl);
+    // En local, le pathname contient déjà "/admin/...", pas besoin de rewrite
+    if (isLocalhost) {
+      return intlProxy(req);
     }
 
     return NextResponse.rewrite(
