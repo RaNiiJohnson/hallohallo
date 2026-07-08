@@ -40,6 +40,13 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
       },
     },
 
+    advanced: {
+      crossSubDomainCookies: {
+        enabled: true,
+        domain: ".hallomada.de",
+      },
+    },
+
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: true,
