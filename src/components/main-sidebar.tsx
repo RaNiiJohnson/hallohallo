@@ -36,6 +36,7 @@ import {
   LogIn,
   LogOut,
   Settings,
+  Shield,
   User,
   Users,
 } from "lucide-react";
@@ -150,6 +151,36 @@ export function MainSidebar({
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        <Authenticated>
+          {user?.role === "admin" && (
+            <SidebarGroup>
+              <SidebarGroupLabel>
+                {t("admin.label") || "Admin"}
+              </SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname.startsWith("/admin")}
+                      tooltip={t("admin.dashboard")}
+                    >
+                      <Link
+                        target="_blank"
+                        href="/admin"
+                        onClick={() => isMobile && setOpenMobile(false)}
+                      >
+                        <Shield />
+                        <span>{t("admin.dashboard")}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          )}
+        </Authenticated>
 
         <SidebarGroup>
           <SidebarGroupLabel>{t("communities.label")}</SidebarGroupLabel>

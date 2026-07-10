@@ -19,5 +19,9 @@
     "profile": "My Profile",
     "settings": "Settings",
     "logout": "Log out"
+  },
+  "admin": {
+    "label": "Admin",
+    "dashboard": "Admin Dashboard"
   }
 }

@@ -19,5 +19,9 @@
     "profile": "Mon Profil",
     "settings": "Paramètres",
     "logout": "Se déconnecter"
+  },
+  "admin": {
+    "label": "Admin",
+    "dashboard": "Tableau de bord"
   }
 }
