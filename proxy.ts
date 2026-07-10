@@ -12,18 +12,8 @@ const HOME_REDIRECT_COOKIE = "home_redirected";
 
 export default async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const hostname = req.headers.get("host") || "";
-
-  // En local (localhost / 127.0.0.1), pas de sous-domaine admin.xxx possible
-  // -> on simule "isAdmin" simplement via le préfixe /admin dans le path.
-  // const isLocalhost =
-  //   hostname.startsWith("localhost") || hostname.startsWith("127.0.0.1");
 
   const bare = pathname.replace(/^\/(fr|en|de)/, "") || "/";
-
-  // const isAdmin = isLocalhost
-  //   ? bare.startsWith("/admin")
-  //   : hostname.startsWith("admin.");
 
   // Fix CVE-2026-44573 — bloquer les routes /_next/data sans préfixe de locale
   const dataRouteWithoutLocale = /^\/_next\/data\/[^/]+\/(?!(fr|en|de)\/)/;
@@ -37,12 +27,8 @@ export default async function proxy(req: NextRequest) {
 
   const locale = pathname.match(/^\/(fr|en|de)/)?.[1] ?? routing.defaultLocale;
 
-  // Rediriger vers l'accueil si l'utilisateur est connecté et tente d'accéder à une page auth
-  if (AUTH_ONLY_PAGES.some((p) => bare.startsWith(p))) {
-    if (hasSession) {
-      return NextResponse.redirect(new URL(`/${locale}`, req.url));
-    }
-  }
+  // Redirection des pages auth (login, register...) si connecté
+  // -> Déplacé dans app/[locale]/(auth)/layout.tsx pour une vraie vérification via token
 
   // Connecté + arrive sur la page d'accueil ("/", "/fr", "/en", "/de")
   // -> redirection vers /communities UNIQUEMENT lors de la première ouverture du site
@@ -69,37 +55,8 @@ export default async function proxy(req: NextRequest) {
     return intlProxy(req);
   }
 
-  // Redirection vers le sous-domaine admin (jamais en local)
-  // if (!isLocalhost && !isAdmin && bare.startsWith("/admin")) {
-  //   const adminUrl = req.nextUrl.clone();
-  //   // Enlever "www." si présent, et ajouter "admin."
-  //   adminUrl.hostname = `admin.${hostname.replace(/^www\./, "")}`;
-  //   return NextResponse.redirect(adminUrl);
-  // }
-
-  // if (isAdmin) {
-  //   // if (!hasSession) {
-  //   //   const loginUrl = req.nextUrl.clone();
-  //   //   if (!isLocalhost) {
-  //   //     // Determine the main domain by removing "admin." from the hostname
-  //   //     loginUrl.hostname = hostname.replace(/^admin\./, "www.");
-  //   //   }
-  //   //   loginUrl.pathname = "/login";
-  //   //   return NextResponse.redirect(loginUrl);
-  //   // }
-
-  //   // En local, le pathname contient déjà "/admin/...", pas besoin de rewrite
-  //   if (isLocalhost) {
-  //     return intlProxy(req);
-  //   }
-
-  //   return NextResponse.rewrite(
-  //     new URL(`/admin${req.nextUrl.pathname}`, req.url),
-  //   );
+  return intlProxy(req);
 }
-
-//   return intlProxy(req);
-// }
 
 export const config = {
   matcher: [
@@ -108,8 +65,7 @@ export const config = {
     // Pages normales
     "/",
     "/(fr|en|de)/:path*",
-    // Exclure les fichiers statiques
-    // Exclude API routes (e.g. NextAuth) and static assets from the middleware
+    // Exclure les fichiers statiques, routes API et assets Next.js
     "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|html|xml|txt)$).*)",
   ],
 };
