@@ -16,14 +16,14 @@ export default async function proxy(req: NextRequest) {
 
   // En local (localhost / 127.0.0.1), pas de sous-domaine admin.xxx possible
   // -> on simule "isAdmin" simplement via le préfixe /admin dans le path.
-  const isLocalhost =
-    hostname.startsWith("localhost") || hostname.startsWith("127.0.0.1");
+  // const isLocalhost =
+  //   hostname.startsWith("localhost") || hostname.startsWith("127.0.0.1");
 
   const bare = pathname.replace(/^\/(fr|en|de)/, "") || "/";
 
-  const isAdmin = isLocalhost
-    ? bare.startsWith("/admin")
-    : hostname.startsWith("admin.");
+  // const isAdmin = isLocalhost
+  //   ? bare.startsWith("/admin")
+  //   : hostname.startsWith("admin.");
 
   // Fix CVE-2026-44573 — bloquer les routes /_next/data sans préfixe de locale
   const dataRouteWithoutLocale = /^\/_next\/data\/[^/]+\/(?!(fr|en|de)\/)/;
@@ -70,36 +70,36 @@ export default async function proxy(req: NextRequest) {
   }
 
   // Redirection vers le sous-domaine admin (jamais en local)
-  if (!isLocalhost && !isAdmin && bare.startsWith("/admin")) {
-    const adminUrl = req.nextUrl.clone();
-    // Enlever "www." si présent, et ajouter "admin."
-    adminUrl.hostname = `admin.${hostname.replace(/^www\./, "")}`;
-    return NextResponse.redirect(adminUrl);
-  }
+  // if (!isLocalhost && !isAdmin && bare.startsWith("/admin")) {
+  //   const adminUrl = req.nextUrl.clone();
+  //   // Enlever "www." si présent, et ajouter "admin."
+  //   adminUrl.hostname = `admin.${hostname.replace(/^www\./, "")}`;
+  //   return NextResponse.redirect(adminUrl);
+  // }
 
-  if (isAdmin) {
-    // if (!hasSession) {
-    //   const loginUrl = req.nextUrl.clone();
-    //   if (!isLocalhost) {
-    //     // Determine the main domain by removing "admin." from the hostname
-    //     loginUrl.hostname = hostname.replace(/^admin\./, "www.");
-    //   }
-    //   loginUrl.pathname = "/login";
-    //   return NextResponse.redirect(loginUrl);
-    // }
+  // if (isAdmin) {
+  //   // if (!hasSession) {
+  //   //   const loginUrl = req.nextUrl.clone();
+  //   //   if (!isLocalhost) {
+  //   //     // Determine the main domain by removing "admin." from the hostname
+  //   //     loginUrl.hostname = hostname.replace(/^admin\./, "www.");
+  //   //   }
+  //   //   loginUrl.pathname = "/login";
+  //   //   return NextResponse.redirect(loginUrl);
+  //   // }
 
-    // En local, le pathname contient déjà "/admin/...", pas besoin de rewrite
-    if (isLocalhost) {
-      return intlProxy(req);
-    }
+  //   // En local, le pathname contient déjà "/admin/...", pas besoin de rewrite
+  //   if (isLocalhost) {
+  //     return intlProxy(req);
+  //   }
 
-    return NextResponse.rewrite(
-      new URL(`/admin${req.nextUrl.pathname}`, req.url),
-    );
-  }
-
-  return intlProxy(req);
+  //   return NextResponse.rewrite(
+  //     new URL(`/admin${req.nextUrl.pathname}`, req.url),
+  //   );
 }
+
+//   return intlProxy(req);
+// }
 
 export const config = {
   matcher: [
