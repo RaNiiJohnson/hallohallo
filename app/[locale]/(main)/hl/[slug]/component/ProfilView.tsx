@@ -1,10 +1,11 @@
 "use client";
 
 import { formatMonthYear } from "@/lib/date";
+import { UserType } from "@convex/betterAuth/users";
 import { Briefcase, Calendar, GraduationCap } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
-export function ProfileView({ user }: { user: any }) {
+export function ProfileView({ user }: { user: UserType }) {
   const locale = useLocale();
   const t = useTranslations("profile");
 

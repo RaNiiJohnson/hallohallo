@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { UserType } from "@convex/betterAuth/users";
 
 export const profileStatusValues = [
   "active",
@@ -44,7 +45,7 @@ function toStringArray(value?: string): string[] | undefined {
   return arr.length > 0 ? arr : undefined;
 }
 
-function buildDefaultValues(user: any) {
+function buildDefaultValues(user: UserType) {
   return {
     name: user.name ?? "",
     headline: user.headline ?? "",
@@ -70,7 +71,7 @@ function buildDefaultValues(user: any) {
 }
 
 interface ProfileEditFormProps {
-  user: any;
+  user: UserType;
   onSaved: () => void;
 }
 
