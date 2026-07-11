@@ -50,8 +50,8 @@ function buildDefaultValues(user: any) {
     headline: user.headline ?? "",
     city: user.city ?? "",
     country: user.country ?? "",
-    industry: user.industry ?? "",
-    company: user.company ?? "",
+    // industry: user.industry ?? "",
+    // company: user.company ?? "",
     field: user.field ?? "",
     bio: user.bio ?? "",
     skills: (user.skills ?? []).join(", "),
@@ -83,8 +83,8 @@ export function ProfileEditForm({ user, onSaved }: ProfileEditFormProps) {
     headline: z.string().optional(),
     city: z.string().optional(),
     country: z.string().optional(),
-    industry: z.string().optional(),
-    company: z.string().optional(),
+    // industry: z.string().optional(),
+    // company: z.string().optional(),
     field: z.string().optional(),
     bio: z.string().max(500, t("editForm.validation.bioMax")).optional(),
     skills: z.string().optional(),
@@ -116,8 +116,8 @@ export function ProfileEditForm({ user, onSaved }: ProfileEditFormProps) {
           headline: data.headline?.trim() || undefined,
           city: data.city?.trim() || undefined,
           country: data.country?.trim() || undefined,
-          industry: data.industry?.trim() || undefined,
-          company: data.company?.trim() || undefined,
+          // industry: data.industry?.trim() || undefined,
+          // company: data.company?.trim() || undefined,
           field: data.field?.trim() || undefined,
           bio: data.bio?.trim() || undefined,
           skills: toStringArray(data.skills),
@@ -256,7 +256,7 @@ export function ProfileEditForm({ user, onSaved }: ProfileEditFormProps) {
               )}
             />
 
-            <Controller
+            {/* <Controller
               name="industry"
               control={form.control}
               render={({ field, fieldState }) => (
@@ -296,7 +296,7 @@ export function ProfileEditForm({ user, onSaved }: ProfileEditFormProps) {
                   )}
                 </Field>
               )}
-            />
+            /> */}
 
             <Controller
               name="field"
