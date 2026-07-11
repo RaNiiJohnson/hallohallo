@@ -21,10 +21,12 @@
   "publicProfile": "Öffentliches Profil",
   "privateProfile": "Privates Profil",
   "edit": "Bearbeiten",
+  "viewProfile": "Profil ansehen",
   "status": {
     "lookingForJob": "Offen für Stellenangebote",
     "onSabbatical": "Im Sabbatjahr",
-    "inactive": "Inaktives Profil"
+    "inactive": "Inaktives Profil",
+    "active": "Aktiv"
   },
   "emptyState": {
     "title": "Profil vervollständigen",
@@ -59,5 +61,44 @@
       "uploadError": "Bild konnte nicht hochgeladen werden",
       "error": "Beim Hochladen ist ein Fehler aufgetreten"
     }
+  },
+  "saveSuccess": "Profil erfolgreich aktualisiert",
+  "saveError": "Beim Aktualisieren des Profils ist ein Fehler aufgetreten",
+  "editForm": {
+    "title": "Profilinformationen",
+    "description": "Passen Sie Ihr öffentliches Profil und Ihre Kontaktdaten an",
+    "name": "Name",
+    "slug": "Öffentlicher Benutzername",
+    "slugHint": "Wird für Ihre Profil-URL verwendet",
+    "email": "Kontakt-E-Mail",
+    "headline": "Überschrift",
+    "city": "Stadt",
+    "country": "Land",
+    "industry": "Branche",
+    "company": "Unternehmen",
+    "field": "Fachgebiet",
+    "experienceYears": "Jahre Erfahrung",
+    "status": "Status",
+    "bio": "Biografie",
+    "bioPlaceholder": "Erzählen Sie uns von sich, Ihrem Werdegang, Ihren Inspirationen...",
+    "skills": "Fähigkeiten",
+    "roles": "Rollen",
+    "journey": "Werdegang",
+    "isServiceProvider": "Dienstleister",
+    "isServiceProviderHint": "Zeigt ein Abzeichen auf Ihrem öffentlichen Profil an",
+    "isPublic": "Öffentliches Profil",
+    "isPublicHint": "Macht Ihr Profil für alle sichtbar",
+    "showEmail": "E-Mail anzeigen",
+    "showPhone": "Telefonnummer anzeigen",
+    "reset": "Zurücksetzen",
+    "save": "Änderungen speichern",
+    "saving": "Wird gespeichert...",
+    "validation": {
+      "nameReq": "Name ist erforderlich",
+      "bioMax": "Die Biografie darf 500 Zeichen nicht überschreiten"
+    },
+    "bioMaxHint": "Max. 500 Zeichen",
+    "separatedByComma": "Werte durch Kommas trennen",
+    "stepsSeparatedByComma": "Schritte durch Kommas getrennt"
   }
 }

@@ -21,10 +21,12 @@
   "publicProfile": "Profil public",
   "privateProfile": "Profil privé",
   "edit": "Modifier",
+  "viewProfile": "Voir le profil",
   "status": {
     "lookingForJob": "Ouvert aux opportunités",
     "onSabbatical": "En sabbatique",
-    "inactive": "Profil inactif"
+    "inactive": "Profil inactif",
+    "active": "Actif"
   },
   "emptyState": {
     "title": "Complétez votre profil",
@@ -59,5 +61,44 @@
       "uploadError": "Échec du téléchargement de l'image",
       "error": "Une erreur est survenue lors du téléchargement"
     }
+  },
+  "saveSuccess": "Profil mis à jour avec succès",
+  "saveError": "Une erreur est survenue lors de la mise à jour du profil",
+  "editForm": {
+    "title": "Informations du profil",
+    "description": "Personnalisez votre profil public et vos informations de contact",
+    "name": "Nom",
+    "slug": "Nom d'utilisateur public",
+    "slugHint": "Utilisé pour votre URL de profil",
+    "email": "Email de contact",
+    "headline": "Titre / accroche",
+    "city": "Ville",
+    "country": "Pays",
+    "industry": "Industrie",
+    "company": "Entreprise",
+    "field": "Domaine",
+    "experienceYears": "Années d'expérience",
+    "status": "Statut",
+    "bio": "Biographie",
+    "bioPlaceholder": "Parlez-nous de vous, de votre parcours, de vos inspirations...",
+    "skills": "Compétences",
+    "roles": "Rôles",
+    "journey": "Parcours",
+    "isServiceProvider": "Prestataire de services",
+    "isServiceProviderHint": "Affiche un badge sur votre profil public",
+    "isPublic": "Profil public",
+    "isPublicHint": "Rend votre profil visible par tout le monde",
+    "showEmail": "Afficher l'email",
+    "showPhone": "Afficher le téléphone",
+    "reset": "Réinitialiser",
+    "save": "Enregistrer les modifications",
+    "saving": "Enregistrement...",
+    "validation": {
+      "nameReq": "Le nom est requis",
+      "bioMax": "La biographie ne peut pas dépasser 500 caractères"
+    },
+    "bioMaxHint": "500 caractères max",
+    "separatedByComma": "Séparez les valeurs par des virgules",
+    "stepsSeparatedByComma": "Étapes séparées par des virgules"
   }
 }

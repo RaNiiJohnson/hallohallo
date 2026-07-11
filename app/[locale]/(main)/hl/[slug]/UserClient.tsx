@@ -1,25 +1,16 @@
 "use client";
 
-import { formatMonthYear } from "@/lib/date";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
 import { Preloaded, usePreloadedQuery } from "convex/react";
-import {
-  Briefcase,
-  Building2,
-  Calendar,
-  Globe,
-  GraduationCap,
-  Mail,
-  MapPin,
-  Pencil,
-  Sparkles,
-} from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { Briefcase, Building2, MapPin, Pencil, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { useState } from "react";
 import { ImageUploadModal } from "./component/ImageUploadModal";
+import { ProfileEditForm } from "./component/ProfilEditForm";
+import { ProfileView } from "./component/ProfilView";
 
 export default function UserClient({
   preloadedUser,
@@ -28,13 +19,11 @@ export default function UserClient({
 }) {
   const user = usePreloadedQuery(preloadedUser);
   const currentUser = useQuery(api.auth.auth.getCurrentUser);
-
-  const locale = useLocale();
   const t = useTranslations("profile");
 
-  // Modal states for image uploads - must be before early return
   const [profileImageModalOpen, setProfileImageModalOpen] = useState(false);
   const [coverImageModalOpen, setCoverImageModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   if (!user) {
     return notFound();
@@ -43,10 +32,9 @@ export default function UserClient({
   const isOwnProfile = currentUser?.email === user.email;
 
   return (
-    <div className="lg:max-w-4xl mx-auto my-4 lg:space-y-4 sm:space-y-2 space-y-1.5 lg:px-0">
-      {/* === HEADER SECTION === */}
+    <div className="lg:max-w-4xl mx-auto my-4 lg:space-y-4 sm:space-y-2 space-y-1.5 sm:px-0">
+      {/* === HEADER SECTION (pdp / pdc - inchangé) === */}
       <section className="bg-card lg:rounded-lg overflow-hidden">
-        {/* Cover Image */}
         <div className="relative">
           <Image
             src={user.coverImage || "/default-cover.jpg"}
@@ -55,7 +43,6 @@ export default function UserClient({
             width={800}
             priority
             className="w-full h-32 sm:h-40 lg:h-48 object-cover"
-            // unoptimized={!!user.coverImage}
           />
           {isOwnProfile && (
             <button
@@ -68,9 +55,8 @@ export default function UserClient({
             </button>
           )}
         </div>
-        {/* Profile Info */}
+
         <div className="relative px-6 pb-6">
-          {/* Avatar */}
           <div className="relative -mt-16 sm:-mt-20 mb-4">
             <div className="relative inline-block">
               <Image
@@ -79,7 +65,6 @@ export default function UserClient({
                 height={140}
                 width={140}
                 className="size-28 sm:size-36 object-cover rounded-full border-4 border-card"
-                // unoptimized={!!user.imageUrl}
               />
               {isOwnProfile && (
                 <button
@@ -94,17 +79,36 @@ export default function UserClient({
             </div>
           </div>
 
-          {/* Name & Headline */}
+          {/* Name / headline + toggle vue/édition */}
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex-1">
               <h1 className="text-2xl sm:text-3xl font-bold">{user.name}</h1>
-              {user.headline && (
+              {!isEditing && user.headline && (
                 <p className="text-muted-foreground mt-1 text-base sm:text-lg">
                   {user.headline}
                 </p>
               )}
+              {isEditing && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  @{user.slug || "—"}
+                </p>
+              )}
+            </div>
 
-              {/* Location & Industry */}
+            {isOwnProfile && (
+              <button
+                type="button"
+                onClick={() => setIsEditing((v) => !v)}
+                className="px-4 py-2 border rounded-full text-sm font-medium hover:bg-accent transition-colors whitespace-nowrap"
+              >
+                {isEditing ? t("viewProfile") : t("editProfileButton")}
+              </button>
+            )}
+          </div>
+
+          {/* Localisation / industrie / badge / société - masqués en mode édition (déjà éditables dans le form) */}
+          {!isEditing && (
+            <>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-sm text-muted-foreground">
                 {(user.city || user.country) && (
                   <span className="flex items-center gap-1.5">
@@ -120,289 +124,37 @@ export default function UserClient({
                 )}
               </div>
 
-              {/* Service Provider Badge */}
               {user.isServiceProvider && (
                 <span className="inline-flex items-center gap-1.5 mt-3 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
                   <Sparkles className="size-4" />
                   {t("serviceProvider")}
                 </span>
               )}
-            </div>
 
-            {/* Action Buttons - Only for own profile */}
-            {isOwnProfile && (
-              <div className="flex gap-2">
-                <button className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium hover:bg-primary/90 transition-colors">
-                  {t("editProfileButton")}
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Company info */}
-          {user.company && (
-            <div className="mt-4 flex items-center gap-2 text-sm">
-              <Briefcase className="size-4 text-muted-foreground" />
-              <span className="font-medium">{user.company}</span>
-              {user.field && (
-                <span className="text-muted-foreground">• {user.field}</span>
+              {user.company && (
+                <div className="mt-4 flex items-center gap-2 text-sm">
+                  <Briefcase className="size-4 text-muted-foreground" />
+                  <span className="font-medium">{user.company}</span>
+                  {user.field && (
+                    <span className="text-muted-foreground">
+                      • {user.field}
+                    </span>
+                  )}
+                </div>
               )}
-            </div>
+            </>
           )}
         </div>
       </section>
 
-      {/* === À PROPOS SECTION === */}
-      {user.bio && (
-        <section className="bg-card lg:rounded-lg p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">{t("about")}</h2>
-            {isOwnProfile && (
-              <button
-                className="p-2 hover:bg-accent rounded-full transition-colors"
-                title={t("edit")}
-              >
-                <Pencil className="size-4" />
-              </button>
-            )}
-          </div>
-          <p className="text-muted-foreground whitespace-pre-line leading-relaxed">
-            {user.bio}
-          </p>
-        </section>
+      {/* === CONTENU : vue en lecture seule OU formulaire d'édition === */}
+      {isOwnProfile && isEditing ? (
+        <ProfileEditForm user={user} onSaved={() => setIsEditing(false)} />
+      ) : (
+        <ProfileView user={user} />
       )}
 
-      {/* === EXPÉRIENCE SECTION === */}
-      {(user.experienceYears || user.roles?.length || user.arrivalDate) && (
-        <section className="bg-card lg:rounded-lg p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">{t("experience")}</h2>
-            {isOwnProfile && (
-              <button
-                className="p-2 hover:bg-accent rounded-full transition-colors"
-                title={t("edit")}
-              >
-                <Pencil className="size-4" />
-              </button>
-            )}
-          </div>
-
-          <div className="space-y-4">
-            {/* Experience Years */}
-            {user.experienceYears && (
-              <div className="flex items-start gap-4">
-                <div className="p-2 bg-secondary lg:rounded-lg">
-                  <Briefcase className="size-5 text-muted-foreground" />
-                </div>
-                <div>
-                  <h3 className="font-medium">
-                    {t("yearsExperience", { count: user.experienceYears })}
-                  </h3>
-                  {user.field && (
-                    <p className="text-sm text-muted-foreground">
-                      {user.field}
-                    </p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Roles */}
-            {user.roles && user.roles.length > 0 && (
-              <div className="flex items-start gap-4">
-                <div className="p-2 bg-secondary lg:rounded-lg">
-                  <GraduationCap className="size-5 text-muted-foreground" />
-                </div>
-                <div>
-                  <h3 className="font-medium">{t("roles")}</h3>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {user.roles?.map((role: string, index: number) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm"
-                      >
-                        {role}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Arrival Date */}
-            {user.arrivalDate && (
-              <div className="flex items-start gap-4">
-                <div className="p-2 bg-secondary lg:rounded-lg">
-                  <Calendar className="size-5 text-muted-foreground" />
-                </div>
-                <div>
-                  <h3 className="font-medium">
-                    {t("since", {
-                      date: formatMonthYear(
-                        user.arrivalDate!,
-                        locale,
-                      ) as string,
-                    })}
-                  </h3>
-                  {user.company && (
-                    <p className="text-sm text-muted-foreground">
-                      {t("at", { company: user.company })}
-                    </p>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-      {/* === COMPÉTENCES SECTION === */}
-      {user.skills && user.skills.length > 0 && (
-        <section className="bg-card lg:rounded-lg p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">{t("skills")}</h2>
-            {isOwnProfile && (
-              <button
-                className="p-2 hover:bg-accent rounded-full transition-colors"
-                title={t("edit")}
-              >
-                <Pencil className="size-4" />
-              </button>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {user.skills?.map((skill: string, index: number) => (
-              <span
-                key={index}
-                className="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium hover:bg-primary/20 transition-colors"
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* === PARCOURS SECTION === */}
-      {user.journey && user.journey.length > 0 && (
-        <section className="bg-card lg:rounded-lg p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">{t("journey")}</h2>
-            {isOwnProfile && (
-              <button
-                className="p-2 hover:bg-accent rounded-full transition-colors"
-                title={t("edit")}
-              >
-                <Pencil className="size-4" />
-              </button>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-3">
-            {user.journey?.map((step: string, index: number) => (
-              <div key={index} className="flex items-center gap-2">
-                <span className="px-4 py-2 bg-secondary text-secondary-foreground lg:rounded-lg text-sm">
-                  {step}
-                </span>
-                {index < user.journey!.length - 1 && (
-                  <span className="text-muted-foreground">→</span>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* === CONTACT INFO SECTION (Own Profile Only) === */}
-      {isOwnProfile && (
-        <section className="bg-card lg:rounded-lg p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">{t("contactInfo")}</h2>
-            <button
-              className="p-2 hover:bg-accent rounded-full transition-colors"
-              title={t("edit")}
-            >
-              <Pencil className="size-4" />
-            </button>
-          </div>
-
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <Mail className="size-5 text-muted-foreground" />
-              <div>
-                <p className="text-sm text-muted-foreground">{t("email")}</p>
-                <p className="font-medium">{user.email}</p>
-                <p className="text-xs text-muted-foreground">
-                  {user.showEmail ? t("visibleOnProfile") : t("hidden")}
-                </p>
-              </div>
-            </div>
-
-            {/* Profile Visibility Status */}
-            <div className="flex items-center gap-3 mt-4 pt-4 border-t">
-              <Globe className="size-5 text-muted-foreground" />
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  {t("profileVisibility")}
-                </p>
-                <p className="font-medium">
-                  {user.isPublic ? t("publicProfile") : t("privateProfile")}
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* === STATUS SECTION (if looking for job, etc.) === */}
-      {user.status && user.status !== "active" && (
-        <section className="bg-card lg:rounded-lg p-6">
-          <div className="flex items-center gap-3">
-            <div
-              className={`w-3 h-3 rounded-full ${
-                user.status === "looking_for_job"
-                  ? "bg-green-500"
-                  : user.status === "on_sabbatical"
-                    ? "bg-yellow-500"
-                    : "bg-gray-500"
-              }`}
-            />
-            <span className="font-medium">
-              {user.status === "looking_for_job"
-                ? t("status.lookingForJob")
-                : user.status === "on_sabbatical"
-                  ? t("status.onSabbatical")
-                  : user.status === "inactive"
-                    ? t("status.inactive")
-                    : user.status}
-            </span>
-          </div>
-        </section>
-      )}
-
-      {/* === EMPTY STATE FOR OWN PROFILE === */}
-      {isOwnProfile &&
-        !user.bio &&
-        !user.skills?.length &&
-        !user.experienceYears && (
-          <section className="bg-card lg:rounded-lg p-8 text-center">
-            <div className="max-w-md mx-auto">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Pencil className="size-8 text-primary" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">
-                {t("emptyState.title")}
-              </h3>
-              <p className="text-muted-foreground mb-4">
-                {t("emptyState.description")}
-              </p>
-              <button className="px-6 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium hover:bg-primary/90 transition-colors">
-                {t("emptyState.button")}
-              </button>
-            </div>
-          </section>
-        )}
-
-      {/* Image Upload Modals */}
+      {/* Image Upload Modals - inchangé */}
       <ImageUploadModal
         userId={user._id}
         imageType="profile"

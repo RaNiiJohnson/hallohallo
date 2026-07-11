@@ -21,10 +21,12 @@
   "publicProfile": "Public profile",
   "privateProfile": "Private profile",
   "edit": "Edit",
+  "viewProfile": "View profile",
   "status": {
     "lookingForJob": "Open to opportunities",
     "onSabbatical": "On sabbatical",
-    "inactive": "Inactive profile"
+    "inactive": "Inactive profile",
+    "active": "Active"
   },
   "emptyState": {
     "title": "Complete your profile",
@@ -59,5 +61,44 @@
       "uploadError": "Failed to upload image",
       "error": "An error occurred while uploading"
     }
+  },
+  "saveSuccess": "Profile updated successfully",
+  "saveError": "Something went wrong while updating your profile",
+  "editForm": {
+    "title": "Profile information",
+    "description": "Customize your public profile and contact information",
+    "name": "Name",
+    "slug": "Public username",
+    "slugHint": "Used for your profile URL",
+    "email": "Contact email",
+    "headline": "Headline",
+    "city": "City",
+    "country": "Country",
+    "industry": "Industry",
+    "company": "Company",
+    "field": "Field",
+    "experienceYears": "Years of experience",
+    "status": "Status",
+    "bio": "Bio",
+    "bioPlaceholder": "Tell us about yourself, your background, your inspirations...",
+    "skills": "Skills",
+    "roles": "Roles",
+    "journey": "Journey",
+    "isServiceProvider": "Service provider",
+    "isServiceProviderHint": "Shows a badge on your public profile",
+    "isPublic": "Public profile",
+    "isPublicHint": "Makes your profile visible to everyone",
+    "showEmail": "Show email",
+    "showPhone": "Show phone number",
+    "reset": "Reset",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "validation": {
+      "nameReq": "Name is required",
+      "bioMax": "Bio can't exceed 500 characters"
+    },
+    "bioMaxHint": "500 characters max",
+    "separatedByComma": "Separate values with commas",
+    "stepsSeparatedByComma": "Steps separated by commas"
   }
 }
