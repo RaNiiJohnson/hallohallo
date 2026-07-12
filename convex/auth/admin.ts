@@ -1,9 +1,8 @@
 import { v } from "convex/values";
+import { generatedSlug } from "../../src/lib/utils";
 import { mutation, query } from "../_generated/server";
-import { UserType } from "../betterAuth/users";
 import { authComponent, createAuth } from "./auth";
 import { UserWithRoleType } from "./users";
-import { generatedSlug } from "../../src/lib/utils";
 
 export const listUsers = query({
   args: {},
@@ -79,6 +78,7 @@ export const createUser = mutation({
         role: args.role,
         data: {
           slug: generatedSlug(args.name),
+          emailVerified: true,
           isPublic: true,
           showEmail: true,
           showPhone: true,
