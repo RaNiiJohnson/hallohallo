@@ -29,7 +29,7 @@ import { Link } from "@/i18n/navigation";
 import { api } from "@convex/_generated/api";
 import { UserWithRoleType } from "@convex/auth/users";
 import { useQuery } from "convex-helpers/react/cache";
-import { useMutation } from "convex/react";
+import { useMutation, useAction } from "convex/react";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -49,7 +49,7 @@ export default function UsersPage() {
   const unbanUser = useMutation(api.auth.admin.unbanUser);
   const setUseRole = useMutation(api.auth.admin.setUserRole);
   const createUser = useMutation(api.auth.admin.createUser);
-  const deleteUser = useMutation(api.auth.admin.deleteUser);
+  const deleteUser = useAction(api.auth.admin.deleteUser);
 
   const [isPending, startTransition] = useTransition();
 

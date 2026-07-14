@@ -1,8 +1,9 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
-import { mutation, query } from "../_generated/server";
+import { action, mutation, query } from "../_generated/server";
 import { authComponent, createAuth } from "./auth";
 import { UserWithRoleType } from "./users";
+import { runCascadeDelete } from "../cascadeDeletes";
 
 export const listUsers = query({
   args: {},
@@ -88,7 +89,7 @@ export const createUser = mutation({
   },
 });
 
-export const deleteUser = mutation({
+export const deleteUser = action({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
     const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
@@ -96,5 +97,8 @@ export const deleteUser = mutation({
       body: { userId: args.userId },
       headers,
     });
+
+    const counts = await runCascadeDelete(ctx, "user", args.userId);
+    return counts;
   },
 });

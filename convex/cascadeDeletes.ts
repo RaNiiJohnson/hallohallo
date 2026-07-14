@@ -1,6 +1,6 @@
+import { CascadingDeletes } from "@sholajegede/convex-cascading-deletes";
 import { components, internal } from "./_generated/api";
 import { ActionCtx } from "./_generated/server";
-import { CascadingDeletes } from "@sholajegede/convex-cascading-deletes";
 
 /**
  * Configuration des relations parent-enfant pour le cascade delete.
@@ -19,6 +19,12 @@ import { CascadingDeletes } from "@sholajegede/convex-cascading-deletes";
  *            car l'index by_user_resource n'est pas un FK simple vers posts)
  */
 export const cascadeRelationships = [
+  {
+    sourceTable: "communities",
+    targetTable: "user",
+    indexName: "by_authorId",
+    fieldName: "authorId",
+  },
   // --- communities → children ---
   {
     sourceTable: "communityMembers",
@@ -97,7 +103,7 @@ export async function runCascadeDelete(
     id,
     resolver: async (sourceTable, parentTable, parentId) => {
       const rel = cascadeRelationships.find(
-        (r) => r.sourceTable === sourceTable && r.targetTable === parentTable
+        (r) => r.sourceTable === sourceTable && r.targetTable === parentTable,
       );
       if (!rel) return [];
       return await ctx.runQuery(internal.cascadeHelpers.resolveChildren, {
@@ -108,6 +114,9 @@ export async function runCascadeDelete(
       });
     },
     deleter: async (targetTable, targetId) => {
+      if (targetTable === "user") {
+        return;
+      }
       await ctx.runMutation(internal.cascadeHelpers.deleteDocument, {
         table: targetTable,
         id: targetId,
