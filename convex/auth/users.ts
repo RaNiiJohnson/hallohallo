@@ -3,7 +3,7 @@ import { ConvexError, v } from "convex/values";
 import { components } from "../_generated/api";
 import { mutation, query } from "../_generated/server";
 import { UserType, userValidator } from "../betterAuth/users";
-import { authComponent, createAuth } from "./auth";
+import { authComponent } from "./auth";
 
 export type UserWithRoleType = UserType & {
   id: string;
@@ -21,6 +21,25 @@ export const getUserBySlug = query({
       components.betterAuth.users.getUserBySlug,
       {
         slug,
+      },
+    );
+
+    if (!user) return null;
+
+    return {
+      ...user,
+    };
+  },
+});
+
+export const getUserById = query({
+  args: { id: v.string() },
+  handler: async (ctx, { id }) => {
+    // 1. Récupérer l'utilisateur via le composant
+    const user: UserType = await ctx.runQuery(
+      components.betterAuth.users.getUserById,
+      {
+        id,
       },
     );
 

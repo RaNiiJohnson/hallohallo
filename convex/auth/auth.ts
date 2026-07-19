@@ -199,6 +199,11 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
           required: false,
           // Date de dernière activité (connexion, post, like) - timestamp en millisecondes
         },
+        cv: {
+          type: "string",
+          required: false,
+          // fichier CV stocké sur Cloudflare R2
+        },
       },
     },
     plugins: [

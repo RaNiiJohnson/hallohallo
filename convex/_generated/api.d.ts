@@ -26,6 +26,8 @@ import type * as http from "../http.js";
 import type * as integrations_cloudinary from "../integrations/cloudinary.js";
 import type * as integrations_r2 from "../integrations/r2.js";
 import type * as integrations_stripe from "../integrations/stripe.js";
+import type * as jobs_CvTemplate from "../jobs/CvTemplate.js";
+import type * as jobs_actions from "../jobs/actions.js";
 import type * as jobs_mutations from "../jobs/mutations.js";
 import type * as jobs_queries from "../jobs/queries.js";
 import type * as listings_mutations from "../listings/mutations.js";
@@ -66,6 +68,8 @@ declare const fullApi: ApiFromModules<{
   "integrations/cloudinary": typeof integrations_cloudinary;
   "integrations/r2": typeof integrations_r2;
   "integrations/stripe": typeof integrations_stripe;
+  "jobs/CvTemplate": typeof jobs_CvTemplate;
+  "jobs/actions": typeof jobs_actions;
   "jobs/mutations": typeof jobs_mutations;
   "jobs/queries": typeof jobs_queries;
   "listings/mutations": typeof listings_mutations;
