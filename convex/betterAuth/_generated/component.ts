@@ -41,6 +41,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   country?: null | string;
                   coverImage?: null | string;
                   createdAt: number;
+                  cv?: null | string;
                   email: string;
                   emailVerified: boolean;
                   experienceYears?: null | number;
@@ -161,6 +162,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "showEmail"
                     | "showPhone"
                     | "lastActiveAt"
+                    | "cv"
                     | "_id";
                   mode?: "sensitive" | "insensitive";
                   operator?:
@@ -379,6 +381,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "showEmail"
                     | "showPhone"
                     | "lastActiveAt"
+                    | "cv"
                     | "_id";
                   mode?: "sensitive" | "insensitive";
                   operator?:
@@ -647,6 +650,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   country?: null | string;
                   coverImage?: null | string;
                   createdAt?: number;
+                  cv?: null | string;
                   email?: string;
                   emailVerified?: boolean;
                   experienceYears?: null | number;
@@ -703,6 +707,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "showEmail"
                     | "showPhone"
                     | "lastActiveAt"
+                    | "cv"
                     | "_id";
                   mode?: "sensitive" | "insensitive";
                   operator?:
@@ -935,6 +940,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   country?: null | string;
                   coverImage?: null | string;
                   createdAt?: number;
+                  cv?: null | string;
                   email?: string;
                   emailVerified?: boolean;
                   experienceYears?: null | number;
@@ -991,6 +997,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "showEmail"
                     | "showPhone"
                     | "lastActiveAt"
+                    | "cv"
                     | "_id";
                   mode?: "sensitive" | "insensitive";
                   operator?:
@@ -1230,6 +1237,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
             country?: null | string;
             coverImage?: null | string;
             createdAt?: number;
+            cv?: null | string;
             email?: string;
             emailVerified?: boolean;
             experienceYears?: null | number;

@@ -3,6 +3,15 @@ import { v } from "convex/values";
 import { Id } from "../_generated/dataModel";
 import { query } from "../_generated/server";
 import { authComponent } from "../auth/auth";
+import { r2 } from "../integrations/r2";
+
+export const getR2FileUrl = query({
+  args: { storageId: v.string() },
+  handler: async (ctx, { storageId }) => {
+    const url = await r2.getUrl(storageId);
+    return url ?? null;
+  },
+});
 
 export const getJobWithContact = query({
   args: { slug: v.string() },
@@ -33,6 +42,22 @@ export const getJobWithContact = query({
     }
 
     return { ...job, contact, isBookmarked };
+  },
+});
+
+export const getJobWithContactById = query({
+  args: { id: v.id("JobOffer") },
+  handler: async (ctx, { id }) => {
+    const job = await ctx.db.get(id);
+
+    if (!job) return null;
+
+    const contact = await ctx.db
+      .query("JobContactInfo")
+      .withIndex("by_jobId", (q) => q.eq("jobId", job._id))
+      .unique();
+
+    return { ...job, contact };
   },
 });
 

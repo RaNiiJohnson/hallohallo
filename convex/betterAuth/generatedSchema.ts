@@ -46,6 +46,7 @@ export const tables = {
     showEmail: v.optional(v.union(v.null(), v.boolean())),
     showPhone: v.optional(v.union(v.null(), v.boolean())),
     lastActiveAt: v.optional(v.union(v.null(), v.number())),
+    cv: v.optional(v.union(v.null(), v.string())),
   })
     .index("email_name", ["email","name"])
     .index("name", ["name"])

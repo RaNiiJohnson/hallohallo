@@ -28,6 +28,7 @@ import DeleteJobDialog from "../_component/dialogs/deleteJobDialog";
 import { SalaryDisplay } from "../_component/salary";
 import { JobDetailsSkeleton } from "../_component/skeleton";
 import { EditJobDialog } from "./_component/editJobDialog";
+import { ApplyJobDialog } from "../_component/dialogs/applyJobDialog";
 
 export default function JobDetailsPage() {
   const { id } = useParams();
@@ -147,17 +148,16 @@ export default function JobDetailsPage() {
                   </ButtonGroup>
                 ) : (
                   <ButtonGroup>
-                    <Button
-                      variant="default"
-                      size="sm"
-                      className="gap-2"
-                      asChild
-                    >
-                      <a href={`mailto:${jobOffer.contact}`}>
+                    <ApplyJobDialog jobOffer={jobOffer}>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="gap-2"
+                      >
                         <Mail className="w-4 h-4" />
                         {t("details.apply")}
-                      </a>
-                    </Button>
+                      </Button>
+                    </ApplyJobDialog>
 
                     <ShareButton text={jobOffer.title} />
 
@@ -466,16 +466,15 @@ export default function JobDetailsPage() {
                 <p className="text-sm text-primary-foreground/90 mb-4">
                   {t("details.dontMiss")}
                 </p>
-                <Button
-                  variant="secondary"
-                  className="w-full"
-                  size="lg"
-                  asChild
-                >
-                  <a href={`mailto:${jobOffer.contact}`}>
+                <ApplyJobDialog jobOffer={jobOffer}>
+                  <Button
+                    variant="secondary"
+                    className="w-full"
+                    size="lg"
+                  >
                     {t("details.applyNow")}
-                  </a>
-                </Button>
+                  </Button>
+                </ApplyJobDialog>
               </div>
             </div>
           </div>
