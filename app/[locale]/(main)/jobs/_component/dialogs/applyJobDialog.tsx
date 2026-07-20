@@ -69,8 +69,8 @@ export function ApplyJobDialog({
       return;
     }
 
-    try {
-      startTransition(async () => {
+    startTransition(async () => {
+      try {
         let cvStorageId = user?.cv;
 
         // If user uploaded a new file, we upload it
@@ -102,10 +102,10 @@ export function ApplyJobDialog({
 
         toast.success("Candidature envoyée avec succès !");
         setIsOpen(false);
-      });
-    } catch (e: any) {
-      toast.error(e.message || "Erreur lors de l'envoi de la candidature.");
-    }
+      } catch (e: any) {
+        toast.error(e.message || "Erreur lors de l'envoi de la candidature.");
+      }
+    });
   }
 
   return (
