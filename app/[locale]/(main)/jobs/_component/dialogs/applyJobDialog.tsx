@@ -111,12 +111,14 @@ export function ApplyJobDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md overflow-hidden">
         <DialogHeader>
           <div className="text-xs font-semibold text-primary mb-1 uppercase tracking-wider">
             CANDIDATURE
           </div>
-          <DialogTitle className="text-xl">{jobOffer.title}</DialogTitle>
+          <DialogTitle className="text-xl truncate">
+            {jobOffer.title}
+          </DialogTitle>
           <DialogDescription className="text-muted-foreground">
             {jobOffer.company}
           </DialogDescription>
@@ -172,12 +174,14 @@ export function ApplyJobDialog({
             ) : null}
 
             {file && (
-              <div className="flex items-center justify-between gap-2 rounded-xl border px-4 py-3 bg-card">
-                <div className="flex items-center gap-3 overflow-hidden">
+              <div className="flex items-center gap-2 rounded-xl border px-4 py-3 bg-card">
+                <div className="flex items-center gap-3 min-w-0 flex-1 overflow-hidden">
                   <PaperclipIcon className="w-4 h-4 text-muted-foreground shrink-0" />
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium">
-                      {file.file.name}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium" title={file.file.name}>
+                      {file.file.name.length > 30
+                        ? `${file.file.name.slice(0, 20)}...${file.file.name.slice(-8)}`
+                        : file.file.name}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {formatBytes(file.file.size)}
@@ -224,7 +228,7 @@ export function ApplyJobDialog({
           </div>
         </div>
 
-        <DialogFooter className="gap-2 sm:gap-0">
+        <DialogFooter className="gap-2">
           <Button
             variant="outline"
             onClick={() => setIsOpen(false)}
