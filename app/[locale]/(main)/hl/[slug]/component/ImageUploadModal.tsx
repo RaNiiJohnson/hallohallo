@@ -206,7 +206,7 @@ export function ImageUploadModal({
           )}
         </div>
 
-        <DialogFooter className="gap-2 sm:gap-0">
+        <DialogFooter className="gap-2">
           <Button
             type="button"
             variant="outline"
