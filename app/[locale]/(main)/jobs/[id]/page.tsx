@@ -302,39 +302,6 @@ export default function JobDetailsPage() {
                 </div>
               </div>
             )}
-
-            {/* Contact Information */}
-
-            {user?._id !== jobOffer.authorId && (
-              <div className="bg-primary/5 border border-primary/20 rounded-lg shadow-sm">
-                <div className="p-4 border-b border-primary/20">
-                  <h2 className="text-xl font-semibold">
-                    {t("details.howToApply")}
-                  </h2>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {t("details.interested")}
-                  </p>
-                </div>
-                <div className="p-4">
-                  <div className="flex items-center gap-4 p-4 bg-background rounded-lg border">
-                    <div className="p-3 bg-primary/10 rounded-lg">
-                      <Mail className="w-6 h-6 text-primary" />
-                    </div>
-                    <div className="space-y-1 flex-1 min-w-0">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">
-                        {t("details.contact")}
-                      </p>
-                      <a
-                        href={`mailto:${jobOffer.contact}`}
-                        className="font-semibold text-primary hover:underline break-all"
-                      >
-                        {jobOffer.contact?.email}
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Right Column - Sidebar */}
