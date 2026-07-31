@@ -330,30 +330,6 @@ export default function JobDetailsPage() {
               </div>
             </div>
 
-            {/* Publisher Info
-            <div className="bg-card dark:bg-card/35 border rounded-lg shadow-sm">
-              <div className="p-4 border-b">
-                <h2 className="text-xl font-semibold">Publié par</h2>
-              </div>
-              <div className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="text-lg font-semibold text-primary">
-                      {jobOffer.contact?.name?.[0]?.toUpperCase() || "A"}
-                    </span>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="font-semibold">
-                      {jobOffer.contact?.name || "Anonyme"}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {getRelativeTime(jobOffer._creationTime)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div> */}
-
             {/* Quick Summary */}
             <div className="bg-muted/30 border rounded-lg shadow-sm">
               <div className="p-4 border-b">
