@@ -119,11 +119,13 @@ export function ApplyJobDialog({
           <div className="text-xs font-semibold text-primary mb-1 uppercase tracking-wider">
             CANDIDATURE
           </div>
-          <DialogTitle className="text-xl truncate">
-            {jobOffer.title}
+          <DialogTitle>
+            <span className="line-clamp-1 text-xl">{jobOffer.title}</span>
           </DialogTitle>
-          <DialogDescription className="text-muted-foreground">
-            {jobOffer.company}
+          <DialogDescription className="text-muted-foreground line-clamp-1">
+            <span className="line-clamp-1 text-muted-foreground ">
+              {jobOffer.company}
+            </span>
           </DialogDescription>
         </DialogHeader>
 
