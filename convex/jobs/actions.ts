@@ -44,7 +44,11 @@ export const applyToJob = action({
       contactEmail = authorUser?.email;
     }
     if (!contactEmail) {
-      throw new Error("Aucun email de contact trouvé pour cette offre.");
+      throw new Error("No contact email found for this job.");
+    }
+
+    if (user.email === contactEmail) {
+      throw new Error("You cannot apply to your own job.");
     }
 
     const html = await render(

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { formatBytes, useFileUpload } from "@/hooks/use-file-upload";
+import { JobOfferDetails } from "@/lib/convexTypes";
 import { useUploadFile } from "@convex-dev/r2/react";
 import { api } from "@convex/_generated/api";
 import { useAction, useMutation, useQuery } from "convex/react";
@@ -29,7 +30,7 @@ export function ApplyJobDialog({
   jobOffer,
   children,
 }: {
-  jobOffer: any; // Using any for simplicity here or could type it properly
+  jobOffer: JobOfferDetails;
   children: React.ReactNode;
 }) {
   const user = useQuery(api.auth.auth.getCurrentUser);
@@ -103,6 +104,8 @@ export function ApplyJobDialog({
         toast.success("Candidature envoyée avec succès !");
         setIsOpen(false);
       } catch (e: any) {
+        console.log({ e });
+
         toast.error(e.message || "Erreur lors de l'envoi de la candidature.");
       }
     });

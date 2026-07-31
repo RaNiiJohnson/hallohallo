@@ -24,11 +24,11 @@ import {
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { notFound, useParams } from "next/navigation";
+import { ApplyJobDialog } from "../_component/dialogs/applyJobDialog";
 import DeleteJobDialog from "../_component/dialogs/deleteJobDialog";
 import { SalaryDisplay } from "../_component/salary";
 import { JobDetailsSkeleton } from "../_component/skeleton";
 import { EditJobDialog } from "./_component/editJobDialog";
-import { ApplyJobDialog } from "../_component/dialogs/applyJobDialog";
 
 export default function JobDetailsPage() {
   const { id } = useParams();
@@ -149,11 +149,7 @@ export default function JobDetailsPage() {
                 ) : (
                   <ButtonGroup>
                     <ApplyJobDialog jobOffer={jobOffer}>
-                      <Button
-                        variant="default"
-                        size="sm"
-                        className="gap-2"
-                      >
+                      <Button variant="default" size="sm" className="gap-2">
                         <Mail className="w-4 h-4" />
                         {t("details.apply")}
                       </Button>
@@ -308,34 +304,37 @@ export default function JobDetailsPage() {
             )}
 
             {/* Contact Information */}
-            <div className="bg-primary/5 border border-primary/20 rounded-lg shadow-sm">
-              <div className="p-4 border-b border-primary/20">
-                <h2 className="text-xl font-semibold">
-                  {t("details.howToApply")}
-                </h2>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {t("details.interested")}
-                </p>
-              </div>
-              <div className="p-4">
-                <div className="flex items-center gap-4 p-4 bg-background rounded-lg border">
-                  <div className="p-3 bg-primary/10 rounded-lg">
-                    <Mail className="w-6 h-6 text-primary" />
-                  </div>
-                  <div className="space-y-1 flex-1 min-w-0">
-                    <p className="text-xs text-muted-foreground uppercase tracking-wide">
-                      {t("details.contact")}
-                    </p>
-                    <a
-                      href={`mailto:${jobOffer.contact}`}
-                      className="font-semibold text-primary hover:underline break-all"
-                    >
-                      {jobOffer.contact?.email}
-                    </a>
+
+            {user?._id !== jobOffer.authorId && (
+              <div className="bg-primary/5 border border-primary/20 rounded-lg shadow-sm">
+                <div className="p-4 border-b border-primary/20">
+                  <h2 className="text-xl font-semibold">
+                    {t("details.howToApply")}
+                  </h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {t("details.interested")}
+                  </p>
+                </div>
+                <div className="p-4">
+                  <div className="flex items-center gap-4 p-4 bg-background rounded-lg border">
+                    <div className="p-3 bg-primary/10 rounded-lg">
+                      <Mail className="w-6 h-6 text-primary" />
+                    </div>
+                    <div className="space-y-1 flex-1 min-w-0">
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                        {t("details.contact")}
+                      </p>
+                      <a
+                        href={`mailto:${jobOffer.contact}`}
+                        className="font-semibold text-primary hover:underline break-all"
+                      >
+                        {jobOffer.contact?.email}
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Right Column - Sidebar */}
@@ -458,25 +457,24 @@ export default function JobDetailsPage() {
             </div>
 
             {/* Apply CTA */}
-            <div className="bg-primary text-primary-foreground border rounded-lg shadow-sm">
-              <div className="p-4">
-                <h3 className="font-bold text-lg mb-2">
-                  {t("details.readyToApply")}
-                </h3>
-                <p className="text-sm text-primary-foreground/90 mb-4">
-                  {t("details.dontMiss")}
-                </p>
-                <ApplyJobDialog jobOffer={jobOffer}>
-                  <Button
-                    variant="secondary"
-                    className="w-full"
-                    size="lg"
-                  >
-                    {t("details.applyNow")}
-                  </Button>
-                </ApplyJobDialog>
+
+            {user?._id !== jobOffer.authorId && (
+              <div className="bg-primary text-primary-foreground border rounded-lg shadow-sm">
+                <div className="p-4">
+                  <h3 className="font-bold text-lg mb-2">
+                    {t("details.readyToApply")}
+                  </h3>
+                  <p className="text-sm text-primary-foreground/90 mb-4">
+                    {t("details.dontMiss")}
+                  </p>
+                  <ApplyJobDialog jobOffer={jobOffer}>
+                    <Button variant="secondary" className="w-full" size="lg">
+                      {t("details.applyNow")}
+                    </Button>
+                  </ApplyJobDialog>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
