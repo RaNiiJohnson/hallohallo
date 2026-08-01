@@ -56,9 +56,9 @@ export default function JobDetailsPage() {
   const isAuthor = user?._id === jobOffer.authorId;
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-muted/50">
       {/* Hero Section without image */}
-      <div className="relative w-full bg-background">
+      <div className="relative w-full">
         <div className="max-w-full mx-auto px-4 pt-2 sm:pt-8">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2 sm:mb-4">
@@ -119,7 +119,7 @@ export default function JobDetailsPage() {
             </p>
 
             {/* Divider */}
-            <Separator className="w-20 h-1 bg-primary mx-auto mb-8" />
+            <Separator className="w-20 h-1 bg-primary mx-auto mb-4" />
 
             <div className="flex lg:flex-row flex-col justify-between items-center gap-4">
               {/* Job Meta Information */}
