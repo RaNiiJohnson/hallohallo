@@ -5,12 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { Link } from "@/i18n/navigation";
 import { formatDateLong, getRelativeTime } from "@/lib/date";
 import { LocationMap } from "@/lib/LocationMap";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
+import { useConvexAuth } from "convex/react";
 import {
   ArrowLeft,
   Award,
@@ -33,6 +35,7 @@ import { EditJobDialog } from "./_component/editJobDialog";
 export default function JobDetailsPage() {
   const { id } = useParams();
   const user = useQuery(api.auth.auth.getCurrentUser);
+  const { isAuthenticated, isLoading } = useConvexAuth();
 
   const timeT = useTimeTranslations();
   const locale = useLocale();
@@ -89,7 +92,11 @@ export default function JobDetailsPage() {
 
             {/* Posted by */}
             <p className="text-sm sm:text-base text-muted-foreground mb-6">
-              {isAuthor ? (
+              {isLoading ? (
+                <div className="flex items-center justify-center w-full">
+                  <Skeleton className="w-[300px] h-[24px] rounded-full border border-muted select-none pointer-events-none" />
+                </div>
+              ) : isAuthor ? (
                 <>
                   <span className="font-semibold text-foreground">
                     {t("details.you")}
@@ -103,8 +110,12 @@ export default function JobDetailsPage() {
                   </span>{" "}
                 </>
               )}{" "}
-              {t("details.postedBy")}{" "}
-              {getRelativeTime(jobOffer._creationTime, timeT)}
+              {!isLoading && (
+                <>
+                  {t("details.postedBy")}{" "}
+                  {getRelativeTime(jobOffer._creationTime, timeT)}
+                </>
+              )}
             </p>
 
             {/* Divider */}
@@ -140,10 +151,12 @@ export default function JobDetailsPage() {
 
               {/* Company Links / Edit Button */}
               <div className="flex flex-wrap items-center justify-center gap-3">
-                {isAuthor ? (
+                {isLoading ? (
+                  <Skeleton className="w-[250px] h-[42px] rounded-full border border-muted select-none pointer-events-none" />
+                ) : isAuthor ? (
                   <ButtonGroup>
                     <DeleteJobDialog jobId={jobOffer._id} />
-                    <ShareButton text={jobOffer.title} />
+                    <ShareButton text={jobOffer.title} jobPage={true} />
                     <EditJobDialog jobOffer={jobOffer} />
                   </ButtonGroup>
                 ) : (
@@ -155,7 +168,7 @@ export default function JobDetailsPage() {
                       </Button>
                     </ApplyJobDialog>
 
-                    <ShareButton text={jobOffer.title} />
+                    <ShareButton text={jobOffer.title} jobPage={true} />
 
                     <Button variant="outline" size="sm">
                       <Bookmark className="w-4 h-4" />

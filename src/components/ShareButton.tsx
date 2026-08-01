@@ -7,28 +7,24 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Link } from "@/i18n/navigation";
 import {
-  Share2,
   Facebook,
-  Twitter,
   Linkedin,
   MessageCircle,
   Send,
+  Share2,
+  Twitter,
 } from "lucide-react";
-import { Link } from "@/i18n/navigation";
 
 interface ShareButtonProps {
   url?: string;
   text: string;
   variant?:
-    | "default"
-    | "destructive"
-    | "outline"
-    | "secondary"
-    | "ghost"
-    | "link";
+    "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
   size?: "default" | "sm" | "lg" | "icon";
   className?: string;
+  jobPage?: boolean;
 }
 
 const SHARE_LINKS = (url: string, text: string) => ({
@@ -53,6 +49,7 @@ export function ShareButton({
   variant = "outline",
   size = "sm",
   className = "gap-2",
+  jobPage,
 }: ShareButtonProps) {
   const currentUrl =
     url ?? (typeof window !== "undefined" ? window.location.href : "");
@@ -60,6 +57,7 @@ export function ShareButton({
   const trigger = (
     <Button variant={variant} size={size} className={className}>
       <Share2 className="w-4 h-4" />
+      {jobPage && <span>Partager</span>}
     </Button>
   );
 
@@ -73,6 +71,7 @@ export function ShareButton({
         onClick={() => navigator.share({ title: text, text, url: currentUrl })}
       >
         <Share2 className="w-4 h-4" />
+        {jobPage && <span>Partager</span>}
       </Button>
     );
   }
