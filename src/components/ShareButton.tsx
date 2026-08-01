@@ -16,6 +16,7 @@ import {
   Share2,
   Twitter,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface ShareButtonProps {
   url?: string;
@@ -51,13 +52,14 @@ export function ShareButton({
   className = "gap-2",
   jobPage,
 }: ShareButtonProps) {
+  const t = useTranslations("common");
   const currentUrl =
     url ?? (typeof window !== "undefined" ? window.location.href : "");
 
   const trigger = (
     <Button variant={variant} size={size} className={className}>
       <Share2 className="w-4 h-4" />
-      {jobPage && <span>Partager</span>}
+      {jobPage && <span>{t("share")}</span>}
     </Button>
   );
 
@@ -71,7 +73,7 @@ export function ShareButton({
         onClick={() => navigator.share({ title: text, text, url: currentUrl })}
       >
         <Share2 className="w-4 h-4" />
-        {jobPage && <span>Partager</span>}
+        {jobPage && <span>{t("share")}</span>}
       </Button>
     );
   }
