@@ -3,6 +3,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -29,6 +30,9 @@ export function CvPreviewDialog({
           <DialogTitle>
             {t.has("previewTitle") ? t("previewTitle") : "Aperçu du CV"}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Aperçu du CV dans une fenêtre de dialogue.
+          </DialogDescription>
         </DialogHeader>
         <div className="flex-1 w-full bg-muted rounded-md overflow-hidden relative mt-2">
           {cvUrl ? (

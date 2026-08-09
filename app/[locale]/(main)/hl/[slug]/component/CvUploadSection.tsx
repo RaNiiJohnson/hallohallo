@@ -107,7 +107,7 @@ export function CvUploadSection({ user }: CvUploadSectionProps) {
 
       {/* Current CV status */}
       {hasProfileCv && !file && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-xl border border-green-200 dark:border-green-500/20 bg-green-50 dark:bg-green-500/10 p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-green-200 dark:border-green-500/20 bg-green-50 dark:bg-green-500/10 p-4">
           <div className="flex items-center gap-3 min-w-0">
             <div className="p-2 bg-green-100 dark:bg-green-500/20 rounded-lg shrink-0">
               <CheckCircle2Icon className="w-5 h-5 text-green-600 dark:text-green-500" />
@@ -124,7 +124,7 @@ export function CvUploadSection({ user }: CvUploadSectionProps) {
           <div className="flex items-center gap-1">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
               className="text-green-700 hover:text-green-800 hover:bg-green-200/50 dark:text-green-500 dark:hover:text-green-400 dark:hover:bg-green-500/20 shrink-0"
               onClick={() => setIsPreviewOpen(true)}
