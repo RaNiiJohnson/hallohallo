@@ -78,7 +78,9 @@
     "uploadSuccess": "CV updated successfully.",
     "uploadError": "Failed to upload CV.",
     "deleteSuccess": "CV deleted successfully.",
-    "deleteError": "Failed to delete CV."
+    "deleteError": "Failed to delete CV.",
+    "view": "View CV",
+    "previewTitle": "CV Preview"
   },
   "saveSuccess": "Profile updated successfully",
   "saveError": "Something went wrong while updating your profile",

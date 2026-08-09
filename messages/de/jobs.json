@@ -139,6 +139,31 @@
       "submiting": "Wird gelöscht...",
       "successToast": "Angebot erfolgreich gelöscht",
       "errorToast": "Fehler beim Löschen des Angebots"
+    },
+    "apply": {
+      "application": "BEWERBUNG",
+      "cvLabel": "LEBENSLAUF *",
+      "cvHint": "(PDF, max 5 MB)",
+      "noProfileCv": "Sie haben noch keinen Lebenslauf in Ihrem Profil. Bitte laden Sie einen hoch, um sich zu bewerben.",
+      "profileCvUsed": "Ihr Profil-Lebenslauf wird standardmäßig verwendet.",
+      "dropHere": "Legen Sie Ihre PDF hier ab oder",
+      "browse": "durchsuchen",
+      "maxSize": "Nur PDF • max 5 MB",
+      "coverLetter": "ANSCHREIBEN",
+      "optional": "Optional",
+      "coverLetterPlaceholder": "Erklären Sie dem Arbeitgeber, warum Sie für diese Position geeignet sind...",
+      "cancel": "Abbrechen",
+      "submit": "Bewerbung absenden",
+      "viewCv": "Lebenslauf ansehen",
+      "errors": {
+        "noCvProvided": "Bitte geben Sie einen Lebenslauf an.",
+        "uploadError": "Fehler beim Hochladen des Lebenslaufs.",
+        "cvNotFound": "Lebenslauf nicht gefunden.",
+        "applyError": "Fehler beim Senden der Bewerbung."
+      },
+      "success": {
+        "applied": "Bewerbung erfolgreich gesendet!"
+      }
     }
   },
   "labels": {

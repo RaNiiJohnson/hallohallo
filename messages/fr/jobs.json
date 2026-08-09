@@ -139,6 +139,31 @@
       "submiting": "Suppression...",
       "successToast": "Offre supprimée avec succès",
       "errorToast": "Erreur lors de la suppression de l'offre"
+    },
+    "apply": {
+      "application": "CANDIDATURE",
+      "cvLabel": "CV *",
+      "cvHint": "(PDF, max 5 MB)",
+      "noProfileCv": "Vous n'avez pas encore de CV sur votre profil. Veuillez en télécharger un pour postuler.",
+      "profileCvUsed": "Votre CV de profil sera utilisé par défaut.",
+      "dropHere": "Déposez votre PDF ici ou",
+      "browse": "parcourir",
+      "maxSize": "PDF uniquement • max 5 Mo",
+      "coverLetter": "LETTRE DE MOTIVATION",
+      "optional": "Optionnel",
+      "coverLetterPlaceholder": "Expliquez au recruteur pourquoi vous correspondez à ce poste...",
+      "cancel": "Annuler",
+      "submit": "Soumettre la candidature",
+      "viewCv": "Voir le CV",
+      "errors": {
+        "noCvProvided": "Veuillez fournir un CV.",
+        "uploadError": "Erreur lors de l'upload du CV.",
+        "cvNotFound": "CV introuvable.",
+        "applyError": "Erreur lors de l'envoi de la candidature."
+      },
+      "success": {
+        "applied": "Candidature envoyée avec succès !"
+      }
     }
   },
   "labels": {

@@ -78,7 +78,9 @@
     "uploadSuccess": "CV mis à jour avec succès.",
     "uploadError": "Erreur lors de l'envoi du CV.",
     "deleteSuccess": "CV supprimé avec succès.",
-    "deleteError": "Erreur lors de la suppression du CV."
+    "deleteError": "Erreur lors de la suppression du CV.",
+    "view": "Voir le CV",
+    "previewTitle": "Aperçu de votre CV"
   },
   "saveSuccess": "Profil mis à jour avec succès",
   "saveError": "Une erreur est survenue lors de la mise à jour du profil",

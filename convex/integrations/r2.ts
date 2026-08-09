@@ -2,7 +2,7 @@ import { R2 } from "@convex-dev/r2";
 import { ConvexError, v } from "convex/values";
 import { components } from "../_generated/api";
 import type { DataModel } from "../_generated/dataModel";
-import { internalMutation, mutation } from "../_generated/server";
+import { internalMutation, mutation, query } from "../_generated/server";
 import { authComponent } from "../auth/auth";
 
 export const r2 = new R2(components.r2);
@@ -81,5 +81,17 @@ export const deleteCv = mutation({
       id: user._id,
       patch: { cv: null },
     });
+  },
+});
+
+/**
+ * Public query: get the URL for the user's CV.
+ */
+export const getCvUrl = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user || !user.cv) return null;
+    return await r2.getUrl(user.cv);
   },
 });

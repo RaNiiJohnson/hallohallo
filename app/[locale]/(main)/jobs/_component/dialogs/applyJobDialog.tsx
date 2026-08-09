@@ -1,5 +1,6 @@
 "use client";
 
+import { CvPreviewDialog } from "@/components/cv-preview-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,11 +19,13 @@ import { api } from "@convex/_generated/api";
 import { useAction, useMutation, useQuery } from "convex/react";
 import {
   AlertCircleIcon,
+  EyeIcon,
   Loader2,
   PaperclipIcon,
   UploadIcon,
   XIcon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -39,8 +42,11 @@ export function ApplyJobDialog({
     api.integrations.r2.uploadCvAndDeleteOld,
   );
   const uploadFile = useUploadFile(api.integrations.r2);
+  const cvUrl = useQuery(api.integrations.r2.getCvUrl);
+  const t = useTranslations("jobs.dialogs.apply");
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [coverLetter, setCoverLetter] = useState("");
   const [isPending, startTransition] = useTransition();
 
@@ -68,7 +74,7 @@ export function ApplyJobDialog({
 
   async function handleApply() {
     if (!file && !hasProfileCv) {
-      toast.error("Veuillez fournir un CV.");
+      toast.error(t("errors.noCvProvided"));
       return;
     }
 
@@ -80,7 +86,7 @@ export function ApplyJobDialog({
         if (file && file.file instanceof File) {
           const uploadedStorageId = await uploadFile(file.file);
           if (!uploadedStorageId) {
-            throw new Error("Erreur lors de l'upload du CV.");
+            throw new Error(t("errors.uploadError"));
           }
           cvStorageId = uploadedStorageId;
 
@@ -91,7 +97,7 @@ export function ApplyJobDialog({
         }
 
         if (!cvStorageId) {
-          throw new Error("CV introuvable.");
+          throw new Error(t("errors.cvNotFound"));
         }
 
         await applyToJob({
@@ -100,12 +106,12 @@ export function ApplyJobDialog({
           coverLetter: coverLetter.trim() || undefined,
         });
 
-        toast.success("Candidature envoyée avec succès !");
+        toast.success(t("success.applied"));
         setIsOpen(false);
       } catch (e: any) {
         console.log({ e });
 
-        toast.error(e.message || "Erreur lors de l'envoi de la candidature.");
+        toast.error(e.message || t("errors.applyError"));
       }
     });
   }
@@ -116,7 +122,7 @@ export function ApplyJobDialog({
       <DialogContent className="max-w-md overflow-hidden">
         <DialogHeader>
           <div className="text-xs font-semibold text-primary mb-1 uppercase tracking-wider">
-            CANDIDATURE
+            {t("application")}
           </div>
           <DialogTitle>
             <span className="line-clamp-1 text-xl">{jobOffer.title}</span>
@@ -132,26 +138,38 @@ export function ApplyJobDialog({
           {/* Section CV */}
           <div className="space-y-3">
             <label className="text-sm font-semibold uppercase tracking-wider">
-              CV *{" "}
+              {t("cvLabel")}{" "}
               <span className="text-muted-foreground font-normal normal-case">
-                (PDF, max 5 MB)
+                {t("cvHint")}
               </span>
             </label>
 
             {!hasProfileCv && !file && (
               <div className="flex gap-2 items-start text-sm text-amber-600 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-500 p-3 rounded-lg border border-amber-200 dark:border-amber-500/20">
                 <AlertCircleIcon className="w-5 h-5 shrink-0 mt-0.5" />
-                <p>
-                  Vous n'avez pas encore de CV sur votre profil. Veuillez en
-                  télécharger un pour postuler.
-                </p>
+                <p>{t("noProfileCv")}</p>
               </div>
             )}
 
             {hasProfileCv && !file && (
-              <div className="flex gap-2 items-center text-sm text-green-700 bg-green-50 dark:bg-green-500/10 dark:text-green-500 p-3 rounded-lg border border-green-200 dark:border-green-500/20">
-                <PaperclipIcon className="w-5 h-5 shrink-0" />
-                <p>Votre CV de profil sera utilisé par défaut.</p>
+              <div className="flex items-center justify-between gap-2 text-sm text-green-700 bg-green-50 dark:bg-green-500/10 dark:text-green-500 p-3 rounded-lg border border-green-200 dark:border-green-500/20">
+                <div className="flex items-center gap-2">
+                  <PaperclipIcon className="w-5 h-5 shrink-0" />
+                  <p>{t("profileCvUsed")}</p>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="text-green-700 hover:text-green-800 hover:bg-green-200/50 dark:text-green-500 dark:hover:text-green-400 dark:hover:bg-green-500/20 shrink-0 h-8 px-2"
+                  onClick={() => setIsPreviewOpen(true)}
+                  disabled={!cvUrl}
+                >
+                  <EyeIcon className="w-4 h-4 mr-1.5" />
+                  <span className="hidden sm:inline">
+                    {t.has("viewCv") ? t("viewCv") : "Voir"}
+                  </span>
+                </Button>
               </div>
             )}
 
@@ -168,11 +186,11 @@ export function ApplyJobDialog({
                 <input {...getInputProps()} className="sr-only" />
                 <UploadIcon className="w-5 h-5 text-muted-foreground mb-2" />
                 <p className="text-sm font-medium">
-                  Déposez votre PDF ici ou{" "}
-                  <span className="text-primary underline">parcourir</span>
+                  {t("dropHere")}{" "}
+                  <span className="text-primary underline">{t("browse")}</span>
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  PDF uniquement • max 5 Mo
+                  {t("maxSize")}
                 </p>
               </div>
             ) : null}
@@ -182,7 +200,10 @@ export function ApplyJobDialog({
                 <div className="flex items-center gap-3 min-w-0 flex-1 overflow-hidden">
                   <PaperclipIcon className="w-4 h-4 text-muted-foreground shrink-0" />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium truncate" title={file.file.name}>
+                    <p
+                      className="text-sm font-medium truncate"
+                      title={file.file.name}
+                    >
                       {file.file.name.length > 30
                         ? `${file.file.name.slice(0, 20)}...${file.file.name.slice(-8)}`
                         : file.file.name}
@@ -218,12 +239,14 @@ export function ApplyJobDialog({
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <label className="text-sm font-semibold uppercase tracking-wider">
-                LETTRE DE MOTIVATION
+                {t("coverLetter")}
               </label>
-              <span className="text-xs text-muted-foreground">Optionnel</span>
+              <span className="text-xs text-muted-foreground">
+                {t("optional")}
+              </span>
             </div>
             <Textarea
-              placeholder="Expliquez au recruteur pourquoi vous correspondez à ce poste..."
+              placeholder={t("coverLetterPlaceholder")}
               value={coverLetter}
               onChange={(e) => setCoverLetter(e.target.value)}
               rows={4}
@@ -238,7 +261,7 @@ export function ApplyJobDialog({
             onClick={() => setIsOpen(false)}
             disabled={isPending}
           >
-            Annuler
+            {t("cancel")}
           </Button>
           <Button
             onClick={handleApply}
@@ -246,10 +269,16 @@ export function ApplyJobDialog({
             className="gap-2"
           >
             {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-            Soumettre la candidature
+            {t("submit")}
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      <CvPreviewDialog
+        isOpen={isPreviewOpen}
+        onOpenChange={setIsPreviewOpen}
+        cvUrl={cvUrl}
+      />
     </Dialog>
   );
 }

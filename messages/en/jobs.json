@@ -139,6 +139,31 @@
       "submiting": "Deleting...",
       "successToast": "Offer deleted successfully",
       "errorToast": "Error deleting the offer"
+    },
+    "apply": {
+      "application": "APPLICATION",
+      "cvLabel": "CV *",
+      "cvHint": "(PDF, max 5 MB)",
+      "noProfileCv": "You do not have a CV on your profile yet. Please upload one to apply.",
+      "profileCvUsed": "Your profile CV will be used by default.",
+      "dropHere": "Drop your PDF here or",
+      "browse": "browse",
+      "maxSize": "PDF only • max 5 MB",
+      "coverLetter": "COVER LETTER",
+      "optional": "Optional",
+      "coverLetterPlaceholder": "Explain to the recruiter why you are a good fit for this position...",
+      "cancel": "Cancel",
+      "submit": "Submit application",
+      "viewCv": "View CV",
+      "errors": {
+        "noCvProvided": "Please provide a CV.",
+        "uploadError": "Error uploading CV.",
+        "cvNotFound": "CV not found.",
+        "applyError": "Error submitting application."
+      },
+      "success": {
+        "applied": "Application submitted successfully!"
+      }
     }
   },
   "labels": {

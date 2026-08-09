@@ -5,10 +5,11 @@ import { formatBytes, useFileUpload } from "@/hooks/use-file-upload";
 import { UserType } from "@convex/betterAuth/users";
 import { useUploadFile } from "@convex-dev/r2/react";
 import { api } from "@convex/_generated/api";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import {
   AlertCircleIcon,
   CheckCircle2Icon,
+  EyeIcon,
   FileTextIcon,
   Loader2,
   PaperclipIcon,
@@ -19,6 +20,7 @@ import {
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { CvPreviewDialog } from "@/components/cv-preview-dialog";
 
 interface CvUploadSectionProps {
   user: UserType;
@@ -31,9 +33,11 @@ export function CvUploadSection({ user }: CvUploadSectionProps) {
     api.integrations.r2.uploadCvAndDeleteOld,
   );
   const deleteCv = useMutation(api.integrations.r2.deleteCv);
+  const cvUrl = useQuery(api.integrations.r2.getCvUrl);
 
   const [isPending, startTransition] = useTransition();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const maxSize = 5 * 1024 * 1024; // 5MB
 
@@ -117,21 +121,37 @@ export function CvUploadSection({ user }: CvUploadSectionProps) {
               </p>
             </div>
           </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0"
-            onClick={handleDeleteCv}
-            disabled={isDeleting}
-          >
-            {isDeleting ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Trash2Icon className="w-4 h-4" />
-            )}
-            <span className="ml-1.5 hidden sm:inline">{t("cv.delete")}</span>
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-green-700 hover:text-green-800 hover:bg-green-200/50 dark:text-green-500 dark:hover:text-green-400 dark:hover:bg-green-500/20 shrink-0"
+              onClick={() => setIsPreviewOpen(true)}
+              disabled={isDeleting || cvUrl === undefined}
+            >
+              <EyeIcon className="w-4 h-4" />
+              <span className="ml-1.5 hidden sm:inline">
+                {/* Fallback to "Voir" if translation is missing */}
+                {t.has("cv.view") ? t("cv.view") : "Voir"}
+              </span>
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0"
+              onClick={handleDeleteCv}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Trash2Icon className="w-4 h-4" />
+              )}
+              <span className="ml-1.5 hidden sm:inline">{t("cv.delete")}</span>
+            </Button>
+          </div>
         </div>
       )}
 
@@ -177,7 +197,10 @@ export function CvUploadSection({ user }: CvUploadSectionProps) {
                 <FileTextIcon className="w-4 h-4 text-primary" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium truncate" title={file.file.name}>
+                <p
+                  className="text-sm font-medium truncate"
+                  title={file.file.name}
+                >
                   {file.file.name.length > 30
                     ? `${file.file.name.slice(0, 20)}...${file.file.name.slice(-8)}`
                     : file.file.name}
@@ -226,6 +249,13 @@ export function CvUploadSection({ user }: CvUploadSectionProps) {
           <span>{errors[0]}</span>
         </div>
       )}
+
+      {/* CV Preview Dialog */}
+      <CvPreviewDialog
+        isOpen={isPreviewOpen}
+        onOpenChange={setIsPreviewOpen}
+        cvUrl={cvUrl}
+      />
     </section>
   );
 }
