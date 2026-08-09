@@ -1,10 +1,11 @@
 "use client";
 
+import { CvPreviewDialog } from "@/components/cv-preview-dialog";
 import { Button } from "@/components/ui/button";
 import { formatBytes, useFileUpload } from "@/hooks/use-file-upload";
-import { UserType } from "@convex/betterAuth/users";
 import { useUploadFile } from "@convex-dev/r2/react";
 import { api } from "@convex/_generated/api";
+import { UserType } from "@convex/betterAuth/users";
 import { useMutation, useQuery } from "convex/react";
 import {
   AlertCircleIcon,
@@ -20,7 +21,6 @@ import {
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { CvPreviewDialog } from "@/components/cv-preview-dialog";
 
 interface CvUploadSectionProps {
   user: UserType;
@@ -101,13 +101,13 @@ export function CvUploadSection({ user }: CvUploadSectionProps) {
   return (
     <section className="bg-card lg:rounded-lg p-6 space-y-4">
       <div>
-        <h2 className="text-xl font-semibold">{t("cv.title")}</h2>
+        <h2 className="text-xl font-semibold mb-4">{t("cv.title")}</h2>
         <p className="text-sm text-muted-foreground">{t("cv.description")}</p>
       </div>
 
       {/* Current CV status */}
       {hasProfileCv && !file && (
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-green-200 dark:border-green-500/20 bg-green-50 dark:bg-green-500/10 p-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-xl border border-green-200 dark:border-green-500/20 bg-green-50 dark:bg-green-500/10 p-4">
           <div className="flex items-center gap-3 min-w-0">
             <div className="p-2 bg-green-100 dark:bg-green-500/20 rounded-lg shrink-0">
               <CheckCircle2Icon className="w-5 h-5 text-green-600 dark:text-green-500" />
@@ -131,10 +131,7 @@ export function CvUploadSection({ user }: CvUploadSectionProps) {
               disabled={isDeleting || cvUrl === undefined}
             >
               <EyeIcon className="w-4 h-4" />
-              <span className="ml-1.5 hidden sm:inline">
-                {/* Fallback to "Voir" if translation is missing */}
-                {t.has("cv.view") ? t("cv.view") : "Voir"}
-              </span>
+              {t.has("cv.view") ? t("cv.view") : "Voir"}
             </Button>
             <Button
               type="button"
@@ -149,7 +146,7 @@ export function CvUploadSection({ user }: CvUploadSectionProps) {
               ) : (
                 <Trash2Icon className="w-4 h-4" />
               )}
-              <span className="ml-1.5 hidden sm:inline">{t("cv.delete")}</span>
+              {t("cv.delete")}
             </Button>
           </div>
         </div>

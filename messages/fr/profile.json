@@ -63,7 +63,7 @@
     }
   },
   "cv": {
-    "title": "CV",
+    "title": "Curriculum vitæ",
     "description": "Téléchargez votre CV pour postuler facilement aux offres d'emploi.",
     "currentCv": "CV enregistré",
     "currentCvHint": "Votre CV sera utilisé par défaut lors de vos candidatures.",
