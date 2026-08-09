@@ -62,6 +62,24 @@
       "error": "Une erreur est survenue lors du téléchargement"
     }
   },
+  "cv": {
+    "title": "CV",
+    "description": "Téléchargez votre CV pour postuler facilement aux offres d'emploi.",
+    "currentCv": "CV enregistré",
+    "currentCvHint": "Votre CV sera utilisé par défaut lors de vos candidatures.",
+    "noCv": "Vous n'avez pas encore de CV sur votre profil. Ajoutez-en un pour postuler plus rapidement.",
+    "dropHere": "Déposez votre PDF ici ou",
+    "browse": "parcourir",
+    "maxSize": "PDF uniquement • max 5 Mo",
+    "willReplace": "Ceci remplacera votre CV actuel.",
+    "upload": "Enregistrer le CV",
+    "uploading": "Envoi en cours...",
+    "delete": "Supprimer",
+    "uploadSuccess": "CV mis à jour avec succès.",
+    "uploadError": "Erreur lors de l'envoi du CV.",
+    "deleteSuccess": "CV supprimé avec succès.",
+    "deleteError": "Erreur lors de la suppression du CV."
+  },
   "saveSuccess": "Profil mis à jour avec succès",
   "saveError": "Une erreur est survenue lors de la mise à jour du profil",
   "editForm": {

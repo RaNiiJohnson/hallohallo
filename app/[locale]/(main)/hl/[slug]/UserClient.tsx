@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { useState } from "react";
+import { CvUploadSection } from "./component/CvUploadSection";
 import { ImageUploadModal } from "./component/ImageUploadModal";
 import { ProfileEditForm } from "./component/ProfilEditForm";
 import { ProfileView } from "./component/ProfilView";
@@ -149,9 +150,15 @@ export default function UserClient({
 
       {/* === CONTENU : vue en lecture seule OU formulaire d'édition === */}
       {isOwnProfile && isEditing ? (
-        <ProfileEditForm user={user} onSaved={() => setIsEditing(false)} />
+        <>
+          <ProfileEditForm user={user} onSaved={() => setIsEditing(false)} />
+          <CvUploadSection user={user} />
+        </>
       ) : (
-        <ProfileView user={user} />
+        <>
+          {isOwnProfile && <CvUploadSection user={user} />}
+          <ProfileView user={user} />
+        </>
       )}
 
       {/* Image Upload Modals - inchangé */}

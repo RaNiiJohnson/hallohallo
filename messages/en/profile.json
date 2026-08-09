@@ -62,6 +62,24 @@
       "error": "An error occurred while uploading"
     }
   },
+  "cv": {
+    "title": "CV / Resume",
+    "description": "Upload your CV to easily apply to job offers.",
+    "currentCv": "CV saved",
+    "currentCvHint": "Your CV will be used by default when applying to jobs.",
+    "noCv": "You haven't uploaded a CV yet. Add one to apply to jobs more quickly.",
+    "dropHere": "Drop your PDF here or",
+    "browse": "browse",
+    "maxSize": "PDF only • max 5 MB",
+    "willReplace": "This will replace your current CV.",
+    "upload": "Save CV",
+    "uploading": "Uploading...",
+    "delete": "Delete",
+    "uploadSuccess": "CV updated successfully.",
+    "uploadError": "Failed to upload CV.",
+    "deleteSuccess": "CV deleted successfully.",
+    "deleteError": "Failed to delete CV."
+  },
   "saveSuccess": "Profile updated successfully",
   "saveError": "Something went wrong while updating your profile",
   "editForm": {

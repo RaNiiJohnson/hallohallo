@@ -35,7 +35,9 @@ export function ApplyJobDialog({
 }) {
   const user = useQuery(api.auth.auth.getCurrentUser);
   const applyToJob = useAction(api.jobs.actions.applyToJob);
-  const updateUserCv = useMutation(api.auth.users.updateUser);
+  const uploadCvAndDeleteOld = useMutation(
+    api.integrations.r2.uploadCvAndDeleteOld,
+  );
   const uploadFile = useUploadFile(api.integrations.r2);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -82,12 +84,9 @@ export function ApplyJobDialog({
           }
           cvStorageId = uploadedStorageId;
 
-          // If they didn't have a CV before, we can set it as default in profile
-          if (!hasProfileCv && user) {
-            await updateUserCv({
-              id: user._id,
-              patch: { cv: cvStorageId },
-            });
+          // Save the new key and delete old one from R2
+          if (user) {
+            await uploadCvAndDeleteOld({ newCvKey: cvStorageId });
           }
         }
 
@@ -183,7 +182,7 @@ export function ApplyJobDialog({
                 <div className="flex items-center gap-3 min-w-0 flex-1 overflow-hidden">
                   <PaperclipIcon className="w-4 h-4 text-muted-foreground shrink-0" />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium" title={file.file.name}>
+                    <p className="text-sm font-medium truncate" title={file.file.name}>
                       {file.file.name.length > 30
                         ? `${file.file.name.slice(0, 20)}...${file.file.name.slice(-8)}`
                         : file.file.name}

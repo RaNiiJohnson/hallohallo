@@ -62,6 +62,24 @@
       "error": "Beim Hochladen ist ein Fehler aufgetreten"
     }
   },
+  "cv": {
+    "title": "Lebenslauf",
+    "description": "Laden Sie Ihren Lebenslauf hoch, um sich einfach auf Stellenangebote zu bewerben.",
+    "currentCv": "Lebenslauf gespeichert",
+    "currentCvHint": "Ihr Lebenslauf wird standardmäßig bei Bewerbungen verwendet.",
+    "noCv": "Sie haben noch keinen Lebenslauf hochgeladen. Fügen Sie einen hinzu, um sich schneller zu bewerben.",
+    "dropHere": "PDF hier ablegen oder",
+    "browse": "durchsuchen",
+    "maxSize": "Nur PDF • max. 5 MB",
+    "willReplace": "Dies ersetzt Ihren aktuellen Lebenslauf.",
+    "upload": "Lebenslauf speichern",
+    "uploading": "Wird hochgeladen...",
+    "delete": "Löschen",
+    "uploadSuccess": "Lebenslauf erfolgreich aktualisiert.",
+    "uploadError": "Lebenslauf konnte nicht hochgeladen werden.",
+    "deleteSuccess": "Lebenslauf erfolgreich gelöscht.",
+    "deleteError": "Lebenslauf konnte nicht gelöscht werden."
+  },
   "saveSuccess": "Profil erfolgreich aktualisiert",
   "saveError": "Beim Aktualisieren des Profils ist ein Fehler aufgetreten",
   "editForm": {
