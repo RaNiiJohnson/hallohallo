@@ -3,7 +3,6 @@ import { Mail, MapPin } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 async function getCurrentYear() {
-  "use cache";
   return new Date().getFullYear();
 }
 
