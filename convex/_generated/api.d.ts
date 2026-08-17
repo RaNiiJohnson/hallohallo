@@ -21,6 +21,7 @@ import type * as chat_queries from "../chat/queries.js";
 import type * as communities_actions from "../communities/actions.js";
 import type * as communities_mutations from "../communities/mutations.js";
 import type * as communities_queries from "../communities/queries.js";
+import type * as debug_aggregates from "../debug_aggregates.js";
 import type * as email from "../email.js";
 import type * as http from "../http.js";
 import type * as integrations_cloudinary from "../integrations/cloudinary.js";
@@ -63,6 +64,7 @@ declare const fullApi: ApiFromModules<{
   "communities/actions": typeof communities_actions;
   "communities/mutations": typeof communities_mutations;
   "communities/queries": typeof communities_queries;
+  debug_aggregates: typeof debug_aggregates;
   email: typeof email;
   http: typeof http;
   "integrations/cloudinary": typeof integrations_cloudinary;
