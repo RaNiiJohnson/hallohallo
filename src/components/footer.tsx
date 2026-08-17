@@ -2,9 +2,14 @@ import { Link } from "@/i18n/navigation";
 import { Mail, MapPin } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
+async function getCurrentYear() {
+  "use cache";
+  return new Date().getFullYear();
+}
+
 export default async function Footer() {
   const t = await getTranslations("footer");
-
+  const currentYear = await getCurrentYear();
   return (
     <footer className="bg-muted/30 border-t mt-16">
       <div className="max-w-6xl mx-auto px-4 py-12">
@@ -111,7 +116,7 @@ export default async function Footer() {
 
         <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
           <p>
-            © {new Date().getFullYear()} Hallo Hallo. {t("copyright")}
+            © {currentYear} Hallo Hallo. {t("copyright")}
           </p>
         </div>
       </div>
