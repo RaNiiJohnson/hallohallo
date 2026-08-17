@@ -65,11 +65,8 @@ export function RoleGuard({ children }: { children: React.ReactNode }) {
           showCloseButton={false}
         >
           <DialogHeader>
-            <DialogTitle></DialogTitle>
-            <DialogDescription>
-              Pour commencer, veuillez nous dire ce que vous recherchez sur la
-              plateforme.
-            </DialogDescription>
+            <DialogTitle>{t("title")}</DialogTitle>
+            <DialogDescription>{t("description")}</DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4 mt-4">
             <Button
@@ -82,9 +79,11 @@ export function RoleGuard({ children }: { children: React.ReactNode }) {
                 <Search className="h-6 w-6 text-primary" />
               </div>
               <div className="flex flex-col items-center gap-1">
-                <span className="font-semibold text-lg">Je cherche</span>
+                <span className="font-semibold text-lg">
+                  {t("seeker.title")}
+                </span>
                 <span className="text-sm text-muted-foreground text-center">
-                  Du bien, du job ou de l'immobilier
+                  {t("seeker.subtitle")}
                 </span>
               </div>
             </Button>
@@ -99,9 +98,11 @@ export function RoleGuard({ children }: { children: React.ReactNode }) {
                 <Building2 className="h-6 w-6 text-primary" />
               </div>
               <div className="flex flex-col items-center gap-1">
-                <span className="font-semibold text-lg">Je propose</span>
+                <span className="font-semibold text-lg">
+                  {t("provider.title")}
+                </span>
                 <span className="text-sm text-muted-foreground text-center">
-                  Du bien, des offres d'emploi ou des annonces
+                  {t("provider.subtitle")}
                 </span>
               </div>
             </Button>
