@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
+import { components } from "../_generated/api";
 import { action, mutation, query } from "../_generated/server";
 import { authComponent, createAuth } from "./auth";
 import { UserWithRoleType } from "./users";
@@ -42,17 +43,14 @@ export const unbanUser = mutation({
 export const setUserRole = mutation({
   args: {
     userId: v.string(),
-    role: v.union(
-      v.literal("user"),
-      v.literal("admin"),
-      v.array(v.union(v.literal("user"), v.literal("admin"))),
-    ),
+    role: v.string(),
   },
   handler: async (ctx, args) => {
-    const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
-    await auth.api.setRole({
-      body: { userId: args.userId, role: args.role },
-      headers,
+    await ctx.runMutation(components.betterAuth.users.updateUser, {
+      id: args.userId as any,
+      patch: {
+        role: args.role,
+      },
     });
   },
 });
@@ -63,11 +61,7 @@ export const createUser = mutation({
     email: v.string(),
     password: v.string(),
     name: v.string(),
-    role: v.union(
-      v.literal("user"),
-      v.literal("admin"),
-      v.array(v.union(v.literal("user"), v.literal("admin"))),
-    ),
+    role: v.string(),
   },
   handler: async (ctx, args) => {
     const { auth } = await authComponent.getAuth(createAuth, ctx);
@@ -76,8 +70,8 @@ export const createUser = mutation({
         email: args.email,
         password: args.password,
         name: args.name,
-        role: args.role,
         data: {
+          role: args.role,
           slug: generatedSlug(args.name),
           emailVerified: true,
           isPublic: true,

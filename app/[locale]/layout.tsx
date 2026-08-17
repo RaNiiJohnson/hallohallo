@@ -1,6 +1,7 @@
 import { OfflineIndicator } from "@/components/offline-indicator";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Locale, routing } from "@/i18n/routing";
+import { getToken } from "@/lib/auth-server";
 import { ConvexClientProvider } from "@/web/ConvexClientProvider";
 import { Analytics } from "@vercel/analytics/next";
 import "flag-icons/css/flag-icons.min.css";
@@ -46,6 +47,7 @@ export default async function RootLayout({
   const { locale } = await params;
   setRequestLocale(locale as Locale);
   const messages = await getMessages();
+  const token = await getToken();
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -59,7 +61,7 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <ConvexClientProvider>
+            <ConvexClientProvider initialToken={token}>
               <OfflineIndicator />
               <NuqsAdapter>{children}</NuqsAdapter>
               <Analytics />

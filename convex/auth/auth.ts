@@ -79,7 +79,6 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
               data: {
                 ...user,
                 slug: generatedSlug(user.name),
-                role: "user",
                 isPublic: true,
                 showEmail: true,
                 showPhone: true,
@@ -91,6 +90,10 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     },
     user: {
       additionalFields: {
+        role: {
+          type: "string",
+          required: false,
+        },
         // === INFORMATIONS DE BASE ===
         coverImage: {
           type: "string",

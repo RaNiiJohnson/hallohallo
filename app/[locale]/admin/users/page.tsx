@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Link } from "@/i18n/navigation";
+import { USER_ROLES, UserRole } from "@/types/role";
 import { api } from "@convex/_generated/api";
 import { UserWithRoleType } from "@convex/auth/users";
 import { useQuery } from "convex-helpers/react/cache";
@@ -66,7 +67,7 @@ export default function UsersPage() {
     const email = formData.get("email") as string;
     const name = formData.get("name") as string;
     const password = formData.get("password") as string;
-    const role = formData.get("role") as "user" | "admin";
+    const role = formData.get("role") as UserRole;
 
     startTransition(async () => {
       try {
@@ -103,7 +104,7 @@ export default function UsersPage() {
     });
   };
 
-  const handleSetRole = (user: UserWithRoleType, role: "user" | "admin") => {
+  const handleSetRole = (user: UserWithRoleType, role: UserRole) => {
     startTransition(async () => {
       try {
         await setUseRole({ userId: user.id, role });
@@ -246,19 +247,20 @@ export default function UsersPage() {
                       </td>
                       <td className="p-4 align-middle">
                         <Select
-                          value={user.role ?? "user"}
+                          value={user.role ?? ""}
                           onValueChange={(value) =>
-                            handleSetRole(user, value as "user" | "admin")
+                            handleSetRole(user, value as UserRole)
                           }
                           disabled={isPending}
                         >
                           <SelectTrigger className="w-28 h-8 text-xs">
-                            <SelectValue />
+                            <SelectValue placeholder="Non défini" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectGroup>
-                              <SelectItem value="user">User</SelectItem>
-                              <SelectItem value="admin">Admin</SelectItem>
+                              <SelectItem value={USER_ROLES.SEEKER}>Chercheur (seeker)</SelectItem>
+                              <SelectItem value={USER_ROLES.PROVIDER}>Offreur (provider)</SelectItem>
+                              <SelectItem value={USER_ROLES.ADMIN}>Admin</SelectItem>
                             </SelectGroup>
                           </SelectContent>
                         </Select>
@@ -442,13 +444,14 @@ export default function UsersPage() {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Rôle</label>
-              <Select name="role" defaultValue="user">
+              <Select name="role" defaultValue={USER_ROLES.SEEKER}>
                 <SelectTrigger className="h-11">
                   <SelectValue placeholder="Sélectionnez un rôle" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="user">Utilisateur</SelectItem>
-                  <SelectItem value="admin">Administrateur</SelectItem>
+                  <SelectItem value={USER_ROLES.SEEKER}>Chercheur (seeker)</SelectItem>
+                  <SelectItem value={USER_ROLES.PROVIDER}>Offreur (provider)</SelectItem>
+                  <SelectItem value={USER_ROLES.ADMIN}>Administrateur</SelectItem>
                 </SelectContent>
               </Select>
             </div>

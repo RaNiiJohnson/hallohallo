@@ -1,0 +1,113 @@
+"use client";
+
+import { useMutation, useQuery } from "convex/react";
+import { Building2, Search } from "lucide-react";
+import { useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { authClient } from "@/lib/auth-client";
+import { UserRole } from "@/types/role";
+import { api } from "@convex/_generated/api";
+import { useTranslations } from "next-intl";
+
+export function RoleGuard({ children }: { children: React.ReactNode }) {
+  const t = useTranslations("auth.roleGuard");
+  const { data: session, isPending } = authClient.useSession();
+  const currentUser = useQuery(
+    api.auth.auth.getCurrentUser,
+    session?.user ? {} : "skip",
+  );
+  const [isUpdating, setIsUpdating] = useState(false);
+  const updateUser = useMutation(api.auth.users.updateUser);
+
+  // If loading or no session, just render children
+  if (isPending || !session?.user) {
+    return <>{children}</>;
+  }
+
+  // Check if role is missing using real-time database state (fallback to session)
+  const userRole = currentUser?.role ?? session.user.role;
+  const needsRole = !userRole;
+
+  const handleSelectRole = async (
+    role: Extract<UserRole, "seeker" | "provider">,
+  ) => {
+    setIsUpdating(true);
+    try {
+      await updateUser({
+        id: session.user.id,
+        patch: {
+          role: role,
+        },
+      });
+    } catch (e) {
+      console.error("Failed to update role", e);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  return (
+    <>
+      {children}
+      <Dialog open={needsRole}>
+        <DialogContent
+          className="sm:max-w-[425px]"
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          showCloseButton={false}
+        >
+          <DialogHeader>
+            <DialogTitle></DialogTitle>
+            <DialogDescription>
+              Pour commencer, veuillez nous dire ce que vous recherchez sur la
+              plateforme.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 mt-4">
+            <Button
+              variant="outline"
+              className="h-auto py-6 flex flex-col items-center gap-3 hover:border-primary hover:bg-primary/5 transition-all text-left"
+              onClick={() => handleSelectRole("seeker")}
+              disabled={isUpdating}
+            >
+              <div className="p-3 bg-primary/10 rounded-full">
+                <Search className="h-6 w-6 text-primary" />
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <span className="font-semibold text-lg">Je cherche</span>
+                <span className="text-sm text-muted-foreground text-center">
+                  Du bien, du job ou de l'immobilier
+                </span>
+              </div>
+            </Button>
+
+            <Button
+              variant="outline"
+              className="h-auto py-6 flex flex-col items-center gap-3 hover:border-primary hover:bg-primary/5 transition-all text-left"
+              onClick={() => handleSelectRole("provider")}
+              disabled={isUpdating}
+            >
+              <div className="p-3 bg-primary/10 rounded-full">
+                <Building2 className="h-6 w-6 text-primary" />
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <span className="font-semibold text-lg">Je propose</span>
+                <span className="text-sm text-muted-foreground text-center">
+                  Du bien, des offres d'emploi ou des annonces
+                </span>
+              </div>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
