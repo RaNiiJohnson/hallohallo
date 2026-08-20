@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { authClient } from "@/lib/auth-client";
-import { UserRole } from "@/types/userType";
+import { UserType } from "@/types/userType";
 import { api } from "@convex/_generated/api";
 import { useTranslations } from "next-intl";
 
@@ -36,7 +36,7 @@ export function RoleGuard({ children }: { children: React.ReactNode }) {
   const needsRole = !!currentUser && !currentUser.userType;
 
   const handleSelectRole = (
-    userType: Extract<UserRole, "seeker" | "provider">,
+    userType: Extract<UserType, "seeker" | "provider">,
   ) => {
     startTransition(async () => {
       try {
