@@ -55,6 +55,21 @@ export const setUserRole = mutation({
   },
 });
 
+export const setUserType = mutation({
+  args: {
+    userId: v.string(),
+    userType: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.runMutation(components.betterAuth.users.updateUser, {
+      id: args.userId as any,
+      patch: {
+        userType: args.userType,
+      },
+    });
+  },
+});
+
 export const createUser = mutation({
   args: {
     userId: v.string(),

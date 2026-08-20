@@ -26,11 +26,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Link } from "@/i18n/navigation";
-import { USER_ROLES, UserRole } from "@/types/role";
+import { ALL_USER_TYPES, UserType } from "@/types/userType";
 import { api } from "@convex/_generated/api";
 import { UserWithRoleType } from "@convex/auth/users";
 import { useQuery } from "convex-helpers/react/cache";
-import { useMutation, useAction } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -48,7 +48,8 @@ export default function UsersPage() {
   const users = useQuery(api.auth.admin.listUsers);
   const banUser = useMutation(api.auth.admin.banUser);
   const unbanUser = useMutation(api.auth.admin.unbanUser);
-  const setUseRole = useMutation(api.auth.admin.setUserRole);
+  const setUserRole = useMutation(api.auth.admin.setUserRole);
+  const setUserType = useMutation(api.auth.admin.setUserType);
   const createUser = useMutation(api.auth.admin.createUser);
   const deleteUser = useAction(api.auth.admin.deleteUser);
 
@@ -67,7 +68,7 @@ export default function UsersPage() {
     const email = formData.get("email") as string;
     const name = formData.get("name") as string;
     const password = formData.get("password") as string;
-    const role = formData.get("role") as UserRole;
+    const role = formData.get("role") as "user" | "admin";
 
     startTransition(async () => {
       try {
@@ -104,13 +105,28 @@ export default function UsersPage() {
     });
   };
 
-  const handleSetRole = (user: UserWithRoleType, role: UserRole) => {
+  const handleSetRole = (user: UserWithRoleType, role: "user" | "admin") => {
     startTransition(async () => {
       try {
-        await setUseRole({ userId: user.id, role });
+        await setUserRole({ userId: user.id, role });
         toast.success(`Rôle de ${user.name} mis à jour : ${role}`);
       } catch (error: any) {
         toast.error(error.message || "Erreur lors du changement de rôle");
+      }
+    });
+  };
+
+  const handleSetUserType = (user: UserWithRoleType, userType: UserType) => {
+    startTransition(async () => {
+      try {
+        await setUserType({ userId: user.id, userType });
+        toast.success(
+          `Type d'utilisateur de ${user.name} mis à jour : ${userType}`,
+        );
+      } catch (error: any) {
+        toast.error(
+          error.message || "Erreur lors du changement de type d'utilisateur",
+        );
       }
     });
   };
@@ -177,6 +193,9 @@ export default function UsersPage() {
                   </th>
                   <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
                     Rôle
+                  </th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                    Type
                   </th>
                   <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">
                     Actions
@@ -247,9 +266,9 @@ export default function UsersPage() {
                       </td>
                       <td className="p-4 align-middle">
                         <Select
-                          value={user.role ?? ""}
+                          value={user.role ?? "user"}
                           onValueChange={(value) =>
-                            handleSetRole(user, value as UserRole)
+                            handleSetRole(user, value as "user" | "admin")
                           }
                           disabled={isPending}
                         >
@@ -258,9 +277,32 @@ export default function UsersPage() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectGroup>
-                              <SelectItem value={USER_ROLES.SEEKER}>Chercheur (seeker)</SelectItem>
-                              <SelectItem value={USER_ROLES.PROVIDER}>Offreur (provider)</SelectItem>
-                              <SelectItem value={USER_ROLES.ADMIN}>Admin</SelectItem>
+                              <SelectItem value="user">Utilisateur</SelectItem>
+                              <SelectItem value="admin">
+                                Administrateur
+                              </SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </td>
+                      <td className="p-4 align-middle">
+                        <Select
+                          value={user.userType ?? "user"}
+                          onValueChange={(value) =>
+                            handleSetUserType(user, value as UserType)
+                          }
+                          disabled={isPending}
+                        >
+                          <SelectTrigger className="w-28 h-8 text-xs">
+                            <SelectValue placeholder="Non défini" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              {ALL_USER_TYPES.map((userType) => (
+                                <SelectItem key={userType} value={userType}>
+                                  {userType}
+                                </SelectItem>
+                              ))}
                             </SelectGroup>
                           </SelectContent>
                         </Select>
@@ -420,7 +462,12 @@ export default function UsersPage() {
           <form onSubmit={handleCreateUser} className="space-y-5">
             <div className="space-y-2">
               <label className="text-sm font-medium">Nom complet</label>
-              <Input name="name" required placeholder="John Doe" className="h-11" />
+              <Input
+                name="name"
+                required
+                placeholder="John Doe"
+                className="h-11"
+              />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Email</label>
@@ -444,14 +491,13 @@ export default function UsersPage() {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Rôle</label>
-              <Select name="role" defaultValue={USER_ROLES.SEEKER}>
+              <Select name="role" defaultValue="user">
                 <SelectTrigger className="h-11">
                   <SelectValue placeholder="Sélectionnez un rôle" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={USER_ROLES.SEEKER}>Chercheur (seeker)</SelectItem>
-                  <SelectItem value={USER_ROLES.PROVIDER}>Offreur (provider)</SelectItem>
-                  <SelectItem value={USER_ROLES.ADMIN}>Administrateur</SelectItem>
+                  <SelectItem value="user">Utilisateur</SelectItem>
+                  <SelectItem value="admin">Administrateur</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { authClient } from "@/lib/auth-client";
-import { UserRole } from "@/types/role";
+import { UserRole } from "@/types/userType";
 import { api } from "@convex/_generated/api";
 import { useTranslations } from "next-intl";
 
