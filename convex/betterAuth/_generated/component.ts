@@ -63,6 +63,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   status?: null | string;
                   updatedAt: number;
                   userId?: null | string;
+                  userType?: null | string;
                 };
                 model: "user";
               }
@@ -163,6 +164,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "showPhone"
                     | "lastActiveAt"
                     | "cv"
+                    | "userType"
                     | "_id";
                   mode?: "sensitive" | "insensitive";
                   operator?:
@@ -382,6 +384,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "showPhone"
                     | "lastActiveAt"
                     | "cv"
+                    | "userType"
                     | "_id";
                   mode?: "sensitive" | "insensitive";
                   operator?:
@@ -662,6 +665,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   status?: null | string;
                   updatedAt?: number;
                   userId?: null | string;
+                  userType?: null | string;
                 };
                 where?: Array<{
                   connector?: "AND" | "OR";
@@ -698,6 +702,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "showPhone"
                     | "lastActiveAt"
                     | "cv"
+                    | "userType"
                     | "_id";
                   mode?: "sensitive" | "insensitive";
                   operator?:
@@ -952,6 +957,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   status?: null | string;
                   updatedAt?: number;
                   userId?: null | string;
+                  userType?: null | string;
                 };
                 where?: Array<{
                   connector?: "AND" | "OR";
@@ -988,6 +994,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "showPhone"
                     | "lastActiveAt"
                     | "cv"
+                    | "userType"
                     | "_id";
                   mode?: "sensitive" | "insensitive";
                   operator?:
@@ -1249,6 +1256,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
             status?: null | string;
             updatedAt?: number;
             userId?: null | string;
+            userType?: null | string;
           };
         },
         any,

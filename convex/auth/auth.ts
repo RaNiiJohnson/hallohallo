@@ -207,6 +207,11 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
           required: false,
           // fichier CV stocké sur Cloudflare R2
         },
+        userType: {
+          type: "string",
+          required: false,
+          // admin chercheur fournisseur
+        },
       },
     },
     plugins: [

@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery } from "convex/react";
 import { Building2, Search } from "lucide-react";
-import { useState } from "react";
+import { useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { authClient } from "@/lib/auth-client";
-import { UserRole } from "@/types/role";
+import { UserRole } from "@/types/userType";
 import { api } from "@convex/_generated/api";
 import { useTranslations } from "next-intl";
 
@@ -24,7 +24,7 @@ export function RoleGuard({ children }: { children: React.ReactNode }) {
     api.auth.auth.getCurrentUser,
     session?.user ? {} : "skip",
   );
-  const [isUpdating, setIsUpdating] = useState(false);
+  const [isUpdating, startTransition] = useTransition();
   const updateUser = useMutation(api.auth.users.updateUser);
 
   // If loading or no session, just render children
@@ -33,25 +33,23 @@ export function RoleGuard({ children }: { children: React.ReactNode }) {
   }
 
   // Check if role is missing using real-time database state (fallback to session)
-  const userRole = currentUser?.role ?? session.user.role;
-  const needsRole = !userRole;
+  const needsRole = !!currentUser && !currentUser.userType;
 
-  const handleSelectRole = async (
-    role: Extract<UserRole, "seeker" | "provider">,
+  const handleSelectRole = (
+    userType: Extract<UserRole, "seeker" | "provider">,
   ) => {
-    setIsUpdating(true);
-    try {
-      await updateUser({
-        id: session.user.id,
-        patch: {
-          role: role,
-        },
-      });
-    } catch (e) {
-      console.error("Failed to update role", e);
-    } finally {
-      setIsUpdating(false);
-    }
+    startTransition(async () => {
+      try {
+        await updateUser({
+          id: session.user.id,
+          patch: {
+            userType,
+          },
+        });
+      } catch (e) {
+        console.error("Failed to update userType", e);
+      }
+    });
   };
 
   return (
