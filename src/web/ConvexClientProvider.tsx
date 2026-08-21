@@ -1,13 +1,50 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { ConvexReactClient } from "convex/react";
 import { authClient } from "@/lib/auth-client";
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
+import { api } from "@convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
+import posthog from "posthog-js";
 
 import { ConvexQueryCacheProvider } from "convex-helpers/react/cache";
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
+function PostHogIdentity() {
+  const user = useQuery(api.auth.auth.getCurrentUser);
+  const identifiedUserId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (user === undefined) return;
+
+    if (user === null) {
+      if (identifiedUserId.current) {
+        posthog.reset();
+        identifiedUserId.current = null;
+      }
+      return;
+    }
+
+    const userId = `${user._id}`;
+
+    if (identifiedUserId.current === userId) return;
+
+    if (identifiedUserId.current) {
+      posthog.reset();
+    }
+
+    posthog.identify(userId, {
+      email: user.email,
+      name: user.name,
+      role: user.userType,
+    });
+    identifiedUserId.current = userId;
+  }, [user]);
+
+  return null;
+}
 
 export function ConvexClientProvider({
   children,
@@ -22,7 +59,10 @@ export function ConvexClientProvider({
       authClient={authClient as any}
       initialToken={initialToken}
     >
-      <ConvexQueryCacheProvider>{children}</ConvexQueryCacheProvider>
+      <ConvexQueryCacheProvider>
+        <PostHogIdentity />
+        {children}
+      </ConvexQueryCacheProvider>
     </ConvexBetterAuthProvider>
   );
 }
