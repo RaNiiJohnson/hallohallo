@@ -10,6 +10,7 @@ import { query } from "../_generated/server";
 import authConfig from "../auth.config";
 import authSchema from "../betterAuth/schema";
 import { sendEmailVerification, sendResetPasswordEmail } from "../email";
+import { posthog, posthogDistinctId } from "../integrations/posthog";
 
 const siteUrl = process.env.SITE_URL!;
 
@@ -84,6 +85,22 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
                 showPhone: true,
               },
             };
+          },
+          after: async (user) => {
+            if (!("scheduler" in ctx)) return;
+            const distinctId = posthogDistinctId(user.id);
+            await posthog.identify(ctx, {
+              distinctId,
+              properties: {
+                email: user.email,
+                name: user.name,
+              },
+            });
+            await posthog.capture(ctx, {
+              distinctId,
+              event: "user_signed_up",
+              properties: { email: user.email },
+            });
           },
         },
       },

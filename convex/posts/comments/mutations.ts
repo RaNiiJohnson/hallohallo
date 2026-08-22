@@ -8,6 +8,7 @@ import { DataModel } from "../../_generated/dataModel";
 import { mutation } from "../../_generated/server";
 import { postCommentsCount } from "../../aggregates";
 import { authComponent } from "../../auth/auth";
+import { posthog, posthogDistinctId } from "../../integrations/posthog";
 
 const triggers = new Triggers<DataModel>();
 triggers.register("postComments", postCommentsCount.trigger());
@@ -48,6 +49,16 @@ export const addComment = mutationWithTriggers({
         message: `${user.name} a commenté votre post "${post.title}"`,
       });
     }
+
+    await posthog.capture(ctx, {
+      distinctId: posthogDistinctId(user._id),
+      event: "comment_created",
+      properties: {
+        comment_id: commentId,
+        post_id: args.postId,
+        post_slug: post.slug,
+      },
+    });
 
     return commentId;
   },
@@ -154,6 +165,15 @@ export const addReply = mutationWithTriggers({
         message: `${user.name} a répondu à votre commentaire`,
       });
     }
+
+    await posthog.capture(ctx, {
+      distinctId: posthogDistinctId(user._id),
+      event: "reply_created",
+      properties: {
+        reply_id: replyId,
+        comment_id: args.commentId,
+      },
+    });
 
     return replyId;
   },

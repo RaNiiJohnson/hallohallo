@@ -3,6 +3,7 @@ import { internal } from "../_generated/api";
 import { action, internalMutation } from "../_generated/server";
 import { authComponent } from "../auth/auth";
 import { runCascadeDelete } from "../cascadeDeletes";
+import { posthog, posthogDistinctId } from "../integrations/posthog";
 
 /**
  * Vérifie que l'utilisateur authentifié est bien le propriétaire de la communauté.
@@ -18,7 +19,11 @@ export const _verifyDeleteAuth = internalMutation({
     if (!community) throw new Error("Community not found");
     if (community.authorId !== user._id) throw new Error("Not authorized");
 
-    return { communityId: community._id, slug: community.slug };
+    return {
+      communityId: community._id,
+      slug: community.slug,
+      userId: user._id,
+    };
   },
 });
 
@@ -31,15 +36,24 @@ export const deleteCommunity = action({
   args: { id: v.id("communities") },
   handler: async (ctx, args) => {
     // 1. Vérifier l'authentification et l'autorisation
-    const { slug } = await ctx.runMutation(internal.communities.actions._verifyDeleteAuth, {
-      id: args.id,
+    const { slug, userId } = await ctx.runMutation(
+      internal.communities.actions._verifyDeleteAuth,
+      {
+        id: args.id,
+      },
+    );
+
+    await ctx.runMutation(internal.notifications.mutations.deleteByCommunity, {
+      slug,
     });
 
-    // 2. Nettoyer les notifications liées à ce slug (et aux posts de cette communauté)
-    await ctx.runMutation(internal.notifications.mutations.deleteByCommunity, { slug });
-
-    // 3. Cascade delete : supprime la communauté et tous les enfants
     const counts = await runCascadeDelete(ctx, "communities", args.id);
+
+    await posthog.capture(ctx, {
+      distinctId: posthogDistinctId(userId),
+      event: "community_deleted",
+      properties: { community_id: args.id, slug },
+    });
 
     return counts;
   },

@@ -3,6 +3,7 @@ import { ConvexError, v } from "convex/values";
 import { components } from "../_generated/api";
 import { mutation, query } from "../_generated/server";
 import { UserType, userValidator } from "../betterAuth/users";
+import { posthog, posthogDistinctId } from "../integrations/posthog";
 import { authComponent } from "./auth";
 
 export type UserWithRoleType = UserType & {
@@ -84,5 +85,23 @@ export const updateUser = mutation({
     }
 
     await ctx.runMutation(components.betterAuth.users.updateUser, args);
+
+    const distinctId = posthogDistinctId(user._id);
+    await posthog.identify(ctx, {
+      distinctId,
+      properties: {
+        email: args.patch.email ?? user.email,
+        name: args.patch.name ?? user.name,
+        role: args.patch.userType ?? user.userType,
+      },
+    });
+
+    if (args.patch.userType) {
+      await posthog.capture(ctx, {
+        distinctId,
+        event: "user_role_selected",
+        properties: { role: args.patch.userType },
+      });
+    }
   },
 });

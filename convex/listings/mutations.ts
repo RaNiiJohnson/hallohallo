@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
 import { mutation } from "../_generated/server";
 import { authComponent } from "../auth/auth";
+import { posthog, posthogDistinctId } from "../integrations/posthog";
 
 export const createListing = mutation({
   args: {
@@ -60,6 +61,19 @@ export const createListing = mutation({
       searchAll: searchAllContent,
       currency: "EUR",
     });
+
+    await posthog.capture(ctx, {
+      distinctId: posthogDistinctId(user._id),
+      event: "listing_created",
+      properties: {
+        listing_id: listingId,
+        property_type: args.propertyType,
+        listing_mode: args.listingMode,
+        city: args.city,
+        price: args.price,
+      },
+    });
+
     return listingId;
   },
 });

@@ -10,6 +10,7 @@ export default defineConfig({
           name: "convex",
           include: ["convex/**/*.test.{ts,js}"],
           environment: "edge-runtime",
+          setupFiles: ["./convex/test.posthog.mock.ts"],
         },
       },
       {

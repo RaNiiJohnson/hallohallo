@@ -16,7 +16,6 @@ import { authClient } from "@/lib/auth-client";
 import { UserType } from "@/types/userType";
 import { api } from "@convex/_generated/api";
 import { useTranslations } from "next-intl";
-import posthog from "posthog-js";
 
 export function RoleGuard({ children }: { children: React.ReactNode }) {
   const t = useTranslations("auth.roleGuard");
@@ -47,7 +46,6 @@ export function RoleGuard({ children }: { children: React.ReactNode }) {
             userType,
           },
         });
-        posthog.capture("user_role_selected", { role: userType });
       } catch (e) {
         console.error("Failed to update userType", e);
       }

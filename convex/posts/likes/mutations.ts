@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { mutation } from "../../_generated/server";
 import { postLikesCount, postSortedByLikes } from "../../aggregates";
 import { authComponent } from "../../auth/auth";
+import { posthog, posthogDistinctId } from "../../integrations/posthog";
 
 export const likePost = mutation({
   args: { postId: v.id("posts") },
@@ -44,6 +45,12 @@ export const likePost = mutation({
         for (const notif of ghostNotifs) await ctx.db.delete(notif._id);
       }
 
+      await posthog.capture(ctx, {
+        distinctId: posthogDistinctId(user._id),
+        event: "post_unliked",
+        properties: { post_id: args.postId, post_slug: post.slug },
+      });
+
       return;
     }
 
@@ -74,6 +81,12 @@ export const likePost = mutation({
         message: `${user.name} a checké votre post "${post.title}"`,
       });
     }
+
+    await posthog.capture(ctx, {
+      distinctId: posthogDistinctId(user._id),
+      event: "post_liked",
+      properties: { post_id: args.postId, post_slug: post.slug },
+    });
   },
 });
 
