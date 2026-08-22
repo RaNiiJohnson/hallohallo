@@ -2,6 +2,7 @@
 import { v } from "convex/values";
 import { mutation } from "../_generated/server";
 import { authComponent } from "../auth/auth";
+import { posthog, posthogDistinctId } from "../integrations/posthog";
 
 export const toggleBookmark = mutation({
   args: {
@@ -30,6 +31,14 @@ export const toggleBookmark = mutation({
 
     if (existing) {
       await ctx.db.delete(existing._id);
+      await posthog.capture(ctx, {
+        distinctId: posthogDistinctId(user._id),
+        event: "bookmark_removed",
+        properties: {
+          resource_id: args.resourceId,
+          resource_type: args.resourceType,
+        },
+      });
       return { bookmarked: false };
     }
 
@@ -37,6 +46,14 @@ export const toggleBookmark = mutation({
       userId: user._id,
       resourceId: args.resourceId,
       resourceType: args.resourceType,
+    });
+    await posthog.capture(ctx, {
+      distinctId: posthogDistinctId(user._id),
+      event: "bookmark_added",
+      properties: {
+        resource_id: args.resourceId,
+        resource_type: args.resourceType,
+      },
     });
     return { bookmarked: true };
   },

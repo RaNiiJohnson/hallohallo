@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation } from "../_generated/server";
 import { authComponent } from "../auth/auth";
+import { posthog, posthogDistinctId } from "../integrations/posthog";
 
 export const sendMessage = mutation({
   args: {
@@ -29,6 +30,13 @@ export const sendMessage = mutation({
     // Mettre à jour lastReadAt de l'expéditeur seulement
     await ctx.db.patch(member._id, {
       lastReadAt: Date.now(),
+    });
+
+    await posthog.capture(ctx, {
+      distinctId: posthogDistinctId(user._id),
+      event: "chat_message_sent",
+      properties: { community_id: args.communityId },
+      groups: { community: args.communityId },
     });
   },
 });

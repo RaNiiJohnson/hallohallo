@@ -16,6 +16,7 @@ import {
   postSortedByLikes,
 } from "../aggregates";
 import { authComponent } from "../auth/auth";
+import { posthog, posthogDistinctId } from "../integrations/posthog";
 import { limiter } from "../rateLimits";
 
 // ─── Triggers
@@ -68,6 +69,16 @@ export const createPost = mutationWithTriggers({
     await postShuffle.insert(ctx, postDoc);
     await postSortedByDate.insert(ctx, postDoc);
     await postSortedByLikes.insert(ctx, postDoc);
+
+    await posthog.capture(ctx, {
+      distinctId: posthogDistinctId(userId),
+      event: "post_created",
+      properties: {
+        post_id: postId,
+        community_id: args.communityId,
+        community_slug: community.slug,
+      },
+    });
 
     return postId;
   },

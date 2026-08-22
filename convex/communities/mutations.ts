@@ -9,6 +9,7 @@ import { DataModel } from "../_generated/dataModel";
 import { mutation } from "../_generated/server";
 import { communityMembersCount, communityPostsCount } from "../aggregates";
 import { authComponent } from "../auth/auth";
+import { posthog, posthogDistinctId } from "../integrations/posthog";
 
 const triggers = new Triggers<DataModel>();
 triggers.register("communityMembers", communityMembersCount.trigger());
@@ -50,6 +51,24 @@ export const createCommunty = mutationWithTriggers({
       userId: user._id,
       communityId: comId,
       role: "admin",
+    });
+
+    const distinctId = posthogDistinctId(user._id);
+    await posthog.groupIdentify(ctx, {
+      groupType: "community",
+      groupKey: comId,
+      properties: { name: args.name, privacy: args.privacy, slug },
+      distinctId,
+    });
+    await posthog.capture(ctx, {
+      distinctId,
+      event: "community_created",
+      properties: {
+        community_id: comId,
+        slug,
+        privacy: args.privacy,
+      },
+      groups: { community: comId },
     });
 
     return { comId, slug };
@@ -107,6 +126,17 @@ export const joinCommunity = mutationWithTriggers({
       role: "member",
     });
 
+    await posthog.capture(ctx, {
+      distinctId: posthogDistinctId(user._id),
+      event: "community_joined",
+      properties: {
+        community_id: args.communityId,
+        community_slug: community.slug,
+        privacy: community.privacy,
+      },
+      groups: { community: args.communityId },
+    });
+
     //notifcation
     if (community.authorId !== user._id) {
       await ctx.db.insert("notifications", {
@@ -141,6 +171,16 @@ export const leaveCommunity = mutationWithTriggers({
       throw new Error("Admin cannot leave — delete the community instead");
 
     await ctx.db.delete(member._id);
+
+    await posthog.capture(ctx, {
+      distinctId: posthogDistinctId(user._id),
+      event: "community_left",
+      properties: {
+        community_id: args.communityId,
+        community_slug: community.slug,
+      },
+      groups: { community: args.communityId },
+    });
 
     //notifcation
     if (community.authorId !== user._id) {

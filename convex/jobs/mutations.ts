@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
 import { mutation } from "../_generated/server";
 import { authComponent } from "../auth/auth";
+import { posthog, posthogDistinctId } from "../integrations/posthog";
 
 export const createJob = mutation({
   args: {
@@ -61,6 +62,18 @@ export const createJob = mutation({
       updatedAt: Date.now(),
       searchAll: searchAllContent,
     });
+
+    await posthog.capture(ctx, {
+      distinctId: posthogDistinctId(user._id),
+      event: "job_created",
+      properties: {
+        job_id: job,
+        type: args.type,
+        city: args.city,
+        contract_type: args.contractType,
+      },
+    });
+
     return job;
   },
 });
@@ -144,5 +157,11 @@ export const deleteJob = mutation({
     if (!existing) throw new Error("Job not found");
 
     await ctx.db.delete("JobOffer", args.id);
+
+    await posthog.capture(ctx, {
+      distinctId: posthogDistinctId(user._id),
+      event: "job_deleted",
+      properties: { job_id: args.id },
+    });
   },
 });
