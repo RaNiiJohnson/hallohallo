@@ -33,11 +33,14 @@ describe("Chat", () => {
   beforeEach(async () => {
     t = convexTest(schema, modules);
 
-    const communityResult = await t.mutation(api.communities.mutations.createCommunty, {
-      name: "Chat Community",
-      description: "Description",
-      privacy: "public",
-    });
+    const communityResult = await t.mutation(
+      api.communities.mutations.createCommunty,
+      {
+        name: "Chat Community",
+        description: "Description",
+        privacy: "public",
+      },
+    );
     communityId = communityResult.comId;
   });
 

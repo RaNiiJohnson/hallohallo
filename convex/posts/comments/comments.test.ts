@@ -84,4 +84,26 @@ describe("Comments", () => {
     const comment = await t.run(async (ctx) => await ctx.db.get(commentId));
     expect(comment).toBeNull();
   });
+
+  it("should update and delete a reply", async () => {
+    const commentId = await t.mutation(api.posts.comments.mutations.addComment, {
+      postId,
+      content: "First Comment",
+    });
+    const replyId = await t.mutation(api.posts.comments.mutations.addReply, {
+      commentId,
+      content: "First Reply",
+    });
+
+    await t.mutation(api.posts.comments.mutations.updateReply, {
+      replyId,
+      content: "Updated Reply",
+    });
+    expect((await t.run(async (ctx) => ctx.db.get(replyId)))?.content).toBe(
+      "Updated Reply",
+    );
+
+    await t.mutation(api.posts.comments.mutations.deleteReply, { replyId });
+    expect(await t.run(async (ctx) => ctx.db.get(replyId))).toBeNull();
+  });
 });

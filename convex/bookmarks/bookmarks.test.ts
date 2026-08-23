@@ -33,11 +33,14 @@ describe("Bookmarks", () => {
   beforeEach(async () => {
     t = convexTest(schema, modules);
 
-    const communityResult = await t.mutation(api.communities.mutations.createCommunty, {
-      name: "Bookmark Community",
-      description: "Description",
-      privacy: "public",
-    });
+    const communityResult = await t.mutation(
+      api.communities.mutations.createCommunty,
+      {
+        name: "Bookmark Community",
+        description: "Description",
+        privacy: "public",
+      },
+    );
 
     postId = (await t.mutation(api.posts.mutations.createPost, {
       title: "Test Post",

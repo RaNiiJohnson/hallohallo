@@ -57,4 +57,43 @@ describe("Likes", () => {
     post = await t.run(async (ctx) => await ctx.db.get(postId));
     expect(post?.likesCount).toBe(0);
   });
+
+  it("should like and unlike a comment and a reply", async () => {
+    const commentId = await t.mutation(api.posts.comments.mutations.addComment, {
+      postId,
+      content: "Comment",
+    });
+    const replyId = await t.mutation(api.posts.comments.mutations.addReply, {
+      commentId,
+      content: "Reply",
+    });
+
+    await t.mutation(api.posts.likes.mutations.likeComment, { commentId });
+    await t.mutation(api.posts.likes.mutations.likeReply, { replyId });
+
+    expect(
+      await t.run(async (ctx) =>
+        ctx.db.query("postCommentLikes").collect(),
+      ),
+    ).toHaveLength(1);
+    expect(
+      await t.run(async (ctx) =>
+        ctx.db.query("postCommentReplyLikes").collect(),
+      ),
+    ).toHaveLength(1);
+
+    await t.mutation(api.posts.likes.mutations.likeComment, { commentId });
+    await t.mutation(api.posts.likes.mutations.likeReply, { replyId });
+
+    expect(
+      await t.run(async (ctx) =>
+        ctx.db.query("postCommentLikes").collect(),
+      ),
+    ).toHaveLength(0);
+    expect(
+      await t.run(async (ctx) =>
+        ctx.db.query("postCommentReplyLikes").collect(),
+      ),
+    ).toHaveLength(0);
+  });
 });
