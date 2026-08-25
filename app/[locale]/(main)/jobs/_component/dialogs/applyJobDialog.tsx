@@ -109,7 +109,7 @@ export function ApplyJobDialog({
         toast.success(t("success.applied"));
         setIsOpen(false);
       } catch {
-        toast.error(e.message || t("errors.applyError"));
+        toast.error(t("errors.applyError"));
       }
     });
   }
