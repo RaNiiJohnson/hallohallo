@@ -5,7 +5,7 @@ import { routing } from "./src/i18n/routing";
 const intlProxy = createMiddleware(routing);
 
 /** Pages inaccessibles si l'utilisateur est déjà connecté */
-const AUTH_ONLY_PAGES = ["/login", "/register", "/verify-email"];
+// const AUTH_ONLY_PAGES = ["/login", "/register", "/verify-email"];
 
 /** Nom du cookie marqueur : "l'utilisateur connecté a déjà été redirigé vers /community" */
 const HOME_REDIRECT_COOKIE = "home_redirected";

@@ -11,9 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import { cn } from "@/lib/utils";
-import { api } from "@convex/_generated/api";
 import { Id } from "@convex/betterAuth/_generated/dataModel";
-import { useMutation } from "convex/react";
 import { Camera, ImageIcon, Loader2, Upload, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
@@ -31,17 +29,17 @@ interface ImageUploadModalProps {
 }
 
 export function ImageUploadModal({
-  userId,
+  //   userId,
   imageType,
   open,
   onOpenChange,
   currentImageUrl,
-  onSuccess,
+  // onSuccess,
 }: ImageUploadModalProps) {
-  const updateUser = useMutation(api.auth.users.updateUser);
+  // const updateUser = useMutation(api.auth.users.updateUser);
   const t = useTranslations("profile.upload");
 
-  const [isPending, startTransition] = useTransition();
+  const [isPending] = useTransition();
 
   const [
     { files, isDragging, errors },

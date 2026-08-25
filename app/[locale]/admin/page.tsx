@@ -99,7 +99,7 @@ export default function AdminDashboardPage() {
       <div>
         <h2 className="text-2xl font-bold tracking-tight">Dashboard</h2>
         <p className="text-muted-foreground">
-          Vue d'ensemble de l'activité sur Hallo Hallo.
+          Vue d&apos;ensemble de l&apos;activité sur Hallo Hallo.
         </p>
       </div>
 

@@ -46,7 +46,7 @@ export default function ModerationPage() {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
         <h2 className="text-2xl font-bold tracking-tight">File de modération</h2>
-        <p className="text-muted-foreground">Traitez les éléments en attente d'approbation ou signalés.</p>
+        <p className="text-muted-foreground">Traitez les éléments en attente d&apos;approbation ou signalés.</p>
       </div>
 
       <Tabs defaultValue="all" className="w-full">

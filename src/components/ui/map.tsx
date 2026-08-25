@@ -446,7 +446,8 @@ function MarkerPopup({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map]);
 
-  if (popup.isOpen()) {
+  useEffect(() => {
+    if (!popup.isOpen()) return;
     const prev = prevPopupOptions.current;
 
     if (prev.offset !== popupOptions.offset) {
@@ -457,7 +458,7 @@ function MarkerPopup({
     }
 
     prevPopupOptions.current = popupOptions;
-  }
+  });
 
   const handleClose = () => popup.remove();
 
@@ -534,7 +535,8 @@ function MarkerTooltip({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map]);
 
-  if (tooltip.isOpen()) {
+  useEffect(() => {
+    if (!tooltip.isOpen()) return;
     const prev = prevTooltipOptions.current;
 
     if (prev.offset !== popupOptions.offset) {
@@ -545,7 +547,7 @@ function MarkerTooltip({
     }
 
     prevTooltipOptions.current = popupOptions;
-  }
+  });
 
   return createPortal(
     <div
@@ -861,7 +863,8 @@ function MapPopup({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map]);
 
-  if (popup.isOpen()) {
+  useEffect(() => {
+    if (!popup.isOpen()) return;
     const prev = popupOptionsRef.current;
 
     if (
@@ -878,7 +881,7 @@ function MapPopup({
       popup.setMaxWidth(popupOptions.maxWidth ?? "none");
     }
     popupOptionsRef.current = popupOptions;
-  }
+  });
 
   const handleClose = () => {
     popup.remove();

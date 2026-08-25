@@ -78,9 +78,8 @@ export function CvUploadSection({ user }: CvUploadSectionProps) {
 
         clearFiles();
         toast.success(t("cv.uploadSuccess"));
-      } catch (e: any) {
-        console.error(e);
-        toast.error(e.message || t("cv.uploadError"));
+      } catch {
+        toast.error(t("cv.uploadError"));
       }
     });
   }
@@ -90,9 +89,8 @@ export function CvUploadSection({ user }: CvUploadSectionProps) {
     try {
       await deleteCv();
       toast.success(t("cv.deleteSuccess"));
-    } catch (e: any) {
-      console.error(e);
-      toast.error(e.message || t("cv.deleteError"));
+    } catch {
+      toast.error(t("cv.deleteError"));
     } finally {
       setIsDeleting(false);
     }

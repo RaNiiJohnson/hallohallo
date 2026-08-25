@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
 import { Check, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -106,7 +106,7 @@ export function ProfileEditForm({ user, onSaved }: ProfileEditFormProps) {
     defaultValues: buildDefaultValues(user),
   });
 
-  const bioValue = form.watch("bio") ?? "";
+  const bioValue = useWatch({ control: form.control, name: "bio" }) ?? "";
 
   const onSubmit = async (data: FormSchema) => {
     try {

@@ -74,6 +74,7 @@ export function ChatWindow({
 
     if (isAtBottom || isMe) {
       bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Intentional: resetting counter when scrolled to bottom or own message
       if (isMe) setNewCount(0);
     } else {
       setNewCount((c) => c + 1);

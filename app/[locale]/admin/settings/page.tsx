@@ -9,7 +9,9 @@ export default function SettingsPage() {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-4xl">
       <div>
         <h2 className="text-2xl font-bold tracking-tight">Paramètres</h2>
-        <p className="text-muted-foreground">Configurez les options globales de la plateforme.</p>
+        <p className="text-muted-foreground">
+          Configurez les options globales de la plateforme.
+        </p>
       </div>
 
       <div className="grid gap-6">
@@ -18,20 +20,25 @@ export default function SettingsPage() {
             <Settings2 className="h-5 w-5 text-primary" />
             <h3 className="text-lg font-semibold">Général</h3>
           </div>
-          
+
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label className="text-base">Mode Maintenance</Label>
-                <p className="text-sm text-muted-foreground">Désactive l'accès au site pour tous les utilisateurs non-admin.</p>
+                <p className="text-sm text-muted-foreground">
+                  Désactive l&apos;accès au site pour tous les utilisateurs
+                  non-admin.
+                </p>
               </div>
               <Switch />
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label className="text-base">Inscriptions Ouvertes</Label>
-                <p className="text-sm text-muted-foreground">Permet aux nouveaux utilisateurs de créer un compte.</p>
+                <p className="text-sm text-muted-foreground">
+                  Permet aux nouveaux utilisateurs de créer un compte.
+                </p>
               </div>
               <Switch defaultChecked />
             </div>
@@ -43,16 +50,19 @@ export default function SettingsPage() {
             <Shield className="h-5 w-5 text-primary" />
             <h3 className="text-lg font-semibold">Modération</h3>
           </div>
-          
+
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label className="text-base">Auto-approbation des offres</Label>
-                <p className="text-sm text-muted-foreground">Les offres des utilisateurs de confiance sont publiées sans modération.</p>
+                <p className="text-sm text-muted-foreground">
+                  Les offres des utilisateurs de confiance sont publiées sans
+                  modération.
+                </p>
               </div>
               <Switch defaultChecked />
             </div>
-            
+
             <div className="space-y-2">
               <Label>Mots interdits (séparés par des virgules)</Label>
               <Input defaultValue="spam, arnaque, insult1, insult2" />
@@ -65,7 +75,7 @@ export default function SettingsPage() {
             <Mail className="h-5 w-5 text-primary" />
             <h3 className="text-lg font-semibold">Emails</h3>
           </div>
-          
+
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Email de contact (Support)</Label>

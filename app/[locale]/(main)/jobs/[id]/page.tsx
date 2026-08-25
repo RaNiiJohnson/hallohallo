@@ -35,7 +35,7 @@ import { EditJobDialog } from "./_component/editJobDialog";
 export default function JobDetailsPage() {
   const { id } = useParams();
   const user = useQuery(api.auth.auth.getCurrentUser);
-  const { isAuthenticated, isLoading } = useConvexAuth();
+  const { isLoading } = useConvexAuth();
 
   const timeT = useTimeTranslations();
   const locale = useLocale();

@@ -1,4 +1,4 @@
-export async function fetchPostJSON(url: string, data?: any) {
+export async function fetchPostJSON(url: string, data?: Record<string, unknown>) {
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -8,8 +8,8 @@ export async function fetchPostJSON(url: string, data?: any) {
       body: JSON.stringify(data || {}),
     });
     return await response.json();
-  } catch (err: any) {
-    throw new Error(err.message);
+  } catch (err: unknown) {
+    throw new Error(err instanceof Error ? err.message : String(err));
   }
 }
 
@@ -17,8 +17,8 @@ export async function fetchGetJSON(url: string) {
   try {
     const response = await fetch(url);
     return await response.json();
-  } catch (err: any) {
-    throw new Error(err.message);
+  } catch (err: unknown) {
+    throw new Error(err instanceof Error ? err.message : String(err));
   }
 }
 
@@ -45,7 +45,7 @@ export function formatAmountForStripe(
   });
   const parts = numberFormat.formatToParts(amount);
   let zeroDecimalCurrency: boolean = true;
-  for (let part of parts) {
+  for (const part of parts) {
     if (part.type === 'decimal') {
       zeroDecimalCurrency = false;
     }

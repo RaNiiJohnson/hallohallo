@@ -55,6 +55,7 @@ export function MagicCard({
   );
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Intentional: tracking client-side mount state for SSR-safe animations
     setIsMounted(true);
     reset();
   }, [reset]);

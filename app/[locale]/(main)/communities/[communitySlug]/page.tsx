@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link } from "@/i18n/navigation";
 import { api } from "@convex/_generated/api";
-import { Id } from "@convex/_generated/dataModel";
 import { useQuery } from "convex-helpers/react/cache";
 import { useAction, useConvexAuth, useMutation } from "convex/react";
 import {
@@ -35,8 +34,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CreatePostDialog } from "../_component/dialogs/createPostDialog";
-import SkeletonCommunity from "./skeleton";
 import { CommunityPostList } from "./_components/communityPostList";
+import SkeletonCommunity from "./skeleton";
 
 export default function CommunityClient() {
   const { communitySlug } = useParams();
@@ -310,10 +309,10 @@ export default function CommunityClient() {
         </DialogContent>
       </Dialog>
       <div className="max-w-4xl mx-auto py-2">
-        <CommunityPostList 
-          communitySlug={community.slug} 
-          communityId={community._id} 
-          isMember={!!isMember} 
+        <CommunityPostList
+          communitySlug={community.slug}
+          communityId={community._id}
+          isMember={!!isMember}
         />
       </div>
     </div>

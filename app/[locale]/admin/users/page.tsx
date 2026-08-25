@@ -81,8 +81,8 @@ export default function UsersPage() {
         });
         toast.success(`Utilisateur ${name} créé avec succès`);
         setIsCreateOpen(false);
-      } catch (error: any) {
-        toast.error(error.message || "Erreur lors de la création");
+      } catch {
+        toast.error("Erreur lors de la création");
       }
     });
   };
@@ -97,8 +97,8 @@ export default function UsersPage() {
           await banUser({ userId: user.id });
           toast.success(`Utilisateur ${user.name} banni`);
         }
-      } catch (error: any) {
-        toast.error(error.message || "Erreur lors de l'opération");
+      } catch {
+        toast.error("Erreur lors de l'opération");
       } finally {
         setConfirmBan(null);
       }
@@ -110,8 +110,8 @@ export default function UsersPage() {
       try {
         await setUserRole({ userId: user.id, role });
         toast.success(`Rôle de ${user.name} mis à jour : ${role}`);
-      } catch (error: any) {
-        toast.error(error.message || "Erreur lors du changement de rôle");
+      } catch {
+        toast.error("Erreur lors du changement de rôle");
       }
     });
   };
@@ -123,10 +123,8 @@ export default function UsersPage() {
         toast.success(
           `Type d'utilisateur de ${user.name} mis à jour : ${userType}`,
         );
-      } catch (error: any) {
-        toast.error(
-          error.message || "Erreur lors du changement de type d'utilisateur",
-        );
+      } catch {
+        toast.error("Erreur lors du changement de type d'utilisateur");
       }
     });
   };
@@ -136,8 +134,8 @@ export default function UsersPage() {
       try {
         await deleteUser({ userId: user.id });
         toast.success(`Utilisateur ${user.name} supprimé`);
-      } catch (error: any) {
-        toast.error(error.message || "Erreur lors de la suppression");
+      } catch {
+        toast.error("Erreur lors de la suppression");
       } finally {
         setConfirmDelete(null);
       }
@@ -376,8 +374,8 @@ export default function UsersPage() {
               </span>
               {confirmBan?.banned && (
                 <span className="block text-amber-600 dark:text-amber-400 font-medium">
-                  L'utilisateur ne pourra plus se connecter à la plateforme tant
-                  que le bannissement est actif.
+                  L&apos;utilisateur ne pourra plus se connecter à la plateforme
+                  tant que le bannissement est actif.
                 </span>
               )}
             </DialogDescription>
@@ -515,7 +513,7 @@ export default function UsersPage() {
                 {isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 ) : null}
-                Créer l'utilisateur
+                Créer l&apos;utilisateur
               </Button>
             </DialogFooter>
           </form>
