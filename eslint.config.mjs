@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Convex generated files:
     "convex/_generated/**",
+    // convex better-auth generated files:
+    "convex/betterAuth/_generated/**",
   ]),
 ]);
 
