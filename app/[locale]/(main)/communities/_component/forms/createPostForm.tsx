@@ -59,7 +59,11 @@ export function CreatePostForm({
         communityId,
       });
 
-      if (typeof result === "object" && result !== null && "retryAfter" in result) {
+      if (
+        typeof result === "object" &&
+        result !== null &&
+        "retryAfter" in result
+      ) {
         const seconds = Math.ceil(result.retryAfter / 1000);
         toast.error(t("errorRateLimit", { seconds }));
         return;
@@ -68,7 +72,7 @@ export function CreatePostForm({
       toast.success(t("successToast"));
       form.reset();
       onSuccess?.();
-    } catch (error) {
+    } catch {
       toast.error(t("errorToast"));
     }
   };

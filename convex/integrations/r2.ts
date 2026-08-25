@@ -8,13 +8,13 @@ import { authComponent } from "../auth/auth";
 export const r2 = new R2(components.r2);
 
 export const { generateUploadUrl, syncMetadata } = r2.clientApi<DataModel>({
-  checkUpload: async (ctx, bucket) => {
+  checkUpload: async (ctx) => {
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) {
       throw new Error("Not authenticated");
     }
   },
-  onUpload: async (ctx, bucket, key) => {
+  onUpload: async () => {
     // Post upload operations can go here
   },
 });

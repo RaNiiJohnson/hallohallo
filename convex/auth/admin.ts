@@ -2,9 +2,9 @@ import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
 import { components } from "../_generated/api";
 import { action, mutation, query } from "../_generated/server";
+import { runCascadeDelete } from "../cascadeDeletes";
 import { authComponent, createAuth } from "./auth";
 import { UserWithRoleType } from "./users";
-import { runCascadeDelete } from "../cascadeDeletes";
 
 export const listUsers = query({
   args: {},
@@ -47,7 +47,7 @@ export const setUserRole = mutation({
   },
   handler: async (ctx, args) => {
     await ctx.runMutation(components.betterAuth.users.updateUser, {
-      id: args.userId as any,
+      id: args.userId,
       patch: {
         role: args.role,
       },
@@ -62,7 +62,7 @@ export const setUserType = mutation({
   },
   handler: async (ctx, args) => {
     await ctx.runMutation(components.betterAuth.users.updateUser, {
-      id: args.userId as any,
+      id: args.userId,
       patch: {
         userType: args.userType,
       },

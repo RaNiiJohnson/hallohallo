@@ -4,6 +4,7 @@ import { convexTest } from "convex-test";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { api } from "../_generated/api";
 import { Id } from "../_generated/dataModel";
+import { limiter } from "../rateLimits";
 import schema from "../schema";
 import { modules } from "../test.setup";
 
@@ -34,11 +35,14 @@ describe("Posts", () => {
   beforeEach(async () => {
     t = convexTest(schema, modules);
 
-    const communityResult = await t.mutation(api.communities.mutations.createCommunty, {
-      name: "Post Community",
-      description: "Description",
-      privacy: "public",
-    });
+    const communityResult = await t.mutation(
+      api.communities.mutations.createCommunty,
+      {
+        name: "Post Community",
+        description: "Description",
+        privacy: "public",
+      },
+    );
 
     postId = (await t.mutation(api.posts.mutations.createPost, {
       title: "Post Title",
@@ -79,5 +83,22 @@ describe("Posts", () => {
       slug: postSlug,
     });
     expect(result).toBeNull();
+  });
+
+  it("should not create a post when the rate limit is reached", async () => {
+    vi.mocked(limiter.limit).mockResolvedValueOnce({
+      ok: false,
+      retryAfter: 60,
+    });
+
+    const result = await t.mutation(api.posts.mutations.createPost, {
+      title: "Rate limited post",
+      content: "Post Content",
+      communityId: (await t.query(api.posts.queries.getPostWithMeta, {
+        slug: postSlug,
+      }))!.communityId,
+    });
+
+    expect(result).toEqual({ retryAfter: 60 });
   });
 });

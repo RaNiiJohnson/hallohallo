@@ -1,18 +1,48 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MoreHorizontal, Search, SlidersHorizontal, Plus, Building } from "lucide-react";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  MoreHorizontal,
+  Search,
+  SlidersHorizontal,
+  Plus,
+  Building,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 export default function ListingPage() {
   const listings = [
-    { id: "1", title: "Colocation 3P au centre", type: "Chambre", location: "Munich", status: "Publiée", price: "600€", author: "Fara Miora" },
-    { id: "2", title: "Studio meublé proche métro", type: "Appartement", location: "Berlin", status: "Publiée", price: "950€", author: "Rivo Rakoto" },
-    { id: "3", title: "Maison de famille", type: "Maison", location: "Frankfurt", status: "En attente", price: "2100€", author: "Haja V" },
+    {
+      id: "1",
+      title: "Colocation 3P au centre",
+      type: "Chambre",
+      location: "Munich",
+      status: "Publiée",
+      price: "600€",
+      author: "Fara Miora",
+    },
+    {
+      id: "2",
+      title: "Studio meublé proche métro",
+      type: "Appartement",
+      location: "Berlin",
+      status: "Publiée",
+      price: "950€",
+      author: "Rivo Rakoto",
+    },
+    {
+      id: "3",
+      title: "Maison de famille",
+      type: "Maison",
+      location: "Frankfurt",
+      status: "En attente",
+      price: "2100€",
+      author: "Haja V",
+    },
   ];
 
   return (
@@ -20,7 +50,9 @@ export default function ListingPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Immobilier</h2>
-          <p className="text-muted-foreground">Gérez les annonces immobilières et colocations.</p>
+          <p className="text-muted-foreground">
+            Gérez les annonces immobilières et colocations.
+          </p>
         </div>
         <Button className="gap-2">
           <Plus className="h-4 w-4" /> Nouvelle annonce
@@ -43,18 +75,35 @@ export default function ListingPage() {
           <table className="w-full caption-bottom text-sm">
             <thead className="[&_tr]:border-b">
               <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Titre</th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Type</th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Lieu</th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Prix</th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Auteur</th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Statut</th>
-                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Actions</th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                  Titre
+                </th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                  Type
+                </th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                  Lieu
+                </th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                  Prix
+                </th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                  Auteur
+                </th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                  Statut
+                </th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="[&_tr:last-child]:border-0">
               {listings.map((item) => (
-                <tr key={item.id} className="border-b transition-colors hover:bg-muted/50">
+                <tr
+                  key={item.id}
+                  className="border-b transition-colors hover:bg-muted/50"
+                >
                   <td className="p-4 align-middle">
                     <div className="flex items-center gap-2">
                       <Building className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -63,14 +112,22 @@ export default function ListingPage() {
                   </td>
                   <td className="p-4 align-middle">{item.type}</td>
                   <td className="p-4 align-middle">{item.location}</td>
-                  <td className="p-4 align-middle font-semibold">{item.price}</td>
-                  <td className="p-4 align-middle text-muted-foreground">{item.author}</td>
+                  <td className="p-4 align-middle font-semibold">
+                    {item.price}
+                  </td>
+                  <td className="p-4 align-middle text-muted-foreground">
+                    {item.author}
+                  </td>
                   <td className="p-4 align-middle">
-                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                      item.status === "Publiée" ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400" :
-                      item.status === "En attente" ? "bg-amber-500/15 text-amber-700 dark:text-amber-400" :
-                      "bg-muted text-muted-foreground"
-                    }`}>
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                        item.status === "Publiée"
+                          ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+                          : item.status === "En attente"
+                            ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+                            : "bg-muted text-muted-foreground"
+                      }`}
+                    >
                       {item.status}
                     </span>
                   </td>
@@ -83,10 +140,14 @@ export default function ListingPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Voir l'annonce</DropdownMenuItem>
+                        <DropdownMenuItem>Voir l&apos;annonce</DropdownMenuItem>
                         <DropdownMenuItem>Approuver</DropdownMenuItem>
-                        <DropdownMenuItem>Marquer comme expirée</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive focus:text-destructive">Supprimer</DropdownMenuItem>
+                        <DropdownMenuItem>
+                          Marquer comme expirée
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive focus:text-destructive">
+                          Supprimer
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </td>

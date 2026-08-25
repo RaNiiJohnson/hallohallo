@@ -56,6 +56,7 @@ export function ConvexClientProvider({
   return (
     <ConvexBetterAuthProvider
       client={convex}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Known type mismatch between better-auth plugin generics and ConvexBetterAuthProvider's AuthClient type
       authClient={authClient as any}
       initialToken={initialToken}
     >

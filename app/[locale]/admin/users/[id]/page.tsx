@@ -1,6 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import { ArrowLeft, User, Mail, MapPin, Calendar, Shield, Activity, Ban } from "lucide-react";
+import {
+  Activity,
+  ArrowLeft,
+  Ban,
+  Calendar,
+  Mail,
+  MapPin,
+  Shield,
+} from "lucide-react";
 
 export default function UserDetailPage() {
   const user = {
@@ -16,7 +24,7 @@ export default function UserDetailPage() {
       posts: 12,
       comments: 45,
       reports: 0,
-    }
+    },
   };
 
   return (
@@ -28,7 +36,9 @@ export default function UserDetailPage() {
           </Link>
         </Button>
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Profil de {user.name}</h2>
+          <h2 className="text-2xl font-bold tracking-tight">
+            Profil de {user.name}
+          </h2>
           <p className="text-muted-foreground">ID: {user.id}</p>
         </div>
       </div>
@@ -38,7 +48,10 @@ export default function UserDetailPage() {
         <div className="md:col-span-1 space-y-6">
           <div className="rounded-xl border bg-card p-6 text-center shadow-sm">
             <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-3xl font-bold text-primary mb-4">
-              {user.name.split(' ').map(n => n[0]).join('')}
+              {user.name
+                .split(" ")
+                .map((n) => n[0])
+                .join("")}
             </div>
             <h3 className="text-xl font-semibold">{user.name}</h3>
             <span className="inline-flex mt-2 items-center rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
@@ -65,10 +78,16 @@ export default function UserDetailPage() {
             </div>
 
             <div className="mt-6 space-y-2">
-              <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white" variant="outline">
+              <Button
+                className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                variant="outline"
+              >
                 <Activity className="mr-2 h-4 w-4" /> Suspendre
               </Button>
-              <Button className="w-full text-destructive border-destructive/30 hover:bg-destructive/10" variant="outline">
+              <Button
+                className="w-full text-destructive border-destructive/30 hover:bg-destructive/10"
+                variant="outline"
+              >
                 <Ban className="mr-2 h-4 w-4" /> Bannir
               </Button>
             </div>
@@ -84,11 +103,17 @@ export default function UserDetailPage() {
             </div>
             <div className="rounded-xl border bg-card p-4 shadow-sm text-center">
               <div className="text-3xl font-bold">{user.stats.comments}</div>
-              <div className="text-xs text-muted-foreground mt-1">Commentaires</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Commentaires
+              </div>
             </div>
             <div className="rounded-xl border bg-card p-4 shadow-sm text-center">
-              <div className="text-3xl font-bold text-destructive">{user.stats.reports}</div>
-              <div className="text-xs text-muted-foreground mt-1">Signalements reçus</div>
+              <div className="text-3xl font-bold text-destructive">
+                {user.stats.reports}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Signalements reçus
+              </div>
             </div>
           </div>
 

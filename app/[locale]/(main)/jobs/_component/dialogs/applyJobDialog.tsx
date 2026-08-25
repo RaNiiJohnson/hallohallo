@@ -108,10 +108,8 @@ export function ApplyJobDialog({
 
         toast.success(t("success.applied"));
         setIsOpen(false);
-      } catch (e: any) {
-        console.log({ e });
-
-        toast.error(e.message || t("errors.applyError"));
+      } catch {
+        toast.error(t("errors.applyError"));
       }
     });
   }

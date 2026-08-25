@@ -1,14 +1,16 @@
-import { v } from "convex/values";
-import { internalQuery } from "./_generated/server";
-import { internalMutation } from "./_generated/server";
-import { customMutation, customCtx } from "convex-helpers/server/customFunctions";
-import { Triggers } from "convex-helpers/server/triggers";
-import { DataModel } from "./_generated/dataModel";
 import {
-  postLikesCount,
-  postCommentsCount,
-  communityPostsCount,
+  customCtx,
+  customMutation,
+} from "convex-helpers/server/customFunctions";
+import { Triggers } from "convex-helpers/server/triggers";
+import { v } from "convex/values";
+import { DataModel, Id, TableNames } from "./_generated/dataModel";
+import { internalMutation, internalQuery } from "./_generated/server";
+import {
   communityMembersCount,
+  communityPostsCount,
+  postCommentsCount,
+  postLikesCount,
   postShuffle,
   postSortedByDate,
   postSortedByLikes,
@@ -25,7 +27,7 @@ triggers.register("posts", postSortedByLikes.trigger());
 
 const mutationWithTriggers = customMutation(
   internalMutation,
-  customCtx(triggers.wrapDB)
+  customCtx(triggers.wrapDB),
 );
 
 /**
@@ -42,12 +44,12 @@ export const resolveChildren = internalQuery({
   },
   handler: async (ctx, args) => {
     const docs = await ctx.db
-      .query(args.sourceTable as any)
-      .withIndex(args.indexName as any, (q: any) =>
-        q.eq(args.fieldName, args.parentId),
+      .query(args.sourceTable as TableNames)
+      .withIndex(args.indexName as never, (q) =>
+        q.eq(args.fieldName as never, args.parentId as never),
       )
       .collect();
-    return docs.map((d: any) => d._id as string);
+    return docs.map((d) => d._id);
   },
 });
 
@@ -61,7 +63,6 @@ export const deleteDocument = mutationWithTriggers({
     id: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.delete(args.id as any);
+    await ctx.db.delete(args.id as Id<TableNames>);
   },
 });
-

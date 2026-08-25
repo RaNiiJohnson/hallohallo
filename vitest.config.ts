@@ -10,7 +10,12 @@ export default defineConfig({
           name: "convex",
           include: ["convex/**/*.test.{ts,js}"],
           environment: "edge-runtime",
-          setupFiles: ["./convex/test.posthog.mock.ts"],
+          setupFiles: [
+            "./convex/test.aggregates.mock.ts",
+            "./convex/test.ratelimits.mock.ts",
+            "./convex/test.posthog.mock.ts",
+            "./convex/test.cascadeDeletes.mock.ts",
+          ],
         },
       },
       {

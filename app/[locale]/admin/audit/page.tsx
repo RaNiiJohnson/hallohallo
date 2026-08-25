@@ -50,7 +50,7 @@ export default function AuditLogPage() {
       <div>
         <h2 className="text-2xl font-bold tracking-tight">Audit log</h2>
         <p className="text-muted-foreground">
-          Historique de toutes les actions d'administration.
+          Historique de toutes les actions d&apos;administration.
         </p>
       </div>
 
