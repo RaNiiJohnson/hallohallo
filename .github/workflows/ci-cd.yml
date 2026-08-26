@@ -100,6 +100,7 @@ jobs:
 
           env -u CONVEX_DEPLOYMENT \
             CONVEX_AGENT_MODE=anonymous \
+            POSTHOG_PROJECT_TOKEN=ci-placeholder \
             pnpm exec convex dev \
             --once \
             --typecheck disable \
