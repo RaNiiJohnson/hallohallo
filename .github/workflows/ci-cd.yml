@@ -98,9 +98,13 @@ jobs:
 
           trap cleanup EXIT
 
+          cat > .env.local <<'EOF'
+          POSTHOG_PROJECT_TOKEN=ci-placeholder
+          EOF
+
+
           env -u CONVEX_DEPLOYMENT \
             CONVEX_AGENT_MODE=anonymous \
-            POSTHOG_PROJECT_TOKEN=ci-placeholder \
             pnpm exec convex dev \
             --once \
             --typecheck disable \
