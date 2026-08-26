@@ -137,11 +137,19 @@ jobs:
       # Vercel production deployment
       # -----------------------------
 
-      - name: Pull Vercel environment
+      - name: Link and pull Vercel environment
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           rm -rf .vercel
+          pnpm dlx vercel@latest link \
+            --yes \
+            --team="$VERCEL_ORG_ID" \
+            --project="$VERCEL_PROJECT_ID" \
+            --token="$VERCEL_TOKEN"
+
           pnpm dlx vercel@latest pull \
             --yes \
             --environment=production \
