@@ -70,42 +70,9 @@ jobs:
       # -----------------------------
 
       - name: Verify Convex generated code
-        env:
-          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
-          POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
         run: |
-          tmp_dir="${RUNNER_TEMP}/convex-codegen-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-$$"
-          mkdir -p "$tmp_dir"
-
-          had_env_local=0
-          had_gitignore=0
-          had_convex_dir=0
-
-          [ -e .env.local ] && had_env_local=1
-          [ -e .gitignore ] && had_gitignore=1
-          [ -e .convex ] && had_convex_dir=1
-
-          cleanup() {
-            if [ "$had_env_local" -eq 0 ] && [ -e .env.local ]; then
-              mv .env.local "$tmp_dir/.env.local"
-            fi
-
-            if [ "$had_gitignore" -eq 0 ] && [ -e .gitignore ]; then
-              mv .gitignore "$tmp_dir/.gitignore"
-            fi
-
-            if [ "$had_convex_dir" -eq 0 ] && [ -e .convex ]; then
-              mv .convex "$tmp_dir/.convex"
-            fi
-          }
-
-          trap cleanup EXIT
-
-          cat > .env.local <<'EOF'
-          POSTHOG_PROJECT_TOKEN=ci-placeholder
-          EOF
-
-
+          pnpm exec convex init
+          pnpm exec convex env set POSTHOG_PROJECT_TOKEN 'ci-placeholder'
           env -u CONVEX_DEPLOYMENT \
             CONVEX_AGENT_MODE=anonymous \
             pnpm exec convex dev \
