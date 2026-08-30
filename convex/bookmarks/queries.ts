@@ -1,4 +1,3 @@
-// convex/bookmarks.ts
 import { Id } from "../_generated/dataModel";
 import { query } from "../_generated/server";
 import { authComponent } from "../auth/auth";
