@@ -43,7 +43,6 @@ import type * as posts_mutations from "../posts/mutations.js";
 import type * as posts_queries from "../posts/queries.js";
 import type * as rateLimits from "../rateLimits.js";
 import type * as sendEmails from "../sendEmails.js";
-import type * as utils_clean from "../utils/clean.js";
 
 import type {
   ApiFromModules,
@@ -87,7 +86,6 @@ declare const fullApi: ApiFromModules<{
   "posts/queries": typeof posts_queries;
   rateLimits: typeof rateLimits;
   sendEmails: typeof sendEmails;
-  "utils/clean": typeof utils_clean;
 }>;
 
 /**

@@ -1,4 +1,3 @@
-// convex/listings.ts
 import {
   OrderedQuery,
   paginationOptsValidator,
