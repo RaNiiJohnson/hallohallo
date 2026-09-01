@@ -2,15 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
+import clsx from "clsx";
 import {
   ArrowDownNarrowWide,
   ArrowUpNarrowWide,
+  Bookmark,
   Flame,
   Shuffle,
-  Bookmark,
 } from "lucide-react";
-import { SortMode } from "./types";
 import { useTranslations } from "next-intl";
+import { SortMode } from "./types";
 
 const FILTERS: { mode: SortMode; icon: React.ElementType }[] = [
   { mode: "shuffle", icon: Shuffle },
@@ -36,7 +37,10 @@ export function ModeToggle({
           key={m}
           variant={mode === m ? "default" : "outline"}
           size="xs"
-          className="gap-1.5 flex-1 md:flex-initial"
+          className={clsx(
+            "gap-1.5 flex-1 md:flex-initial",
+            mode === m ? "text-primary-foreground" : "text-muted-foreground",
+          )}
           onClick={() => onChange(m)}
         >
           <Icon size={14} />
