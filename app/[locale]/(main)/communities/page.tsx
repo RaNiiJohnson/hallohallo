@@ -17,7 +17,7 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-background pb-12">
       {/* Header */}
-      <div className="max-w-4xl mx-auto px-4 pt-5 pb-3 border-b border-border">
+      <div className="max-w-4xl mx-auto px-4 pt-5">
         <div className="flex items-center justify-between gap-3 mb-3">
           <h1 className="text-xl font-bold">{t("title")}</h1>
           <div className="flex items-center gap-2">
