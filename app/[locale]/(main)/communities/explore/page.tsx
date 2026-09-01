@@ -1,86 +1,90 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { api } from "@convex/_generated/api";
 import { usePaginatedQuery } from "convex/react";
-import { Users, LayoutGrid } from "lucide-react";
-import { Link } from "@/i18n/navigation";
-import { Button } from "@/components/ui/button";
+import { FileText, LayoutGrid, Users } from "lucide-react";
 
 export default function ExploreCommunitiesPage() {
+  const t = useTranslations("communities.explore");
   const { results, status, loadMore } = usePaginatedQuery(
     api.communities.queries.getCommunitiesPreview,
     {},
-    { initialNumItems: 12 },
+    { initialNumItems: 25 },
   );
 
   return (
     <div className="min-h-screen bg-background pb-12">
-      <div className="max-w-6xl mx-auto lg:px-4 sm:px-2 py-8">
-        <div className="mb-8 p-4">
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <LayoutGrid className="size-8 text-primary" />
-            Explorer les communautés
+      <div className="max-w-3xl mx-auto px-3 sm:px-4 py-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <LayoutGrid className="size-6 text-primary" />
+            {t("title")}
           </h1>
-          <p className="text-muted-foreground mt-2">
-            Découvrez et rejoignez des communautés qui partagent vos centres
-            d&apos;intérêt.
+          <p className="text-muted-foreground text-sm mt-1">
+            {t("description")}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+        <div className="rounded-md border bg-card divide-y divide-border overflow-hidden dark:bg-card/35">
           {results.map((community) => (
             <Link
               key={community._id}
               href={`/communities/${community.slug}`}
-              className="group flex flex-col p-6 rounded-xl border bg-card dark:bg-card/35 hover:border-primary/50 hover:shadow-sm transition-all h-full"
+              className="group flex items-center gap-3 px-3 py-2 hover:bg-muted/50 transition-colors"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-2 text-primary">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Users className="size-5" />
-                  </div>
-                  <h2 className="font-semibold text-lg line-clamp-1 group-hover:underline">
-                    {community.name}
-                  </h2>
-                </div>
+              <div className="shrink-0 size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <Users className="size-4" />
               </div>
-              <p className="text-sm text-foreground/80 line-clamp-3 mb-6 flex-1">
-                {community.description}
-              </p>
-
-              {/* Show recent posts stats if available */}
-              <div className="flex flex-col gap-2 mb-4 pt-4 border-t border-border/50">
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span className="font-medium">
-                    {community.membersCount} membre(s)
-                  </span>
-                  <span>{community.postsCount} post(s)</span>
-                </div>
+              <div className="min-w-0 flex-1 flex flex-col">
+                <span className="font-medium text-sm truncate group-hover:underline">
+                  {community.name}
+                </span>
+                <span className="hidden sm:block text-xs text-muted-foreground truncate">
+                  {community.description}
+                </span>
               </div>
 
-              <div className="mt-auto flex items-center justify-center py-2 w-full rounded-md bg-secondary text-secondary-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-colors text-sm font-medium">
-                Visiter la communauté
+              <div className="hidden md:flex items-center gap-3 shrink-0 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <Users className="size-3" />
+                  {community.membersCount}
+                </span>
+                <span className="flex items-center gap-1">
+                  <FileText className="size-3" />
+                  {community.postsCount}
+                </span>
               </div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="shrink-0 h-7 px-3 text-xs"
+                asChild
+              >
+                <span>{t("visit")}</span>
+              </Button>
             </Link>
           ))}
         </div>
 
         {status === "LoadingFirstPage" && (
-          <div className="text-center mt-12 text-muted-foreground">
-            Chargement des communautés...
+          <div className="text-center mt-8 text-sm text-muted-foreground">
+            {t("loadingFirstPage")}
           </div>
         )}
 
         {status === "LoadingMore" && (
-          <div className="text-center mt-12 text-muted-foreground">
-            Chargement...
+          <div className="text-center mt-8 text-sm text-muted-foreground">
+            {t("loadingMore")}
           </div>
         )}
 
         {status === "CanLoadMore" && (
-          <div className="flex justify-center mt-12">
-            <Button onClick={() => loadMore(12)} variant="outline" size="lg">
-              Charger plus
+          <div className="flex justify-center mt-8">
+            <Button onClick={() => loadMore(25)} variant="outline" size="sm">
+              {t("canLoadMore")}
             </Button>
           </div>
         )}

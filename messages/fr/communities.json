@@ -95,5 +95,13 @@
     "comment": "Commenter",
     "commentsCount": "{count} commentaire",
     "commentsCountPlural": "{count} commentaires"
+  },
+  "explore": {
+    "title": "Explorer les communautés",
+    "description": "Découvrez et rejoignez des communautés qui partagent vos centres d'intérêt.",
+    "visit": "Visiter",
+    "loadingFirstPage": "Chargement des communautés...",
+    "loadingMore": "Chargement...",
+    "canLoadMore": "Charger plus"
   }
 }
