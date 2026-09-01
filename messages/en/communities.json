@@ -1,5 +1,6 @@
 {
   "title": "Communities",
+  "exploreAction": "Explore",
   "dialogs": {
     "createCommunity": {
       "trigger": "Create a community",
