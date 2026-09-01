@@ -182,7 +182,7 @@ export function MainSidebar({
           )}
         </Authenticated>
 
-        <SidebarGroup>
+        <SidebarGroup className="group-data-[collapsible=icon]:hidden">
           <SidebarGroupLabel>{t("communities.label")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
