@@ -95,5 +95,13 @@
     "comment": "Comment",
     "commentsCount": "{count} comment",
     "commentsCountPlural": "{count} comments"
+  },
+  "explore": {
+    "title": "Explore communities",
+    "description": "Discover and join communities that share your interests.",
+    "visit": "Visit",
+    "loadingFirstPage": "Loading communities...",
+    "loadingMore": "Loading...",
+    "canLoadMore": "Load more"
   }
 }
