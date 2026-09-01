@@ -1,24 +1,20 @@
 import {
   InputGroup,
   InputGroupAddon,
-  InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@radix-ui/react-popover";
-import { Filter, Search } from "lucide-react";
+import { Search } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function ComFilters() {
+  const t = useTranslations("jobs");
   return (
     <InputGroup>
-      <InputGroupInput placeholder="Rechercher ..." className="pl-10" />
+      <InputGroupInput placeholder={t("filters.search")} className="pl-10" />
       <InputGroupAddon>
         <Search className="h-4 w-4" />
       </InputGroupAddon>
-      <InputGroupAddon align="inline-end">
+      {/* <InputGroupAddon align="inline-end">
         <Popover>
           <PopoverTrigger asChild>
             <InputGroupButton variant="outline">
@@ -37,7 +33,7 @@ export default function ComFilters() {
             </div>
           </PopoverContent>
         </Popover>
-      </InputGroupAddon>
+      </InputGroupAddon> */}
     </InputGroup>
   );
 }

@@ -1,5 +1,6 @@
 {
   "title": "Communities",
+  "exploreAction": "Browse",
   "dialogs": {
     "createCommunity": {
       "trigger": "Create a community",
@@ -30,7 +31,8 @@
       "privacyLabel": "Visibility *",
       "privacyPlaceholder": "Choose visibility",
       "submiting": "Creating...",
-      "submit": "Create community"
+      "submit": "Create community",
+      "characters": "characters"
     },
     "createPost": {
       "errorTitleMin": "The title must contain at least 3 characters",
@@ -95,5 +97,13 @@
     "comment": "Comment",
     "commentsCount": "{count} comment",
     "commentsCountPlural": "{count} comments"
+  },
+  "explore": {
+    "title": "Explore communities",
+    "description": "Discover and join communities that share your interests.",
+    "visit": "Visit",
+    "loadingFirstPage": "Loading communities...",
+    "loadingMore": "Loading...",
+    "canLoadMore": "Load more"
   }
 }

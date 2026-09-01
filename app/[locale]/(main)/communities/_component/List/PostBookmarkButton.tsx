@@ -57,7 +57,7 @@ export const PostBookmarkButton = ({
       variant="ghost"
       size="sm"
       className={cn(
-        "group flex items-center gap-1.5 transition-colors h-8 px-2 ml-auto",
+        "group flex items-center gap-1.5 transition-colors h-8 px-2",
         optimisticIsBookmarked
           ? "text-blue-500 hover:bg-blue-500/20"
           : "text-muted-foreground hover:text-foreground hover:bg-muted",

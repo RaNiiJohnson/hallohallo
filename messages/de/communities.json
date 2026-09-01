@@ -1,5 +1,6 @@
 {
   "title": "Gemeinschaften",
+  "exploreAction": "Durchstöberncourir",
   "dialogs": {
     "createCommunity": {
       "trigger": "Community erstellen",
@@ -30,7 +31,8 @@
       "privacyLabel": "Sichtbarkeit *",
       "privacyPlaceholder": "Sichtbarkeit wählen",
       "submiting": "Wird erstellt...",
-      "submit": "Community erstellen"
+      "submit": "Community erstellen",
+      "characters": "Zeichen"
     },
     "createPost": {
       "errorTitleMin": "Der Titel muss mindestens 3 Zeichen lang sein",
@@ -95,5 +97,13 @@
     "comment": "Kommentieren",
     "commentsCount": "{count} Kommentar",
     "commentsCountPlural": "{count} Kommentare"
+  },
+  "explore": {
+    "title": "Communities erkunden",
+    "description": "Entdecken Sie Communities, die Ihre Interessen teilen, und treten Sie ihnen bei.",
+    "visit": "Besuchen",
+    "loadingFirstPage": "Communities werden geladen...",
+    "loadingMore": "Wird geladen...",
+    "canLoadMore": "Mehr laden"
   }
 }
