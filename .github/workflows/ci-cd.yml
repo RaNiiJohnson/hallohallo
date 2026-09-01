@@ -146,7 +146,7 @@ jobs:
           rm -rf .vercel
           pnpm dlx vercel@latest link \
             --yes \
-            --team="$VERCEL_ORG_ID" \
+            --scope="$VERCEL_ORG_ID" \
             --project="$VERCEL_PROJECT_ID" \
             --token="$VERCEL_TOKEN"
 
