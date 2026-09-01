@@ -22,25 +22,25 @@ export function PostCard({
   return (
     <div className="block px-4 py-4 hover:bg-muted/30 transition-colors border-b border-border bg-background max-w-4xl mx-auto">
       <div className="flex sm:flex-row flex-col text-xs text-muted-foreground mb-2">
-        <div className="flex flex-wrap items-center gap-1">
+        <div className="flex flex-wrap items-center gap-1.5">
           <Link
             href={`/hl/${post.author.slug}`}
-            className="flex items-center gap-1"
+            className="flex items-center gap-1.5 group/author"
           >
-            <Avatar>
+            <Avatar className="size-5">
               <AvatarImage src={post.author.image ?? "/random-user.png"} />
-              <AvatarFallback>
+              <AvatarFallback className="text-[10px]">
                 {post.authorName?.slice(0, 2)?.toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <span className="text-primary hover:underline">
+            <span className="text-foreground/80 group-hover/author:text-foreground group-hover/author:underline">
               {post.authorName}
             </span>
           </Link>
-          <ChevronRight className="size-3" />
+          <ChevronRight className="size-3 text-muted-foreground/50" />
           <Link
             href={`/communities/${post.communitySlug}`}
-            className="font-semibold text-accent-foreground hover:underline"
+            className="text-primary font-medium hover:underline"
           >
             {post.communityName}
           </Link>
@@ -51,15 +51,15 @@ export function PostCard({
         href={`/communities/${post.communitySlug}/${post.slug}`}
         className="block group"
       >
-        <h2 className="font-semibold text-foreground text-base leading-snug group-hover:underline">
+        <h2 className="font-bold text-foreground text-base leading-snug group-hover:underline">
           {post.title}
         </h2>
         {post.content && (
-          <p className="text-sm text-foreground/80 line-clamp-6 mb-2 mt-2 whitespace-pre-wrap">
+          <p className="text-sm text-foreground/70 line-clamp-6 mt-1 whitespace-pre-wrap">
             {post.content}
           </p>
         )}
-        <span className="text-xs text-muted-foreground mt-2">
+        <span className="block text-xs text-muted-foreground mt-1.5">
           {getRelativeTime(post._creationTime, timeT)}
         </span>
       </Link>

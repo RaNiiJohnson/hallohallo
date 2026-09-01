@@ -1,5 +1,6 @@
 {
   "title": "Gemeinschaften",
+  "exploreAction": "Entdecken",
   "dialogs": {
     "createCommunity": {
       "trigger": "Community erstellen",
