@@ -30,7 +30,8 @@
       "privacyLabel": "Visibility *",
       "privacyPlaceholder": "Choose visibility",
       "submiting": "Creating...",
-      "submit": "Create community"
+      "submit": "Create community",
+      "characters": "characters"
     },
     "createPost": {
       "errorTitleMin": "The title must contain at least 3 characters",

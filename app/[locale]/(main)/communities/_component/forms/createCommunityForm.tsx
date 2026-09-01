@@ -133,7 +133,7 @@ export function CreateCommunityForm({ onSuccess }: CreateCommunityFormProps) {
                   />
                   <InputGroupAddon align="block-end">
                     <InputGroupText className="tabular-nums">
-                      {field.value.length}
+                      {field.value.length} {t("characters")}
                     </InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>

@@ -30,7 +30,8 @@
       "privacyLabel": "Sichtbarkeit *",
       "privacyPlaceholder": "Sichtbarkeit wählen",
       "submiting": "Wird erstellt...",
-      "submit": "Community erstellen"
+      "submit": "Community erstellen",
+      "characters": "Zeichen"
     },
     "createPost": {
       "errorTitleMin": "Der Titel muss mindestens 3 Zeichen lang sein",
