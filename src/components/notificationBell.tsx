@@ -123,7 +123,7 @@ export function NotificationWidget() {
   );
 
   return (
-    <div className="fixed bottom-4 right-20 z-50">
+    <div className="fixed bottom-5 right-5 z-50">
       {isMobile ? (
         <>
           {!isOpen && (

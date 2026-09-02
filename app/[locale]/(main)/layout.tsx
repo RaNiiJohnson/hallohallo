@@ -1,8 +1,8 @@
-import { ChatWidget } from "@/components/ChatWidget";
 import Footer from "@/components/footer";
 import LocaleSwitcher from "@/components/locale-switcher";
 import { MainSidebar } from "@/components/main-sidebar";
 import { NotificationWidget } from "@/components/notificationBell";
+import { RoleGuard } from "@/components/role-guard";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
   SidebarInset,
@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WidgetProvider } from "@/components/WidgetContext";
-import { RoleGuard } from "@/components/role-guard";
 import { Locale } from "@/i18n/routing";
 import { setRequestLocale } from "next-intl/server";
 
@@ -47,8 +46,8 @@ export default async function RootLayout({
         </main>
         <Footer />
         <WidgetProvider>
-          <ChatWidget />
           <NotificationWidget />
+          {/* <ChatWidget /> */}
         </WidgetProvider>
       </SidebarInset>
     </SidebarProvider>
