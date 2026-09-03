@@ -91,90 +91,90 @@ jobs:
         env:
           CI: true
 
-  # =================================
-  # Production deployment
-  # =================================
+  # # =================================
+  # # Production deployment
+  # # =================================
 
-  deploy:
-    name: Deploy production
+  # deploy:
+  #   name: Deploy production
 
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
-    needs: quality
+  #   needs: quality
 
-    runs-on: ubuntu-latest
+  #   runs-on: ubuntu-latest
 
-    environment:
-      name: production
+  #   environment:
+  #     name: production
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+  #     - name: Setup pnpm
+  #       uses: pnpm/action-setup@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 22
+  #         cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
 
-      # -----------------------------
-      # Convex production deployment
-      # -----------------------------
+  #     # -----------------------------
+  #     # Convex production deployment
+  #     # -----------------------------
 
-      - name: Deploy Convex
-        env:
-          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
-          POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
-        run: pnpm exec convex deploy
+  #     - name: Deploy Convex
+  #       env:
+  #         CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
+  #         POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
+  #       run: pnpm exec convex deploy
 
-      # -----------------------------
-      # Vercel production deployment
-      # -----------------------------
+  #     # -----------------------------
+  #     # Vercel production deployment
+  #     # -----------------------------
 
-      - name: Link and pull Vercel environment
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: |
-          rm -rf .vercel
-          pnpm dlx vercel@latest link \
-            --yes \
-            --scope="$VERCEL_ORG_ID" \
-            --project="$VERCEL_PROJECT_ID" \
-            --token="$VERCEL_TOKEN"
+  #     - name: Link and pull Vercel environment
+  #       env:
+  #         VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  #         VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  #         VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  #       run: |
+  #         rm -rf .vercel
+  #         pnpm dlx vercel@latest link \
+  #           --yes \
+  #           --scope="$VERCEL_ORG_ID" \
+  #           --project="$VERCEL_PROJECT_ID" \
+  #           --token="$VERCEL_TOKEN"
 
-          pnpm dlx vercel@latest pull \
-            --yes \
-            --environment=production \
-            --token="$VERCEL_TOKEN"
+  #         pnpm dlx vercel@latest pull \
+  #           --yes \
+  #           --environment=production \
+  #           --token="$VERCEL_TOKEN"
 
-      - name: Build Vercel artifact
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
-          # VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          # VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          # VERCEL_ENV: production
-        run: |
-          pnpm dlx vercel@latest build \
-            --prod \
-            --token="$VERCEL_TOKEN"
+  #     - name: Build Vercel artifact
+  #       env:
+  #         VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  #         CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
+  #         # VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  #         # VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  #         # VERCEL_ENV: production
+  #       run: |
+  #         pnpm dlx vercel@latest build \
+  #           --prod \
+  #           --token="$VERCEL_TOKEN"
 
-      - name: Deploy Vercel
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_ENV: production
-        run: |
-          pnpm dlx vercel@latest deploy \
-            --prebuilt \
-            --prod \
-            --token="$VERCEL_TOKEN"
+  #     - name: Deploy Vercel
+  #       env:
+  #         VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  #         VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  #         VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  #         VERCEL_ENV: production
+  #       run: |
+  #         pnpm dlx vercel@latest deploy \
+  #           --prebuilt \
+  #           --prod \
+  #           --token="$VERCEL_TOKEN"
