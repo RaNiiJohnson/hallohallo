@@ -13,8 +13,8 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { formatBytes, useFileUpload } from "@/hooks/use-file-upload";
+import { useTypedR2Upload } from "@/hooks/use-r2-typed-upload";
 import { JobOfferDetails } from "@/lib/convexTypes";
-import { useUploadFile } from "@convex-dev/r2/react";
 import { api } from "@convex/_generated/api";
 import { useAction, useMutation, useQuery } from "convex/react";
 import {
@@ -38,10 +38,16 @@ export function ApplyJobDialog({
 }) {
   const user = useQuery(api.auth.auth.getCurrentUser);
   const applyToJob = useAction(api.jobs.actions.applyToJob);
+
+  const { upload: uploadCv } = useTypedR2Upload(
+    api.integrations.r2.generateCvUploadUrl,
+    api.integrations.r2.syncMetadata,
+    { accept: "application/pdf" },
+  );
+
   const uploadCvAndDeleteOld = useMutation(
     api.integrations.r2.uploadCvAndDeleteOld,
   );
-  const uploadFile = useUploadFile(api.integrations.r2);
   const cvUrl = useQuery(api.integrations.r2.getCvUrl);
   const t = useTranslations("jobs.dialogs.apply");
 
@@ -84,7 +90,7 @@ export function ApplyJobDialog({
 
         // If user uploaded a new file, we upload it
         if (file && file.file instanceof File) {
-          const uploadedStorageId = await uploadFile(file.file);
+          const uploadedStorageId = await uploadCv(file.file);
           if (!uploadedStorageId) {
             throw new Error(t("errors.uploadError"));
           }

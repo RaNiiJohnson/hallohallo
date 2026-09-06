@@ -3,7 +3,7 @@
 import { CvPreviewDialog } from "@/components/cv-preview-dialog";
 import { Button } from "@/components/ui/button";
 import { formatBytes, useFileUpload } from "@/hooks/use-file-upload";
-import { useUploadFile } from "@convex-dev/r2/react";
+import { useTypedR2Upload } from "@/hooks/use-r2-typed-upload";
 import { api } from "@convex/_generated/api";
 import { UserType } from "@convex/betterAuth/users";
 import { useMutation, useQuery } from "convex/react";
@@ -28,7 +28,13 @@ interface CvUploadSectionProps {
 
 export function CvUploadSection({ user }: CvUploadSectionProps) {
   const t = useTranslations("profile");
-  const uploadFile = useUploadFile(api.integrations.r2);
+
+  const { upload: uploadCv } = useTypedR2Upload(
+    api.integrations.r2.generateCvUploadUrl,
+    api.integrations.r2.syncMetadata,
+    { accept: "application/pdf" },
+  );
+
   const uploadCvAndDeleteOld = useMutation(
     api.integrations.r2.uploadCvAndDeleteOld,
   );
@@ -68,7 +74,7 @@ export function CvUploadSection({ user }: CvUploadSectionProps) {
     startTransition(async () => {
       try {
         // Upload to R2
-        const newCvKey = await uploadFile(file.file as File);
+        const newCvKey = await uploadCv(file.file as File);
         if (!newCvKey) {
           throw new Error("Upload failed");
         }

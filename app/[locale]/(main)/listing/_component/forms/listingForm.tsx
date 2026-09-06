@@ -41,7 +41,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { useUploadFile } from "@convex-dev/r2/react";
 import { useMutation } from "convex/react";
 import {
   AlertCircleIcon,
@@ -56,6 +55,7 @@ import {
 import { toast } from "sonner";
 
 import { useFileUpload } from "@/hooks/use-file-upload";
+import { useTypedR2Upload } from "@/hooks/use-r2-typed-upload";
 import { LocationPicker } from "@/lib/LocationPicker";
 import { api } from "@convex/_generated/api";
 import imageCompression from "browser-image-compression";
@@ -76,7 +76,12 @@ interface ListingFormProps {
 
 export function ListingForm({ onSuccess }: ListingFormProps) {
   const t = useTranslations("listing");
-  const uploadFile = useUploadFile(api.integrations.r2);
+
+  const { upload: uploadListingImages } = useTypedR2Upload(
+    api.integrations.r2.generateListingUploadUrl,
+    api.integrations.r2.syncMetadata,
+    { accept: "image/*" },
+  );
 
   const createListing = useMutation(api.listings.mutations.createListing);
 
@@ -99,7 +104,14 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
     bedrooms: z.string().min(1, t("form.validation.bedroomsReq")),
     floor: z.string().min(1, t("form.validation.floorReq")),
     pets: z.boolean(),
-    images: z.array(z.object({ storageId: z.string().optional(), url: z.string().optional(), publicId: z.string().optional(), secureUrl: z.string().optional() })),
+    images: z.array(
+      z.object({
+        storageId: z.string().optional(),
+        url: z.string().optional(),
+        publicId: z.string().optional(),
+        secureUrl: z.string().optional(),
+      }),
+    ),
     description: z.string().min(10, t("form.validation.descMin")),
     extras: z.array(z.string()).optional(),
     availableFrom: z.string().optional(),
@@ -228,7 +240,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
           });
 
           // Upload to R2, returns the storageId (object key)
-          const storageId = await uploadFile(compressedFile);
+          const storageId = await uploadListingImages(compressedFile);
           if (!storageId) {
             throw new Error("Erreur lors de l'upload de l'image");
           }
@@ -877,8 +889,10 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
 
           {/* Extras */}
           <Field>
-            <FieldLabel>{t("form.labels.extras")}</FieldLabel>
-            <FieldDescription>{t("form.labels.extrasDesc")}</FieldDescription>
+            <FieldLabel>{t("form.labels_extra.extras")}</FieldLabel>
+            <FieldDescription>
+              {t("form.labels_extra.extrasDesc")}
+            </FieldDescription>
             <div className="flex gap-2">
               <Input
                 value={extraInput}
