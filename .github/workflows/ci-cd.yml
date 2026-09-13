@@ -159,12 +159,7 @@ jobs:
       # -----------------------------
       # Convex preview deployment + Vercel build, in one command
       # -----------------------------
-      # `convex deploy` (with a Preview Deploy Key) creates/reuses a Convex
-      # preview deployment named after the PR's Git branch, then runs the
-      # --cmd command with the resulting URL exported as
-      # NEXT_PUBLIC_CONVEX_URL, so the Vercel build always points at the
-      # Convex deployment that was JUST created — no manual env var to keep
-      # in sync.
+
       - name: Deploy Convex preview and build Vercel artifact
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_PREVIEW_DEPLOY_KEY }}
