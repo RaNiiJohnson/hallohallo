@@ -14,7 +14,7 @@ export const isMember = query({
   args: { communityId: v.id("communities") },
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) return [];
+    if (!user) return null;
 
     const member = await ctx.db
       .query("communityMembers")
@@ -122,7 +122,7 @@ export const getCommunity = query({
 export const getMyCommunities = query({
   handler: async (ctx) => {
     const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) return null;
+    if (!user) return [];
 
     const memberships = await ctx.db
       .query("communityMembers")
