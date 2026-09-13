@@ -237,12 +237,7 @@ jobs:
       # -----------------------------
       # Convex production deployment + Vercel build, in one command
       # -----------------------------
-      # Same principle as the preview job above, but with the production
-      # Deploy Key. This is the CI equivalent of the manual
-      # `npx convex deploy --cmd 'npm run build'` that already works for you:
-      # Convex pushes your functions AND exports the resulting production
-      # URL as NEXT_PUBLIC_CONVEX_URL for the Vercel build, so the two can
-      # never drift apart.
+
       - name: Deploy Convex and build Vercel artifact
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
