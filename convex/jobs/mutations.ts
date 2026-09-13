@@ -1,10 +1,9 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
-import { mutation } from "../_generated/server";
-import { authComponent } from "../auth/auth";
+import { authMutation } from "../functions";
 import { posthog, posthogDistinctId } from "../integrations/posthog";
 
-export const createJob = mutation({
+export const createJob = authMutation({
   args: {
     title: v.string(),
     type: v.union(
@@ -46,11 +45,7 @@ export const createJob = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-
-    if (!user) {
-      throw new Error("Not authenticated");
-    }
+    const user = ctx.user;
 
     const searchAllContent = `${args.title} ${args.type} ${args.city} ${args.contractType} ${args.description}`;
 
@@ -78,7 +73,7 @@ export const createJob = mutation({
   },
 });
 
-export const updateJob = mutation({
+export const updateJob = authMutation({
   args: {
     id: v.id("JobOffer"),
     title: v.string(),
@@ -121,12 +116,6 @@ export const updateJob = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-
-    if (!user) {
-      throw new Error("Not authenticated");
-    }
-
     const existing = await ctx.db.get("JobOffer", args.id);
     if (!existing) throw new Error("Job not found");
 
@@ -142,16 +131,12 @@ export const updateJob = mutation({
   },
 });
 
-export const deleteJob = mutation({
+export const deleteJob = authMutation({
   args: {
     id: v.id("JobOffer"),
   },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-
-    if (!user) {
-      throw new Error("Not authenticated");
-    }
+    const user = ctx.user;
 
     const existing = await ctx.db.get("JobOffer", args.id);
     if (!existing) throw new Error("Job not found");

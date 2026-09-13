@@ -11,6 +11,9 @@ vi.mock("../../auth/auth", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../auth/auth")>();
   return {
     ...actual,
+    requireAuth: vi.fn().mockResolvedValue({
+      user: { _id: "testUserId", id: "testUserId", name: "Test User" },
+    }),
     authComponent: {
       ...actual.authComponent,
       safeGetAuthUser: vi.fn().mockResolvedValue({
@@ -33,11 +36,14 @@ describe("Comments", () => {
   beforeEach(async () => {
     t = convexTest(schema, modules);
 
-    const communityResult = await t.mutation(api.communities.mutations.createCommunty, {
-      name: "Comment Community",
-      description: "Description",
-      privacy: "public",
-    });
+    const communityResult = await t.mutation(
+      api.communities.mutations.createCommunity,
+      {
+        name: "Comment Community",
+        description: "Description",
+        privacy: "public",
+      },
+    );
 
     postId = (await t.mutation(api.posts.mutations.createPost, {
       title: "Test Post",
@@ -47,20 +53,26 @@ describe("Comments", () => {
   });
 
   it("should add a comment", async () => {
-    const commentId = await t.mutation(api.posts.comments.mutations.addComment, {
-      postId,
-      content: "First Comment",
-    });
+    const commentId = await t.mutation(
+      api.posts.comments.mutations.addComment,
+      {
+        postId,
+        content: "First Comment",
+      },
+    );
 
     const comment = await t.run(async (ctx) => await ctx.db.get(commentId));
     expect(comment?.content).toBe("First Comment");
   });
 
   it("should update a comment", async () => {
-    const commentId = await t.mutation(api.posts.comments.mutations.addComment, {
-      postId,
-      content: "First Comment",
-    });
+    const commentId = await t.mutation(
+      api.posts.comments.mutations.addComment,
+      {
+        postId,
+        content: "First Comment",
+      },
+    );
 
     await t.mutation(api.posts.comments.mutations.updateComment, {
       commentId,
@@ -72,10 +84,13 @@ describe("Comments", () => {
   });
 
   it("should delete a comment", async () => {
-    const commentId = await t.mutation(api.posts.comments.mutations.addComment, {
-      postId,
-      content: "First Comment",
-    });
+    const commentId = await t.mutation(
+      api.posts.comments.mutations.addComment,
+      {
+        postId,
+        content: "First Comment",
+      },
+    );
 
     await t.mutation(api.posts.comments.mutations.deleteComment, {
       commentId,
@@ -86,10 +101,13 @@ describe("Comments", () => {
   });
 
   it("should update and delete a reply", async () => {
-    const commentId = await t.mutation(api.posts.comments.mutations.addComment, {
-      postId,
-      content: "First Comment",
-    });
+    const commentId = await t.mutation(
+      api.posts.comments.mutations.addComment,
+      {
+        postId,
+        content: "First Comment",
+      },
+    );
     const replyId = await t.mutation(api.posts.comments.mutations.addReply, {
       commentId,
       content: "First Reply",

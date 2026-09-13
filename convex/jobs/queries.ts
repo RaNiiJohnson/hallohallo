@@ -1,8 +1,8 @@
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { Id } from "../_generated/dataModel";
-import { query } from "../_generated/server";
 import { authComponent } from "../auth/auth";
+import { query } from "../functions";
 import { r2 } from "../integrations/r2";
 
 export const getR2FileUrl = query({

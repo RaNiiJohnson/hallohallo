@@ -1,14 +1,11 @@
 import { v } from "convex/values";
-import { mutation } from "../../_generated/server";
-import { postLikesCount, postSortedByLikes } from "../../aggregates";
-import { authComponent } from "../../auth/auth";
+import { authMutation } from "../../functions";
 import { posthog, posthogDistinctId } from "../../integrations/posthog";
 
-export const likePost = mutation({
+export const likePost = authMutation({
   args: { postId: v.id("posts") },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
+    const { user } = ctx;
 
     const post = await ctx.db.get(args.postId);
     if (!post) throw new Error("Post not found");
@@ -20,15 +17,12 @@ export const likePost = mutation({
       .first();
 
     if (existing) {
-      await postLikesCount.delete(ctx, existing);
       await ctx.db.delete(existing._id);
 
       // Sync likesCount & aggregate
       const oldPost = (await ctx.db.get(args.postId))!;
       const newCount = Math.max(0, (oldPost.likesCount ?? 1) - 1);
       await ctx.db.patch(args.postId, { likesCount: newCount });
-      const updatedPost = (await ctx.db.get(args.postId))!;
-      await postSortedByLikes.replace(ctx, oldPost, updatedPost);
       // Remove ghost notification if exists
       if (post.authorId !== user._id) {
         const ghostNotifs = await ctx.db
@@ -38,8 +32,8 @@ export const likePost = mutation({
             q.and(
               q.eq(q.field("type"), "new_like"),
               q.eq(q.field("fromUserName"), user.name),
-              q.eq(q.field("postSlug"), post.slug)
-            )
+              q.eq(q.field("postSlug"), post.slug),
+            ),
           )
           .take(1);
         for (const notif of ghostNotifs) await ctx.db.delete(notif._id);
@@ -54,19 +48,14 @@ export const likePost = mutation({
       return;
     }
 
-    const likeId = await ctx.db.insert("postLikes", {
+    await ctx.db.insert("postLikes", {
       postId: args.postId,
       userId: user._id,
     });
-    const likeDoc = (await ctx.db.get(likeId))!;
-    await postLikesCount.insert(ctx, likeDoc);
-
     // Sync likesCount & aggregate
     const oldPost = (await ctx.db.get(args.postId))!;
     const newCount = (oldPost.likesCount ?? 0) + 1;
     await ctx.db.patch(args.postId, { likesCount: newCount });
-    const updatedPost = (await ctx.db.get(args.postId))!;
-    await postSortedByLikes.replace(ctx, oldPost, updatedPost);
 
     // Notification
     if (post.authorId !== user._id) {
@@ -90,11 +79,10 @@ export const likePost = mutation({
   },
 });
 
-export const likeComment = mutation({
+export const likeComment = authMutation({
   args: { commentId: v.id("postComments") },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
+    const { user } = ctx;
 
     const comment = await ctx.db.get(args.commentId);
     if (!comment) throw new Error("Comment not found");
@@ -117,8 +105,8 @@ export const likeComment = mutation({
             q.and(
               q.eq(q.field("type"), "new_comment_like"),
               q.eq(q.field("fromUserName"), user.name),
-              q.eq(q.field("postSlug"), post?.slug)
-            )
+              q.eq(q.field("postSlug"), post?.slug),
+            ),
           )
           .take(1);
         for (const notif of ghostNotifs) await ctx.db.delete(notif._id);
@@ -149,11 +137,10 @@ export const likeComment = mutation({
   },
 });
 
-export const likeReply = mutation({
+export const likeReply = authMutation({
   args: { replyId: v.id("postCommentReplies") },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
+    const { user } = ctx;
 
     const reply = await ctx.db.get(args.replyId);
     if (!reply) throw new Error("Reply not found");
@@ -177,8 +164,8 @@ export const likeReply = mutation({
             q.and(
               q.eq(q.field("type"), "new_reply_like"),
               q.eq(q.field("fromUserName"), user.name),
-              q.eq(q.field("postSlug"), post?.slug)
-            )
+              q.eq(q.field("postSlug"), post?.slug),
+            ),
           )
           .take(1);
         for (const notif of ghostNotifs) await ctx.db.delete(notif._id);

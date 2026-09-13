@@ -1,8 +1,8 @@
 import { partial } from "convex-helpers/validators";
-import { ConvexError, v } from "convex/values";
+import { v } from "convex/values";
 import { components } from "../_generated/api";
-import { mutation, query } from "../_generated/server";
 import { UserType, userValidator } from "../betterAuth/users";
+import { authMutation, query } from "../functions";
 import { posthog, posthogDistinctId } from "../integrations/posthog";
 import { authComponent } from "./auth";
 
@@ -17,7 +17,6 @@ export type UserWithRoleType = UserType & {
 export const getUserBySlug = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
-    // 1. Récupérer l'utilisateur via le composant
     const user: UserType = await ctx.runQuery(
       components.betterAuth.users.getUserBySlug,
       {
@@ -36,7 +35,6 @@ export const getUserBySlug = query({
 export const getUserById = query({
   args: { id: v.string() },
   handler: async (ctx, { id }) => {
-    // 1. Récupérer l'utilisateur via le composant
     const user: UserType = await ctx.runQuery(
       components.betterAuth.users.getUserById,
       {
@@ -55,7 +53,6 @@ export const getUserById = query({
 export const getAllUsers = query({
   args: {},
   handler: async (ctx) => {
-    // 1. Récupérer les users via la query du composant betterAuth
     const users: UserType[] = await ctx.runQuery(
       components.betterAuth.users.getAllUsers,
       {},
@@ -67,24 +64,21 @@ export const getAllUsers = query({
       ? users.filter((u) => u._id !== currentUser._id)
       : users;
 
-    // 2. Résoudre les URLs d’images dans ce contexte
+    // Resolve image URLs in this context
     return filtered;
   },
 });
 
-export const updateUser = mutation({
+export const updateUser = authMutation({
   args: {
-    id: v.string(),
     patch: partial(userValidator.omit("updatedAt")),
   },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-
-    if (!user) {
-      throw new ConvexError("Not authenticated");
-    }
-
-    await ctx.runMutation(components.betterAuth.users.updateUser, args);
+    const user = ctx.user;
+    await ctx.runMutation(components.betterAuth.users.updateUser, {
+      id: user._id,
+      patch: args.patch,
+    });
 
     const distinctId = posthogDistinctId(user._id);
     await posthog.identify(ctx, {

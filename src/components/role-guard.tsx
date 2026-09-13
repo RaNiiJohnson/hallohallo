@@ -41,7 +41,6 @@ export function RoleGuard({ children }: { children: React.ReactNode }) {
     startTransition(async () => {
       try {
         await updateUser({
-          id: session.user.id,
           patch: {
             userType,
           },

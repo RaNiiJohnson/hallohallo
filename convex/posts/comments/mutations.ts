@@ -1,31 +1,14 @@
-import {
-  customCtx,
-  customMutation,
-} from "convex-helpers/server/customFunctions";
-import { Triggers } from "convex-helpers/server/triggers";
 import { v } from "convex/values";
-import { DataModel } from "../../_generated/dataModel";
-import { mutation } from "../../_generated/server";
-import { postCommentsCount } from "../../aggregates";
-import { authComponent } from "../../auth/auth";
+import { authMutation } from "../../functions";
 import { posthog, posthogDistinctId } from "../../integrations/posthog";
 
-const triggers = new Triggers<DataModel>();
-triggers.register("postComments", postCommentsCount.trigger());
-
-const mutationWithTriggers = customMutation(
-  mutation,
-  customCtx(triggers.wrapDB),
-);
-
-export const addComment = mutationWithTriggers({
+export const addComment = authMutation({
   args: {
     postId: v.id("posts"),
     content: v.string(),
   },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
+    const { user } = ctx;
 
     const post = await ctx.db.get(args.postId);
     if (!post) throw new Error("Post not found");
@@ -64,11 +47,10 @@ export const addComment = mutationWithTriggers({
   },
 });
 
-export const deleteComment = mutationWithTriggers({
+export const deleteComment = authMutation({
   args: { commentId: v.id("postComments") },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
+    const { user } = ctx;
 
     const comment = await ctx.db.get(args.commentId);
     if (!comment) throw new Error("Comment not found");
@@ -115,14 +97,13 @@ export const deleteComment = mutationWithTriggers({
   },
 });
 
-export const updateComment = mutationWithTriggers({
+export const updateComment = authMutation({
   args: {
     commentId: v.id("postComments"),
     content: v.string(),
   },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
+    const { user } = ctx;
 
     const comment = await ctx.db.get(args.commentId);
     if (!comment) throw new Error("Comment not found");
@@ -132,14 +113,13 @@ export const updateComment = mutationWithTriggers({
   },
 });
 
-export const addReply = mutationWithTriggers({
+export const addReply = authMutation({
   args: {
     commentId: v.id("postComments"),
     content: v.string(),
   },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
+    const { user } = ctx;
 
     const comment = await ctx.db.get(args.commentId);
     if (!comment) throw new Error("Comment not found");
@@ -179,14 +159,13 @@ export const addReply = mutationWithTriggers({
   },
 });
 
-export const updateReply = mutationWithTriggers({
+export const updateReply = authMutation({
   args: {
     replyId: v.id("postCommentReplies"),
     content: v.string(),
   },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
+    const { user } = ctx;
 
     const reply = await ctx.db.get(args.replyId);
     if (!reply) throw new Error("Reply not found");
@@ -196,11 +175,10 @@ export const updateReply = mutationWithTriggers({
   },
 });
 
-export const deleteReply = mutationWithTriggers({
+export const deleteReply = authMutation({
   args: { replyId: v.id("postCommentReplies") },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
+    const { user } = ctx;
 
     const reply = await ctx.db.get(args.replyId);
     if (!reply) throw new Error("Reply not found");

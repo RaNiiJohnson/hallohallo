@@ -111,7 +111,6 @@ export function ProfileEditForm({ user, onSaved }: ProfileEditFormProps) {
   const onSubmit = async (data: FormSchema) => {
     try {
       await updateUser({
-        id: user._id,
         patch: {
           name: data.name.trim(),
           headline: data.headline?.trim() || undefined,

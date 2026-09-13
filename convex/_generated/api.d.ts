@@ -23,6 +23,7 @@ import type * as communities_mutations from "../communities/mutations.js";
 import type * as communities_queries from "../communities/queries.js";
 import type * as debug_aggregates from "../debug_aggregates.js";
 import type * as email from "../email.js";
+import type * as functions from "../functions.js";
 import type * as http from "../http.js";
 import type * as integrations_cloudinary from "../integrations/cloudinary.js";
 import type * as integrations_posthog from "../integrations/posthog.js";
@@ -43,6 +44,7 @@ import type * as posts_mutations from "../posts/mutations.js";
 import type * as posts_queries from "../posts/queries.js";
 import type * as rateLimits from "../rateLimits.js";
 import type * as sendEmails from "../sendEmails.js";
+import type * as utils_errors from "../utils/errors.js";
 
 import type {
   ApiFromModules,
@@ -66,6 +68,7 @@ declare const fullApi: ApiFromModules<{
   "communities/queries": typeof communities_queries;
   debug_aggregates: typeof debug_aggregates;
   email: typeof email;
+  functions: typeof functions;
   http: typeof http;
   "integrations/cloudinary": typeof integrations_cloudinary;
   "integrations/posthog": typeof integrations_posthog;
@@ -86,6 +89,7 @@ declare const fullApi: ApiFromModules<{
   "posts/queries": typeof posts_queries;
   rateLimits: typeof rateLimits;
   sendEmails: typeof sendEmails;
+  "utils/errors": typeof utils_errors;
 }>;
 
 /**

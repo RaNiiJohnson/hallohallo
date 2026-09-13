@@ -1,10 +1,9 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
-import { mutation } from "../_generated/server";
-import { authComponent } from "../auth/auth";
+import { authMutation } from "../functions";
 import { posthog, posthogDistinctId } from "../integrations/posthog";
 
-export const createListing = mutation({
+export const createListing = authMutation({
   args: {
     title: v.string(),
     propertyType: v.union(
@@ -44,11 +43,7 @@ export const createListing = mutation({
     availableFrom: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-
-    if (!user) {
-      throw new Error("Not authenticated");
-    }
+    const user = ctx.user;
 
     const searchAllContent = `${args.title} ${args.propertyType} ${args.listingMode} ${args.city} ${args.description}`;
 

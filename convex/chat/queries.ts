@@ -17,7 +17,7 @@ export const getMessages = query({
   },
 });
 
-// Retourne juste les communityId qui ont des messages non lus
+// Return just the communityIds that have unread messages
 export const getCommunitiesWithUnread = query({
   handler: async (ctx) => {
     const user = await authComponent.safeGetAuthUser(ctx);
@@ -45,7 +45,7 @@ export const getCommunitiesWithUnread = query({
               q.neq(q.field("authorId"), user._id),
             ),
           )
-          .first(); // juste vérifier s'il en existe un — pas besoin de tout charger
+          .first(); // Check if there are unread messages
 
         if (hasUnread) {
           unreadCommunityIds.push(member.communityId);

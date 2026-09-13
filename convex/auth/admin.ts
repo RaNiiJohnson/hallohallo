@@ -1,12 +1,12 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
 import { components } from "../_generated/api";
-import { action, mutation, query } from "../_generated/server";
 import { runCascadeDelete } from "../cascadeDeletes";
+import { adminAction, adminMutation, adminQuery } from "../functions";
 import { authComponent, createAuth } from "./auth";
 import { UserWithRoleType } from "./users";
 
-export const listUsers = query({
+export const listUsers = adminQuery({
   args: {},
   handler: async (ctx) => {
     const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
@@ -18,7 +18,7 @@ export const listUsers = query({
   },
 });
 
-export const banUser = mutation({
+export const banUser = adminMutation({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
     const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
@@ -29,7 +29,7 @@ export const banUser = mutation({
   },
 });
 
-export const unbanUser = mutation({
+export const unbanUser = adminMutation({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
     const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
@@ -40,7 +40,7 @@ export const unbanUser = mutation({
   },
 });
 
-export const setUserRole = mutation({
+export const setUserRole = adminMutation({
   args: {
     userId: v.string(),
     role: v.string(),
@@ -55,7 +55,7 @@ export const setUserRole = mutation({
   },
 });
 
-export const setUserType = mutation({
+export const setUserType = adminMutation({
   args: {
     userId: v.string(),
     userType: v.string(),
@@ -70,7 +70,7 @@ export const setUserType = mutation({
   },
 });
 
-export const createUser = mutation({
+export const createUser = adminMutation({
   args: {
     userId: v.string(),
     email: v.string(),
@@ -98,7 +98,7 @@ export const createUser = mutation({
   },
 });
 
-export const deleteUser = action({
+export const deleteUser = adminAction({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
     const { auth, headers } = await authComponent.getAuth(createAuth, ctx);

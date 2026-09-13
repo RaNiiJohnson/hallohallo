@@ -1,17 +1,15 @@
 import { v } from "convex/values";
-import { mutation } from "../_generated/server";
-import { authComponent } from "../auth/auth";
+import { authMutation } from "../functions";
 import { posthog, posthogDistinctId } from "../integrations/posthog";
+import { throwForbidden, throwNotFound } from "../utils/errors";
 
-export const sendMessage = mutation({
+export const sendMessage = authMutation({
   args: {
     communityId: v.id("communities"),
     content: v.string(),
   },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
-
+    const user = ctx.user;
     const member = await ctx.db
       .query("communityMembers")
       .withIndex("by_userId", (q) => q.eq("userId", user._id))
@@ -27,7 +25,7 @@ export const sendMessage = mutation({
       content: args.content,
     });
 
-    // Mettre à jour lastReadAt de l'expéditeur seulement
+    // Update lastReadAt for the sender only
     await ctx.db.patch(member._id, {
       lastReadAt: Date.now(),
     });
@@ -41,16 +39,14 @@ export const sendMessage = mutation({
   },
 });
 
-export const editMessage = mutation({
+export const editMessage = authMutation({
   args: {
     id: v.id("communityMessages"),
     communityId: v.id("communities"),
     content: v.string(),
   },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
-
+    const user = ctx.user;
     const member = await ctx.db
       .query("communityMembers")
       .withIndex("by_userId", (q) => q.eq("userId", user._id))
@@ -71,38 +67,34 @@ export const editMessage = mutation({
   },
 });
 
-export const deleteMessage = mutation({
+export const deleteMessage = authMutation({
   args: {
     id: v.id("communityMessages"),
     communityId: v.id("communities"),
   },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
-
+    const user = ctx.user;
     const member = await ctx.db
       .query("communityMembers")
       .withIndex("by_userId", (q) => q.eq("userId", user._id))
       .filter((q) => q.eq(q.field("communityId"), args.communityId))
       .first();
 
-    if (!member) throw new Error("Not a member");
+    if (!member) throwForbidden("Not a member");
 
     const message = await ctx.db.get(args.id);
-    if (!message) throw new Error("Message not found");
+    if (!message) throwNotFound("Message not found");
 
-    if (message.authorId !== user._id) throw new Error("Not authorized");
+    if (message.authorId !== user._id) throwForbidden("Not authorized");
 
     await ctx.db.delete(args.id);
   },
 });
 
-export const markAsRead = mutation({
+export const markAsRead = authMutation({
   args: { communityId: v.id("communities") },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) return;
-
+    const user = ctx.user;
     const member = await ctx.db
       .query("communityMembers")
       .withIndex("by_userId", (q) => q.eq("userId", user._id))
