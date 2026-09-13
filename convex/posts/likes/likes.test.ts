@@ -11,6 +11,9 @@ vi.mock("../../auth/auth", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../auth/auth")>();
   return {
     ...actual,
+    requireAuth: vi.fn().mockResolvedValue({
+      user: { _id: "testUserId", id: "testUserId", name: "Test User" },
+    }),
     authComponent: {
       ...actual.authComponent,
       safeGetAuthUser: vi.fn().mockResolvedValue({
@@ -33,11 +36,14 @@ describe("Likes", () => {
   beforeEach(async () => {
     t = convexTest(schema, modules);
 
-    const communityResult = await t.mutation(api.communities.mutations.createCommunty, {
-      name: "Like Community",
-      description: "Description",
-      privacy: "public",
-    });
+    const communityResult = await t.mutation(
+      api.communities.mutations.createCommunity,
+      {
+        name: "Like Community",
+        description: "Description",
+        privacy: "public",
+      },
+    );
 
     postId = (await t.mutation(api.posts.mutations.createPost, {
       title: "Test Post",
@@ -59,10 +65,13 @@ describe("Likes", () => {
   });
 
   it("should like and unlike a comment and a reply", async () => {
-    const commentId = await t.mutation(api.posts.comments.mutations.addComment, {
-      postId,
-      content: "Comment",
-    });
+    const commentId = await t.mutation(
+      api.posts.comments.mutations.addComment,
+      {
+        postId,
+        content: "Comment",
+      },
+    );
     const replyId = await t.mutation(api.posts.comments.mutations.addReply, {
       commentId,
       content: "Reply",
@@ -72,9 +81,7 @@ describe("Likes", () => {
     await t.mutation(api.posts.likes.mutations.likeReply, { replyId });
 
     expect(
-      await t.run(async (ctx) =>
-        ctx.db.query("postCommentLikes").collect(),
-      ),
+      await t.run(async (ctx) => ctx.db.query("postCommentLikes").collect()),
     ).toHaveLength(1);
     expect(
       await t.run(async (ctx) =>
@@ -86,9 +93,7 @@ describe("Likes", () => {
     await t.mutation(api.posts.likes.mutations.likeReply, { replyId });
 
     expect(
-      await t.run(async (ctx) =>
-        ctx.db.query("postCommentLikes").collect(),
-      ),
+      await t.run(async (ctx) => ctx.db.query("postCommentLikes").collect()),
     ).toHaveLength(0);
     expect(
       await t.run(async (ctx) =>

@@ -1,9 +1,8 @@
-import { query } from "../_generated/server";
-import { authComponent } from "../auth/auth";
+import { authQuery } from "../functions";
 
-export const getMyNotifications = query({
+export const getMyNotifications = authQuery({
   handler: async (ctx) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
+    const user = ctx.user;
     if (!user) return [];
 
     return await ctx.db
@@ -14,10 +13,9 @@ export const getMyNotifications = query({
   },
 });
 
-export const getUnreadCount = query({
+export const getUnreadCount = authQuery({
   handler: async (ctx) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) return 0;
+    const user = ctx.user;
 
     const unread = await ctx.db
       .query("notifications")

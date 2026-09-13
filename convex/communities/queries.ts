@@ -1,7 +1,6 @@
 import { getManyFrom } from "convex-helpers/server/relationships";
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
-import { query } from "../_generated/server";
 import {
   communityMembersCount,
   communityPostsCount,
@@ -9,12 +8,13 @@ import {
   postLikesCount,
 } from "../aggregates";
 import { authComponent } from "../auth/auth";
+import { internalQuery, query } from "../functions";
 
 export const isMember = query({
   args: { communityId: v.id("communities") },
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) return null;
+    if (!user) return [];
 
     const member = await ctx.db
       .query("communityMembers")
@@ -122,7 +122,7 @@ export const getCommunity = query({
 export const getMyCommunities = query({
   handler: async (ctx) => {
     const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) return [];
+    if (!user) return null;
 
     const memberships = await ctx.db
       .query("communityMembers")
@@ -276,5 +276,12 @@ export const getCommunityPosts = query({
     );
 
     return { ...postsPage, page: enrichedPage };
+  },
+});
+
+export const getCommunityForDelete = internalQuery({
+  args: { id: v.id("communities") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
   },
 });

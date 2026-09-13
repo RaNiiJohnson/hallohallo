@@ -1,16 +1,12 @@
 import { Id } from "../_generated/dataModel";
-import { query } from "../_generated/server";
-import { authComponent } from "../auth/auth";
+import { authQuery } from "../functions";
 
-export const getMyBookmarks = query({
+export const getMyBookmarks = authQuery({
   args: {},
   handler: async (ctx) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) return [];
-
     const bookmarks = await ctx.db
       .query("bookmarks")
-      .withIndex("by_userId", (q) => q.eq("userId", user._id))
+      .withIndex("by_userId", (q) => q.eq("userId", ctx.user._id))
       .collect();
 
     return Promise.all(

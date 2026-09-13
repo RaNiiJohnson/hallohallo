@@ -6,11 +6,13 @@ import { admin } from "better-auth/plugins";
 import { generatedSlug } from "../../src/lib/utils";
 import { components } from "../_generated/api";
 import { DataModel } from "../_generated/dataModel";
-import { query } from "../_generated/server";
+import type { ActionCtx, MutationCtx, QueryCtx } from "../_generated/server";
 import authConfig from "../auth.config";
 import authSchema from "../betterAuth/schema";
 import { sendEmailVerification, sendResetPasswordEmail } from "../email";
+import { query } from "../_generated/server";
 import { posthog, posthogDistinctId } from "../integrations/posthog";
+import { throwForbidden, throwUnauthorized } from "../utils/errors";
 
 const siteUrl = process.env.SITE_URL!;
 
@@ -251,6 +253,8 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
   return betterAuth(createAuthOptions(ctx));
 };
 
+type AuthCtx = QueryCtx | MutationCtx | ActionCtx;
+
 export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
@@ -261,3 +265,31 @@ export const getCurrentUser = query({
     return user;
   },
 });
+
+export async function requireAuth(ctx: AuthCtx) {
+  // `safeGetAuthUser` resolves the actual Convex `user` document.  That is the
+  // shape used throughout this app (`_id`, custom profile fields, etc.), unlike
+  // Better Auth's session payload whose identifier is `id`.
+  const user = await authComponent.safeGetAuthUser(ctx);
+  if (!user) {
+    throwUnauthorized();
+  }
+
+  // Phase 17 B2: block banned users at the function layer, not just the client.
+  if (
+    user.banned === true &&
+    (!user.banExpires || user.banExpires > Date.now())
+  ) {
+    throwForbidden("Account banned");
+  }
+
+  return { user };
+}
+
+export async function requireAdmin(ctx: AuthCtx) {
+  const result = await requireAuth(ctx);
+  if (result.user.role !== "admin") {
+    throwForbidden("Admin access required");
+  }
+  return result;
+}

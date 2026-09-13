@@ -1,9 +1,8 @@
 import { v } from "convex/values";
-import { mutation } from "../_generated/server";
-import { authComponent } from "../auth/auth";
+import { authMutation } from "../functions";
 import { posthog, posthogDistinctId } from "../integrations/posthog";
 
-export const toggleBookmark = mutation({
+export const toggleBookmark = authMutation({
   args: {
     resourceId: v.union(
       v.id("JobOffer"),
@@ -17,10 +16,8 @@ export const toggleBookmark = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
-
-    // Vérifier si le favori existe déjà
+    const user = ctx.user;
+    // Verify if the bookmark already exists
     const existing = await ctx.db
       .query("bookmarks")
       .withIndex("by_user_resource", (q) =>

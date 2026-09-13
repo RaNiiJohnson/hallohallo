@@ -1,58 +1,41 @@
 import { v } from "convex/values";
 import { internal } from "../_generated/api";
-import { action, internalMutation } from "../_generated/server";
-import { authComponent } from "../auth/auth";
 import { runCascadeDelete } from "../cascadeDeletes";
+import { authAction } from "../functions";
 import { posthog, posthogDistinctId } from "../integrations/posthog";
+import { throwNotFound } from "../utils/errors";
 
 /**
- * Vérifie que l'utilisateur authentifié est bien le propriétaire de la communauté.
- * Appelé depuis l'action deleteCommunity via ctx.runQuery.
+ *
+ * Delete a community and all its child documents * (members, messages, posts, likes, comments, replies, reply likes) * using cascade delete.
+ *
  */
-export const _verifyDeleteAuth = internalMutation({
+export const deleteCommunity = authAction({
   args: { id: v.id("communities") },
+
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
-
-    const community = await ctx.db.get(args.id);
-    if (!community) throw new Error("Community not found");
-    if (community.authorId !== user._id) throw new Error("Not authorized");
-
-    return {
-      communityId: community._id,
-      slug: community.slug,
-      userId: user._id,
-    };
-  },
-});
-
-/**
- * Supprime une communauté et tous ses documents enfants
- * (members, messages, posts, likes, comments, replies, reply likes)
- * en utilisant le cascade delete.
- */
-export const deleteCommunity = action({
-  args: { id: v.id("communities") },
-  handler: async (ctx, args) => {
-    // 1. Vérifier l'authentification et l'autorisation
-    const { slug, userId } = await ctx.runMutation(
-      internal.communities.actions._verifyDeleteAuth,
-      {
-        id: args.id,
-      },
+    const community = await ctx.runQuery(
+      internal.communities.queries.getCommunityForDelete,
+      { id: args.id },
     );
 
+    if (!community || community.authorId !== ctx.user._id) {
+      throwNotFound("Community not found");
+    }
+
     await ctx.runMutation(internal.notifications.mutations.deleteByCommunity, {
-      slug,
+      slug: community.slug,
     });
 
     const counts = await runCascadeDelete(ctx, "communities", args.id);
 
     await posthog.capture(ctx, {
-      distinctId: posthogDistinctId(userId),
+      distinctId: posthogDistinctId(ctx.user._id),
       event: "community_deleted",
-      properties: { community_id: args.id, slug },
+      properties: {
+        community_id: args.id,
+        slug: community.slug,
+      },
     });
 
     return counts;

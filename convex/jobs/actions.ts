@@ -1,23 +1,20 @@
 import { v } from "convex/values";
 import { render } from "react-email";
 import { api } from "../_generated/api";
-import { action } from "../_generated/server";
+import { authAction } from "../functions";
 import { posthog, posthogDistinctId } from "../integrations/posthog";
 import { resend } from "../sendEmails";
+import { throwForbidden, throwNotFound } from "../utils/errors";
 import NewApplicationEmail from "./CvTemplate";
 
-export const applyToJob = action({
+export const applyToJob = authAction({
   args: {
     jobId: v.id("JobOffer"),
     cvStorageId: v.string(),
     coverLetter: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const user = await ctx.runQuery(api.auth.auth.getCurrentUser);
-
-    if (!user) {
-      throw new Error("Not authenticated");
-    }
+    const user = ctx.user;
 
     const distinctId = posthogDistinctId(user._id);
 
@@ -26,14 +23,14 @@ export const applyToJob = action({
         id: args.jobId,
       });
       if (!job) {
-        throw new Error("Job not found");
+        throwNotFound("Job not found");
       }
 
       const cvUrl = await ctx.runQuery(api.jobs.queries.getR2FileUrl, {
         storageId: args.cvStorageId,
       });
       if (!cvUrl) {
-        throw new Error("CV not found");
+        throwNotFound("CV not found");
       }
 
       let contactEmail = job.contact?.email;
@@ -44,11 +41,11 @@ export const applyToJob = action({
         contactEmail = authorUser?.email;
       }
       if (!contactEmail) {
-        throw new Error("No contact email found for this job.");
+        throwNotFound("No contact email found for this job.");
       }
 
       if (user.email === contactEmail) {
-        throw new Error("You cannot apply to your own job.");
+        throwForbidden("You cannot apply to your own job.");
       }
 
       const html = await render(

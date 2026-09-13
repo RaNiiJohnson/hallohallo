@@ -11,6 +11,9 @@ vi.mock("../auth/auth", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../auth/auth")>();
   return {
     ...actual,
+    requireAuth: vi.fn().mockResolvedValue({
+      user: { _id: "testUserId", id: "testUserId", name: "Test User" },
+    }),
     authComponent: {
       ...actual.authComponent,
       safeGetAuthUser: vi.fn().mockResolvedValue({
@@ -34,7 +37,7 @@ describe("Bookmarks", () => {
     t = convexTest(schema, modules);
 
     const communityResult = await t.mutation(
-      api.communities.mutations.createCommunty,
+      api.communities.mutations.createCommunity,
       {
         name: "Bookmark Community",
         description: "Description",

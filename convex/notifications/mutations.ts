@@ -1,11 +1,9 @@
 import { v } from "convex/values";
-import { internalMutation, mutation } from "../_generated/server";
-import { authComponent } from "../auth/auth";
+import { authMutation, internalMutation } from "../functions";
 
-export const markAllRead = mutation({
+export const markAllRead = authMutation({
   handler: async (ctx) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) return;
+    const user = ctx.user;
 
     const unread = await ctx.db
       .query("notifications")
@@ -18,7 +16,7 @@ export const markAllRead = mutation({
   },
 });
 
-export const markOneRead = mutation({
+export const markOneRead = authMutation({
   args: { notificationId: v.id("notifications") },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.notificationId, { read: true });

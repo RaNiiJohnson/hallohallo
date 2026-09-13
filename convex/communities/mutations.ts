@@ -1,26 +1,9 @@
-import {
-  customCtx,
-  customMutation,
-} from "convex-helpers/server/customFunctions";
-import { Triggers } from "convex-helpers/server/triggers";
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
-import { DataModel } from "../_generated/dataModel";
-import { mutation } from "../_generated/server";
-import { communityMembersCount, communityPostsCount } from "../aggregates";
-import { authComponent } from "../auth/auth";
+import { authMutation } from "../functions";
 import { posthog, posthogDistinctId } from "../integrations/posthog";
 
-const triggers = new Triggers<DataModel>();
-triggers.register("communityMembers", communityMembersCount.trigger());
-triggers.register("posts", communityPostsCount.trigger());
-
-const mutationWithTriggers = customMutation(
-  mutation,
-  customCtx(triggers.wrapDB),
-);
-
-export const createCommunty = mutationWithTriggers({
+export const createCommunity = authMutation({
   args: {
     name: v.string(),
     description: v.string(),
@@ -31,8 +14,7 @@ export const createCommunty = mutationWithTriggers({
     ),
   },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
+    const { user } = ctx;
 
     const slug = generatedSlug(args.name);
 
@@ -75,7 +57,7 @@ export const createCommunty = mutationWithTriggers({
   },
 });
 
-export const updateCommunity = mutationWithTriggers({
+export const updateCommunity = authMutation({
   args: {
     id: v.id("communities"),
     name: v.string(),
@@ -87,8 +69,7 @@ export const updateCommunity = mutationWithTriggers({
     ),
   },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
+    const { user } = ctx;
 
     const community = await ctx.db.get(args.id);
     if (!community) throw new Error("Community not found");
@@ -103,11 +84,10 @@ export const updateCommunity = mutationWithTriggers({
   },
 });
 
-export const joinCommunity = mutationWithTriggers({
+export const joinCommunity = authMutation({
   args: { communityId: v.id("communities") },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
+    const { user } = ctx;
 
     const community = await ctx.db.get(args.communityId);
     if (!community) throw new Error("Community not found");
@@ -151,11 +131,10 @@ export const joinCommunity = mutationWithTriggers({
   },
 });
 
-export const leaveCommunity = mutationWithTriggers({
+export const leaveCommunity = authMutation({
   args: { communityId: v.id("communities") },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) throw new Error("Not authenticated");
+    const { user } = ctx;
 
     const community = await ctx.db.get(args.communityId);
     if (!community) throw new Error("Community not found");

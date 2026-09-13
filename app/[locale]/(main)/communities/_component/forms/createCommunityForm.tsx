@@ -39,7 +39,9 @@ interface CreateCommunityFormProps {
 
 export function CreateCommunityForm({ onSuccess }: CreateCommunityFormProps) {
   const router = useRouter();
-  const createCommunity = useMutation(api.communities.mutations.createCommunty);
+  const createCommunity = useMutation(
+    api.communities.mutations.createCommunity,
+  );
   const t = useTranslations("communities.forms.createCommunity");
 
   const formSchema = z.object({
