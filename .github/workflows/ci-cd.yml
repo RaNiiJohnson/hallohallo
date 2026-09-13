@@ -20,6 +20,8 @@ jobs:
 
     env:
       # Values only used to make the Next.js build deterministic in CI.
+      # This job never talks to a real Convex deployment or Vercel project,
+      # it only checks that the code compiles/lints/passes tests/builds.
       NEXT_PUBLIC_CONVEX_URL: https://ci-placeholder.convex.cloud
       NEXT_PUBLIC_CONVEX_SITE_URL: https://ci-placeholder.convex.site
       SITE_URL: https://ci-placeholder.example.com
@@ -83,7 +85,7 @@ jobs:
           git diff --exit-code -- convex/_generated
 
       # -----------------------------
-      # Production build
+      # Production build (placeholder env vars, just a compile check)
       # -----------------------------
 
       - name: Build
@@ -91,9 +93,100 @@ jobs:
         env:
           CI: true
 
-  # # =================================
-  # # Production deployment
-  # # =================================
+  # =================================
+  # Preview deployment (Pull Requests)
+  # =================================
+  #
+  # This job gives every PR a *real* preview: it creates/updates a Convex
+  # Preview Deployment for the branch and bakes its URL into the Vercel
+  # preview build, using `convex deploy --cmd`, exactly like the manual
+  # `npx convex deploy --cmd 'npm run build'` flow that already works for you.
+  #
+  # NOTE: if Vercel's own Git integration is also connected to this repo,
+  # it will create its *own* automatic preview deployment for every PR,
+  # separate from this job, using whatever env vars are set in the Vercel
+  # dashboard for the "Preview" environment — that is almost certainly why
+  # your PR previews currently show no Convex data. Either disable Vercel's
+  # automatic Git deployments (Project Settings > Git) and rely on this job,
+  # or make sure the Preview environment variables in Vercel match a real
+  # Convex preview deployment.
+  preview:
+    name: Deploy preview
+
+    if: github.event_name == 'pull_request'
+
+    needs: quality
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: preview
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Link and pull Vercel environment
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          rm -rf .vercel
+          pnpm dlx vercel@latest link \
+            --yes \
+            --scope="$VERCEL_ORG_ID" \
+            --project="$VERCEL_PROJECT_ID" \
+            --token="$VERCEL_TOKEN"
+
+          pnpm dlx vercel@latest pull \
+            --yes \
+            --environment=preview \
+            --token="$VERCEL_TOKEN"
+
+      # -----------------------------
+      # Convex preview deployment + Vercel build, in one command
+      # -----------------------------
+      # `convex deploy` (with a Preview Deploy Key) creates/reuses a Convex
+      # preview deployment named after the PR's Git branch, then runs the
+      # --cmd command with the resulting URL exported as
+      # NEXT_PUBLIC_CONVEX_URL, so the Vercel build always points at the
+      # Convex deployment that was JUST created — no manual env var to keep
+      # in sync.
+      - name: Deploy Convex preview and build Vercel artifact
+        env:
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_PREVIEW_DEPLOY_KEY }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          pnpm exec convex deploy \
+            --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL \
+            --cmd "pnpm dlx vercel@latest build --token=$VERCEL_TOKEN"
+
+      - name: Deploy Vercel preview
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          pnpm dlx vercel@latest deploy \
+            --prebuilt \
+            --token="$VERCEL_TOKEN"
+
+  # =================================
+  # Production deployment
+  # =================================
 
   deploy:
     name: Deploy production
@@ -123,20 +216,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # -----------------------------
-      # Convex production deployment
-      # -----------------------------
-
-      - name: Deploy Convex
-        env:
-          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
-          POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
-        run: pnpm exec convex deploy
-
-      # -----------------------------
-      # Vercel production deployment
-      # -----------------------------
-
       - name: Link and pull Vercel environment
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -155,17 +234,24 @@ jobs:
             --environment=production \
             --token="$VERCEL_TOKEN"
 
-      - name: Build Vercel artifact
+      # -----------------------------
+      # Convex production deployment + Vercel build, in one command
+      # -----------------------------
+      # Same principle as the preview job above, but with the production
+      # Deploy Key. This is the CI equivalent of the manual
+      # `npx convex deploy --cmd 'npm run build'` that already works for you:
+      # Convex pushes your functions AND exports the resulting production
+      # URL as NEXT_PUBLIC_CONVEX_URL for the Vercel build, so the two can
+      # never drift apart.
+      - name: Deploy Convex and build Vercel artifact
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
-          # VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          # VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          # VERCEL_ENV: production
+          POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
-          pnpm dlx vercel@latest build \
-            --prod \
-            --token="$VERCEL_TOKEN"
+          pnpm exec convex deploy \
+            --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL \
+            --cmd "pnpm dlx vercel@latest build --prod --token=$VERCEL_TOKEN"
 
       - name: Deploy Vercel
         env:
