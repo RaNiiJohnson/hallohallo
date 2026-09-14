@@ -96,20 +96,7 @@ jobs:
   # =================================
   # Preview deployment (Pull Requests)
   # =================================
-  #
-  # This job gives every PR a *real* preview: it creates/updates a Convex
-  # Preview Deployment for the branch and bakes its URL into the Vercel
-  # preview build, using `convex deploy --cmd`, exactly like the manual
-  # `npx convex deploy --cmd 'npm run build'` flow that already works for you.
-  #
-  # NOTE: if Vercel's own Git integration is also connected to this repo,
-  # it will create its *own* automatic preview deployment for every PR,
-  # separate from this job, using whatever env vars are set in the Vercel
-  # dashboard for the "Preview" environment — that is almost certainly why
-  # your PR previews currently show no Convex data. Either disable Vercel's
-  # automatic Git deployments (Project Settings > Git) and rely on this job,
-  # or make sure the Preview environment variables in Vercel match a real
-  # Convex preview deployment.
+
   preview:
     name: Deploy preview
 
