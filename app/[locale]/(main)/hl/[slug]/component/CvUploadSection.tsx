@@ -6,7 +6,8 @@ import { formatBytes, useFileUpload } from "@/hooks/use-file-upload";
 import { useTypedR2Upload } from "@/hooks/use-r2-typed-upload";
 import { api } from "@convex/_generated/api";
 import { UserType } from "@convex/betterAuth/users";
-import { useMutation, useQuery } from "convex/react";
+import { useQuery } from "convex-helpers/react/cache";
+import { useMutation } from "convex/react";
 import {
   AlertCircleIcon,
   CheckCircle2Icon,

@@ -14,7 +14,8 @@ import {
 } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { api } from "@convex/_generated/api";
-import { useConvexAuth, useQuery } from "convex/react";
+import { useQuery } from "convex-helpers/react/cache";
+import { useConvexAuth } from "convex/react";
 import { MessageCircle, Minus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 

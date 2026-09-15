@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
 import { api } from "@convex/_generated/api";
-import { usePaginatedQuery } from "convex/react";
+import { usePaginatedQuery } from "convex-helpers/react/cache";
 import { FileText, LayoutGrid, Users } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function ExploreCommunitiesPage() {
   const t = useTranslations("communities.explore");

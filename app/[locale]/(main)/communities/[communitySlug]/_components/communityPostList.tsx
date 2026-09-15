@@ -7,13 +7,14 @@ import { Link } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
-import { useConvexAuth, useMutation, usePaginatedQuery } from "convex/react";
+import clsx from "clsx";
+import { usePaginatedQuery } from "convex-helpers/react/cache";
+import { useConvexAuth, useMutation } from "convex/react";
 import { CheckIcon, MessageSquare } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { CreatePostDialog } from "../../_component/dialogs/createPostDialog";
 import { PostBookmarkButton } from "../../_component/List/PostBookmarkButton";
-import clsx from "clsx";
 
 interface CommunityPostListProps {
   communitySlug: string;
@@ -33,7 +34,7 @@ export function CommunityPostList({
   const { results, status, loadMore } = usePaginatedQuery(
     api.communities.queries.getCommunityPosts,
     { communitySlug },
-    { initialNumItems: 10 }
+    { initialNumItems: 10 },
   );
 
   const likePost = useMutation(api.posts.likes.mutations.likePost);
@@ -134,7 +135,9 @@ export function CommunityPostList({
                 size={15}
                 className="transition-transform group-active:scale-95"
               />
-              <span className="text-xs font-medium">{post.likesCount ?? 0}</span>
+              <span className="text-xs font-medium">
+                {post.likesCount ?? 0}
+              </span>
             </Button>
 
             <ShareButton

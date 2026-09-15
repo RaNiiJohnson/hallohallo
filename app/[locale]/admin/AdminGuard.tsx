@@ -2,7 +2,7 @@
 
 import { redirect } from "@/i18n/navigation";
 import { api } from "@convex/_generated/api";
-import { useQuery } from "convex/react";
+import { useQuery } from "convex-helpers/react/cache";
 import { useLocale } from "next-intl";
 import { ReactNode } from "react";
 
