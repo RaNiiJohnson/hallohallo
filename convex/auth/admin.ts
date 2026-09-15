@@ -3,6 +3,7 @@ import { generatedSlug } from "../../src/lib/utils";
 import { components } from "../_generated/api";
 import { runCascadeDelete } from "../cascadeDeletes";
 import { adminAction, adminMutation, adminQuery } from "../functions";
+import { throwForbidden } from "../utils/errors";
 import { authComponent, createAuth } from "./auth";
 import { UserWithRoleType } from "./users";
 
@@ -22,6 +23,9 @@ export const banUser = adminMutation({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
     const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
+    if (args.userId === ctx.user._id) {
+      throwForbidden("Cannot perform this action on your own account.");
+    }
     await auth.api.banUser({
       body: { userId: args.userId, banReason: "Non respect" },
       headers,
@@ -33,6 +37,9 @@ export const unbanUser = adminMutation({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
     const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
+    if (args.userId === ctx.user._id) {
+      throwForbidden("Cannot perform this action on your own account.");
+    }
     await auth.api.unbanUser({
       body: { userId: args.userId },
       headers,
@@ -43,14 +50,16 @@ export const unbanUser = adminMutation({
 export const setUserRole = adminMutation({
   args: {
     userId: v.string(),
-    role: v.string(),
+    role: v.union(v.literal("admin"), v.literal("user")),
   },
   handler: async (ctx, args) => {
-    await ctx.runMutation(components.betterAuth.users.updateUser, {
-      id: args.userId,
-      patch: {
-        role: args.role,
-      },
+    const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
+    if (args.userId === ctx.user._id) {
+      throwForbidden("Cannot perform this action on your own account.");
+    }
+    await auth.api.setRole({
+      body: { userId: args.userId, role: args.role },
+      headers,
     });
   },
 });

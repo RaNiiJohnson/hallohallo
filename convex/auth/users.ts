@@ -6,6 +6,32 @@ import { authMutation, query } from "../functions";
 import { posthog, posthogDistinctId } from "../integrations/posthog";
 import { authComponent } from "./auth";
 
+const editableUserFields = userValidator.pick(
+  "name",
+  "image",
+  "coverImage",
+  "slug",
+  "headline",
+  "bio",
+  "city",
+  "country",
+  "industry",
+  "roles",
+  "company",
+  "field",
+  "skills",
+  "experienceYears",
+  "arrivalDate",
+  "journey",
+  "status",
+  "isServiceProvider",
+  "isPublic",
+  "showEmail",
+  "showPhone",
+  "cv",
+  "userType",
+);
+
 export type UserWithRoleType = UserType & {
   id: string;
   role?: string | undefined;
@@ -71,7 +97,7 @@ export const getAllUsers = query({
 
 export const updateUser = authMutation({
   args: {
-    patch: partial(userValidator.omit("updatedAt")),
+    patch: partial(editableUserFields),
   },
   handler: async (ctx, args) => {
     const user = ctx.user;
@@ -84,7 +110,7 @@ export const updateUser = authMutation({
     await posthog.identify(ctx, {
       distinctId,
       properties: {
-        email: args.patch.email ?? user.email,
+        email: user.email,
         name: args.patch.name ?? user.name,
         role: args.patch.userType ?? user.userType,
       },
