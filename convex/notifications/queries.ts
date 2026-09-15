@@ -1,8 +1,9 @@
-import { authQuery } from "../functions";
+import { authComponent } from "../auth/auth";
+import { query } from "../functions";
 
-export const getMyNotifications = authQuery({
+export const getMyNotifications = query({
   handler: async (ctx) => {
-    const user = ctx.user;
+    const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) return [];
 
     return await ctx.db
@@ -13,9 +14,10 @@ export const getMyNotifications = authQuery({
   },
 });
 
-export const getUnreadCount = authQuery({
+export const getUnreadCount = query({
   handler: async (ctx) => {
-    const user = ctx.user;
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) return [];
 
     const unread = await ctx.db
       .query("notifications")
