@@ -1,7 +1,6 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
 import { authMutation } from "../functions";
-import { posthog, posthogDistinctId } from "../integrations/posthog";
 
 export const createJob = authMutation({
   args: {
@@ -58,16 +57,16 @@ export const createJob = authMutation({
       searchAll: searchAllContent,
     });
 
-    await posthog.capture(ctx, {
-      distinctId: posthogDistinctId(user._id),
-      event: "job_created",
-      properties: {
-        job_id: job,
-        type: args.type,
-        city: args.city,
-        contract_type: args.contractType,
-      },
-    });
+    // await posthog.capture(ctx, {
+    //   distinctId: posthogDistinctId(user._id),
+    //   event: "job_created",
+    //   properties: {
+    //     job_id: job,
+    //     type: args.type,
+    //     city: args.city,
+    //     contract_type: args.contractType,
+    //   },
+    // });
 
     return job;
   },
@@ -136,17 +135,17 @@ export const deleteJob = authMutation({
     id: v.id("JobOffer"),
   },
   handler: async (ctx, args) => {
-    const user = ctx.user;
+    // const user = ctx.user;
 
     const existing = await ctx.db.get("JobOffer", args.id);
     if (!existing) throw new Error("Job not found");
 
     await ctx.db.delete("JobOffer", args.id);
 
-    await posthog.capture(ctx, {
-      distinctId: posthogDistinctId(user._id),
-      event: "job_deleted",
-      properties: { job_id: args.id },
-    });
+    // await posthog.capture(ctx, {
+    //   distinctId: posthogDistinctId(user._id),
+    //   event: "job_deleted",
+    //   properties: { job_id: args.id },
+    // });
   },
 });

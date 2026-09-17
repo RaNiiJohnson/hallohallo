@@ -1,6 +1,5 @@
 import { v } from "convex/values";
 import { authMutation } from "../functions";
-import { posthog, posthogDistinctId } from "../integrations/posthog";
 import { throwForbidden, throwNotFound } from "../utils/errors";
 
 export const sendMessage = authMutation({
@@ -30,12 +29,12 @@ export const sendMessage = authMutation({
       lastReadAt: Date.now(),
     });
 
-    await posthog.capture(ctx, {
-      distinctId: posthogDistinctId(user._id),
-      event: "chat_message_sent",
-      properties: { community_id: args.communityId },
-      groups: { community: args.communityId },
-    });
+    // await posthog.capture(ctx, {
+    //   distinctId: posthogDistinctId(user._id),
+    //   event: "chat_message_sent",
+    //   properties: { community_id: args.communityId },
+    //   groups: { community: args.communityId },
+    // });
   },
 });
 

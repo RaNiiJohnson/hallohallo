@@ -1,6 +1,5 @@
 import { v } from "convex/values";
 import { authMutation } from "../../functions";
-import { posthog, posthogDistinctId } from "../../integrations/posthog";
 
 export const addComment = authMutation({
   args: {
@@ -33,15 +32,15 @@ export const addComment = authMutation({
       });
     }
 
-    await posthog.capture(ctx, {
-      distinctId: posthogDistinctId(user._id),
-      event: "comment_created",
-      properties: {
-        comment_id: commentId,
-        post_id: args.postId,
-        post_slug: post.slug,
-      },
-    });
+    // await posthog.capture(ctx, {
+    //   distinctId: posthogDistinctId(user._id),
+    //   event: "comment_created",
+    //   properties: {
+    //     comment_id: commentId,
+    //     post_id: args.postId,
+    //     post_slug: post.slug,
+    //   },
+    // });
 
     return commentId;
   },
@@ -86,8 +85,8 @@ export const deleteComment = authMutation({
           q.and(
             q.eq(q.field("type"), "new_comment"),
             q.eq(q.field("fromUserName"), user.name),
-            q.eq(q.field("postSlug"), post.slug)
-          )
+            q.eq(q.field("postSlug"), post.slug),
+          ),
         )
         .take(1);
       for (const notif of ghostNotifs) await ctx.db.delete(notif._id);
@@ -146,14 +145,14 @@ export const addReply = authMutation({
       });
     }
 
-    await posthog.capture(ctx, {
-      distinctId: posthogDistinctId(user._id),
-      event: "reply_created",
-      properties: {
-        reply_id: replyId,
-        comment_id: args.commentId,
-      },
-    });
+    // await posthog.capture(ctx, {
+    //   distinctId: posthogDistinctId(user._id),
+    //   event: "reply_created",
+    //   properties: {
+    //     reply_id: replyId,
+    //     comment_id: args.commentId,
+    //   },
+    // });
 
     return replyId;
   },
@@ -201,8 +200,8 @@ export const deleteReply = authMutation({
           q.and(
             q.eq(q.field("type"), "new_reply"),
             q.eq(q.field("fromUserName"), user.name),
-            q.eq(q.field("postSlug"), post?.slug)
-          )
+            q.eq(q.field("postSlug"), post?.slug),
+          ),
         )
         .take(1);
       for (const notif of ghostNotifs) await ctx.db.delete(notif._id);

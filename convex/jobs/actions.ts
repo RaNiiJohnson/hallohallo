@@ -2,7 +2,6 @@ import { v } from "convex/values";
 import { render } from "react-email";
 import { api } from "../_generated/api";
 import { authAction } from "../functions";
-import { posthog, posthogDistinctId } from "../integrations/posthog";
 import { resend } from "../sendEmails";
 import { throwForbidden, throwNotFound } from "../utils/errors";
 import NewApplicationEmail from "./CvTemplate";
@@ -16,7 +15,7 @@ export const applyToJob = authAction({
   handler: async (ctx, args) => {
     const user = ctx.user;
 
-    const distinctId = posthogDistinctId(user._id);
+    // const distinctId = posthogDistinctId(user._id);
 
     try {
       const job = await ctx.runQuery(api.jobs.queries.getJobWithContactById, {
@@ -65,20 +64,20 @@ export const applyToJob = authAction({
         html,
       });
 
-      await posthog.capture(ctx, {
-        distinctId,
-        event: "job_application_submitted",
-        properties: {
-          job_id: args.jobId,
-          job_title: job.title,
-        },
-      });
+      // await posthog.capture(ctx, {
+      //   distinctId,
+      //   event: "job_application_submitted",
+      //   properties: {
+      //     job_id: args.jobId,
+      //     job_title: job.title,
+      //   },
+      // });
     } catch (error) {
-      await posthog.captureException(ctx, {
-        error,
-        distinctId,
-        additionalProperties: { job_id: args.jobId },
-      });
+      // await posthog.captureException(ctx, {
+      //   error,
+      //   distinctId,
+      //   additionalProperties: { job_id: args.jobId },
+      // });
       throw error;
     }
   },
