@@ -1,7 +1,6 @@
 "use client";
 
-import { Activity, useState } from "react";
-import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,8 +9,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Activity, useState } from "react";
 import { JobOfferForm } from "../forms/jobOfferForm";
 
 interface PublishJobDialogProps {

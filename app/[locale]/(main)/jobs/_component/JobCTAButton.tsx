@@ -16,9 +16,7 @@ export function JobCTAButton() {
 
   if (isAuthenticated) {
     return (
-      <PublishJobDialog
-        trigger={<Button size="lg">{t("publish")}</Button>}
-      />
+      <PublishJobDialog trigger={<Button size="lg">{t("publish")}</Button>} />
     );
   }
 

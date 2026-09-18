@@ -135,13 +135,13 @@ export function ListingList() {
   return (
     <div
       className={cn(
-        "transition-all duration-300",
+        "transition-all duration-300 ",
         selectedId && "max-w-7xl mx-auto",
       )}
     >
       <div
         className={cn(
-          "grid gap-6 transition-all duration-300",
+          "grid gap-6 transition-all duration-300 mt-8",
           selectedId
             ? "lg:grid-cols-[repeat(2,minmax(0,1fr))_450px]"
             : "md:grid-cols-2 lg:grid-cols-3",
@@ -167,7 +167,11 @@ export function ListingList() {
           >
             <div className="relative h-80 w-full rounded-xl overflow-hidden shadow-xl">
               <Image
-                src={list.images?.[0]?.url || list.images?.[0]?.secureUrl || "/default-cover.jpg"}
+                src={
+                  list.images?.[0]?.url ||
+                  list.images?.[0]?.secureUrl ||
+                  "/default-cover.jpg"
+                }
                 alt={list.title}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
