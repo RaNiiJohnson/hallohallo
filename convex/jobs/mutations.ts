@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
 import { authMutation } from "../functions";
+import { throwForbidden } from "../utils/errors";
 
 export const createJob = authMutation({
   args: {
@@ -45,6 +46,10 @@ export const createJob = authMutation({
   },
   handler: async (ctx, args) => {
     const user = ctx.user;
+
+    if (user.userType !== "provider" && user.role !== "admin") {
+      throwForbidden("Only providers or admins can publish listings");
+    }
 
     const searchAllContent = `${args.title} ${args.type} ${args.city} ${args.contractType} ${args.description}`;
 

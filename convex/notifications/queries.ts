@@ -17,7 +17,7 @@ export const getMyNotifications = query({
 export const getUnreadCount = query({
   handler: async (ctx) => {
     const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) return [];
+    if (!user) return null;
 
     const unread = await ctx.db
       .query("notifications")

@@ -53,6 +53,10 @@ export const createListing = authMutation({
   handler: async (ctx, args) => {
     const user = ctx.user;
 
+    if (user.userType !== "provider" && user.role !== "admin") {
+      throwForbidden("Only providers or admins can publish listings");
+    }
+
     const searchAllContent = `${args.title} ${args.propertyType} ${args.listingMode} ${args.city} ${args.description}`;
 
     const listingId = await ctx.db.insert("RealestateListing", {
