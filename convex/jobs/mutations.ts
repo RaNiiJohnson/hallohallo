@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
 import { authMutation } from "../functions";
-import { throwForbidden } from "../utils/errors";
+import { throwForbidden, throwNotFound } from "../utils/errors";
 
 export const createJob = authMutation({
   args: {
@@ -48,7 +48,7 @@ export const createJob = authMutation({
     const user = ctx.user;
 
     if (user.userType !== "provider" && user.role !== "admin") {
-      throwForbidden("Only providers or admins can publish listings");
+      throwForbidden("Only providers or admins can publish jobs");
     }
 
     const searchAllContent = `${args.title} ${args.type} ${args.city} ${args.contractType} ${args.description}`;
@@ -120,21 +120,26 @@ export const updateJob = authMutation({
     ),
   },
   handler: async (ctx, args) => {
-    const existing = await ctx.db.get("JobOffer", args.id);
-    if (!existing) throw new Error("Job not found");
+    const existing = await ctx.db.get(args.id);
+    if (!existing) throwNotFound("Job not found");
+
+    const isOwner = existing.authorId === ctx.user._id;
+    const isAdmin = ctx.user.role === "admin";
+    if (!isOwner && !isAdmin) {
+      throwForbidden("Not allowed to update this job");
+    }
 
     // Remove id from args before updating because it's not a field of the document
     const { id, ...updateData } = args;
 
     const searchAllContent = `${args.title} ${args.type} ${args.city} ${args.contractType} ${args.description}`;
 
-    await ctx.db.patch("JobOffer", id, {
+    await ctx.db.patch(id, {
       ...updateData,
       searchAll: searchAllContent,
     });
   },
 });
-
 export const deleteJob = authMutation({
   args: {
     id: v.id("JobOffer"),

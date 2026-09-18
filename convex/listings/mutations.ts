@@ -114,11 +114,11 @@ export const deleteListing = authMutation({
     }
 
     // 2. Deletes the linked contact
-    // const contact = await ctx.db
-    //   .query("RealestateContactInfo")
-    //   .withIndex("by_listingId", (q) => q.eq("listingId", listingId))
-    //   .unique();
-    // if (contact) await ctx.db.delete(contact._id);
+    const contact = await ctx.db
+      .query("RealestateContactInfo")
+      .withIndex("by_listingId", (q) => q.eq("listingId", listingId))
+      .unique();
+    if (contact) await ctx.db.delete(contact._id);
 
     // 3. Deletes the bookmarks pointing to this listing.
     const bookmarks = await ctx.db
@@ -199,7 +199,8 @@ export const updateListing = authMutation({
       }
     }
 
-    const searchAllContent = `${patch.title} ${patch.propertyType} ${patch.city} ${patch.listingMode} ${patch.description}`;
+    const updatedListing = { ...listing, ...patch };
+    const searchAllContent = `${updatedListing.title} ${updatedListing.propertyType} ${updatedListing.city} ${updatedListing.listingMode} ${updatedListing.description}`;
 
     await ctx.db.patch(listingId, { ...patch, searchAll: searchAllContent });
   },
