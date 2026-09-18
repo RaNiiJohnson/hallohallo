@@ -91,7 +91,7 @@ export default function JobDetailsPage() {
             </div>
 
             {/* Posted by */}
-            <p className="text-sm sm:text-base text-muted-foreground mb-6">
+            <div className="text-sm sm:text-base text-muted-foreground mb-6">
               {isLoading ? (
                 <div className="flex items-center justify-center w-full">
                   <Skeleton className="w-[300px] h-[24px] rounded-full border border-muted select-none pointer-events-none" />
@@ -116,7 +116,7 @@ export default function JobDetailsPage() {
                   {getRelativeTime(jobOffer._creationTime, timeT)}
                 </>
               )}
-            </p>
+            </div>
 
             {/* Divider */}
             <Separator className="w-20 h-1 bg-primary mx-auto mb-4" />

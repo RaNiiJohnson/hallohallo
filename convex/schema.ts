@@ -154,7 +154,11 @@ export default defineSchema({
 
   bookmarks: defineTable({
     userId: v.string(),
-    resourceId: v.union(v.id("JobOffer"), v.id("RealestateListing"), v.id("posts")),
+    resourceId: v.union(
+      v.id("JobOffer"),
+      v.id("RealestateListing"),
+      v.id("posts"),
+    ),
     resourceType: v.union(
       v.literal("job"),
       v.literal("realEstate"),
@@ -162,7 +166,8 @@ export default defineSchema({
     ),
   })
     .index("by_userId", ["userId"])
-    .index("by_user_resource", ["userId", "resourceId"]),
+    .index("by_user_resource", ["userId", "resourceId"])
+    .index("by_resourceId", ["resourceId"]),
 
   communities: defineTable({
     slug: v.string(),

@@ -1,7 +1,8 @@
 import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
-import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
+import { usePaginatedQuery, useQuery } from "convex-helpers/react/cache";
+import { useMutation } from "convex/react";
 import { ChevronLeft, Maximize2, Minimize2, Send, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";

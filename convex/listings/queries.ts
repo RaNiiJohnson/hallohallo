@@ -54,11 +54,11 @@ export const getListingWithContact = query({
       if (existingBookmark) isBookmarked = true;
     }
 
-    // Récupération des informations de contact via l'index
+    // get contact information via the index
     const contact = await ctx.db
       .query("RealestateContactInfo")
       .withIndex("by_listingId", (q) => q.eq("listingId", listing._id))
-      .unique(); // Utilise .unique() si une annonce n'a qu'un seul bloc de contact
+      .unique(); // Use .unique() if an ad has only one contact block.
 
     const images = await resolveImages(listing.images ?? []);
 
@@ -139,14 +139,14 @@ export const getListing = query({
       return { ...bookmarksPage, page: filteredPage };
     }
 
-    // Étape 1 : table
+    // Step 1: table
     const tableQuery: QueryInitializer<DataModel["RealestateListing"]> =
       ctx.db.query("RealestateListing");
 
     let orderedQuery: OrderedQuery<DataModel["RealestateListing"]>;
 
     if (searchTerm && searchTerm.trim() !== "") {
-      // Étape 2+3 : search index (inclut déjà l’ordre)
+      // Steps 2+3: search index (already includes the order)
       orderedQuery = tableQuery.withSearchIndex("search_all_fields", (q) => {
         let search = q.search("searchAll", searchTerm);
         if (propertyType) search = search.eq("propertyType", propertyType);
@@ -154,7 +154,7 @@ export const getListing = query({
         return search;
       });
     } else {
-      // Étape 2 : index normal ou pas d’index
+      // Step 2: Standard index or no index
       let indexedQuery: Query<DataModel["RealestateListing"]> = tableQuery;
       if (propertyType) {
         indexedQuery = tableQuery.withIndex("by_propertyType", (q) =>
@@ -162,11 +162,11 @@ export const getListing = query({
         );
       }
 
-      // Étape 3 : ordre
+      // Step 3: Order
       orderedQuery = indexedQuery.order("desc");
     }
 
-    // Étape 4 : filtres supplémentaires
+    // Step 4: Additional filters
     const filtered = orderedQuery.filter((q) => {
       let expr = q.eq(q.field("_id"), q.field("_id")); // toujours vrai
 
@@ -183,7 +183,7 @@ export const getListing = query({
       return expr;
     });
 
-    // Étape 5 : pagination
+    // Step 5: Pagination
     const results = await filtered.paginate(args.paginationOpts);
 
     const enrichedPage = await Promise.all(
@@ -261,7 +261,7 @@ export const getSimilarRealEstateListings = query({
       .filter((q) =>
         q.and(
           q.neq(q.field("slug"), args.excludeSlug),
-          q.neq(q.field("city"), args.city), // éviter les doublons ville déjà pris
+          q.neq(q.field("city"), args.city), // Avoid duplicates; city already taken.
         ),
       )
       .order("desc")

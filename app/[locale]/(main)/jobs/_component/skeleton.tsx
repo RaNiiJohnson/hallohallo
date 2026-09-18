@@ -34,7 +34,7 @@ export function JobFiltersSkeleton() {
 export function JobPageSkeleton() {
   return (
     <>
-      <div className="space-y-4">
+      <div className="space-y-4 mt-8">
         {[1, 2, 3].map((i) => (
           <div key={i} className="bg-card border border-border rounded-lg p-4">
             <div className="flex items-start justify-between gap-4">

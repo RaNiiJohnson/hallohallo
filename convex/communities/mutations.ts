@@ -1,7 +1,6 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
 import { authMutation } from "../functions";
-import { posthog, posthogDistinctId } from "../integrations/posthog";
 
 export const createCommunity = authMutation({
   args: {
@@ -35,23 +34,23 @@ export const createCommunity = authMutation({
       role: "admin",
     });
 
-    const distinctId = posthogDistinctId(user._id);
-    await posthog.groupIdentify(ctx, {
-      groupType: "community",
-      groupKey: comId,
-      properties: { name: args.name, privacy: args.privacy, slug },
-      distinctId,
-    });
-    await posthog.capture(ctx, {
-      distinctId,
-      event: "community_created",
-      properties: {
-        community_id: comId,
-        slug,
-        privacy: args.privacy,
-      },
-      groups: { community: comId },
-    });
+    // const distinctId = posthogDistinctId(user._id);
+    // await posthog.groupIdentify(ctx, {
+    //   groupType: "community",
+    //   groupKey: comId,
+    //   properties: { name: args.name, privacy: args.privacy, slug },
+    //   distinctId,
+    // });
+    // await posthog.capture(ctx, {
+    //   distinctId,
+    //   event: "community_created",
+    //   properties: {
+    //     community_id: comId,
+    //     slug,
+    //     privacy: args.privacy,
+    //   },
+    //   groups: { community: comId },
+    // });
 
     return { comId, slug };
   },
@@ -106,16 +105,16 @@ export const joinCommunity = authMutation({
       role: "member",
     });
 
-    await posthog.capture(ctx, {
-      distinctId: posthogDistinctId(user._id),
-      event: "community_joined",
-      properties: {
-        community_id: args.communityId,
-        community_slug: community.slug,
-        privacy: community.privacy,
-      },
-      groups: { community: args.communityId },
-    });
+    // await posthog.capture(ctx, {
+    //   distinctId: posthogDistinctId(user._id),
+    //   event: "community_joined",
+    //   properties: {
+    //     community_id: args.communityId,
+    //     community_slug: community.slug,
+    //     privacy: community.privacy,
+    //   },
+    //   groups: { community: args.communityId },
+    // });
 
     //notifcation
     if (community.authorId !== user._id) {
@@ -151,15 +150,15 @@ export const leaveCommunity = authMutation({
 
     await ctx.db.delete(member._id);
 
-    await posthog.capture(ctx, {
-      distinctId: posthogDistinctId(user._id),
-      event: "community_left",
-      properties: {
-        community_id: args.communityId,
-        community_slug: community.slug,
-      },
-      groups: { community: args.communityId },
-    });
+    // await posthog.capture(ctx, {
+    //   distinctId: posthogDistinctId(user._id),
+    //   event: "community_left",
+    //   properties: {
+    //     community_id: args.communityId,
+    //     community_slug: community.slug,
+    //   },
+    //   groups: { community: args.communityId },
+    // });
 
     //notifcation
     if (community.authorId !== user._id) {

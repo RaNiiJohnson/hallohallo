@@ -1,9 +1,10 @@
 import { R2 } from "@convex-dev/r2";
-import { ConvexError, v } from "convex/values";
+import { v } from "convex/values";
 import { components } from "../_generated/api";
 import type { DataModel } from "../_generated/dataModel";
-import { internalMutation, mutation, query } from "../_generated/server";
 import { authComponent } from "../auth/auth";
+import { authMutation, internalMutation, query } from "../functions";
+import { throwForbidden, throwNotFound } from "../utils/errors";
 
 export const r2 = new R2(components.r2);
 
@@ -18,7 +19,7 @@ export const { generateUploadUrl, syncMetadata } = r2.clientApi<DataModel>({
   checkUpload: async (ctx) => {
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) {
-      throw new Error("Not authenticated");
+      throwForbidden("Not authenticated");
     }
   },
   onUpload: async () => {
@@ -38,16 +39,11 @@ function buildKey(folder: string, contentType?: string | null) {
  * Custom mutation to upload a CV: the key is forced into the "cv/"
  * folder.
  */
-export const generateCvUploadUrl = mutation({
+export const generateCvUploadUrl = authMutation({
   args: {
     contentType: v.optional(v.string()),
   },
-  handler: async (ctx, { contentType }) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) {
-      throw new ConvexError("Not authenticated");
-    }
-
+  handler: async (_, { contentType }) => {
     const key = buildKey("cv", contentType);
 
     // r2.generateUploadUrl (instance method, NOT clientApi) accepts a
@@ -60,16 +56,11 @@ export const generateCvUploadUrl = mutation({
 /**
  * Custom mutation to upload an image tied to a listing.
  */
-export const generateListingUploadUrl = mutation({
+export const generateListingUploadUrl = authMutation({
   args: {
     contentType: v.optional(v.string()),
   },
-  handler: async (ctx, { contentType }) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) {
-      throw new ConvexError("Not authenticated");
-    }
-
+  handler: async (_, { contentType }) => {
     const key = buildKey("listing", contentType);
     return await r2.generateUploadUrl(key);
   },
@@ -78,16 +69,11 @@ export const generateListingUploadUrl = mutation({
 /**
  * Custom mutation to upload a profile picture (pdp).
  */
-export const generatePdpUploadUrl = mutation({
+export const generatePdpUploadUrl = authMutation({
   args: {
     contentType: v.optional(v.string()),
   },
-  handler: async (ctx, { contentType }) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) {
-      throw new ConvexError("Not authenticated");
-    }
-
+  handler: async (_, { contentType }) => {
     const key = buildKey("pdp", contentType);
     return await r2.generateUploadUrl(key);
   },
@@ -96,16 +82,11 @@ export const generatePdpUploadUrl = mutation({
 /**
  * Custom mutation to upload a cover picture (pdc).
  */
-export const generatePdcUploadUrl = mutation({
+export const generatePdcUploadUrl = authMutation({
   args: {
     contentType: v.optional(v.string()),
   },
-  handler: async (ctx, { contentType }) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) {
-      throw new ConvexError("Not authenticated");
-    }
-
+  handler: async (_, { contentType }) => {
     const key = buildKey("pdc", contentType);
     return await r2.generateUploadUrl(key);
   },
@@ -127,15 +108,12 @@ export const deleteR2Object = internalMutation({
  * - Deletes old CV from R2 if user had one
  * - Patches the user record with the new CV key
  */
-export const uploadCvAndDeleteOld = mutation({
+export const uploadCvAndDeleteOld = authMutation({
   args: {
     newCvKey: v.string(),
   },
   handler: async (ctx, { newCvKey }) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) {
-      throw new ConvexError("Not authenticated");
-    }
+    const user = ctx.user;
 
     // Delete old CV from R2 if it exists
     if (user.cv) {
@@ -153,16 +131,12 @@ export const uploadCvAndDeleteOld = mutation({
 /**
  * Public mutation: delete the user's CV from R2 and clear the field.
  */
-export const deleteCv = mutation({
+export const deleteCv = authMutation({
   args: {},
   handler: async (ctx) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) {
-      throw new ConvexError("Not authenticated");
-    }
-
+    const user = ctx.user;
     if (!user.cv) {
-      throw new ConvexError("No CV to delete");
+      throwNotFound("No CV to delete");
     }
 
     // Delete from R2

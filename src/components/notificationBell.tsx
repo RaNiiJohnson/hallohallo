@@ -17,7 +17,8 @@ import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { Link } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
-import { useConvexAuth, useMutation, useQuery } from "convex/react";
+import { useQuery } from "convex-helpers/react/cache";
+import { useConvexAuth, useMutation } from "convex/react";
 import { Bell, X } from "lucide-react";
 import { useEffect } from "react";
 

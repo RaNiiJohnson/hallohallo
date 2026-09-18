@@ -2,7 +2,6 @@ import { v } from "convex/values";
 import { internal } from "../_generated/api";
 import { runCascadeDelete } from "../cascadeDeletes";
 import { authAction } from "../functions";
-import { posthog, posthogDistinctId } from "../integrations/posthog";
 import { throwNotFound } from "../utils/errors";
 
 /**
@@ -29,14 +28,14 @@ export const deleteCommunity = authAction({
 
     const counts = await runCascadeDelete(ctx, "communities", args.id);
 
-    await posthog.capture(ctx, {
-      distinctId: posthogDistinctId(ctx.user._id),
-      event: "community_deleted",
-      properties: {
-        community_id: args.id,
-        slug: community.slug,
-      },
-    });
+    // await posthog.capture(ctx, {
+    //   distinctId: posthogDistinctId(ctx.user._id),
+    //   event: "community_deleted",
+    //   properties: {
+    //     community_id: args.id,
+    //     slug: community.slug,
+    //   },
+    // });
 
     return counts;
   },

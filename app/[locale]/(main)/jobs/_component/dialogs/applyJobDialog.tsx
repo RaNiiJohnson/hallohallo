@@ -16,7 +16,8 @@ import { formatBytes, useFileUpload } from "@/hooks/use-file-upload";
 import { useTypedR2Upload } from "@/hooks/use-r2-typed-upload";
 import { JobOfferDetails } from "@/lib/convexTypes";
 import { api } from "@convex/_generated/api";
-import { useAction, useMutation, useQuery } from "convex/react";
+import { useQuery } from "convex-helpers/react/cache";
+import { useAction, useMutation } from "convex/react";
 import {
   AlertCircleIcon,
   EyeIcon,

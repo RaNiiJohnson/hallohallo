@@ -1,6 +1,5 @@
 import { v } from "convex/values";
 import { authMutation } from "../../functions";
-import { posthog, posthogDistinctId } from "../../integrations/posthog";
 
 export const likePost = authMutation({
   args: { postId: v.id("posts") },
@@ -39,11 +38,11 @@ export const likePost = authMutation({
         for (const notif of ghostNotifs) await ctx.db.delete(notif._id);
       }
 
-      await posthog.capture(ctx, {
-        distinctId: posthogDistinctId(user._id),
-        event: "post_unliked",
-        properties: { post_id: args.postId, post_slug: post.slug },
-      });
+      // await posthog.capture(ctx, {
+      //   distinctId: posthogDistinctId(user._id),
+      //   event: "post_unliked",
+      //   properties: { post_id: args.postId, post_slug: post.slug },
+      // });
 
       return;
     }
@@ -71,11 +70,11 @@ export const likePost = authMutation({
       });
     }
 
-    await posthog.capture(ctx, {
-      distinctId: posthogDistinctId(user._id),
-      event: "post_liked",
-      properties: { post_id: args.postId, post_slug: post.slug },
-    });
+    // await posthog.capture(ctx, {
+    //   distinctId: posthogDistinctId(user._id),
+    //   event: "post_liked",
+    //   properties: { post_id: args.postId, post_slug: post.slug },
+    // });
   },
 });
 

@@ -7,7 +7,7 @@ import { r2 } from "../integrations/r2";
 
 export const getR2FileUrl = query({
   args: { storageId: v.string() },
-  handler: async (ctx, { storageId }) => {
+  handler: async (_, { storageId }) => {
     const url = await r2.getUrl(storageId);
     return url ?? null;
   },

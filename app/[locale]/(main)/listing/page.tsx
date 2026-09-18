@@ -1,7 +1,6 @@
 import { HeroSection } from "@/components/hero-section";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
-import { CTAButton } from "./_component/CTAButton";
 import { ListingList } from "./_component/List/listingList";
 import { ListingActionsBar } from "./_component/ListingActionsBar";
 import { RealEstatesFilters } from "./_component/listingFilters";
@@ -27,7 +26,7 @@ export default async function ListingPage() {
           </Suspense>
         </div>
 
-        <div className="text-center flex flex-col items-center mt-16 p-8 bg-card border rounded-xl shadow-sm">
+        {/*<div className="text-center flex flex-col items-center mt-16 p-8 bg-card border rounded-xl shadow-sm">
           <h3 className="text-2xl font-bold mb-4">{t("cta.title")}</h3>
           <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
             {t("cta.desc")}
@@ -39,7 +38,7 @@ export default async function ListingPage() {
           >
             <CTAButton />
           </Suspense>
-        </div>
+        </div>*/}
       </div>
     </div>
   );

@@ -1,6 +1,5 @@
 import { v } from "convex/values";
 import { authMutation } from "../functions";
-import { posthog, posthogDistinctId } from "../integrations/posthog";
 
 export const toggleBookmark = authMutation({
   args: {
@@ -27,14 +26,14 @@ export const toggleBookmark = authMutation({
 
     if (existing) {
       await ctx.db.delete(existing._id);
-      await posthog.capture(ctx, {
-        distinctId: posthogDistinctId(user._id),
-        event: "bookmark_removed",
-        properties: {
-          resource_id: args.resourceId,
-          resource_type: args.resourceType,
-        },
-      });
+      // await posthog.capture(ctx, {
+      //   distinctId: posthogDistinctId(user._id),
+      //   event: "bookmark_removed",
+      //   properties: {
+      //     resource_id: args.resourceId,
+      //     resource_type: args.resourceType,
+      //   },
+      // });
       return { bookmarked: false };
     }
 
@@ -43,14 +42,14 @@ export const toggleBookmark = authMutation({
       resourceId: args.resourceId,
       resourceType: args.resourceType,
     });
-    await posthog.capture(ctx, {
-      distinctId: posthogDistinctId(user._id),
-      event: "bookmark_added",
-      properties: {
-        resource_id: args.resourceId,
-        resource_type: args.resourceType,
-      },
-    });
+    // await posthog.capture(ctx, {
+    //   distinctId: posthogDistinctId(user._id),
+    //   event: "bookmark_added",
+    //   properties: {
+    //     resource_id: args.resourceId,
+    //     resource_type: args.resourceType,
+    //   },
+    // });
     return { bookmarked: true };
   },
 });

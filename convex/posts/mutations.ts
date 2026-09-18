@@ -1,7 +1,6 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
 import { authMutation } from "../functions";
-import { posthog, posthogDistinctId } from "../integrations/posthog";
 import { limiter } from "../rateLimits";
 
 export const createPost = authMutation({
@@ -37,15 +36,15 @@ export const createPost = authMutation({
       searchAll: `${args.title} ${args.content} ${user.name} ${community.name}`,
     });
 
-    await posthog.capture(ctx, {
-      distinctId: posthogDistinctId(userId),
-      event: "post_created",
-      properties: {
-        post_id: postId,
-        community_id: args.communityId,
-        community_slug: community.slug,
-      },
-    });
+    // await posthog.capture(ctx, {
+    //   distinctId: posthogDistinctId(userId),
+    //   event: "post_created",
+    //   properties: {
+    //     post_id: postId,
+    //     community_id: args.communityId,
+    //     community_slug: community.slug,
+    //   },
+    // });
 
     return postId;
   },

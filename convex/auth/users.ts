@@ -3,8 +3,33 @@ import { v } from "convex/values";
 import { components } from "../_generated/api";
 import { UserType, userValidator } from "../betterAuth/users";
 import { authMutation, query } from "../functions";
-import { posthog, posthogDistinctId } from "../integrations/posthog";
 import { authComponent } from "./auth";
+
+const editableUserFields = userValidator.pick(
+  "name",
+  "image",
+  "coverImage",
+  "slug",
+  "headline",
+  "bio",
+  "city",
+  "country",
+  "industry",
+  "roles",
+  "company",
+  "field",
+  "skills",
+  "experienceYears",
+  "arrivalDate",
+  "journey",
+  "status",
+  "isServiceProvider",
+  "isPublic",
+  "showEmail",
+  "showPhone",
+  "cv",
+  "userType",
+);
 
 export type UserWithRoleType = UserType & {
   id: string;
@@ -71,7 +96,7 @@ export const getAllUsers = query({
 
 export const updateUser = authMutation({
   args: {
-    patch: partial(userValidator.omit("updatedAt")),
+    patch: partial(editableUserFields),
   },
   handler: async (ctx, args) => {
     const user = ctx.user;
@@ -80,22 +105,22 @@ export const updateUser = authMutation({
       patch: args.patch,
     });
 
-    const distinctId = posthogDistinctId(user._id);
-    await posthog.identify(ctx, {
-      distinctId,
-      properties: {
-        email: args.patch.email ?? user.email,
-        name: args.patch.name ?? user.name,
-        role: args.patch.userType ?? user.userType,
-      },
-    });
+    // const distinctId = posthogDistinctId(user._id);
+    // await posthog.identify(ctx, {
+    //   distinctId,
+    //   properties: {
+    //     email: user.email,
+    //     name: args.patch.name ?? user.name,
+    //     role: args.patch.userType ?? user.userType,
+    //   },
+    // });
 
-    if (args.patch.userType) {
-      await posthog.capture(ctx, {
-        distinctId,
-        event: "user_role_selected",
-        properties: { role: args.patch.userType },
-      });
-    }
+    // if (args.patch.userType) {
+    //   await posthog.capture(ctx, {
+    //     distinctId,
+    //     event: "user_role_selected",
+    //     properties: { role: args.patch.userType },
+    //   });
+    // }
   },
 });

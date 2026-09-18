@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
 import { authMutation } from "../functions";
-import { posthog, posthogDistinctId } from "../integrations/posthog";
+import { throwForbidden, throwNotFound } from "../utils/errors";
 
 export const createJob = authMutation({
   args: {
@@ -47,6 +47,10 @@ export const createJob = authMutation({
   handler: async (ctx, args) => {
     const user = ctx.user;
 
+    if (user.userType !== "provider" && user.role !== "admin") {
+      throwForbidden("Only providers or admins can publish jobs");
+    }
+
     const searchAllContent = `${args.title} ${args.type} ${args.city} ${args.contractType} ${args.description}`;
 
     const job = await ctx.db.insert("JobOffer", {
@@ -58,16 +62,16 @@ export const createJob = authMutation({
       searchAll: searchAllContent,
     });
 
-    await posthog.capture(ctx, {
-      distinctId: posthogDistinctId(user._id),
-      event: "job_created",
-      properties: {
-        job_id: job,
-        type: args.type,
-        city: args.city,
-        contract_type: args.contractType,
-      },
-    });
+    // await posthog.capture(ctx, {
+    //   distinctId: posthogDistinctId(user._id),
+    //   event: "job_created",
+    //   properties: {
+    //     job_id: job,
+    //     type: args.type,
+    //     city: args.city,
+    //     contract_type: args.contractType,
+    //   },
+    // });
 
     return job;
   },
@@ -116,37 +120,42 @@ export const updateJob = authMutation({
     ),
   },
   handler: async (ctx, args) => {
-    const existing = await ctx.db.get("JobOffer", args.id);
-    if (!existing) throw new Error("Job not found");
+    const existing = await ctx.db.get(args.id);
+    if (!existing) throwNotFound("Job not found");
+
+    const isOwner = existing.authorId === ctx.user._id;
+    const isAdmin = ctx.user.role === "admin";
+    if (!isOwner && !isAdmin) {
+      throwForbidden("Not allowed to update this job");
+    }
 
     // Remove id from args before updating because it's not a field of the document
     const { id, ...updateData } = args;
 
     const searchAllContent = `${args.title} ${args.type} ${args.city} ${args.contractType} ${args.description}`;
 
-    await ctx.db.patch("JobOffer", id, {
+    await ctx.db.patch(id, {
       ...updateData,
       searchAll: searchAllContent,
     });
   },
 });
-
 export const deleteJob = authMutation({
   args: {
     id: v.id("JobOffer"),
   },
   handler: async (ctx, args) => {
-    const user = ctx.user;
+    // const user = ctx.user;
 
     const existing = await ctx.db.get("JobOffer", args.id);
     if (!existing) throw new Error("Job not found");
 
     await ctx.db.delete("JobOffer", args.id);
 
-    await posthog.capture(ctx, {
-      distinctId: posthogDistinctId(user._id),
-      event: "job_deleted",
-      properties: { job_id: args.id },
-    });
+    // await posthog.capture(ctx, {
+    //   distinctId: posthogDistinctId(user._id),
+    //   event: "job_deleted",
+    //   properties: { job_id: args.id },
+    // });
   },
 });

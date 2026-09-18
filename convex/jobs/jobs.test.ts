@@ -12,13 +12,19 @@ vi.mock("../auth/auth", async (importOriginal) => {
   return {
     ...actual,
     requireAuth: vi.fn().mockResolvedValue({
-      user: { _id: "testUserId", id: "testUserId", name: "Test User" },
+      user: {
+        _id: "testUserId",
+        id: "testUserId",
+        name: "Test User",
+        userType: "provider",
+      },
     }),
     authComponent: {
       ...actual.authComponent,
       safeGetAuthUser: vi.fn().mockResolvedValue({
         _id: "testUserId",
         name: "Test User",
+        userType: "provider",
       }),
     },
   };
