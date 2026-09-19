@@ -29,10 +29,10 @@
     "allTypes": "All types",
     "listingMode": "Listing mode",
     "allModes": "All modes",
-    "bookmarked": "Saved",
+    "bookmarked": "Favorites",
     "advanced": "Advanced filters",
     "all": "All",
-    "bedrooms": "Bedrooms",
+    "bedrooms": "Number of bedrooms",
     "bedroomsAll": "All",
     "bedrooms1": "1 bedroom",
     "bedrooms2": "2 bedrooms",
@@ -43,8 +43,8 @@
   },
   "dialogs": {
     "publish": {
-      "title": "Publish a listing",
-      "desc": "Fill out the form below to showcase your property."
+      "title": "Publish an ad",
+      "desc": "Fill out the form below to offer your property."
     },
     "delete": {
       "title": "Delete listing?",
@@ -61,9 +61,9 @@
     "steps": {
       "type": "Property type",
       "location": "Location",
-      "mainInfo": "Main info",
+      "mainInfo": "Main information",
       "conditions": "Conditions",
-      "media": "Media"
+      "media": "Content & media"
     },
     "labels": {
       "title": "Listing title *",
@@ -71,7 +71,7 @@
       "listingMode": "Listing mode *",
       "city": "City / Location *",
       "mapPosition": "Map position (optional)",
-      "mapDesc": "Click on the map to pinpoint the property. The city will update automatically.",
+      "mapDesc": "Click on the map to pinpoint the exact position of the property. The city will update automatically.",
       "priceRent": "Monthly rent *",
       "priceSale": "Sale price *",
       "area": "Area *",
@@ -79,7 +79,7 @@
       "bathrooms": "Bathrooms *",
       "floor": "Floor *",
       "deposit": "Deposit",
-      "charges": "Additional charges",
+      "charges": "Charges",
       "pets": "Pets allowed",
       "availableFrom": "Available from",
       "description": "Description *",
@@ -89,7 +89,7 @@
       "photosAdded": "Added photos ({count})"
     },
     "placeholders": {
-      "title": "E.g. Bright 3-bedroom apartment, downtown",
+      "title": "E.g. Bright 3-room apartment, downtown",
       "selectType": "Select property type",
       "selectMode": "Rent or sale",
       "city": "E.g. Königstein im Taunus, Hesse",
@@ -101,15 +101,17 @@
       "deposit": "E.g. 1700",
       "charges": "E.g. 150",
       "selectDate": "Select a date",
-      "description": "Describe the property: general condition, amenities, brightness, proximity to transport..."
+      "description": "Describe the property: general condition, amenities, brightness, proximity to transport and shops…",
+      "photosDrop": "Drag your photos here",
+      "extras": "E.g. Parking, Balcony, Cellar..."
     },
     "validation": {
       "titleReq": "Title is required",
       "cityReq": "City is required",
       "priceReq": "Price is required",
       "areaReq": "Area is required",
-      "bedroomsReq": "Bedrooms required",
-      "bathroomsReq": "Bathrooms required",
+      "bedroomsReq": "Number of bedrooms is required",
+      "bathroomsReq": "Number of bathrooms is required",
       "floorReq": "Floor is required",
       "descMin": "Description must be at least 10 characters long"
     },
@@ -131,7 +133,6 @@
       "uploadImages": "Upload images",
       "removeImage": "Remove image: {name}"
     },
-
     "labels_extra": {
       "extras": "Extras / Amenities",
       "extrasDesc": "Add property amenities and perks (e.g. Parking, Balcony, Cellar, Elevator...)"
@@ -167,10 +168,10 @@
     "contact": "Contact owner",
     "seeDetails": "See full details",
     "backBtn": "Back to listings",
-    "bookmarkAdd": "Added to bookmarks",
-    "bookmarkRemove": "Removed from bookmarks",
-    "bookmarkError": "Error updating bookmark",
-    "bookmarkBtn": "Save",
+    "bookmarkAdd": "Added to favorites",
+    "bookmarkRemove": "Removed from favorites",
+    "bookmarkError": "Error updating favorite",
+    "bookmarkBtn": "Favorites",
     "featuresTitle": "Features",
     "level": "Level",
     "available": "Available:",
@@ -180,7 +181,7 @@
     "seeMore": "See more",
     "seeLess": "See less",
     "locationTitle": "Location",
-    "extrasTitle": "Amenities",
+    "extrasTitle": "Amenities & services",
     "contactTitle": "Contact",
     "anonymous": "Anonymous",
     "ownerRole": "Owner",
@@ -195,6 +196,6 @@
     "seeAll": "See all listings",
     "photos": "{count} photos",
     "emptyMsg": "Not enough similar listings in this area?",
-    "emptyBtn": "Discover all listings"
+    "emptyBtn": "Discover all our listings"
   }
 }
