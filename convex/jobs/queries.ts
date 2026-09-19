@@ -216,3 +216,19 @@ export const getJobs = query({
     return { ...results, page: enrichedPage };
   },
 });
+
+export const getTranslation = query({
+  args: {
+    jobId: v.id("JobOffer"),
+    language: v.union(v.literal("fr"), v.literal("en"), v.literal("de")),
+  },
+
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("jobTranslations")
+      .withIndex("by_job_language", (q) =>
+        q.eq("jobId", args.jobId).eq("language", args.language),
+      )
+      .unique();
+  },
+});

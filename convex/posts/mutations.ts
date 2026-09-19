@@ -34,6 +34,7 @@ export const createPost = authMutation({
       communityName: community.name,
       communitySlug: community.slug,
       searchAll: `${args.title} ${args.content} ${user.name} ${community.name}`,
+      updatedAt: Date.now(),
     });
 
     // await posthog.capture(ctx, {
@@ -67,6 +68,7 @@ export const updatePost = authMutation({
       content: args.content,
       title: args.title,
       searchAll: `${args.title} ${args.content} ${user.name}`,
+      updatedAt: Date.now(),
     });
   },
 });

@@ -7,19 +7,19 @@
     "title": "Immobilien",
     "publish": "Anzeige veröffentlichen",
     "emptyTitle": "Keine Anzeigen gefunden",
-    "emptyDesc": "Versuchen Sie, Ihre Suchkriterien zu ändern oder einige Filter zu entfernen",
+    "emptyDesc": "Versuche, deine Suchkriterien zu ändern oder einige Filter zu entfernen",
     "loadMore": "Mehr laden",
     "loading": "Wird geladen...",
     "allLoaded": "Alle Anzeigen wurden geladen.",
     "allLoadedToast": "Alle Angebote wurden geladen",
     "dialogDesc": "Details zur Immobilienanzeige",
-    "loadMoreBtn": "Weitere Anzeigen laden"
+    "loadMoreBtn": "Weitere Anzeigen ansehen"
   },
   "cta": {
     "title": "Hast du eine Immobilie anzubieten?",
-    "desc": "Schließe dich hunderten Eigentümern an, die unserer Plattform vertrauen, um ihre Immobilien anzubieten und Mieter zu finden.",
-    "publish": "Anzeige aufgeben",
-    "registerToPublish": "Registrieren um zu posten"
+    "desc": "Schließe dich Hunderten von Eigentümern an, die unserer Plattform vertrauen, um ihre Immobilien anzubieten und ihre zukünftigen Mieter zu finden.",
+    "publish": "Anzeige veröffentlichen",
+    "registerToPublish": "Registrieren, um zu veröffentlichen"
   },
   "filters": {
     "search": "Suchen...",
@@ -28,11 +28,11 @@
     "propertyType": "Immobilientyp",
     "allTypes": "Alle Typen",
     "listingMode": "Angebotsart",
-    "allModes": "Alle Arten",
+    "allModes": "Alle Angebotsarten",
     "bookmarked": "Favoriten",
     "advanced": "Erweiterte Filter",
     "all": "Alle",
-    "bedrooms": "Schlafzimmer",
+    "bedrooms": "Anzahl der Schlafzimmer",
     "bedroomsAll": "Alle",
     "bedrooms1": "1 Schlafzimmer",
     "bedrooms2": "2 Schlafzimmer",
@@ -44,11 +44,11 @@
   "dialogs": {
     "publish": {
       "title": "Anzeige veröffentlichen",
-      "desc": "Füll das Formular aus, um deine Immobilie zu präsentieren."
+      "desc": "Fülle das folgende Formular aus, um deine Immobilie anzubieten."
     },
     "delete": {
       "title": "Anzeige löschen?",
-      "desc": "Das kann nicht rückgängig gemacht werden. Deine Anzeige wird dauerhaft gelöscht.",
+      "desc": "Diese Aktion kann nicht rückgängig gemacht werden. Die Anzeige wird dauerhaft gelöscht.",
       "cancel": "Abbrechen",
       "confirm": "Anzeige löschen"
     }
@@ -61,9 +61,9 @@
     "steps": {
       "type": "Immobilientyp",
       "location": "Standort",
-      "mainInfo": "Hauptinfos",
+      "mainInfo": "Hauptinformationen",
       "conditions": "Bedingungen",
-      "media": "Medien"
+      "media": "Inhalt & Medien"
     },
     "labels": {
       "title": "Titel der Anzeige *",
@@ -71,7 +71,7 @@
       "listingMode": "Angebotsart *",
       "city": "Stadt / Ort *",
       "mapPosition": "Kartenposition (optional)",
-      "mapDesc": "Klicke auf die Karte, um den genauen Standort anzugeben. Die Stadt aktualisiert sich automatisch.",
+      "mapDesc": "Klicke auf die Karte, um den genauen Standort der Immobilie anzugeben. Die Stadt wird automatisch aktualisiert.",
       "priceRent": "Monatsmiete *",
       "priceSale": "Verkaufspreis *",
       "area": "Wohnfläche *",
@@ -84,13 +84,13 @@
       "availableFrom": "Verfügbar ab",
       "description": "Beschreibung *",
       "descHint": "Eine gute Beschreibung erhöht deine Chancen, schnell einen Mieter zu finden.",
-      "photos": "Immobilienfotos",
-      "photosDesc": "Füge bis zu {maxFiles} Fotos hinzu (max. {maxSize}MB pro Bild)",
+      "photos": "Fotos der Immobilie",
+      "photosDesc": "Füge bis zu {maxFiles} Fotos hinzu (max. {maxSize}MB pro Foto)",
       "photosAdded": "Hinzugefügte Fotos ({count})"
     },
     "placeholders": {
       "title": "Z.B. Helle 3-Zimmer-Wohnung im Zentrum",
-      "selectType": "Immobilientyp wählen",
+      "selectType": "Immobilientyp auswählen",
       "selectMode": "Miete oder Kauf",
       "city": "Z.B. Königstein im Taunus, Hessen",
       "price": "Z.B. 850",
@@ -101,17 +101,19 @@
       "deposit": "Z.B. 1700",
       "charges": "Z.B. 150",
       "selectDate": "Datum auswählen",
-      "description": "Beschreibe die Immobilie: Zustand, Ausstattung, Helligkeit, Nähe zu Verkehrsmitteln..."
+      "description": "Beschreibe die Immobilie: allgemeiner Zustand, Ausstattung, Helligkeit, Nähe zu Verkehrsmitteln und Geschäften…",
+      "photosDrop": "Ziehe deine Fotos hierher",
+      "extras": "Z.B. Parkplatz, Balkon, Keller..."
     },
     "validation": {
-      "titleReq": "Titel ist erforderlich",
-      "cityReq": "Stadt ist erforderlich",
-      "priceReq": "Preis ist erforderlich",
-      "areaReq": "Fläche ist erforderlich",
-      "bedroomsReq": "Schlafzimmer erforderlich",
-      "bathroomsReq": "Badezimmer erforderlich",
-      "floorReq": "Etage ist erforderlich",
-      "descMin": "Beschreibung muss mindestens 10 Zeichen lang sein"
+      "titleReq": "Der Titel ist erforderlich",
+      "cityReq": "Die Stadt ist erforderlich",
+      "priceReq": "Der Preis ist erforderlich",
+      "areaReq": "Die Fläche ist erforderlich",
+      "bedroomsReq": "Die Anzahl der Schlafzimmer ist erforderlich",
+      "bathroomsReq": "Die Anzahl der Badezimmer ist erforderlich",
+      "floorReq": "Die Etage ist erforderlich",
+      "descMin": "Die Beschreibung muss mindestens 10 Zeichen lang sein"
     },
     "messages": {
       "success": "Anzeige erfolgreich veröffentlicht!",
@@ -123,18 +125,17 @@
       "addPhoto": "Hinzufügen",
       "prev": "Zurück",
       "next": "Weiter",
-      "publish": "Anzeige aufgeben",
-      "publishing": "Veröffentliche...",
-      "removeExtra": "Entfernen {extra}"
+      "publish": "Anzeige veröffentlichen",
+      "publishing": "Wird veröffentlicht...",
+      "removeExtra": "{extra} entfernen"
     },
     "aria": {
       "uploadImages": "Bilder hochladen",
       "removeImage": "Bild entfernen: {name}"
     },
-
     "labels_extra": {
       "extras": "Extras / Ausstattung",
-      "extrasDesc": "Fügen Sie Ausstattungsmerkmale und Vorteile der Immobilie hinzu (z. B. Parkplatz, Balkon, Keller, Aufzug...)"
+      "extrasDesc": "Füge Ausstattungsmerkmale und Vorteile der Immobilie hinzu (z. B. Parkplatz, Balkon, Keller, Aufzug...)"
     }
   },
   "labels": {
@@ -155,7 +156,7 @@
     "updated": "Aktualisiert am",
     "area": "Wohnfläche",
     "bedrooms": "Schlafzimmer",
-    "bathrooms": "Bäder",
+    "bathrooms": "Badezimmer",
     "floor": "Etage {floor}",
     "deposit": "Kaution",
     "charges": "Nebenkosten",
@@ -169,10 +170,10 @@
     "backBtn": "Zurück zu den Anzeigen",
     "bookmarkAdd": "Zu Favoriten hinzugefügt",
     "bookmarkRemove": "Aus Favoriten entfernt",
-    "bookmarkError": "Fehler beim Aktualisieren der Favoriten",
-    "bookmarkBtn": "Speichern",
+    "bookmarkError": "Fehler beim Aktualisieren des Favoriten",
+    "bookmarkBtn": "Favoriten",
     "featuresTitle": "Eigenschaften",
-    "level": "Etage",
+    "level": "Ebene",
     "available": "Verfügbar:",
     "pets": "Haustiere:",
     "petsDenied": "Nicht erlaubt",
@@ -180,7 +181,7 @@
     "seeMore": "Mehr anzeigen",
     "seeLess": "Weniger anzeigen",
     "locationTitle": "Standort",
-    "extrasTitle": "Ausstattung",
+    "extrasTitle": "Ausstattung und Services",
     "contactTitle": "Kontakt",
     "anonymous": "Anonym",
     "ownerRole": "Eigentümer",
@@ -195,6 +196,6 @@
     "seeAll": "Alle Anzeigen ansehen",
     "photos": "{count} Fotos",
     "emptyMsg": "Nicht genug ähnliche Anzeigen in diesem Bereich?",
-    "emptyBtn": "Alle Anzeigen entdecken"
+    "emptyBtn": "Alle unsere Anzeigen entdecken"
   }
 }

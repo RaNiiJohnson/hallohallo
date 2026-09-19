@@ -202,6 +202,8 @@ export default defineSchema({
     .index("by_communityId", ["communityId"])
     .index("by_userId_communityId", ["userId", "communityId"]),
 
+  // Posts
+
   posts: defineTable({
     slug: v.string(),
     title: v.string(),
@@ -214,6 +216,7 @@ export default defineSchema({
     searchAll: v.optional(v.string()),
     likesCount: v.optional(v.number()),
     commentsCount: v.optional(v.number()),
+    updatedAt: v.optional(v.number()),
   })
     .index("by_authorId", ["authorId"])
     .index("by_slug", ["slug"])
@@ -258,6 +261,40 @@ export default defineSchema({
   })
     .index("by_userId", ["userId"])
     .index("by_replyId", ["replyId"]),
+
+  // Translations
+
+  jobTranslations: defineTable({
+    jobId: v.id("JobOffer"),
+    language: v.union(v.literal("fr"), v.literal("en"), v.literal("de")),
+    title: v.string(),
+    city: v.string(),
+    description: v.string(),
+    sourceUpdatedAt: v.number(),
+  })
+    .index("by_job_language", ["jobId", "language"])
+    .index("by_job", ["jobId"]),
+
+  listingTranslations: defineTable({
+    listingId: v.id("RealestateListing"),
+    language: v.union(v.literal("fr"), v.literal("en"), v.literal("de")),
+    title: v.string(),
+    description: v.string(),
+    city: v.string(),
+    sourceUpdatedAt: v.number(),
+  })
+    .index("by_listing_language", ["listingId", "language"])
+    .index("by_listing", ["listingId"]),
+
+  postTranslations: defineTable({
+    postId: v.id("posts"),
+    language: v.union(v.literal("fr"), v.literal("en"), v.literal("de")),
+    title: v.string(),
+    content: v.string(),
+    sourceUpdatedAt: v.number(),
+  })
+    .index("by_post_language", ["postId", "language"])
+    .index("by_post", ["postId"]),
 
   communityMessages: defineTable({
     communityId: v.id("communities"),

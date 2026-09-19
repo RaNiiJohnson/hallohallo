@@ -7,6 +7,7 @@ import { ButtonGroup } from "@/components/ui/button-group";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
+import { useTranslatedJob } from "@/hooks/use-translated-job";
 import { Link } from "@/i18n/navigation";
 import { formatDateLong, getRelativeTime } from "@/lib/date";
 import { LocationMap } from "@/lib/LocationMap";
@@ -45,6 +46,8 @@ export default function JobDetailsPage() {
     slug: id as string,
   });
 
+  const translated = useTranslatedJob(jobOffer);
+
   if (jobOffer === undefined) {
     return <JobDetailsSkeleton />;
   }
@@ -72,7 +75,7 @@ export default function JobDetailsPage() {
               <ChevronRight className="w-4 h-4" />
             </span>
             <span className="text-foreground font-medium line-clamp-1">
-              {jobOffer.title}
+              {translated.title ?? jobOffer.title}
             </span>
           </div>
 
@@ -86,7 +89,7 @@ export default function JobDetailsPage() {
             {/* Job Title */}
             <div className="mb-4 flex justify-center">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
-                {jobOffer.title}
+                {translated.title ?? jobOffer.title}
               </h1>
             </div>
 
@@ -145,7 +148,9 @@ export default function JobDetailsPage() {
                 {/* Location */}
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-primary/60" />
-                  <span className="font-medium">{jobOffer.city}</span>
+                  <span className="font-medium">
+                    {translated.city ?? jobOffer.city}
+                  </span>
                 </div>
               </div>
 
@@ -244,7 +249,10 @@ export default function JobDetailsPage() {
                     <p className="text-sm text-muted-foreground">
                       {t("details.location")}
                     </p>
-                    <p className="font-semibold">{jobOffer.city}</p>
+                    <p className="font-semibold">
+                      {" "}
+                      {translated.city ?? jobOffer.city}
+                    </p>
                   </div>
 
                   <div className="space-y-1">
@@ -280,7 +288,7 @@ export default function JobDetailsPage() {
               <div className="p-4">
                 <div className="prose prose-sm sm:prose-base max-w-none dark:prose-invert">
                   <p className="whitespace-pre-wrap text-foreground/90 leading-relaxed">
-                    {jobOffer.description}
+                    {translated.description ?? jobOffer.description}
                   </p>
                 </div>
               </div>
@@ -336,7 +344,7 @@ export default function JobDetailsPage() {
                       {jobOffer.company || t("details.companyName")}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {jobOffer.city}
+                      {translated.city ?? jobOffer.city}
                     </p>
                   </div>
                 </div>
@@ -372,7 +380,7 @@ export default function JobDetailsPage() {
                   <div className="flex items-center text-muted-foreground bg-muted px-2.5 py-0.5 rounded-md">
                     <MapPin className="w-4 h-4 mr-1.5" />
                     <span className="font-semibold text-sm">
-                      {jobOffer.city}
+                      {translated.city ?? jobOffer.city}
                     </span>
                   </div>
                 </div>

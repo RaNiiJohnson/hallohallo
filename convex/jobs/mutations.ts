@@ -137,9 +137,11 @@ export const updateJob = authMutation({
     await ctx.db.patch(id, {
       ...updateData,
       searchAll: searchAllContent,
+      updatedAt: Date.now(),
     });
   },
 });
+
 export const deleteJob = authMutation({
   args: {
     id: v.id("JobOffer"),
@@ -149,6 +151,12 @@ export const deleteJob = authMutation({
 
     const existing = await ctx.db.get("JobOffer", args.id);
     if (!existing) throw new Error("Job not found");
+
+    const translations = await ctx.db
+      .query("jobTranslations")
+      .withIndex("by_job", (q) => q.eq("jobId", args.id))
+      .collect();
+    await Promise.all(translations.map((t) => ctx.db.delete(t._id)));
 
     await ctx.db.delete("JobOffer", args.id);
 

@@ -120,6 +120,12 @@ export const deleteListing = authMutation({
       .unique();
     if (contact) await ctx.db.delete(contact._id);
 
+    const translations = await ctx.db
+      .query("listingTranslations")
+      .withIndex("by_listing", (q) => q.eq("listingId", listingId))
+      .collect();
+    await Promise.all(translations.map((t) => ctx.db.delete(t._id)));
+
     // 3. Deletes the bookmarks pointing to this listing.
     const bookmarks = await ctx.db
       .query("bookmarks")
@@ -202,6 +208,10 @@ export const updateListing = authMutation({
     const updatedListing = { ...listing, ...patch };
     const searchAllContent = `${updatedListing.title} ${updatedListing.propertyType} ${updatedListing.city} ${updatedListing.listingMode} ${updatedListing.description}`;
 
-    await ctx.db.patch(listingId, { ...patch, searchAll: searchAllContent });
+    await ctx.db.patch(listingId, {
+      ...patch,
+      searchAll: searchAllContent,
+      updatedAt: Date.now(),
+    });
   },
 });

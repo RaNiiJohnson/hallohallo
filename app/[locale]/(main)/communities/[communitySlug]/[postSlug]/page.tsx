@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
+import { useTranslatedPost } from "@/hooks/use-translated-job";
 import { Link } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
@@ -53,6 +54,8 @@ export default function PostClient() {
   const timeT = useTimeTranslations();
   const t = useTranslations("communities.post");
   const tc = useTranslations("communities.community");
+
+  const translated = useTranslatedPost(post);
 
   if (post === undefined) {
     return <SkeletonPost />;
@@ -146,7 +149,7 @@ export default function PostClient() {
           <ChevronRight className="w-4 h-4" />
         </span>
         <span className="text-foreground font-medium line-clamp-1">
-          {post.title}
+          {translated.title ?? post.title}
         </span>
       </div>
       <div className="max-w-3xl mx-auto py-2 space-y-4">
@@ -203,12 +206,12 @@ export default function PostClient() {
           ) : (
             <>
               <h1 className="text-xl font-bold text-foreground mb-2">
-                {post.title}
+                {translated.title ?? post.title}
               </h1>
 
               {post.content && (
                 <p className="text-sm text-foreground leading-relaxed mb-4 whitespace-pre-wrap">
-                  {post.content}
+                  {translated.content ?? post.content}
                 </p>
               )}
             </>
