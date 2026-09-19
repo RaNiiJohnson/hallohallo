@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
-import { authMutation, internalMutation } from "../functions";
+import { authMutation } from "../functions";
 import { throwForbidden, throwNotFound } from "../utils/errors";
 
 export const createJob = authMutation({
@@ -137,6 +137,7 @@ export const updateJob = authMutation({
     await ctx.db.patch(id, {
       ...updateData,
       searchAll: searchAllContent,
+      updatedAt: Date.now(),
     });
   },
 });
@@ -151,6 +152,12 @@ export const deleteJob = authMutation({
     const existing = await ctx.db.get("JobOffer", args.id);
     if (!existing) throw new Error("Job not found");
 
+    const translations = await ctx.db
+      .query("jobTranslations")
+      .withIndex("by_job", (q) => q.eq("jobId", args.id))
+      .collect();
+    await Promise.all(translations.map((t) => ctx.db.delete(t._id)));
+
     await ctx.db.delete("JobOffer", args.id);
 
     // await posthog.capture(ctx, {
@@ -158,41 +165,5 @@ export const deleteJob = authMutation({
     //   event: "job_deleted",
     //   properties: { job_id: args.id },
     // });
-  },
-});
-
-export const saveTranslation = internalMutation({
-  args: {
-    jobId: v.id("JobOffer"),
-    language: v.union(v.literal("fr"), v.literal("en"), v.literal("de")),
-    title: v.string(),
-    description: v.string(),
-    sourceUpdatedAt: v.number(),
-  },
-
-  handler: async (ctx, args) => {
-    const existing = await ctx.db
-      .query("jobTranslations")
-      .withIndex("by_job_language", (q) =>
-        q.eq("jobId", args.jobId).eq("language", args.language),
-      )
-      .unique();
-
-    if (existing) {
-      if (args.sourceUpdatedAt < existing.sourceUpdatedAt) {
-        return existing._id;
-      }
-      await ctx.db.patch(existing._id, {
-        title: args.title,
-        description: args.description,
-        sourceUpdatedAt: args.sourceUpdatedAt,
-      });
-
-      return existing._id;
-    }
-
-    return await ctx.db.insert("jobTranslations", {
-      ...args,
-    });
   },
 });

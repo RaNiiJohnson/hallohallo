@@ -36,6 +36,7 @@ import type * as jobs_queries from "../jobs/queries.js";
 import type * as jobs_translate from "../jobs/translate.js";
 import type * as listings_mutations from "../listings/mutations.js";
 import type * as listings_queries from "../listings/queries.js";
+import type * as listings_translate from "../listings/translate.js";
 import type * as notifications_mutations from "../notifications/mutations.js";
 import type * as notifications_queries from "../notifications/queries.js";
 import type * as posts_actions from "../posts/actions.js";
@@ -43,8 +44,10 @@ import type * as posts_comments_mutations from "../posts/comments/mutations.js";
 import type * as posts_likes_mutations from "../posts/likes/mutations.js";
 import type * as posts_mutations from "../posts/mutations.js";
 import type * as posts_queries from "../posts/queries.js";
+import type * as posts_translate from "../posts/translate.js";
 import type * as rateLimits from "../rateLimits.js";
 import type * as sendEmails from "../sendEmails.js";
+import type * as translations_shared from "../translations/shared.js";
 import type * as utils_errors from "../utils/errors.js";
 
 import type {
@@ -82,6 +85,7 @@ declare const fullApi: ApiFromModules<{
   "jobs/translate": typeof jobs_translate;
   "listings/mutations": typeof listings_mutations;
   "listings/queries": typeof listings_queries;
+  "listings/translate": typeof listings_translate;
   "notifications/mutations": typeof notifications_mutations;
   "notifications/queries": typeof notifications_queries;
   "posts/actions": typeof posts_actions;
@@ -89,8 +93,10 @@ declare const fullApi: ApiFromModules<{
   "posts/likes/mutations": typeof posts_likes_mutations;
   "posts/mutations": typeof posts_mutations;
   "posts/queries": typeof posts_queries;
+  "posts/translate": typeof posts_translate;
   rateLimits: typeof rateLimits;
   sendEmails: typeof sendEmails;
+  "translations/shared": typeof translations_shared;
   "utils/errors": typeof utils_errors;
 }>;
 
