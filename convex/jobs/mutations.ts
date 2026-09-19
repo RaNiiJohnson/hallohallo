@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
-import { authMutation } from "../functions";
+import { authMutation, internalMutation } from "../functions";
 import { throwForbidden, throwNotFound } from "../utils/errors";
 
 export const createJob = authMutation({
@@ -140,6 +140,7 @@ export const updateJob = authMutation({
     });
   },
 });
+
 export const deleteJob = authMutation({
   args: {
     id: v.id("JobOffer"),
@@ -157,5 +158,41 @@ export const deleteJob = authMutation({
     //   event: "job_deleted",
     //   properties: { job_id: args.id },
     // });
+  },
+});
+
+export const saveTranslation = internalMutation({
+  args: {
+    jobId: v.id("JobOffer"),
+    language: v.union(v.literal("fr"), v.literal("en"), v.literal("de")),
+    title: v.string(),
+    description: v.string(),
+    sourceUpdatedAt: v.number(),
+  },
+
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("jobTranslations")
+      .withIndex("by_job_language", (q) =>
+        q.eq("jobId", args.jobId).eq("language", args.language),
+      )
+      .unique();
+
+    if (existing) {
+      if (args.sourceUpdatedAt < existing.sourceUpdatedAt) {
+        return existing._id;
+      }
+      await ctx.db.patch(existing._id, {
+        title: args.title,
+        description: args.description,
+        sourceUpdatedAt: args.sourceUpdatedAt,
+      });
+
+      return existing._id;
+    }
+
+    return await ctx.db.insert("jobTranslations", {
+      ...args,
+    });
   },
 });

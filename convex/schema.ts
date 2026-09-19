@@ -70,6 +70,16 @@ export default defineSchema({
       filterFields: ["city", "type", "contractType"],
     }),
 
+  jobTranslations: defineTable({
+    jobId: v.id("JobOffer"),
+    language: v.union(v.literal("fr"), v.literal("en"), v.literal("de")),
+    title: v.string(),
+    description: v.string(),
+    sourceUpdatedAt: v.number(),
+  })
+    .index("by_job_language", ["jobId", "language"])
+    .index("by_job", ["jobId"]),
+
   RealestateListing: defineTable({
     title: v.string(),
     propertyType: v.union(
