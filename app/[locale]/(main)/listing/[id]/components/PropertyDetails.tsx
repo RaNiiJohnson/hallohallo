@@ -2,7 +2,10 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Item, ItemContent, ItemSeparator } from "@/components/ui/item";
 import { Separator } from "@/components/ui/separator";
+import { ListingListDetails } from "@/lib/convexTypes";
+import { truncateText } from "@/lib/utils";
 import {
   Bath,
   Bed,
@@ -15,15 +18,13 @@ import {
   User,
 } from "lucide-react";
 import { useState } from "react";
-import { ImageGrid } from "./ImageGrid";
-import { Item, ItemContent, ItemSeparator } from "@/components/ui/item";
 import { PriceDisplay } from "../../_component/price";
-import { truncateText } from "@/lib/utils";
-import { ListingListDetails } from "@/lib/convexTypes";
+import { ImageGrid } from "./ImageGrid";
 
+import { useTranslatedListing } from "@/hooks/use-translated-job";
+import { formatDateWithFallback } from "@/lib/date";
 import { LocationMap } from "@/lib/LocationMap";
 import { useLocale, useTranslations } from "next-intl";
-import { formatDateWithFallback } from "@/lib/date";
 
 interface PropertyDetailsProps {
   property: ListingListDetails;
@@ -31,6 +32,7 @@ interface PropertyDetailsProps {
 
 export function PropertyDetails({ property }: PropertyDetailsProps) {
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const translated = useTranslatedListing(property);
   const locale = useLocale();
   const t = useTranslations("common");
   const tListing = useTranslations("listing");
@@ -39,26 +41,41 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
     <div className="space-y-8">
       {/* Galerie d'images */}
       <div className="w-full">
-        <ImageGrid images={property.images} title={property.title} />
+        <ImageGrid
+          images={property.images}
+          title={translated.title ?? property.title}
+        />
       </div>
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold">{property.title}</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold">
+              {translated.title ?? property.title}
+            </h1>
             <div className="flex items-center gap-2 text-muted-foreground mt-2">
               <MapPin className="h-4 w-4 shrink-0" />
-              <span className="text-sm sm:text-base">{property.city}</span>
+              <span className="text-sm sm:text-base">
+                {translated.city ?? property.city}
+              </span>
             </div>
             <div className="flex gap-2 mt-2">
               <Badge variant="secondary">
-                {tListing(`labels.listingTypes.${property.propertyType}` as Parameters<typeof tListing>[0])}
+                {tListing(
+                  `labels.listingTypes.${property.propertyType}` as Parameters<
+                    typeof tListing
+                  >[0],
+                )}
               </Badge>
               <Badge
                 variant={
                   property.listingMode === "rent" ? "default" : "outline"
                 }
               >
-                {tListing(`labels.listingModes.${property.listingMode}` as Parameters<typeof tListing>[0])}
+                {tListing(
+                  `labels.listingModes.${property.listingMode}` as Parameters<
+                    typeof tListing
+                  >[0],
+                )}
               </Badge>
             </div>
           </div>
@@ -72,13 +89,15 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
             {property.listingMode === "rent" &&
               property.deposit !== undefined && (
                 <div className="text-sm text-muted-foreground mt-1">
-                  {tListing("details.deposit")} : <PriceDisplay price={property.deposit} />
+                  {tListing("details.deposit")} :{" "}
+                  <PriceDisplay price={property.deposit} />
                 </div>
               )}
             {property.listingMode === "rent" &&
               property.charges !== undefined && (
                 <div className="text-sm text-muted-foreground mt-1">
-                  {tListing("details.charges")} : <PriceDisplay price={property.charges} /> /mois
+                  {tListing("details.charges")} :{" "}
+                  <PriceDisplay price={property.charges} /> /mois
                 </div>
               )}
           </div>
@@ -93,7 +112,9 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
           <ItemSeparator />
           <div>
             <div className="py-6">
-              <h2 className="text-xl font-semibold mb-4">{tListing("details.featuresTitle")}</h2>
+              <h2 className="text-xl font-semibold mb-4">
+                {tListing("details.featuresTitle")}
+              </h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                   <Bed className="h-5 w-5 text-primary" />
@@ -119,7 +140,9 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                   <Square className="h-5 w-5 text-primary" />
                   <div>
                     <div className="font-medium">{property.area}m²</div>
-                    <div className="text-xs text-muted-foreground">{tListing("details.area")}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {tListing("details.area")}
+                    </div>
                   </div>
                 </div>
 
@@ -128,8 +151,12 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                     {property.floor}
                   </div>
                   <div>
-                    <div className="font-medium">{tListing("details.floor", { floor: property.floor })}</div>
-                    <div className="text-xs text-muted-foreground">{tListing("details.level")}</div>
+                    <div className="font-medium">
+                      {tListing("details.floor", { floor: property.floor })}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {tListing("details.level")}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -138,7 +165,9 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
               <div className="mt-6 space-y-3">
                 <div className="flex items-center gap-3">
                   <Calendar className="h-5 w-5 text-primary" />
-                  <span className="font-medium">{tListing("details.available")}</span>
+                  <span className="font-medium">
+                    {tListing("details.available")}
+                  </span>
                   <span>
                     {formatDateWithFallback(
                       property.availableFrom,
@@ -150,9 +179,13 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
 
                 <div className="flex items-center gap-3">
                   <PawPrint className="h-5 w-5 text-primary" />
-                  <span className="font-medium">{tListing("details.pets")}</span>
+                  <span className="font-medium">
+                    {tListing("details.pets")}
+                  </span>
                   <Badge variant={property.pets ? "default" : "secondary"}>
-                    {property.pets ? tListing("details.petsAllowed") : tListing("details.petsDenied")}
+                    {property.pets
+                      ? tListing("details.petsAllowed")
+                      : tListing("details.petsDenied")}
                   </Badge>
                 </div>
               </div>
@@ -162,7 +195,9 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
           {/* Description */}
           <div>
             <div className="py-6">
-              <h2 className="text-xl font-semibold mb-4">{tListing("details.descTitle")}</h2>
+              <h2 className="text-xl font-semibold mb-4">
+                {tListing("details.descTitle")}
+              </h2>
               <div className="prose prose-sm max-w-none">
                 <p
                   className={`text-muted-foreground leading-relaxed ${
@@ -171,16 +206,19 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                       : ""
                   }`}
                 >
-                  {property.description}
+                  {translated.description ?? property.description}
                 </p>
 
-                {property.description.length > 300 && (
+                {(translated.description ?? property.description).length >
+                  300 && (
                   <Button
                     variant="link"
                     className="p-0 h-auto mt-2"
                     onClick={() => setShowFullDescription(!showFullDescription)}
                   >
-                    {showFullDescription ? tListing("details.seeLess") : tListing("details.seeMore")}
+                    {showFullDescription
+                      ? tListing("details.seeLess")
+                      : tListing("details.seeMore")}
                   </Button>
                 )}
               </div>
@@ -191,9 +229,11 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
           {/* Location Map - Only show if coordinates exist */}
           <div>
             <div className="py-6">
-              <h2 className="text-xl font-semibold mb-4">{tListing("details.locationTitle")}</h2>
+              <h2 className="text-xl font-semibold mb-4">
+                {tListing("details.locationTitle")}
+              </h2>
               <p className="text-sm text-muted-foreground mt-1">
-                {property.city}
+                {translated.city ?? property.city}
               </p>
             </div>
             {property.location && (
@@ -229,7 +269,9 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
         <div className="space-y-6">
           <Item variant="outline" className="sticky top-24">
             <ItemContent className="">
-              <h2 className="text-xl font-semibold mb-4">{tListing("details.contactTitle")}</h2>
+              <h2 className="text-xl font-semibold mb-4">
+                {tListing("details.contactTitle")}
+              </h2>
 
               {/* Informations du propriétaire */}
               <div className="flex items-center gap-3 mb-6">
@@ -287,13 +329,17 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                 <div className="mt-4 pt-4 border-t space-y-2">
                   {property.contact.phone && (
                     <div className="text-sm text-muted-foreground">
-                      <span className="font-medium">{tListing("details.phone")}</span>{" "}
+                      <span className="font-medium">
+                        {tListing("details.phone")}
+                      </span>{" "}
                       {property.contact.phone}
                     </div>
                   )}
                   {property.contact.email && (
                     <div className="text-sm text-muted-foreground">
-                      <span className="font-medium">{tListing("details.email")}</span>{" "}
+                      <span className="font-medium">
+                        {tListing("details.email")}
+                      </span>{" "}
                       {truncateText(property.contact.email, 20)}
                     </div>
                   )}
