@@ -21,7 +21,7 @@ import { useState } from "react";
 import { PriceDisplay } from "../../_component/price";
 import { ImageGrid } from "./ImageGrid";
 
-import { useTranslatedListing } from "@/hooks/use-translated-job";
+import { useTranslatedListing } from "@/hooks/use-translated";
 import { formatDateWithFallback } from "@/lib/date";
 import { LocationMap } from "@/lib/LocationMap";
 import { useLocale, useTranslations } from "next-intl";

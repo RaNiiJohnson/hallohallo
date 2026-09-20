@@ -3,7 +3,7 @@ import type { Id } from "@convex/_generated/dataModel";
 import { useQuery } from "convex-helpers/react/cache";
 import { useAction } from "convex/react";
 import { useLocale } from "next-intl";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const SUPPORTED = ["fr", "en", "de"] as const;
 type SupportedLang = (typeof SUPPORTED)[number];
@@ -15,49 +15,49 @@ function useSupportedLang(): SupportedLang | null {
     : null;
 }
 
-/**
- * Logique commune : si le cache est chargé mais absent/périmé,
- * on lance la traduction UNE seule fois par (ressource, langue, version).
- */
 function useAutoTranslate<T extends { sourceUpdatedAt: number }>({
   resourceKey,
   sourceUpdatedAt,
   cached,
   run,
 }: {
-  resourceKey: string | null; // null = rien à traduire (pas chargé / locale non supportée)
+  resourceKey: string | null;
   sourceUpdatedAt: number | undefined;
-  cached: T | null | undefined; // undefined = query en chargement
+  cached: T | null | undefined;
   run: (() => Promise<unknown>) | null;
 }) {
   const requested = useRef<string | null>(null);
   const runRef = useRef(run);
+  const [failedKey, setFailedKey] = useState<string | null>(null);
 
   useEffect(() => {
     runRef.current = run;
   });
+
+  const currentKey =
+    resourceKey && sourceUpdatedAt !== undefined
+      ? `${resourceKey}:${sourceUpdatedAt}`
+      : null;
 
   const isFresh =
     !!cached &&
     sourceUpdatedAt !== undefined &&
     cached.sourceUpdatedAt === sourceUpdatedAt;
 
+  const hasFailed = currentKey !== null && failedKey === currentKey;
+
   useEffect(() => {
-    if (!resourceKey || sourceUpdatedAt === undefined) return;
-    if (cached === undefined || isFresh) return;
+    if (!currentKey || cached === undefined || isFresh) return;
+    if (requested.current === currentKey) return; // already attempted (success or failure)
 
-    const key = `${resourceKey}:${sourceUpdatedAt}`;
-    if (requested.current === key) return;
-    requested.current = key;
-
-    runRef.current?.().catch(() => {
-      requested.current = null; // permettra de réessayer plus tard
-    });
-  }, [resourceKey, sourceUpdatedAt, cached, isFresh]);
+    requested.current = currentKey;
+    runRef.current?.().catch(() => setFailedKey(currentKey));
+  }, [currentKey, cached, isFresh]);
 
   return {
     translation: isFresh ? (cached as T) : null,
-    isTranslating: !!resourceKey && !isFresh,
+    isTranslating: !!currentKey && !isFresh && !hasFailed,
+    hasError: hasFailed,
   };
 }
 
@@ -151,7 +151,7 @@ export function useTranslatedPost(post: PostInput | null | undefined) {
 
   const { translation, isTranslating } = useAutoTranslate({
     resourceKey: post && lang ? `${post._id}:${lang}` : null,
-    // même règle que côté serveur : updatedAt ?? _creationTime
+    // Same rule as server-side: updatedAt ?? _creationTime
     sourceUpdatedAt: post ? (post.updatedAt ?? post._creationTime) : undefined,
     cached,
     run:

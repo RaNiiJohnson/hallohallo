@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
-import { useTranslatedPost } from "@/hooks/use-translated-job";
+import { useTranslatedPost } from "@/hooks/use-translated";
 import { Link } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";

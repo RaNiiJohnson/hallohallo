@@ -7,7 +7,7 @@ import { ButtonGroup } from "@/components/ui/button-group";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
-import { useTranslatedJob } from "@/hooks/use-translated-job";
+import { useTranslatedJob } from "@/hooks/use-translated";
 import { Link } from "@/i18n/navigation";
 import { formatDateLong, getRelativeTime } from "@/lib/date";
 import { LocationMap } from "@/lib/LocationMap";
