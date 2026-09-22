@@ -15,15 +15,21 @@ function useSupportedLang(): SupportedLang | null {
     : null;
 }
 
+/**
+ * Shared logic: if the cache is loaded but the item is missing or stale,
+ * trigger the translation exactly once per (resource, language, version).
+ * In case of failure, clear the "in-progress" state (avoiding an infinite spinner)
+ * and do not retry in a loop.
+ */
 function useAutoTranslate<T extends { sourceUpdatedAt: number }>({
   resourceKey,
   sourceUpdatedAt,
   cached,
   run,
 }: {
-  resourceKey: string | null;
+  resourceKey: string | null; // null = nothing to translate (not loaded / locale not supported)
   sourceUpdatedAt: number | undefined;
-  cached: T | null | undefined;
+  cached: T | null | undefined; // undefined = query loading
   run: (() => Promise<unknown>) | null;
 }) {
   const requested = useRef<string | null>(null);
@@ -57,7 +63,6 @@ function useAutoTranslate<T extends { sourceUpdatedAt: number }>({
   return {
     translation: isFresh ? (cached as T) : null,
     isTranslating: !!currentKey && !isFresh && !hasFailed,
-    hasError: hasFailed,
   };
 }
 
@@ -88,11 +93,27 @@ export function useTranslatedJob(job: JobInput | null | undefined) {
         : null,
   });
 
+  const [showOriginal, setShowOriginal] = useState(false);
+
+  // Le bouton n'a de sens que si la traduction diffère de l'original
+  // const canToggle =
+  //   !!job &&
+  //   canToggle={translated.canToggle}
+  //   !!translation &&
+  //   (translation.title !== job.title ||
+  //     translation.description !== job.description ||
+  //     translation.city !== job.city);
+
+  const active = translation && !showOriginal ? translation : null;
+
   return {
-    title: translation?.title ?? job?.title,
-    description: translation?.description ?? job?.description,
-    city: translation?.city ?? job?.city,
+    title: active?.title ?? job?.title,
+    description: active?.description ?? job?.description,
+    city: active?.city ?? job?.city,
     isTranslating,
+    // canToggle,
+    showOriginal,
+    toggleOriginal: () => setShowOriginal((v) => !v),
   };
 }
 
@@ -102,6 +123,7 @@ type ListingInput = {
   title: string;
   description: string;
   city: string;
+  extras: string[];
   updatedAt: number;
 };
 
@@ -124,11 +146,25 @@ export function useTranslatedListing(listing: ListingInput | null | undefined) {
         : null,
   });
 
+  const [showOriginal, setShowOriginal] = useState(false);
+
+  const canToggle =
+    !!listing &&
+    !!translation &&
+    (translation.title !== listing.title ||
+      translation.description !== listing.description ||
+      translation.city !== listing.city);
+
+  const active = translation && !showOriginal ? translation : null;
+
   return {
-    title: translation?.title ?? listing?.title,
-    description: translation?.description ?? listing?.description,
-    city: translation?.city ?? listing?.city,
+    title: active?.title ?? listing?.title,
+    description: active?.description ?? listing?.description,
+    city: active?.city ?? listing?.city,
     isTranslating,
+    canToggle,
+    showOriginal,
+    toggleOriginal: () => setShowOriginal((v) => !v),
   };
 }
 
@@ -160,9 +196,21 @@ export function useTranslatedPost(post: PostInput | null | undefined) {
         : null,
   });
 
+  const [showOriginal, setShowOriginal] = useState(false);
+
+  const canToggle =
+    !!post &&
+    !!translation &&
+    (translation.title !== post.title || translation.content !== post.content);
+
+  const active = translation && !showOriginal ? translation : null;
+
   return {
-    title: translation?.title ?? post?.title,
-    content: translation?.content ?? post?.content,
+    title: active?.title ?? post?.title,
+    content: active?.content ?? post?.content,
     isTranslating,
+    canToggle,
+    showOriginal,
+    toggleOriginal: () => setShowOriginal((v) => !v),
   };
 }

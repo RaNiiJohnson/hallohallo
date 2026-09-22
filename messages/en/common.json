@@ -16,5 +16,9 @@
   "pending": "Translating…",
   "translatedTo": "Translated · {lang}",
   "viewOriginal": "View original",
-  "error": "Translation is unavailable right now"
+  "error": "Translation is unavailable right now",
+  "translating": "Translating…",
+  "showOriginal": "View original",
+  "showTranslated": "View translation",
+  "translateError": "Translation is unavailable right now"
 }

@@ -38,7 +38,7 @@ export function TranslateMenu({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
+          variant="link"
           size="sm"
           disabled={isPending}
           className={

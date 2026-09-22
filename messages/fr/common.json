@@ -16,5 +16,9 @@
   "pending": "Traduction…",
   "translatedTo": "Traduit · {lang}",
   "viewOriginal": "Voir l'original",
-  "error": "Traduction impossible pour le moment"
+  "error": "Traduction impossible pour le moment",
+  "translating": "Traduction…",
+  "showOriginal": "Voir l'original",
+  "showTranslated": "Voir la traduction",
+  "translateError": "Traduction impossible pour le moment"
 }

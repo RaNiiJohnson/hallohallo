@@ -1,11 +1,12 @@
 "use client";
 
 import { ShareButton } from "@/components/ShareButton";
+import { TranslateMenu } from "@/components/translate-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useManualTranslate } from "@/hooks/use-manual-translate";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
-import { useTranslatedPost } from "@/hooks/use-translated";
 import { Link } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
@@ -54,8 +55,20 @@ export default function PostClient() {
   const timeT = useTimeTranslations();
   const t = useTranslations("communities.post");
   const tc = useTranslations("communities.community");
+  const te = useTranslations("common");
 
-  const translated = useTranslatedPost(post);
+  // const translated = useTranslatedPost(post);
+
+  const translatePost = useAction(api.posts.translate.translatePost);
+
+  const { data, activeLang, pendingLang, translate, reset } =
+    useManualTranslate(
+      (lang) => {
+        if (!post) throw new Error("Post not loaded");
+        return translatePost({ postId: post._id, targetLanguage: lang });
+      },
+      { onError: () => toast.error(te("translateError")) },
+    );
 
   if (post === undefined) {
     return <SkeletonPost />;
@@ -64,6 +77,9 @@ export default function PostClient() {
   if (post === null) {
     return <p className="text-muted-foreground p-8">{t("notFound")}</p>;
   }
+
+  const title = data?.title ?? post.title;
+  const content = data?.content ?? post.content;
 
   const currentUserId = me?._id;
   const isPostOwner = currentUserId && post.authorId === currentUserId;
@@ -149,7 +165,7 @@ export default function PostClient() {
           <ChevronRight className="w-4 h-4" />
         </span>
         <span className="text-foreground font-medium line-clamp-1">
-          {translated.title ?? post.title}
+          {title}
         </span>
       </div>
       <div className="max-w-3xl mx-auto py-2 space-y-4">
@@ -206,12 +222,12 @@ export default function PostClient() {
           ) : (
             <>
               <h1 className="text-xl font-bold text-foreground mb-2">
-                {translated.title ?? post.title}
+                {title}
               </h1>
 
               {post.content && (
                 <p className="text-sm text-foreground leading-relaxed mb-4 whitespace-pre-wrap">
-                  {translated.content ?? post.content}
+                  {content}
                 </p>
               )}
             </>
@@ -286,6 +302,26 @@ export default function PostClient() {
                 />
               </>
             )}
+
+            {/* Translation toggle (original / traduit) */}
+            {/*{!isEditingPost && (
+              <div className="ml-auto">
+                <TranslationToggle
+                  isTranslating={translated.isTranslating}
+                  showOriginal={translated.showOriginal}
+                  onToggleAction={translated.toggleOriginal}
+                />
+              </div>
+            )}*/}
+
+            <div className="ml-auto">
+              <TranslateMenu
+                activeLang={activeLang}
+                pendingLang={pendingLang}
+                onTranslateAction={translate}
+                onResetAction={reset}
+              />
+            </div>
           </div>
         </article>
 

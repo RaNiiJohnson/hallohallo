@@ -16,5 +16,9 @@
   "pending": "Wird übersetzt…",
   "translatedTo": "Übersetzt · {lang}",
   "viewOriginal": "Original anzeigen",
-  "error": "Übersetzung derzeit nicht möglich"
+  "error": "Übersetzung derzeit nicht möglich",
+  "translating": "Wird übersetzt…",
+  "showOriginal": "Original anzeigen",
+  "showTranslated": "Übersetzung anzeigen",
+  "translateError": "Übersetzung derzeit nicht möglich"
 }
