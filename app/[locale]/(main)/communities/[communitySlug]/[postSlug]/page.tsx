@@ -171,12 +171,11 @@ export default function PostClient() {
       <div className="max-w-3xl mx-auto py-2 space-y-4">
         {/* Post */}
         <article className="border-b border-border bg-background px-4 py-4">
-          <p className="text-xs text-muted-foreground mb-1">
-            {" "}
+          <p className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
             <span className="text-primary hover:underline cursor-pointer">
               {post.authorName}
-            </span>{" "}
-            • {getRelativeTime(post._creationTime, timeT)}
+            </span>
+            • <span>{getRelativeTime(post._creationTime, timeT)}</span>
           </p>
 
           {isEditingPost ? (
@@ -221,12 +220,12 @@ export default function PostClient() {
             </div>
           ) : (
             <>
-              <h1 className="text-xl font-bold text-foreground mb-2">
+              <h1 className="text-xl font-bold text-foreground mb-1">
                 {title}
               </h1>
 
               {post.content && (
-                <p className="text-sm text-foreground leading-relaxed mb-4 whitespace-pre-wrap">
+                <p className="text-sm text-foreground leading-relaxed mb-2 whitespace-pre-wrap">
                   {content}
                 </p>
               )}
@@ -234,7 +233,7 @@ export default function PostClient() {
           )}
 
           {/* Actions post */}
-          <div className="flex items-center gap-1 mt-4">
+          <div className="flex items-center gap-1 mt-2">
             <Button
               variant="ghost"
               size="sm"
@@ -314,14 +313,12 @@ export default function PostClient() {
               </div>
             )}*/}
 
-            <div className="ml-auto">
-              <TranslateMenu
-                activeLang={activeLang}
-                pendingLang={pendingLang}
-                onTranslateAction={translate}
-                onResetAction={reset}
-              />
-            </div>
+            <TranslateMenu
+              activeLang={activeLang}
+              pendingLang={pendingLang}
+              onTranslateAction={translate}
+              onResetAction={reset}
+            />
           </div>
         </article>
 

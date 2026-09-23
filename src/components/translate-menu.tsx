@@ -39,15 +39,15 @@ export function TranslateMenu({
       <DropdownMenuTrigger asChild>
         <Button
           variant="link"
-          size="sm"
+          size="lg"
           disabled={isPending}
           className={
             className ??
-            "group flex items-center gap-1.5 text-muted-foreground hover:text-green-600 hover:bg-green-500/10 transition-colors h-8 px-2"
+            "group flex items-center gap-1.5 text-muted-foreground hover:text-accent-foreground transition-colors h-8 px-2"
           }
         >
           <Languages size={15} />
-          <span className="text-xs font-medium">
+          <span className=" font-bold">
             {activeLang
               ? t("translatedTo", { lang: activeLang.toUpperCase() })
               : t("button")}

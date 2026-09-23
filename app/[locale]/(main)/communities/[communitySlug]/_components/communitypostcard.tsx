@@ -59,14 +59,13 @@ export function CommunityPostCard({
         href={`/communities/${communitySlug}/${post.slug}`}
         className="block"
       >
-        <p className="text-xs text-muted-foreground mb-1">
-          {" "}
+        <p className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
           <span className="text-primary hover:underline">
             {post.authorName}
-          </span>{" "}
-          • {getRelativeTime(post._creationTime, timeT)}
+          </span>
+          •<span>{getRelativeTime(post._creationTime, timeT)}</span>
         </p>
-        <h2 className="font-semibold text-foreground text-base leading-snug mb-1">
+        <h2 className="font-bold text-foreground text-xl leading-snug mb-1">
           {title}
         </h2>
         {content && (
@@ -129,20 +128,12 @@ export function CommunityPostCard({
           initialBookmark={post.isBookmarked}
         />
 
-        <div
-          className="ml-auto"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-        >
-          <TranslateMenu
-            activeLang={activeLang}
-            pendingLang={pendingLang}
-            onTranslateAction={translate}
-            onResetAction={reset}
-          />
-        </div>
+        <TranslateMenu
+          activeLang={activeLang}
+          pendingLang={pendingLang}
+          onTranslateAction={translate}
+          onResetAction={reset}
+        />
       </div>
     </article>
   );

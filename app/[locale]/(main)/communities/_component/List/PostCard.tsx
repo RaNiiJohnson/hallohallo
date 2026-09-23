@@ -68,7 +68,7 @@ export function PostCard({
         href={`/communities/${post.communitySlug}/${post.slug}`}
         className="block group"
       >
-        <h2 className="font-bold text-foreground text-base leading-snug group-hover:underline">
+        <h2 className="font-bold text-foreground text-xl leading-snug group-hover:underline">
           {title}
         </h2>
         {content && (
@@ -120,14 +120,12 @@ export function PostCard({
           initialBookmark={post.isBookmarked}
         />
 
-        <div className="ml-auto">
-          <TranslateMenu
-            activeLang={activeLang}
-            pendingLang={pendingLang}
-            onTranslateAction={translate}
-            onResetAction={reset}
-          />
-        </div>
+        <TranslateMenu
+          activeLang={activeLang}
+          pendingLang={pendingLang}
+          onTranslateAction={translate}
+          onResetAction={reset}
+        />
       </div>
     </div>
   );
