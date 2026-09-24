@@ -105,5 +105,30 @@
     "loadingFirstPage": "Chargement des communautés...",
     "loadingMore": "Chargement...",
     "canLoadMore": "Charger plus"
+  },
+  "comment": {
+    "loginToLike": "Connectez-vous pour liker",
+    "reply": "Répondre",
+    "sending": "...",
+    "replyPlaceholder": "Votre réponse...",
+    "replyAdded": "Réponse ajoutée !",
+    "replyError": "Erreur lors de l'ajout de la réponse",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "save": "Enregistrer",
+    "saving": "...",
+    "cancel": "Annuler",
+    "commentUpdated": "Commentaire modifié !",
+    "commentDeleted": "Commentaire supprimé !",
+    "replyUpdated": "Réponse modifiée !",
+    "replyDeleted": "Réponse supprimée !",
+    "updateError": "Erreur lors de la modification",
+    "deleteError": "Erreur lors de la suppression",
+    "deleteCommentTitle": "Supprimer le commentaire",
+    "deleteCommentDescription": "Voulez-vous vraiment supprimer ce commentaire et toutes ses réponses ? Cette action est irréversible.",
+    "deleteReplyTitle": "Supprimer la réponse",
+    "deleteReplyDescription": "Voulez-vous vraiment supprimer cette réponse ? Cette action est irréversible.",
+    "repliesCount": "{count} réponse",
+    "repliesCountPlural": "{count} réponses"
   }
 }

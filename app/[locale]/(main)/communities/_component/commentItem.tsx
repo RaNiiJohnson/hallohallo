@@ -6,7 +6,8 @@ import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
 import { useConvexAuth, useMutation } from "convex/react";
-import { ChevronDown, ChevronUp, Pencil, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Pencil, Reply, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DeleteConfirmDialog } from "./deleteConfirmDialog";
@@ -38,13 +39,14 @@ export function CommentItem({
   const [isDeleting, setIsDeleting] = useState(false);
 
   const timeT = useTimeTranslations();
+  const t = useTranslations("communities.comment");
 
   if (!comment) return null;
 
   const isOwner = currentUserId && comment.authorId === currentUserId;
 
   const handleLike = async () => {
-    if (!isAuthenticated) return toast.error("Connectez-vous pour liker");
+    if (!isAuthenticated) return toast.error(t("loginToLike"));
     await likeComment({ commentId: comment._id });
   };
 
@@ -56,9 +58,9 @@ export function CommentItem({
       setReplyContent("");
       setShowReplyForm(false);
       setShowReplies(true);
-      toast.success("Réponse ajoutée !");
+      toast.success(t("replyAdded"));
     } catch {
-      toast.error("Erreur lors de l'ajout de la réponse");
+      toast.error(t("replyError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -80,9 +82,9 @@ export function CommentItem({
     try {
       await updateComment({ commentId: comment._id, content: editContent });
       setIsEditing(false);
-      toast.success("Commentaire modifié !");
+      toast.success(t("commentUpdated"));
     } catch {
-      toast.error("Erreur lors de la modification");
+      toast.error(t("updateError"));
     } finally {
       setIsSaving(false);
     }
@@ -92,9 +94,9 @@ export function CommentItem({
     setIsDeleting(true);
     try {
       await deleteComment({ commentId: comment._id });
-      toast.success("Commentaire supprimé !");
+      toast.success(t("commentDeleted"));
     } catch {
-      toast.error("Erreur lors de la suppression");
+      toast.error(t("deleteError"));
     } finally {
       setIsDeleting(false);
     }
@@ -103,139 +105,168 @@ export function CommentItem({
   const validReplies = comment.replies.filter(Boolean);
 
   return (
-    <div className="border-b border-border py-4">
-      {/* Author */}
-      <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1.5">
-        <span className="text-primary font-bold hover:underline cursor-pointer">
-          {comment.authorName}
-        </span>{" "}
-        • <span>{getRelativeTime(comment._creationTime, timeT)}</span>
-      </p>
+    <div className="flex gap-3 py-4 border-b border-border last:border-b-0">
+      <div className="flex-1 min-w-0">
+        {/* Author */}
+        <p className="flex items-center gap-1.5 text-xs mb-1">
+          <span className="text-primary font-medium hover:underline cursor-pointer">
+            {comment.authorName}
+          </span>
+          <span className="text-muted-foreground">•</span>
+          <span className="text-muted-foreground">
+            {getRelativeTime(comment._creationTime, timeT)}
+          </span>
+        </p>
 
-      {/* Content / Edit mode */}
-      {isEditing ? (
-        <div className="space-y-2 mb-3">
-          <Textarea
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-            rows={3}
-            className="resize-none text-sm"
-            autoFocus
-          />
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              onClick={handleSaveEdit}
-              disabled={isSaving || !editContent.trim()}
-            >
-              {isSaving ? "..." : "Enregistrer"}
-            </Button>
-            <Button size="sm" variant="ghost" onClick={handleCancelEdit}>
-              Annuler
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <p className="text-sm text-foreground mb-3">{comment.content}</p>
-      )}
-
-      {/* Actions */}
-      <div className="flex items-center gap-3">
-        <LikeButton
-          initialCount={comment.likesCount}
-          initialIsLiked={comment.userHasLiked}
-          onLike={handleLike}
-        />
-
-        {isAuthenticated && (
-          <button
-            onClick={() => setShowReplyForm(!showReplyForm)}
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Répondre
-          </button>
-        )}
-
-        {isOwner && !isEditing && (
-          <>
-            <button
-              onClick={handleStartEdit}
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
-            >
-              <Pencil size={12} />
-              Modifier
-            </button>
-
-            <DeleteConfirmDialog
-              title="Supprimer le commentaire"
-              description="Voulez-vous vraiment supprimer ce commentaire et toutes ses réponses ? Cette action est irréversible."
-              onConfirm={handleDelete}
-              isPending={isDeleting}
-              trigger={
-                <button className="text-xs text-muted-foreground hover:text-destructive transition-colors flex items-center gap-1">
-                  <Trash2 size={12} />
-                  Supprimer
-                </button>
-              }
+        {/* Content / Edit mode */}
+        {isEditing ? (
+          <div className="space-y-2 mb-2">
+            <Textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              rows={3}
+              className="resize-none text-sm"
+              autoFocus
             />
-          </>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={handleSaveEdit}
+                disabled={isSaving || !editContent.trim()}
+              >
+                {isSaving ? t("saving") : t("save")}
+              </Button>
+              <Button size="sm" variant="ghost" onClick={handleCancelEdit}>
+                {t("cancel")}
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-foreground leading-relaxed mb-2 whitespace-pre-wrap">
+            {comment.content}
+          </p>
         )}
 
-        {validReplies.length > 0 && (
-          <button
-            onClick={() => setShowReplies(!showReplies)}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {showReplies ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-            {validReplies.length} réponse{validReplies.length > 1 ? "s" : ""}
-          </button>
+        {/* Actions */}
+        <div className="flex items-center gap-1 -ml-2 flex-wrap">
+          <LikeButton
+            initialCount={comment.likesCount}
+            initialIsLiked={comment.userHasLiked}
+            onLike={handleLike}
+          />
+
+          {isAuthenticated && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowReplyForm(!showReplyForm)}
+              className="group flex items-center gap-1.5 text-muted-foreground hover:text-blue-500 hover:bg-blue-500/10 transition-colors h-8 px-2"
+            >
+              <Reply
+                size={14}
+                className="transition-transform group-active:scale-95"
+              />
+              <span className="text-xs font-medium">{t("reply")}</span>
+            </Button>
+          )}
+
+          {isOwner && !isEditing && (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleStartEdit}
+                aria-label={t("edit")}
+                className="text-muted-foreground hover:text-foreground h-8 px-2"
+              >
+                <Pencil size={14} />
+              </Button>
+
+              <DeleteConfirmDialog
+                title={t("deleteCommentTitle")}
+                description={t("deleteCommentDescription")}
+                onConfirm={handleDelete}
+                isPending={isDeleting}
+                trigger={
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    aria-label={t("delete")}
+                    className="text-muted-foreground hover:text-destructive h-8 px-2"
+                  >
+                    <Trash2 size={14} />
+                  </Button>
+                }
+              />
+            </>
+          )}
+
+          {validReplies.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowReplies(!showReplies)}
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors h-8 px-2"
+            >
+              {showReplies ? (
+                <ChevronUp size={14} />
+              ) : (
+                <ChevronDown size={14} />
+              )}
+              <span className="text-xs font-medium">
+                {validReplies.length === 1
+                  ? t("repliesCount", { count: 1 })
+                  : t("repliesCountPlural", { count: validReplies.length })}
+              </span>
+            </Button>
+          )}
+        </div>
+
+        {/* Reply form */}
+        {showReplyForm && (
+          <div className="mt-3 space-y-2">
+            <Textarea
+              value={replyContent}
+              onChange={(e) => setReplyContent(e.target.value)}
+              placeholder={t("replyPlaceholder")}
+              rows={2}
+              className="resize-none text-sm"
+            />
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={handleReply}
+                disabled={isSubmitting || !replyContent.trim()}
+              >
+                {isSubmitting ? t("sending") : t("reply")}
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setShowReplyForm(false);
+                  setReplyContent("");
+                }}
+              >
+                {t("cancel")}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Replies */}
+        {showReplies && validReplies.length > 0 && (
+          <div className="mt-2 pl-4 border-l border-border space-y-0">
+            {validReplies.map((reply) => (
+              <ReplyItem
+                key={reply!._id}
+                reply={reply}
+                currentUserId={currentUserId}
+              />
+            ))}
+          </div>
         )}
       </div>
-
-      {/* Reply form */}
-      {showReplyForm && (
-        <div className="mt-3 ml-4 space-y-2">
-          <Textarea
-            value={replyContent}
-            onChange={(e) => setReplyContent(e.target.value)}
-            placeholder="Votre réponse..."
-            rows={2}
-            className="resize-none text-sm"
-          />
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              onClick={handleReply}
-              disabled={isSubmitting || !replyContent.trim()}
-            >
-              {isSubmitting ? "..." : "Répondre"}
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                setShowReplyForm(false);
-                setReplyContent("");
-              }}
-            >
-              Annuler
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Replies */}
-      {showReplies && (
-        <div className="mt-2">
-          {validReplies.map((reply) => (
-            <ReplyItem
-              key={reply!._id}
-              reply={reply}
-              currentUserId={currentUserId}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }

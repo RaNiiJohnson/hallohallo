@@ -349,8 +349,8 @@ export default function PostClient() {
         )}
 
         {/* Comments */}
-        <div className="space-y-0 px-4 mt-4">
-          <h2 className="text-sm font-semibold text-foreground mb-4">
+        <div className="space-y-0 px-4">
+          <h2 className="font-bold text-foreground">
             {validComments.length === 1
               ? t("commentsCount", { count: 1 })
               : t("commentsCountPlural", { count: validComments.length })}
