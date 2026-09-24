@@ -1,19 +1,20 @@
 "use client";
 
 import { ShareButton } from "@/components/ShareButton";
+import { TranslateMenu } from "@/components/translate-menu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useManualTranslate } from "@/hooks/use-manual-translate";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
-import { useTranslatedJob } from "@/hooks/use-translated-job";
 import { Link } from "@/i18n/navigation";
 import { formatDateLong, getRelativeTime } from "@/lib/date";
 import { LocationMap } from "@/lib/LocationMap";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
-import { useConvexAuth } from "convex/react";
+import { useAction, useConvexAuth } from "convex/react";
 import {
   ArrowLeft,
   Award,
@@ -27,6 +28,7 @@ import {
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { notFound, useParams } from "next/navigation";
+import { toast } from "sonner";
 import { ApplyJobDialog } from "../_component/dialogs/applyJobDialog";
 import DeleteJobDialog from "../_component/dialogs/deleteJobDialog";
 import { SalaryDisplay } from "../_component/salary";
@@ -41,12 +43,24 @@ export default function JobDetailsPage() {
   const timeT = useTimeTranslations();
   const locale = useLocale();
   const t = useTranslations("jobs");
+  const te = useTranslations("common");
 
   const jobOffer = useQuery(api.jobs.queries.getJobWithContact, {
     slug: id as string,
   });
 
-  const translated = useTranslatedJob(jobOffer);
+  // const translated = useTranslatedJob(jobOffer);
+
+  const translateJob = useAction(api.jobs.translate.translateJob);
+
+  const { data, activeLang, pendingLang, translate, reset } =
+    useManualTranslate(
+      (lang) => {
+        if (!jobOffer) throw new Error("jobOffer not loaded");
+        return translateJob({ jobId: jobOffer._id, targetLanguage: lang });
+      },
+      { onError: () => toast.error(te("translateError")) },
+    );
 
   if (jobOffer === undefined) {
     return <JobDetailsSkeleton />;
@@ -55,6 +69,10 @@ export default function JobDetailsPage() {
   if (jobOffer === null) {
     return notFound();
   }
+
+  const title = data?.title ?? jobOffer.title;
+  const description = data?.description ?? jobOffer.description;
+  const city = data?.city ?? jobOffer.city;
 
   const isAuthor = user?._id === jobOffer.authorId;
 
@@ -75,7 +93,7 @@ export default function JobDetailsPage() {
               <ChevronRight className="w-4 h-4" />
             </span>
             <span className="text-foreground font-medium line-clamp-1">
-              {translated.title ?? jobOffer.title}
+              {title}
             </span>
           </div>
 
@@ -89,7 +107,7 @@ export default function JobDetailsPage() {
             {/* Job Title */}
             <div className="mb-4 flex justify-center">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
-                {translated.title ?? jobOffer.title}
+                {title}
               </h1>
             </div>
 
@@ -121,6 +139,16 @@ export default function JobDetailsPage() {
               )}
             </div>
 
+            {/* toggle translation  (original / traduit) */}
+            <div className="mb-4 flex justify-center">
+              <TranslateMenu
+                activeLang={activeLang}
+                pendingLang={pendingLang}
+                onTranslateAction={translate}
+                onResetAction={reset}
+              />
+            </div>
+
             {/* Divider */}
             <Separator className="w-20 h-1 bg-primary mx-auto mb-4" />
 
@@ -148,9 +176,7 @@ export default function JobDetailsPage() {
                 {/* Location */}
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-primary/60" />
-                  <span className="font-medium">
-                    {translated.city ?? jobOffer.city}
-                  </span>
+                  <span className="font-medium">{city}</span>
                 </div>
               </div>
 
@@ -249,10 +275,7 @@ export default function JobDetailsPage() {
                     <p className="text-sm text-muted-foreground">
                       {t("details.location")}
                     </p>
-                    <p className="font-semibold">
-                      {" "}
-                      {translated.city ?? jobOffer.city}
-                    </p>
+                    <p className="font-semibold"> {city}</p>
                   </div>
 
                   <div className="space-y-1">
@@ -286,11 +309,17 @@ export default function JobDetailsPage() {
                 </h2>
               </div>
               <div className="p-4">
-                <div className="prose prose-sm sm:prose-base max-w-none dark:prose-invert">
+                <div className="prose prose-sm sm:prose-base max-w-none dark:prose-invert mb-4">
                   <p className="whitespace-pre-wrap text-foreground/90 leading-relaxed">
-                    {translated.description ?? jobOffer.description}
+                    {description}
                   </p>
                 </div>
+                <TranslateMenu
+                  activeLang={activeLang}
+                  pendingLang={pendingLang}
+                  onTranslateAction={translate}
+                  onResetAction={reset}
+                />
               </div>
             </div>
 
@@ -343,9 +372,7 @@ export default function JobDetailsPage() {
                     <p className="font-semibold text-lg">
                       {jobOffer.company || t("details.companyName")}
                     </p>
-                    <p className="text-sm text-muted-foreground">
-                      {translated.city ?? jobOffer.city}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{city}</p>
                   </div>
                 </div>
               </div>
@@ -379,9 +406,7 @@ export default function JobDetailsPage() {
                   </div>
                   <div className="flex items-center text-muted-foreground bg-muted px-2.5 py-0.5 rounded-md">
                     <MapPin className="w-4 h-4 mr-1.5" />
-                    <span className="font-semibold text-sm">
-                      {translated.city ?? jobOffer.city}
-                    </span>
+                    <span className="font-semibold text-sm">{city}</span>
                   </div>
                 </div>
 

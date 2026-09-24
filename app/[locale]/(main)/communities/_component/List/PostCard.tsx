@@ -1,11 +1,17 @@
 import { ShareButton } from "@/components/ShareButton";
+import { TranslateMenu } from "@/components/translate-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { buttonVariants } from "@/components/ui/button";
+import { useManualTranslate } from "@/hooks/use-manual-translate";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { Link } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
+import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
+import { useAction } from "convex/react";
 import { ChevronRight, MessageSquare } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { LikeButton } from "../likeButton";
 import { PostBookmarkButton } from "./PostBookmarkButton";
 import { Post } from "./types";
@@ -18,6 +24,17 @@ export function PostCard({
   onLike: (id: Id<"posts">) => void;
 }) {
   const timeT = useTimeTranslations();
+  const te = useTranslations("common");
+
+  const translatePost = useAction(api.posts.translate.translatePost);
+  const { data, activeLang, pendingLang, translate, reset } =
+    useManualTranslate(
+      (lang) => translatePost({ postId: post._id, targetLanguage: lang }),
+      { onError: () => toast.error(te("translateError")) },
+    );
+
+  const title = data?.title ?? post.title;
+  const content = data?.content ?? post.content;
 
   return (
     <div className="block px-4 py-4 hover:bg-muted/30 transition-colors border-b border-border bg-background max-w-4xl mx-auto">
@@ -51,12 +68,12 @@ export function PostCard({
         href={`/communities/${post.communitySlug}/${post.slug}`}
         className="block group"
       >
-        <h2 className="font-bold text-foreground text-base leading-snug group-hover:underline">
-          {post.title}
+        <h2 className="font-bold text-foreground text-xl leading-snug group-hover:underline">
+          {title}
         </h2>
-        {post.content && (
+        {content && (
           <p className="text-sm text-foreground/70 line-clamp-6 mt-1 whitespace-pre-wrap">
-            {post.content}
+            {content}
           </p>
         )}
         <span className="block text-xs text-muted-foreground mt-1.5">
@@ -101,6 +118,13 @@ export function PostCard({
         <PostBookmarkButton
           postId={post._id}
           initialBookmark={post.isBookmarked}
+        />
+
+        <TranslateMenu
+          activeLang={activeLang}
+          pendingLang={pendingLang}
+          onTranslateAction={translate}
+          onResetAction={reset}
         />
       </div>
     </div>

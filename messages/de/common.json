@@ -11,5 +11,14 @@
   "communityTitle": "Community - Hallo Hallo",
   "communityDescription": "Finden Sie Ihre Community oder teilen Sie sie mit der Gemeinschaft",
   "metaTitle": "Hallo Hallo - Madagassische Gemeinschaft in Deutschland",
-  "metaDescription": "Austausch- und Sharing-Plattform zur Förderung der gegenseitigen Unterstützung junger madagassischer Expats in Deutschland. Jobs, Wohnungen, Community."
+  "metaDescription": "Austausch- und Sharing-Plattform zur Förderung der gegenseitigen Unterstützung junger madagassischer Expats in Deutschland. Jobs, Wohnungen, Community.",
+  "button": "Übersetzen",
+  "pending": "Wird übersetzt…",
+  "translatedTo": "Übersetzt · {lang}",
+  "viewOriginal": "Original anzeigen",
+  "error": "Übersetzung derzeit nicht möglich",
+  "translating": "Wird übersetzt…",
+  "showOriginal": "Original anzeigen",
+  "showTranslated": "Übersetzung anzeigen",
+  "translateError": "Übersetzung derzeit nicht möglich"
 }

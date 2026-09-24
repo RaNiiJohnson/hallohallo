@@ -105,5 +105,30 @@
     "loadingFirstPage": "Loading communities...",
     "loadingMore": "Loading...",
     "canLoadMore": "Load more"
+  },
+  "comment": {
+    "loginToLike": "Log in to like",
+    "reply": "Reply",
+    "sending": "...",
+    "replyPlaceholder": "Your reply...",
+    "replyAdded": "Reply added!",
+    "replyError": "Error adding reply",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "saving": "...",
+    "cancel": "Cancel",
+    "commentUpdated": "Comment updated!",
+    "commentDeleted": "Comment deleted!",
+    "replyUpdated": "Reply updated!",
+    "replyDeleted": "Reply deleted!",
+    "updateError": "Error updating",
+    "deleteError": "Error deleting",
+    "deleteCommentTitle": "Delete comment",
+    "deleteCommentDescription": "Are you sure you want to delete this comment and all its replies? This action cannot be undone.",
+    "deleteReplyTitle": "Delete reply",
+    "deleteReplyDescription": "Are you sure you want to delete this reply? This action cannot be undone.",
+    "repliesCount": "{count} reply",
+    "repliesCountPlural": "{count} replies"
   }
 }

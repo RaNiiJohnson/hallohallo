@@ -8,6 +8,7 @@ import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 import { useConvexAuth, useMutation } from "convex/react";
 import { Pencil, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DeleteConfirmDialog } from "./deleteConfirmDialog";
@@ -22,6 +23,7 @@ export function ReplyItem({
     _creationTime: number;
     authorId?: string;
     authorName?: string;
+    authorImage?: string;
     content: string;
     likes: { userId: string }[];
     likesCount: number;
@@ -40,13 +42,14 @@ export function ReplyItem({
   const [isDeleting, setIsDeleting] = useState(false);
 
   const timeT = useTimeTranslations();
+  const t = useTranslations("communities.comment");
 
   if (!reply) return null;
 
   const isOwner = currentUserId && reply.authorId === currentUserId;
 
   const handleLike = async () => {
-    if (!isAuthenticated) return toast.error("Connectez-vous pour liker");
+    if (!isAuthenticated) return toast.error(t("loginToLike"));
     await likeReply({ replyId: reply._id });
   };
 
@@ -66,9 +69,9 @@ export function ReplyItem({
     try {
       await updateReply({ replyId: reply._id, content: editContent });
       setIsEditing(false);
-      toast.success("Réponse modifiée !");
+      toast.success(t("replyUpdated"));
     } catch {
-      toast.error("Erreur lors de la modification");
+      toast.error(t("updateError"));
     } finally {
       setIsSaving(false);
     }
@@ -78,78 +81,91 @@ export function ReplyItem({
     setIsDeleting(true);
     try {
       await deleteReply({ replyId: reply._id });
-      toast.success("Réponse supprimée !");
+      toast.success(t("replyDeleted"));
     } catch {
-      toast.error("Erreur lors de la suppression");
+      toast.error(t("deleteError"));
     } finally {
       setIsDeleting(false);
     }
   };
 
   return (
-    <div className="ml-8 pl-4 border-l border-border py-2">
-      <p className="text-xs text-muted-foreground mb-1">
-        <span className="text-primary font-medium">{reply.authorName}</span> •{" "}
-        {getRelativeTime(reply._creationTime, timeT)}
-      </p>
+    <div className="flex gap-2.5 py-3">
+      <div className="flex-1 min-w-0">
+        <p className="flex items-center gap-1.5 text-xs mb-1">
+          <span className="text-primary font-medium">{reply.authorName}</span>
+          <span className="text-muted-foreground">•</span>
+          <span className="text-muted-foreground">
+            {getRelativeTime(reply._creationTime, timeT)}
+          </span>
+        </p>
 
-      {isEditing ? (
-        <div className="space-y-2">
-          <Textarea
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-            rows={2}
-            className="resize-none text-sm"
-            autoFocus
-          />
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              onClick={handleSaveEdit}
-              disabled={isSaving || !editContent.trim()}
-            >
-              {isSaving ? "..." : "Enregistrer"}
-            </Button>
-            <Button size="sm" variant="ghost" onClick={handleCancelEdit}>
-              Annuler
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <p className="text-sm text-foreground mb-2">{reply.content}</p>
-      )}
-
-      <div className="flex items-center gap-2">
-        <LikeButton
-          initialCount={reply.likesCount}
-          onLike={handleLike}
-          initialIsLiked={reply.userHasLiked}
-        />
-
-        {isOwner && !isEditing && (
-          <>
-            <button
-              onClick={handleStartEdit}
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
-            >
-              <Pencil size={12} />
-              Modifier
-            </button>
-
-            <DeleteConfirmDialog
-              title="Supprimer la réponse"
-              description="Voulez-vous vraiment supprimer cette réponse ? Cette action est irréversible."
-              onConfirm={handleDelete}
-              isPending={isDeleting}
-              trigger={
-                <button className="text-xs text-muted-foreground hover:text-destructive transition-colors flex items-center gap-1">
-                  <Trash2 size={12} />
-                  Supprimer
-                </button>
-              }
+        {isEditing ? (
+          <div className="space-y-2 mb-2">
+            <Textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              rows={2}
+              className="resize-none text-sm"
+              autoFocus
             />
-          </>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={handleSaveEdit}
+                disabled={isSaving || !editContent.trim()}
+              >
+                {isSaving ? t("saving") : t("save")}
+              </Button>
+              <Button size="sm" variant="ghost" onClick={handleCancelEdit}>
+                {t("cancel")}
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-foreground leading-relaxed mb-2 whitespace-pre-wrap">
+            {reply.content}
+          </p>
         )}
+
+        <div className="flex items-center gap-1 -ml-2 flex-wrap">
+          <LikeButton
+            initialCount={reply.likesCount}
+            onLike={handleLike}
+            initialIsLiked={reply.userHasLiked}
+          />
+
+          {isOwner && !isEditing && (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleStartEdit}
+                aria-label={t("edit")}
+                className="text-muted-foreground hover:text-foreground h-8 px-2"
+              >
+                <Pencil size={13} />
+              </Button>
+
+              <DeleteConfirmDialog
+                title={t("deleteReplyTitle")}
+                description={t("deleteReplyDescription")}
+                onConfirm={handleDelete}
+                isPending={isDeleting}
+                trigger={
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    aria-label={t("delete")}
+                    className="text-muted-foreground hover:text-destructive h-8 px-2"
+                  >
+                    <Trash2 size={13} />
+                  </Button>
+                }
+              />
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

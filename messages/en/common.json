@@ -11,5 +11,14 @@
   "communityTitle": "Community - Hallo Hallo",
   "communityDescription": "Find your community or share yours with the community",
   "metaTitle": "Hallo Hallo - Malagasy Community in Germany",
-  "metaDescription": "Exchange and sharing platform to promote mutual support among young Malagasy expats in Germany. Jobs, housing, community."
+  "metaDescription": "Exchange and sharing platform to promote mutual support among young Malagasy expats in Germany. Jobs, housing, community.",
+  "button": "Translate",
+  "pending": "Translating…",
+  "translatedTo": "Translated · {lang}",
+  "viewOriginal": "View original",
+  "error": "Translation is unavailable right now",
+  "translating": "Translating…",
+  "showOriginal": "View original",
+  "showTranslated": "View translation",
+  "translateError": "Translation is unavailable right now"
 }

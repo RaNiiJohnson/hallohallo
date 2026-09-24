@@ -105,5 +105,30 @@
     "loadingFirstPage": "Communities werden geladen...",
     "loadingMore": "Wird geladen...",
     "canLoadMore": "Mehr laden"
+  },
+  "comment": {
+    "loginToLike": "Zum Liken anmelden",
+    "reply": "Antworten",
+    "sending": "...",
+    "replyPlaceholder": "Deine Antwort...",
+    "replyAdded": "Antwort hinzugefügt!",
+    "replyError": "Fehler beim Hinzufügen der Antwort",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "save": "Speichern",
+    "saving": "...",
+    "cancel": "Abbrechen",
+    "commentUpdated": "Kommentar aktualisiert!",
+    "commentDeleted": "Kommentar gelöscht!",
+    "replyUpdated": "Antwort aktualisiert!",
+    "replyDeleted": "Antwort gelöscht!",
+    "updateError": "Fehler beim Aktualisieren",
+    "deleteError": "Fehler beim Löschen",
+    "deleteCommentTitle": "Kommentar löschen",
+    "deleteCommentDescription": "Möchten Sie diesen Kommentar und alle Antworten wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "deleteReplyTitle": "Antwort löschen",
+    "deleteReplyDescription": "Möchten Sie diese Antwort wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "repliesCount": "{count} Antwort",
+    "repliesCountPlural": "{count} Antworten"
   }
 }

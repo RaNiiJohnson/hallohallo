@@ -21,10 +21,14 @@ import { useState } from "react";
 import { PriceDisplay } from "../../_component/price";
 import { ImageGrid } from "./ImageGrid";
 
-import { useTranslatedListing } from "@/hooks/use-translated-job";
+import { TranslateMenu } from "@/components/translate-menu";
+import { useManualTranslate } from "@/hooks/use-manual-translate";
 import { formatDateWithFallback } from "@/lib/date";
 import { LocationMap } from "@/lib/LocationMap";
+import { api } from "@convex/_generated/api";
+import { useAction } from "convex/react";
 import { useLocale, useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 interface PropertyDetailsProps {
   property: ListingListDetails;
@@ -32,31 +36,46 @@ interface PropertyDetailsProps {
 
 export function PropertyDetails({ property }: PropertyDetailsProps) {
   const [showFullDescription, setShowFullDescription] = useState(false);
-  const translated = useTranslatedListing(property);
+  // const translated = useTranslatedListing(property);
   const locale = useLocale();
   const t = useTranslations("common");
   const tListing = useTranslations("listing");
+  const te = useTranslations("common");
+
+  const translateListing = useAction(api.listings.translate.translateListing);
+
+  const { data, activeLang, pendingLang, translate, reset } =
+    useManualTranslate(
+      (lang) => {
+        if (!property) throw new Error("property not loaded");
+        return translateListing({
+          listingId: property._id,
+          targetLanguage: lang,
+        });
+      },
+      { onError: () => toast.error(te("translateError")) },
+    );
+
+  // Une seule source de vérité (traduit ou original) pour description et extras
+  const description = data?.description ?? property.description;
+  const isLongDescription = description.length > 300;
+
+  const title = data?.title ?? property.title;
+  const city = data?.city ?? property.city;
 
   return (
     <div className="space-y-8">
       {/* Galerie d'images */}
       <div className="w-full">
-        <ImageGrid
-          images={property.images}
-          title={translated.title ?? property.title}
-        />
+        <ImageGrid images={property.images} title={title} />
       </div>
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold">
-              {translated.title ?? property.title}
-            </h1>
+            <h1 className="text-2xl sm:text-3xl font-bold">{title}</h1>
             <div className="flex items-center gap-2 text-muted-foreground mt-2">
               <MapPin className="h-4 w-4 shrink-0" />
-              <span className="text-sm sm:text-base">
-                {translated.city ?? property.city}
-              </span>
+              <span className="text-sm sm:text-base">{city}</span>
             </div>
             <div className="flex gap-2 mt-2">
               <Badge variant="secondary">
@@ -77,6 +96,20 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                   >[0],
                 )}
               </Badge>
+            </div>
+
+            <div className="mt-2">
+              {/*<TranslationToggle
+                isTranslating={translated.isTranslating}
+                showOriginal={translated.showOriginal}
+                onToggleAction={translated.toggleOriginal}
+              />*/}
+              <TranslateMenu
+                activeLang={activeLang}
+                pendingLang={pendingLang}
+                onTranslateAction={translate}
+                onResetAction={reset}
+              />
             </div>
           </div>
 
@@ -201,16 +234,15 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
               <div className="prose prose-sm max-w-none">
                 <p
                   className={`text-muted-foreground leading-relaxed ${
-                    !showFullDescription && property.description.length > 300
+                    !showFullDescription && isLongDescription
                       ? "line-clamp-4"
                       : ""
                   }`}
                 >
-                  {translated.description ?? property.description}
+                  {description}
                 </p>
 
-                {(translated.description ?? property.description).length >
-                  300 && (
+                {isLongDescription && (
                   <Button
                     variant="link"
                     className="p-0 h-auto mt-2"
@@ -223,6 +255,12 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                 )}
               </div>
             </div>
+            <TranslateMenu
+              activeLang={activeLang}
+              pendingLang={pendingLang}
+              onTranslateAction={translate}
+              onResetAction={reset}
+            />
           </div>
 
           <ItemSeparator />
@@ -232,9 +270,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
               <h2 className="text-xl font-semibold mb-4">
                 {tListing("details.locationTitle")}
               </h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                {translated.city ?? property.city}
-              </p>
+              <p className="text-sm text-muted-foreground mt-1">{city}</p>
             </div>
             {property.location && (
               <LocationMap
