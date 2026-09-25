@@ -1,6 +1,5 @@
 "use client";
 
-import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import {
   Item,
   ItemContent,
@@ -18,7 +16,7 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { Link } from "@/i18n/navigation";
-import { cn } from "@/lib/utils";
+import { playwriteLight } from "@/web/fonts";
 import { useConvexAuth } from "convex/react";
 import {
   ArrowRightIcon,
@@ -54,50 +52,57 @@ export function HomePageContent() {
   return (
     <div className="min-h-screen overflow-hidden flex flex-col">
       {/* Hero Section */}
-      <section className="relative w-full flex flex-col items-center justify-center gap-4 py-20 h-auto">
-        <div className="text-center p-4 max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-bold sm:mb-6 mb-3 pt-20">
+      <section className="relative flex min-h-[calc(100vh-56px)] w-full items-center justify-center overflow-hidden">
+        <div className="mx-auto flex w-full max-w-4xl flex-col items-center px-6 pb-20 pt-16 text-center sm:pt-24">
+          {/* Small label */}
+          <div
+            className={`
+            ${playwriteLight.className} mb-8 inline-flex items-center rounded-full border border-border/70 bg-card/60 px-4 py-2 text-xs text-muted-foreground shadow-sm backdrop-blur-sm`}
+          >
+            <span className="mr-2 h-2 w-2 font-light rounded-full bg-primary" />
             Hallo Hallo
+          </div>
+
+          <h1 className="max-w-4xl text-balance text-4xl font-medium leading-tight tracking-tight sm:text-5xl md:text-6xl md:leading-[1.05] lg:text-7xl">
+            {t("hero.headlinePrefix")}{" "}
+            <span className="font-light text-primary">
+              {t("hero.headlineHighlight")}
+            </span>
+            {t("hero.headlineSuffix")}
           </h1>
-          <p className="md:text-xl mb-8 text-muted-foreground leading-relaxed">
-            {t("description")}
+
+          {/* Subtitle */}
+          <p className="mt-7 max-w-xl text-pretty text-base leading-7 text-muted-foreground sm:text-lg">
+            {t("hero.description")}
           </p>
 
-          {isLoading ? (
-            <div className="flex items-center justify-center w-full">
-              <Skeleton className="w-[140px] h-[42px] rounded-full border border-muted select-none pointer-events-none" />
-            </div>
-          ) : isAuthenticated ? (
-            <div className="space-y-4 opacity-100">
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/communities"
-                  className="z-10 flex items-center justify-center"
-                >
-                  <div
-                    className={cn(
-                      "group rounded-full border border-border bg-card/90 text-base text-card-foreground transition-all ease-in hover:cursor-pointer hover:bg-accent/80 backdrop-blur-sm shadow-sm hover:shadow-xl",
-                    )}
-                  >
-                    <AnimatedShinyText className="inline-flex items-center justify-center px-6 py-3 transition ease-out hover:text-accent-foreground hover:duration-300">
-                      <Users className="mr-2 h-4 w-4" />
-                      <span>{t("community")}</span>
-                      <ArrowRightIcon className="ml-2 size-4 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
-                    </AnimatedShinyText>
-                  </div>
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <Link
-              href="/login"
-              className="z-10 flex items-center justify-center"
-            >
-              <InteractiveHoverButton className="bg-card/90 shadow-sm hover:shadow-xl">
-                {t("login")}
-              </InteractiveHoverButton>
-            </Link>
-          )}
+          {/* CTA */}
+          <div className="mt-9 flex flex-col items-center gap-4">
+            {isLoading ? (
+              <Skeleton className="h-12 w-52 rounded-full" />
+            ) : isAuthenticated ? (
+              <Link
+                href="/communities"
+                className="group inline-flex h-12 items-center justify-center rounded-full bg-primary px-7 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/25"
+              >
+                <Users className="mr-2 h-4 w-4" />
+                {t("hero.authenticatedCta")}
+                <ArrowRightIcon className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="group inline-flex h-12 items-center justify-center rounded-full bg-primary px-7 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/25"
+              >
+                {t("hero.loginCta")}
+                <ArrowRightIcon className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </Link>
+            )}
+
+            <span className="text-xs text-muted-foreground">
+              {t("hero.categories")}
+            </span>
+          </div>
         </div>
       </section>
 

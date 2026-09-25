@@ -1,7 +1,8 @@
 {
   "hero": {
-    "title": "Ihre Zukunft in Deutschland beginnt hier",
-    "description": "Au-pair, Ausbildung, Beschäftigung, Freiwilligenarbeit. Finden Sie Stellenangebote, die zu Ihrem Profil und Ihren beruflichen Ambitionen passen."
+    "title": "Arbeiten, lernen, vorankommen",
+    "description": "Au-pair, Ausbildung, Beschäftigung, Freiwilligenarbeit. Finden Sie Stellenangebote, die zu Ihrem Profil und Ihren beruflichen Ambitionen passen.",
+    "eyebrow": "Jobs"
   },
   "title": "Stellenangebote",
   "cta": {

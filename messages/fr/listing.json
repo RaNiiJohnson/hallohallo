@@ -1,7 +1,8 @@
 {
   "hero": {
-    "title": "Immobilier",
-    "subtitle": "Trouvez votre logement ou partagez le vôtre avec la communauté"
+    "title": "Trouvez où vivre",
+    "subtitle": "Chambre, studio, appartement ou colocation : trouvez ce qu'il vous faut.",
+    "eyebrow": "Logement"
   },
   "list": {
     "title": "Immobilier",

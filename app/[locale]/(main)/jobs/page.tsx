@@ -12,9 +12,9 @@ export default async function JobsPage() {
   return (
     <div className="min-h-screen bg-background pb-12">
       <HeroSection
+        eyebrow={t("hero.eyebrow")}
         title={t("hero.title")}
         subtitle={t("hero.description")}
-        backgroundImage="/images/jobs-bg.png"
       />
 
       <div className="max-w-6xl mx-auto px-4 py-8">

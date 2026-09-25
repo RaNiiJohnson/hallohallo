@@ -1,4 +1,13 @@
 {
+  "hero": {
+    "headlinePrefix": "Deine Community. Deine",
+    "headlineHighlight": "Chancen",
+    "headlineSuffix": ".",
+    "description": "Finde Jobs, eine Wohnung und Unterstützung in der madagassischen Community in Deutschland.",
+    "authenticatedCta": "Community entdecken",
+    "loginCta": "Hallomada beitreten",
+    "categories": "Jobs · Wohnen · Unterstützung"
+  },
   "title": "Unsere Dienstleistungen",
   "community": "Gemeinschaft",
   "housing": "Immobilien",
