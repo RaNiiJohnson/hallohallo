@@ -1,48 +1,42 @@
 "use client";
 
-import Image from "next/image";
 import { ReactNode } from "react";
 
 interface HeroSectionProps {
   children?: ReactNode;
   title: string;
   subtitle: string;
-  backgroundImage: string;
+  /**
+   * Small pill above the title, e.g. "Immobilier" — like the "• Pricing" /
+   * "• Product updates" pill on Lumail's inner pages. Hardcoded for now
+   * (no translation key yet) — wire it into next-intl once we're happy
+   * with the copy.
+   */
+  eyebrow?: string;
 }
 
-export function HeroSection({
-  children,
-  title,
-  subtitle,
-  backgroundImage,
-}: HeroSectionProps) {
+export function HeroSection({ children, title, subtitle }: HeroSectionProps) {
   return (
-    <div className="relative -top-10 w-full bg-background text-foreground overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src={backgroundImage}
-          alt="Hero background"
-          fill
-          sizes="100vw"
-          className="object-cover opacity-30"
-          priority
-        />
-        <div className="absolute inset-0 bg-linear-to-b from-background/75 from-0% via-transparent via-60% to-background to-100%" />
-      </div>
+    <div className="relative -top-10 w-full bg-background text-foreground">
+      <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-4 pt-28 pb-14 text-center sm:pt-36 sm:pb-20">
+        {/* Narrow text column — Lumail's inner-page headline width, not the full 6xl container */}
+        <div className="mx-auto max-w-2xl">
+          {/*{eyebrow && (
+            <span className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              <span className="size-1 rounded-full bg-primary" />
+              {eyebrow}
+            </span>
+          )}*/}
 
-      {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 pt-32 pb-16 sm:pt-40 sm:pb-24 flex flex-col items-center text-center">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-4">
-          {title}
-        </h1>
-        <p className="text-lg sm:text-xl text-foreground/80 max-w-2xl mb-10">
-          {subtitle}
-        </p>
+          <h1 className="mb-4 text-4xl font-semibold tracking-tight sm:text-5xl">
+            {title}
+          </h1>
+          <p className="text-base text-foreground/70 sm:text-lg">{subtitle}</p>
+        </div>
 
-        {/* Filters Container */}
+        {/* Filters Container — can stay wider than the text column */}
         {children && (
-          <div className="w-full max-w-4xl bg-background/95 backdrop-blur-sm rounded-lg p-4 shadow-xl text-foreground ">
+          <div className="mt-10 w-full max-w-4xl rounded-lg bg-background/95 p-4 text-foreground shadow-xl backdrop-blur-sm">
             {children}
           </div>
         )}

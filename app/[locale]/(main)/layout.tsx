@@ -1,14 +1,7 @@
 import Footer from "@/components/footer";
-import LocaleSwitcher from "@/components/locale-switcher";
-import { MainSidebar } from "@/components/main-sidebar";
+import { MainNavbar } from "@/components/main-navbar";
 import { NotificationWidget } from "@/components/notificationBell";
 import { RoleGuard } from "@/components/role-guard";
-import { ThemeToggle } from "@/components/theme-toggle";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WidgetProvider } from "@/components/WidgetContext";
 import { Locale } from "@/i18n/routing";
@@ -25,30 +18,17 @@ export default async function RootLayout({
   setRequestLocale(locale as Locale);
 
   return (
-    <SidebarProvider>
-      <MainSidebar />
-      <SidebarInset>
-        <header className="sticky  mt-2 top-0 z-40 flex h-12 shrink-0 items-center gap-2 bg-transparent rounded-t-xl backdrop-blur-sm px-4 justify-between">
-          <div className="flex items-center gap-2">
-            <SidebarTrigger className="-ml-1" />
-          </div>
-          <div className="flex items-center gap-1">
-            <LocaleSwitcher />
-            <ThemeToggle />
-          </div>
-        </header>
-
-        <main className="mx-auto w-full min-h-screen">
-          <RoleGuard>
-            <TooltipProvider>{children}</TooltipProvider>
-          </RoleGuard>
-        </main>
-        <Footer />
-        <WidgetProvider>
-          <NotificationWidget />
-          {/* <ChatWidget /> */}
-        </WidgetProvider>
-      </SidebarInset>
-    </SidebarProvider>
+    <div className="flex min-h-svh flex-col bg-background">
+      <MainNavbar />
+      <main className="mx-auto w-full min-h-screen">
+        <RoleGuard>
+          <TooltipProvider>{children}</TooltipProvider>
+        </RoleGuard>
+      </main>
+      <Footer />
+      <WidgetProvider>
+        <NotificationWidget />
+      </WidgetProvider>
+    </div>
   );
 }

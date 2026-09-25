@@ -1,7 +1,8 @@
 {
   "hero": {
-    "title": "Real Estate",
-    "subtitle": "Find your home or share yours with the community"
+    "title": "Find a place to live",
+    "subtitle": "Room, studio, apartment, or shared accommodation: find what you need.",
+    "eyebrow": "Housing"
   },
   "list": {
     "title": "Real Estate",

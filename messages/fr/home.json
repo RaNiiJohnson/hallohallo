@@ -1,4 +1,13 @@
 {
+  "hero": {
+    "headlinePrefix": "Vos communautés. Vos",
+    "headlineHighlight": "opportunités",
+    "headlineSuffix": ".",
+    "description": "Trouvez des opportunités, un logement et de l'entraide auprès de la communauté malgache en Allemagne.",
+    "authenticatedCta": "Découvrir la communauté",
+    "loginCta": "Rejoindre Hallomada",
+    "categories": "Emploi · Logement · Entraide"
+  },
   "title": "Nos Services",
   "community": "Communauté",
   "opportunities": "Opportunités",

@@ -1,4 +1,13 @@
 {
+  "hero": {
+    "headlinePrefix": "Your community. Your",
+    "headlineHighlight": "opportunities",
+    "headlineSuffix": ".",
+    "description": "Find jobs, housing and support within the Malagasy community in Germany.",
+    "authenticatedCta": "Discover the community",
+    "loginCta": "Join Hallomada",
+    "categories": "Jobs · Housing · Support"
+  },
   "title": "Our Services",
   "community": "Community",
   "opportunities": "Opportunities",

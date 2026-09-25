@@ -1,7 +1,8 @@
 {
   "hero": {
-    "title": "Immobilien",
-    "subtitle": "Finde dein Zuhause oder teile deins mit der Community"
+    "title": "Finden Sie eine Unterkunft",
+    "subtitle": "Zimmer, Studio, Wohnung oder WG: Finden Sie das Passende für sich.",
+    "eyebrow": "Wohnen"
   },
   "list": {
     "title": "Immobilien",

@@ -1,7 +1,8 @@
 {
   "hero": {
-    "title": "Votre avenir en Allemagne commence ici",
-    "description": "Au pair, Formation, Emploi, Volontariat. Trouvez des opportunités d'emploi adaptées à votre profil et vos ambitions professionnelles."
+    "title": "Travailler, apprendre, avancer",
+    "description": "Au pair, Formation, Emploi, Volontariat. Trouvez des opportunités d'emploi adaptées à votre profil et vos ambitions professionnelles.",
+    "eyebrow": "Emploi"
   },
   "title": "Opportunités",
   "cta": {
