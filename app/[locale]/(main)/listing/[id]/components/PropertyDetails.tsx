@@ -1,11 +1,17 @@
 "use client";
 
+import { TranslateMenu } from "@/components/translate-menu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Item, ItemContent, ItemSeparator } from "@/components/ui/item";
 import { Separator } from "@/components/ui/separator";
+import { useManualTranslate } from "@/hooks/use-manual-translate";
 import { ListingListDetails } from "@/lib/convexTypes";
+import { formatDateWithFallback } from "@/lib/date";
+import { LocationMap } from "@/lib/LocationMap";
 import { truncateText } from "@/lib/utils";
+import { api } from "@convex/_generated/api";
+import { useAction } from "convex/react";
 import {
   Bath,
   Bed,
@@ -17,26 +23,17 @@ import {
   Square,
   User,
 } from "lucide-react";
-import { useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import ReactMarkdown from "react-markdown";
+import { toast } from "sonner";
 import { PriceDisplay } from "../../_component/price";
 import { ImageGrid } from "./ImageGrid";
-
-import { TranslateMenu } from "@/components/translate-menu";
-import { useManualTranslate } from "@/hooks/use-manual-translate";
-import { formatDateWithFallback } from "@/lib/date";
-import { LocationMap } from "@/lib/LocationMap";
-import { api } from "@convex/_generated/api";
-import { useAction } from "convex/react";
-import { useLocale, useTranslations } from "next-intl";
-import { toast } from "sonner";
 
 interface PropertyDetailsProps {
   property: ListingListDetails;
 }
 
 export function PropertyDetails({ property }: PropertyDetailsProps) {
-  const [showFullDescription, setShowFullDescription] = useState(false);
-  // const translated = useTranslatedListing(property);
   const locale = useLocale();
   const t = useTranslations("common");
   const tListing = useTranslations("listing");
@@ -56,9 +53,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
       { onError: () => toast.error(te("translateError")) },
     );
 
-  // Une seule source de vérité (traduit ou original) pour description et extras
   const description = data?.description ?? property.description;
-  const isLongDescription = description.length > 300;
 
   const title = data?.title ?? property.title;
   const city = data?.city ?? property.city;
@@ -227,32 +222,16 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
           <ItemSeparator />
           {/* Description */}
           <div>
-            <div className="py-6">
+            <div className="pt-6 pb-4">
               <h2 className="text-xl font-semibold mb-4">
                 {tListing("details.descTitle")}
               </h2>
               <div className="prose prose-sm max-w-none">
-                <p
-                  className={`text-muted-foreground leading-relaxed ${
-                    !showFullDescription && isLongDescription
-                      ? "line-clamp-4"
-                      : ""
-                  }`}
-                >
-                  {description}
-                </p>
-
-                {isLongDescription && (
-                  <Button
-                    variant="link"
-                    className="p-0 h-auto mt-2"
-                    onClick={() => setShowFullDescription(!showFullDescription)}
-                  >
-                    {showFullDescription
-                      ? tListing("details.seeLess")
-                      : tListing("details.seeMore")}
-                  </Button>
-                )}
+                <div className="text-muted-foreground leading-relaxed">
+                  <div className="prose prose-invert prose-sm max-w-none">
+                    <ReactMarkdown>{description}</ReactMarkdown>
+                  </div>
+                </div>
               </div>
             </div>
             <TranslateMenu

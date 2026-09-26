@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { notFound, useParams } from "next/navigation";
+import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { ApplyJobDialog } from "../_component/dialogs/applyJobDialog";
 import DeleteJobDialog from "../_component/dialogs/deleteJobDialog";
@@ -309,10 +310,8 @@ export default function JobDetailsPage() {
                 </h2>
               </div>
               <div className="p-4">
-                <div className="prose prose-sm sm:prose-base max-w-none dark:prose-invert mb-4">
-                  <p className="whitespace-pre-wrap text-foreground/90 leading-relaxed">
-                    {description}
-                  </p>
+                <div className="prose prose-invert prose-sm max-w-none mb-4">
+                  <ReactMarkdown>{description}</ReactMarkdown>
                 </div>
                 <TranslateMenu
                   activeLang={activeLang}
