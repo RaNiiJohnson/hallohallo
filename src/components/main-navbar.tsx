@@ -343,7 +343,7 @@ function CommunitiesMenu({
             </button>
           </DropdownMenuTrigger>
         </div>
-        <DropdownMenuContent align="start" className="w-72 p-3">
+        <DropdownMenuContent align="center" className="w-72 p-3 mt-1">
           <div className="mb-1 flex items-center justify-between px-1 py-1">
             <span className="text-sm font-semibold text-foreground">
               {label}
