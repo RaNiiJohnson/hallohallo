@@ -350,11 +350,18 @@ export default function PostClient() {
 
         {/* Comments */}
         <div className="space-y-0 px-4">
-          <h2 className="font-bold text-foreground">
-            {validComments.length === 1
-              ? t("commentsCount", { count: 1 })
-              : t("commentsCountPlural", { count: validComments.length })}
-          </h2>
+          {validComments.length === 0 ? (
+            <div className="text-sm text-muted-foreground text-center">
+              <p className="font-bold">{t("noComments")}</p>
+              {isAuthenticated && <p>{t("noCommentsDescription")}</p>}
+            </div>
+          ) : (
+            <h2 className="font-bold text-foreground">
+              {validComments.length === 1
+                ? t("commentsCount", { count: 1 })
+                : t("commentsCountPlural", { count: validComments.length })}
+            </h2>
+          )}
           {validComments.map((comment) => (
             <CommentItem
               key={comment!._id}

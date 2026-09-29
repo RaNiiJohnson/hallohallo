@@ -96,7 +96,9 @@
     "sending": "Sending...",
     "comment": "Comment",
     "commentsCount": "{count} comment",
-    "commentsCountPlural": "{count} comments"
+    "commentsCountPlural": "{count} comments",
+    "noComments": "No replies yet",
+    "noCommentsDescription": "Your comment could be the first."
   },
   "explore": {
     "title": "Explore communities",

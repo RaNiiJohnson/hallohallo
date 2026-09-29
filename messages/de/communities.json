@@ -96,7 +96,9 @@
     "sending": "Wird gesendet...",
     "comment": "Kommentieren",
     "commentsCount": "{count} Kommentar",
-    "commentsCountPlural": "{count} Kommentare"
+    "commentsCountPlural": "{count} Kommentare",
+    "noComments": "Noch keine Antworten",
+    "noCommentsDescription": "Ihr Kommentar könnte das erste sein."
   },
   "explore": {
     "title": "Communities erkunden",

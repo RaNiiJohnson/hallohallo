@@ -96,7 +96,9 @@
     "sending": "Envoi...",
     "comment": "Commenter",
     "commentsCount": "{count} commentaire",
-    "commentsCountPlural": "{count} commentaires"
+    "commentsCountPlural": "{count} commentaires",
+    "noComments": "Aucune réponse pour l'instant",
+    "noCommentsDescription": "Votre commentaire pourrait être le premier."
   },
   "explore": {
     "title": "Explorer les communautés",
