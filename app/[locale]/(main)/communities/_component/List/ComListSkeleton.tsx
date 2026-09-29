@@ -42,14 +42,12 @@ export function ComListSkeleton() {
             size={15}
             className="transition-transform group-active:scale-95"
           />
-          <span className="text-xs font-medium">0</span>
         </div>
         <div className="group flex items-center gap-1.5 text-muted-foreground transition-colors h-8 px-2">
           <Bookmark
             size={15}
             className="transition-transform group-active:scale-95"
           />
-          <span className="text-xs font-medium">0</span>
         </div>
       </div>
     </div>
