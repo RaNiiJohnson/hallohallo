@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { ComListSkeleton } from "../_component/List/ComListSkeleton";
 
 export default function SkeletonCommunity() {
   return (
@@ -24,16 +25,9 @@ export default function SkeletonCommunity() {
         </div>
       </div>
       {/* Post list */}
-      <div className="max-w-4xl mx-auto py-2">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="px-4 py-4 border-b border-border space-y-2">
-            <Skeleton className="h-3 w-40" />
-            <Skeleton className="h-5 w-3/4" />
-            <Skeleton className="h-3 w-full" />
-            <Skeleton className="h-3 w-5/6" />
-          </div>
-        ))}
-      </div>
+      {Array.from({ length: 2 }).map((_, i) => (
+        <ComListSkeleton key={i} />
+      ))}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { ComListSkeleton } from "../../_component/List/ComListSkeleton";
 
 export default function SkeletonPost() {
   return (
@@ -13,18 +14,7 @@ export default function SkeletonPost() {
       </div>
       <div className="max-w-3xl mx-auto py-2 space-y-4">
         {/* Article */}
-        <div className="border-b border-border bg-background px-4 py-4 space-y-3">
-          <Skeleton className="h-3 w-40" />
-          <Skeleton className="h-6 w-3/4" />
-          <Skeleton className="h-3 w-full" />
-          <Skeleton className="h-3 w-5/6" />
-          <Skeleton className="h-3 w-4/5" />
-          <div className="flex gap-2 mt-4">
-            <Skeleton className="h-8 w-10 rounded-md" />
-            <Skeleton className="h-8 w-10 rounded-md" />
-            <Skeleton className="h-8 w-16 rounded-md" />
-          </div>
-        </div>
+        <ComListSkeleton />
       </div>
     </div>
   );
