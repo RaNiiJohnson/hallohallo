@@ -108,10 +108,6 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     },
     user: {
       additionalFields: {
-        role: {
-          type: "string",
-          required: false,
-        },
         // === INFORMATIONS DE BASE ===
         coverImage: {
           type: "string",
