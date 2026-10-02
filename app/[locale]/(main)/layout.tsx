@@ -1,7 +1,6 @@
 import Footer from "@/components/footer";
 import { MainNavbar } from "@/components/main-navbar";
 import { NotificationWidget } from "@/components/notificationBell";
-import { RoleGuard } from "@/components/role-guard";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WidgetProvider } from "@/components/WidgetContext";
 import { Locale } from "@/i18n/routing";
@@ -21,9 +20,7 @@ export default async function RootLayout({
     <div className="flex min-h-svh flex-col bg-background">
       <MainNavbar />
       <main className="mx-auto w-full min-h-screen">
-        <RoleGuard>
-          <TooltipProvider>{children}</TooltipProvider>
-        </RoleGuard>
+        <TooltipProvider>{children}</TooltipProvider>
       </main>
       <Footer />
       <WidgetProvider>
