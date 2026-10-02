@@ -55,6 +55,7 @@ export function SigninForm() {
     await authClient.signIn.email({
       email: values.email,
       password: values.password,
+      rememberMe: values.rememberMe,
       fetchOptions: {
         onSuccess: () => {
           toast.success(tToast("success"));
@@ -93,6 +94,7 @@ export function SigninForm() {
                 <FormControl>
                   <Input
                     type="email"
+                    autoComplete="email"
                     placeholder={t("emailPlaceholder")}
                     className="h-11"
                     {...field}
@@ -119,7 +121,7 @@ export function SigninForm() {
                 <FormControl>
                   <PasswordInput
                     autoComplete="current-password"
-                    placeholder={t("passwordPlaceholder")}
+                    placeholder="••••••••••••••••"
                     className="h-11"
                     {...field}
                   />
