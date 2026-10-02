@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -17,10 +18,34 @@ import {
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { authClient } from "@/lib/auth-client";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+
+function generateStrongPassword(length = 16) {
+  const sets = [
+    "abcdefghijkmnopqrstuvwxyz",
+    "ABCDEFGHJKLMNPQRSTUVWXYZ",
+    "23456789",
+    "!@#$%^&*-_",
+  ];
+  const all = sets.join("");
+  const rand = (max: number) => {
+    const buf = new Uint32Array(1);
+    crypto.getRandomValues(buf);
+    return buf[0] % max;
+  };
+
+  const chars = sets.map((s) => s[rand(s.length)]);
+  while (chars.length < length) chars.push(all[rand(all.length)]);
+
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = rand(i + 1);
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+  return chars.join("");
+}
 
 export function SignupForm() {
   const router = useRouter();
@@ -60,6 +85,18 @@ export function SignupForm() {
   const {
     formState: { isSubmitting },
   } = form;
+
+  async function handleGeneratePassword() {
+    const password = generateStrongPassword();
+    form.setValue("password", password, { shouldValidate: true });
+    form.setValue("passwordConfirmation", password, { shouldValidate: true });
+    try {
+      await navigator.clipboard.writeText(password);
+      toast.success(t("passwordGenerated"));
+    } catch {
+      toast.success(t("passwordGeneratedNoCopy"));
+    }
+  }
 
   async function onSubmit(values: z.infer<typeof SignupFormSchema>) {
     await authClient.signUp.email({
@@ -104,6 +141,7 @@ export function SignupForm() {
                 <FormControl>
                   <Input
                     type="text"
+                    autoComplete="name"
                     placeholder={t("namePlaceholder")}
                     className="h-11"
                     {...field}
@@ -122,6 +160,7 @@ export function SignupForm() {
                 <FormControl>
                   <Input
                     type="email"
+                    autoComplete="email"
                     placeholder={t("emailPlaceholder")}
                     className="h-11"
                     {...field}
@@ -132,42 +171,59 @@ export function SignupForm() {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("password")}</FormLabel>
-                <FormControl>
-                  <PasswordInput
-                    autoComplete="new-password"
-                    placeholder={t("passwordPlaceholder")}
-                    className="h-11"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="passwordConfirmation"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("confirmPassword")}</FormLabel>
-                <FormControl>
-                  <PasswordInput
-                    autoComplete="new-password"
-                    placeholder={t("confirmPasswordPlaceholder")}
-                    className="h-11"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("password")}</FormLabel>
+                  <FormControl>
+                    <PasswordInput
+                      autoComplete="new-password"
+                      placeholder="••••••••••••••••"
+                      className="h-11"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="passwordConfirmation"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("confirmPassword")}</FormLabel>
+                  <FormControl>
+                    <PasswordInput
+                      autoComplete="new-password"
+                      placeholder="••••••••••••••••"
+                      className="h-11"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <FormDescription>{t("passwordHint")}</FormDescription>
+            <Button
+              type="button"
+              variant="link"
+              size="sm"
+              className="h-auto p-0"
+              onClick={handleGeneratePassword}
+            >
+              <Sparkles className="mr-1 h-4 w-4" />
+              {t("generatePassword")}
+            </Button>
+          </div>
+
           <Button type="submit" className="w-full h-11" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
@@ -178,6 +234,10 @@ export function SignupForm() {
               t("submit")
             )}
           </Button>
+
+          <p className="text-center text-xs text-muted-foreground">
+            {t("terms")}
+          </p>
         </form>
       </Form>
     </div>

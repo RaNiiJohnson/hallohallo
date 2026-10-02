@@ -18,10 +18,11 @@ export default function SignupPage() {
         </Link>
       </Button>
       <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md shadow-xl border-0 ">
+        <Card className="w-full max-w-md shadow-xl border-0">
           <CardHeader className="space-y-4 pb-8 text-center">
             <div className="space-y-2">
               <CardTitle className="text-2xl font-bold">{t("title")}</CardTitle>
+              <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
