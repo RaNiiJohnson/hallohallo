@@ -28,9 +28,6 @@ export async function generateMetadata(): Promise<Metadata> {
     title: "Hallo Hallo - Malagasy Community in Germany",
     description:
       "Exchange and sharing platform to promote mutual support among young Malagasy expats in Germany. Jobs, housing, community.",
-    icons: {
-      icon: "/logo.svg",
-    },
   };
 }
 export function generateStaticParams() {
