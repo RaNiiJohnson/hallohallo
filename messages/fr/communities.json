@@ -1,6 +1,6 @@
 {
   "title": "Communautés",
-  "publicPost": "Publication publique",
+  "publicPost": "Post public",
   "createPostAction": "Créer une publication",
   "createPostShort": "Post",
   "createActionShort": "Créer",
@@ -54,7 +54,7 @@
       "contentPlaceholder": "Exprimez-vous...",
       "destinationLabel": "Publier dans",
       "destinationPlaceholder": "Choisir une destination",
-      "publicDestination": "Fil public Hallo Hallo",
+      "publicDestination": "Contenu public",
       "communityDestination": "Cette communauté",
       "destinationHelp": "Seules vos communautés apparaissent dans cette liste.",
       "submiting": "Publication...",
