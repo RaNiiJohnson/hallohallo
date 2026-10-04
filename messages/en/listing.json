@@ -55,7 +55,7 @@
     "delete": {
       "trigger": "Delete",
       "title": "Delete listing?",
-      "desc": "This action cannot be undone. The listing and its photos will be permanently deleted.",
+      "desc": "This action cannot be undone. The listing will be permanently deleted.",
       "cancel": "Cancel",
       "confirm": "Delete listing",
       "submitting": "Deleting...",
@@ -143,6 +143,7 @@
       "next": "Next",
       "publish": "Publish listing",
       "publishing": "Publishing...",
+      "clearDate": "Clear date",
       "save": "Save changes",
       "saving": "Saving...",
       "removeExtra": "Remove {extra}"

@@ -76,6 +76,20 @@ export const listingModeValues = ["rent", "sale"] as const;
 const missingImagePreview =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect width='100%25' height='100%25' fill='%23e5e7eb'/%3E%3C/svg%3E";
 
+function formatLocalCalendarDate(timestamp: number) {
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function parseLocalCalendarDate(value: string) {
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
 interface ListingFormProps {
   listing?: ListingListDetails;
   onSuccess?: () => void;
@@ -200,7 +214,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
       description: listing?.description ?? "",
       extras: listing?.extras ?? [],
       availableFrom: listing?.availableFrom
-        ? new Date(listing.availableFrom).toISOString().slice(0, 10)
+        ? formatLocalCalendarDate(listing.availableFrom)
         : "",
     },
   });
@@ -268,7 +282,8 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
   };
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    if (files.length === 0) {
+    const requiresImage = !isEditing || (listing?.images.length ?? 0) > 0;
+    if (requiresImage && files.length === 0) {
       toast.error(t("form.messages.imagesRequired"));
       return;
     }
@@ -308,6 +323,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
       });
 
       const images = await Promise.all(uploadPromises);
+      const isRental = data.listingMode === "rent";
       const values = {
         title: data.title,
         propertyType: data.propertyType,
@@ -330,10 +346,10 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
           patch: {
             ...values,
             location: data.location ?? null,
-            charges: data.charges ? Number(data.charges) : null,
-            deposit: data.deposit ? Number(data.deposit) : null,
+            charges: isRental && data.charges ? Number(data.charges) : null,
+            deposit: isRental && data.deposit ? Number(data.deposit) : null,
             availableFrom: data.availableFrom
-              ? new Date(data.availableFrom).getTime()
+              ? parseLocalCalendarDate(data.availableFrom).getTime()
               : null,
           },
         });
@@ -341,10 +357,10 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
         await createListing({
           ...values,
           location: data.location,
-          charges: data.charges ? Number(data.charges) : undefined,
-          deposit: data.deposit ? Number(data.deposit) : undefined,
+          charges: isRental && data.charges ? Number(data.charges) : undefined,
+          deposit: isRental && data.deposit ? Number(data.deposit) : undefined,
           availableFrom: data.availableFrom
-            ? new Date(data.availableFrom).getTime()
+            ? parseLocalCalendarDate(data.availableFrom).getTime()
             : undefined,
         });
       }
@@ -767,7 +783,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
             control={form.control}
             render={({ field, fieldState }) => {
               const selectedDate = field.value
-                ? new Date(field.value)
+                ? parseLocalCalendarDate(field.value)
                 : undefined;
 
               return (
@@ -803,13 +819,27 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
                         captionLayout="dropdown"
                         onSelect={(date) => {
                           if (date) {
-                            field.onChange(date.toISOString().split("T")[0]);
+                            field.onChange(
+                              formatLocalCalendarDate(date.getTime()),
+                            );
                           }
                           setCalendarOpen(false);
                         }}
                       />
                     </PopoverContent>
                   </Popover>
+                  {selectedDate && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="mt-1 h-auto px-0 text-muted-foreground hover:text-foreground"
+                      onClick={() => field.onChange("")}
+                    >
+                      <XIcon className="size-3.5" />
+                      {t("form.actions.clearDate")}
+                    </Button>
+                  )}
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}

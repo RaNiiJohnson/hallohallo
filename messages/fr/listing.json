@@ -55,7 +55,7 @@
     "delete": {
       "trigger": "Supprimer",
       "title": "Supprimer l'annonce ?",
-      "desc": "Cette action est irréversible. L'annonce et ses photos seront définitivement supprimées.",
+      "desc": "Cette action est irréversible. L'annonce sera définitivement supprimée.",
       "cancel": "Annuler",
       "confirm": "Supprimer l'annonce",
       "submitting": "Suppression...",
@@ -143,6 +143,7 @@
       "next": "Suivant",
       "publish": "Publier l'annonce",
       "publishing": "Publication...",
+      "clearDate": "Effacer la date",
       "save": "Enregistrer les modifications",
       "saving": "Enregistrement...",
       "removeExtra": "Supprimer {extra}"

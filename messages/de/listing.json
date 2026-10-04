@@ -55,7 +55,7 @@
     "delete": {
       "trigger": "Löschen",
       "title": "Anzeige löschen?",
-      "desc": "Diese Aktion kann nicht rückgängig gemacht werden. Die Anzeige und ihre Fotos werden dauerhaft gelöscht.",
+      "desc": "Diese Aktion kann nicht rückgängig gemacht werden. Die Anzeige wird dauerhaft gelöscht.",
       "cancel": "Abbrechen",
       "confirm": "Anzeige löschen",
       "submitting": "Wird gelöscht...",
@@ -143,6 +143,7 @@
       "next": "Weiter",
       "publish": "Anzeige veröffentlichen",
       "publishing": "Wird veröffentlicht...",
+      "clearDate": "Datum löschen",
       "save": "Änderungen speichern",
       "saving": "Wird gespeichert...",
       "removeExtra": "{extra} entfernen"
