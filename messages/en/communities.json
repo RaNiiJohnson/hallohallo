@@ -54,7 +54,7 @@
       "contentPlaceholder": "Express yourself...",
       "destinationLabel": "Post to",
       "destinationPlaceholder": "Choose a destination",
-      "publicDestination": "Public feed",
+      "publicDestination": "Public post",
       "communityDestination": "This community",
       "destinationHelp": "Only communities you belong to appear in this list.",
       "submiting": "Publishing...",
