@@ -25,7 +25,7 @@ export const postCommentsCount = new TableAggregate<{
 });
 
 export const communityPostsCount = new TableAggregate<{
-  Namespace: Id<"communities">;
+  Namespace: Id<"communities"> | undefined;
   Key: null;
   DataModel: DataModel;
   TableName: "posts";

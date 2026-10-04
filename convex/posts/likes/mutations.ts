@@ -58,7 +58,9 @@ export const likePost = authMutation({
 
     // Notification
     if (post.authorId !== user._id) {
-      const community = await ctx.db.get(post.communityId);
+      const community = post.communityId
+        ? await ctx.db.get(post.communityId)
+        : null;
       await ctx.db.insert("notifications", {
         userId: post.authorId,
         type: "new_like",
@@ -122,7 +124,9 @@ export const likeComment = authMutation({
     // Notification
     if (comment.authorId !== user._id) {
       const post = await ctx.db.get(comment.postId);
-      const community = post ? await ctx.db.get(post.communityId) : null;
+      const community = post?.communityId
+        ? await ctx.db.get(post.communityId)
+        : null;
       await ctx.db.insert("notifications", {
         userId: comment.authorId,
         type: "new_comment_like",
@@ -182,7 +186,9 @@ export const likeReply = authMutation({
     if (reply.authorId !== user._id) {
       const comment = await ctx.db.get(reply.commentId);
       const post = comment ? await ctx.db.get(comment.postId) : null;
-      const community = post ? await ctx.db.get(post.communityId) : null;
+      const community = post?.communityId
+        ? await ctx.db.get(post.communityId)
+        : null;
       await ctx.db.insert("notifications", {
         userId: reply.authorId,
         type: "new_reply_like",

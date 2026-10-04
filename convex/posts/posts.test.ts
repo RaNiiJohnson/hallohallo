@@ -64,6 +64,59 @@ describe("Posts", () => {
     expect(result?.title).toBe("Post Title");
   });
 
+  it("should create a public post without a community", async () => {
+    const publicPostId = (await t.mutation(api.posts.mutations.createPost, {
+      title: "Public Post",
+      content: "This post belongs to the public feed.",
+    })) as Id<"posts">;
+
+    const publicPost = await t.run(async (ctx) =>
+      await ctx.db.get(publicPostId),
+    );
+    expect(publicPost?.scope).toBe("public");
+    expect(publicPost?.communityId).toBeUndefined();
+  });
+
+  it("should refuse a post in a community the author has not joined", async () => {
+    const otherCommunityId = await t.run(async (ctx) =>
+      await ctx.db.insert("communities", {
+        name: "Someone Else's Community",
+        slug: "someone-elses-community",
+        description: "A community the current user has not joined.",
+        authorId: "another-user",
+        privacy: "public",
+      }),
+    );
+
+    await expect(
+      t.mutation(api.posts.mutations.createPost, {
+        title: "Unauthorized Post",
+        content: "This attempt must be rejected by the server.",
+        communityId: otherCommunityId,
+      }),
+    ).rejects.toThrow("You must be a community member to post");
+  });
+
+  it("should list only the author's communities as post destinations", async () => {
+    await t.run(async (ctx) =>
+      await ctx.db.insert("communities", {
+        name: "Not My Community",
+        slug: "not-my-community",
+        description: "The current user is not a member of this community.",
+        authorId: "another-user",
+        privacy: "public",
+      }),
+    );
+
+    const destinations = await t.query(
+      api.communities.queries.getMyCommunitiesForPosting,
+      {},
+    );
+    expect(destinations).toHaveLength(1);
+    expect(destinations[0]?.name).toBe("Post Community");
+    expect(destinations[0]?.role).toBe("admin");
+  });
+
   it("should update a post", async () => {
     await t.mutation(api.posts.mutations.updatePost, {
       postId,

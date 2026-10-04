@@ -18,9 +18,10 @@ export const isMember = query({
 
     const member = await ctx.db
       .query("communityMembers")
-      .withIndex("by_userId", (q) => q.eq("userId", user._id))
-      .filter((q) => q.eq(q.field("communityId"), args.communityId))
-      .first();
+      .withIndex("by_userId_communityId", (q) =>
+        q.eq("userId", user._id).eq("communityId", args.communityId),
+      )
+      .unique();
 
     return member ?? null;
   },
@@ -134,6 +135,49 @@ export const getMyCommunities = query({
     );
 
     return communities.filter(Boolean);
+  },
+});
+
+export const getMyCommunitiesForPosting = query({
+  args: {},
+  returns: v.array(
+    v.object({
+      _id: v.id("communities"),
+      name: v.string(),
+      slug: v.string(),
+      role: v.union(
+        v.literal("admin"),
+        v.literal("member"),
+        v.literal("moderator"),
+      ),
+    }),
+  ),
+  handler: async (ctx) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) return [];
+
+    const memberships = await ctx.db
+      .query("communityMembers")
+      .withIndex("by_userId", (q) => q.eq("userId", user._id))
+      .collect();
+
+    const communities = await Promise.all(
+      memberships.map(async (membership) => {
+        const community = await ctx.db.get(membership.communityId);
+        if (!community) return null;
+        return {
+          _id: community._id,
+          name: community.name,
+          slug: community.slug,
+          role: membership.role,
+        };
+      }),
+    );
+
+    return communities.filter(
+      (community): community is NonNullable<typeof community> =>
+        community !== null,
+    );
   },
 });
 

@@ -20,7 +20,9 @@ export const addComment = authMutation({
     });
 
     if (post.authorId !== user._id) {
-      const community = await ctx.db.get(post.communityId);
+      const community = post.communityId
+        ? await ctx.db.get(post.communityId)
+        : null;
       await ctx.db.insert("notifications", {
         userId: post.authorId,
         type: "new_comment",
@@ -133,7 +135,9 @@ export const addReply = authMutation({
     // Notification — pas se notifier soi-même
     if (comment.authorId !== user._id) {
       const post = await ctx.db.get(comment.postId);
-      const community = post ? await ctx.db.get(post.communityId) : null;
+      const community = post?.communityId
+        ? await ctx.db.get(post.communityId)
+        : null;
       await ctx.db.insert("notifications", {
         userId: comment.authorId,
         type: "new_reply",

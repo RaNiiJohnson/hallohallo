@@ -7,15 +7,27 @@ export const createPost = authMutation({
   args: {
     content: v.string(),
     title: v.string(),
-    communityId: v.id("communities"),
+    communityId: v.optional(v.id("communities")),
   },
   handler: async (ctx, args) => {
     const { user } = ctx;
 
     const userId = user._id;
 
-    const community = await ctx.db.get(args.communityId);
-    if (!community) throw new Error("Community not found");
+    const community = args.communityId
+      ? await ctx.db.get(args.communityId)
+      : null;
+    if (args.communityId && !community) throw new Error("Community not found");
+
+    if (args.communityId) {
+      const membership = await ctx.db
+        .query("communityMembers")
+        .withIndex("by_userId_communityId", (q) =>
+          q.eq("userId", userId).eq("communityId", args.communityId!),
+        )
+        .unique();
+      if (!membership) throw new Error("You must be a community member to post");
+    }
 
     const { ok, retryAfter } = await limiter.limit(ctx, "createPostPerUser", {
       key: userId,
@@ -30,10 +42,11 @@ export const createPost = authMutation({
       content: args.content,
       title: args.title,
       authorName: user.name,
-      communityId: args.communityId,
-      communityName: community.name,
-      communitySlug: community.slug,
-      searchAll: `${args.title} ${args.content} ${user.name} ${community.name}`,
+      scope: community ? "community" : "public",
+      communityId: community?._id,
+      communityName: community?.name,
+      communitySlug: community?.slug,
+      searchAll: `${args.title} ${args.content} ${user.name}${community ? ` ${community.name}` : ""}`,
       updatedAt: Date.now(),
     });
 

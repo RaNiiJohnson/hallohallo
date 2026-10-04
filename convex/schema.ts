@@ -207,8 +207,11 @@ export default defineSchema({
   posts: defineTable({
     slug: v.string(),
     title: v.string(),
-    communityId: v.id("communities"),
-    communityName: v.string(),
+    // Public posts deliberately have no community. `scope` remains optional
+    // during the migration so every existing post is still valid.
+    scope: v.optional(v.union(v.literal("public"), v.literal("community"))),
+    communityId: v.optional(v.id("communities")),
+    communityName: v.optional(v.string()),
     communitySlug: v.optional(v.string()),
     content: v.string(),
     authorId: v.string(),
