@@ -7,13 +7,19 @@ import { Id } from "../_generated/dataModel";
 import schema from "../schema";
 import { modules } from "../test.setup";
 
+const authState = vi.hoisted(() => ({ userId: "testUserId" }));
+
 vi.mock("../auth/auth", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../auth/auth")>();
   return {
     ...actual,
-    requireAuth: vi.fn().mockResolvedValue({
-      user: { _id: "testUserId", id: "testUserId", name: "Test User" },
-    }),
+    requireAuth: vi.fn().mockImplementation(async () => ({
+      user: {
+        _id: authState.userId,
+        id: authState.userId,
+        name: "Test User",
+      },
+    })),
     authComponent: {
       ...actual.authComponent,
       safeGetAuthUser: vi.fn().mockResolvedValue({
@@ -29,6 +35,7 @@ describe("Notifications", () => {
   let notificationId: Id<"notifications">;
 
   beforeEach(async () => {
+    authState.userId = "testUserId";
     t = convexTest(schema, modules);
 
     notificationId = await t.run(async (ctx) => {
@@ -56,5 +63,16 @@ describe("Notifications", () => {
 
     const notif = await t.run(async (ctx) => await ctx.db.get(notificationId));
     expect(notif?.read).toBe(true);
+  });
+
+  it("should refuse to modify another user's notification", async () => {
+    authState.userId = "anotherUserId";
+
+    await expect(
+      t.mutation(api.notifications.mutations.markOneRead, { notificationId }),
+    ).rejects.toThrow("Not allowed to update this notification");
+
+    const notif = await t.run(async (ctx) => await ctx.db.get(notificationId));
+    expect(notif?.read).toBe(false);
   });
 });
