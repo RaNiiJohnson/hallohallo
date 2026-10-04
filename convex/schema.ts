@@ -328,4 +328,20 @@ export default defineSchema({
     .index("by_userId_read", ["userId", "read"])
     .index("by_communitySlug", ["communitySlug"])
     .index("by_postSlug", ["postSlug"]),
+
+  uploadGrants: defineTable({
+    key: v.string(),
+    userId: v.string(),
+    kind: v.union(
+      v.literal("cv"),
+      v.literal("listing"),
+      v.literal("profile"),
+      v.literal("cover"),
+    ),
+    expectedContentType: v.string(),
+    maxSize: v.number(),
+    verified: v.boolean(),
+  })
+    .index("by_key", ["key"])
+    .index("by_userId", ["userId"]),
 });

@@ -3,15 +3,6 @@ import { v } from "convex/values";
 import { Id } from "../_generated/dataModel";
 import { authComponent } from "../auth/auth";
 import { query } from "../functions";
-import { r2 } from "../integrations/r2";
-
-export const getR2FileUrl = query({
-  args: { storageId: v.string() },
-  handler: async (_, { storageId }) => {
-    const url = await r2.getUrl(storageId);
-    return url ?? null;
-  },
-});
 
 export const getJobWithContact = query({
   args: { slug: v.string() },

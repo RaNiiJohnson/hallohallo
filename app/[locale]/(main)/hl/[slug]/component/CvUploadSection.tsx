@@ -67,7 +67,7 @@ export function CvUploadSection({ user }: CvUploadSectionProps) {
   });
 
   const file = files[0];
-  const hasProfileCv = !!user?.cv;
+  const hasProfileCv = user.hasCv === true;
 
   async function handleUploadCv() {
     if (!file || !(file.file instanceof File)) return;

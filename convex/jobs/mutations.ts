@@ -146,11 +146,16 @@ export const deleteJob = authMutation({
   args: {
     id: v.id("JobOffer"),
   },
+  returns: v.null(),
   handler: async (ctx, args) => {
-    // const user = ctx.user;
-
     const existing = await ctx.db.get("JobOffer", args.id);
-    if (!existing) throw new Error("Job not found");
+    if (!existing) throwNotFound("Job not found");
+
+    const isOwner = existing.authorId === ctx.user._id;
+    const isAdmin = ctx.user.role === "admin";
+    if (!isOwner && !isAdmin) {
+      throwForbidden("Not allowed to delete this job");
+    }
 
     const translations = await ctx.db
       .query("jobTranslations")
@@ -165,5 +170,6 @@ export const deleteJob = authMutation({
     //   event: "job_deleted",
     //   properties: { job_id: args.id },
     // });
+    return null;
   },
 });

@@ -100,7 +100,7 @@ export const createUser = adminMutation({
           emailVerified: true,
           isPublic: true,
           showEmail: true,
-          showPhone: true,
+          showPhone: false,
         },
       },
     });

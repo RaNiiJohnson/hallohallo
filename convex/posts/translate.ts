@@ -1,7 +1,8 @@
 import { v } from "convex/values";
 import { api, internal } from "../_generated/api";
-import { action, internalMutation, query } from "../functions";
+import { authAction, internalMutation, query } from "../functions";
 import { languageValidator } from "../translations/shared";
+import { enforceTranslationLimits } from "../translations/security";
 import { translateWithOpenAI } from "../translations/translate.lib";
 
 type PostFields = { title: string; content: string };
@@ -61,7 +62,7 @@ export const saveTranslation = internalMutation({
   },
 });
 
-export const translatePost = action({
+export const translatePost = authAction({
   args: { postId: v.id("posts"), targetLanguage: languageValidator },
   returns: v.object({ title: v.string(), content: v.string() }),
   handler: async (ctx, args): Promise<PostFields> => {
@@ -78,6 +79,11 @@ export const translatePost = action({
     if (cached && cached.sourceUpdatedAt === post.updatedAt) {
       return { title: cached.title, content: cached.content };
     }
+
+    await enforceTranslationLimits(ctx, {
+      userId: ctx.user._id,
+      resourceKey: `post:${args.postId}:${args.targetLanguage}:${post.updatedAt}`,
+    });
 
     const translated = await translateWithOpenAI(
       "post",

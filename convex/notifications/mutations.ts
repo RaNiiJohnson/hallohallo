@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { authMutation, internalMutation } from "../functions";
+import { throwForbidden, throwNotFound } from "../utils/errors";
 
 export const markAllRead = authMutation({
   handler: async (ctx) => {
@@ -18,8 +19,15 @@ export const markAllRead = authMutation({
 
 export const markOneRead = authMutation({
   args: { notificationId: v.id("notifications") },
+  returns: v.null(),
   handler: async (ctx, args) => {
+    const notification = await ctx.db.get(args.notificationId);
+    if (!notification) throwNotFound("Notification not found");
+    if (notification.userId !== ctx.user._id) {
+      throwForbidden("Not allowed to update this notification");
+    }
     await ctx.db.patch(args.notificationId, { read: true });
+    return null;
   },
 });
 

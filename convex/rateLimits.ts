@@ -9,4 +9,21 @@ export const limiter = new RateLimiter(components.rateLimiter, {
     period: 5 * MINUTE,
     capacity: 2,
   },
+  translatePerUser: {
+    kind: "token bucket",
+    rate: 10,
+    period: MINUTE,
+    capacity: 5,
+  },
+  translateResource: {
+    kind: "fixed window",
+    rate: 1,
+    period: MINUTE,
+  },
+  uploadUrlPerUser: {
+    kind: "token bucket",
+    rate: 12,
+    period: MINUTE,
+    capacity: 6,
+  },
 });
