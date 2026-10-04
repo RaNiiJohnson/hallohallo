@@ -1,5 +1,12 @@
 {
   "title": "Communautés",
+  "publicPost": "Publication publique",
+  "createPostAction": "Créer une publication",
+  "createPostShort": "Post",
+  "createActionShort": "Créer",
+  "composerPlaceholder": "Partagez quelque chose avec la communauté…",
+  "feedTitle": "Publications",
+  "sortLabel": "Trier les publications",
   "exploreAction": "Parcourir",
   "dialogs": {
     "createCommunity": {
@@ -10,7 +17,7 @@
     "createPost": {
       "trigger": "Créer un post",
       "title": "Créer un post",
-      "description": "Partagez quelque chose avec la communauté"
+      "description": "Partagez quelque chose publiquement ou dans une de vos communautés"
     }
   },
   "forms": {
@@ -45,6 +52,11 @@
       "titlePlaceholder": "Un titre accrocheur...",
       "contentLabel": "Contenu *",
       "contentPlaceholder": "Exprimez-vous...",
+      "destinationLabel": "Publier dans",
+      "destinationPlaceholder": "Choisir une destination",
+      "publicDestination": "Fil public Hallo Hallo",
+      "communityDestination": "Cette communauté",
+      "destinationHelp": "Seules vos communautés apparaissent dans cette liste.",
       "submiting": "Publication...",
       "submit": "Publier",
       "characters": "caractères"

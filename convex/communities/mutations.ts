@@ -6,10 +6,14 @@ export const createCommunity = authMutation({
   args: {
     name: v.string(),
     description: v.string(),
-    privacy: v.union(
-      v.literal("public"),
-      v.literal("private"),
-      v.literal("secret"),
+    // Kept temporarily for backward-compatible callers. All new communities
+    // are public until privacy settings are reintroduced.
+    privacy: v.optional(
+      v.union(
+        v.literal("public"),
+        v.literal("private"),
+        v.literal("secret"),
+      ),
     ),
   },
   handler: async (ctx, args) => {
@@ -23,7 +27,7 @@ export const createCommunity = authMutation({
       description: args.description,
       authorId: user._id,
       authorName: user.name,
-      privacy: args.privacy,
+      privacy: "public",
       searchAll: `${args.name} ${args.description} ${user.name}`,
     });
 
@@ -77,7 +81,7 @@ export const updateCommunity = authMutation({
     await ctx.db.patch(args.id, {
       name: args.name,
       description: args.description,
-      privacy: args.privacy,
+      privacy: "public",
       searchAll: `${args.name} ${args.description} ${user.name}`,
     });
   },
@@ -93,9 +97,10 @@ export const joinCommunity = authMutation({
 
     const existing = await ctx.db
       .query("communityMembers")
-      .withIndex("by_userId", (q) => q.eq("userId", user._id))
-      .filter((q) => q.eq(q.field("communityId"), args.communityId))
-      .first();
+      .withIndex("by_userId_communityId", (q) =>
+        q.eq("userId", user._id).eq("communityId", args.communityId),
+      )
+      .unique();
 
     if (existing) throw new Error("Already a member");
 
@@ -140,9 +145,10 @@ export const leaveCommunity = authMutation({
 
     const member = await ctx.db
       .query("communityMembers")
-      .withIndex("by_userId", (q) => q.eq("userId", user._id))
-      .filter((q) => q.eq(q.field("communityId"), args.communityId))
-      .first();
+      .withIndex("by_userId_communityId", (q) =>
+        q.eq("userId", user._id).eq("communityId", args.communityId),
+      )
+      .unique();
 
     if (!member) throw new Error("Not a member");
     if (member.role === "admin")

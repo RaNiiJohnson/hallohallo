@@ -1,5 +1,12 @@
 {
   "title": "Communities",
+  "publicPost": "Public post",
+  "createPostAction": "Create a post",
+  "createPostShort": "Post",
+  "createActionShort": "Create",
+  "composerPlaceholder": "Share something with the community…",
+  "feedTitle": "Posts",
+  "sortLabel": "Sort posts",
   "exploreAction": "Browse",
   "dialogs": {
     "createCommunity": {
@@ -10,7 +17,7 @@
     "createPost": {
       "trigger": "Create a post",
       "title": "Create a post",
-      "description": "Share something with the community"
+      "description": "Share something publicly or in one of your communities"
     }
   },
   "forms": {
@@ -45,6 +52,11 @@
       "titlePlaceholder": "A catchy title...",
       "contentLabel": "Content *",
       "contentPlaceholder": "Express yourself...",
+      "destinationLabel": "Post to",
+      "destinationPlaceholder": "Choose a destination",
+      "publicDestination": "Hallo Hallo public feed",
+      "communityDestination": "This community",
+      "destinationHelp": "Only communities you belong to appear in this list.",
       "submiting": "Publishing...",
       "submit": "Publish",
       "characters": "characters"

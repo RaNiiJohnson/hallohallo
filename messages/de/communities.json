@@ -1,5 +1,12 @@
 {
   "title": "Gemeinschaften",
+  "publicPost": "Öffentlicher Beitrag",
+  "createPostAction": "Beitrag erstellen",
+  "createPostShort": "Beitrag",
+  "createActionShort": "Erstellen",
+  "composerPlaceholder": "Teilen Sie etwas mit der Community…",
+  "feedTitle": "Beiträge",
+  "sortLabel": "Beiträge sortieren",
   "exploreAction": "Durchstöberncourir",
   "dialogs": {
     "createCommunity": {
@@ -10,7 +17,7 @@
     "createPost": {
       "trigger": "Post erstellen",
       "title": "Post erstellen",
-      "description": "Teilen Sie etwas mit der Community"
+      "description": "Teilen Sie etwas öffentlich oder in einer Ihrer Gemeinschaften"
     }
   },
   "forms": {
@@ -45,6 +52,11 @@
       "titlePlaceholder": "Ein einprägsamer Titel...",
       "contentLabel": "Inhalt *",
       "contentPlaceholder": "Drücken Sie sich aus...",
+      "destinationLabel": "Veröffentlichen in",
+      "destinationPlaceholder": "Ziel auswählen",
+      "publicDestination": "Öffentlicher Hallo-Hallo-Feed",
+      "communityDestination": "Diese Gemeinschaft",
+      "destinationHelp": "Hier erscheinen nur Gemeinschaften, denen Sie angehören.",
       "submiting": "Wird veröffentlicht...",
       "submit": "Veröffentlichen",
       "characters": "Zeichen"

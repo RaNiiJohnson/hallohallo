@@ -20,25 +20,38 @@ import {
 } from "@/components/ui/input-group";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface CreatePostFormProps {
-  communityId: Id<"communities">;
+  communityId?: Id<"communities">;
+  communityName?: string;
   onSuccess?: () => void;
 }
 
 export function CreatePostForm({
   communityId,
+  communityName,
   onSuccess,
 }: CreatePostFormProps) {
   const createPost = useMutation(api.posts.mutations.createPost);
+  const myCommunities = useQuery(
+    api.communities.queries.getMyCommunitiesForPosting,
+  );
   const t = useTranslations("communities.forms.createPost");
 
   const formSchema = z.object({
     title: z.string().min(3, t("errorTitleMin")).max(100, t("errorTitleMax")),
     content: z.string().min(10, t("errorContentMin")),
+    destination: z.string(),
   });
 
   type FormSchema = z.infer<typeof formSchema>;
@@ -48,6 +61,7 @@ export function CreatePostForm({
     defaultValues: {
       title: "",
       content: "",
+      destination: communityId ?? "public",
     },
   });
 
@@ -56,7 +70,10 @@ export function CreatePostForm({
       const result = await createPost({
         title: data.title,
         content: data.content,
-        communityId,
+        communityId:
+          data.destination === "public"
+            ? undefined
+            : (data.destination as Id<"communities">),
       });
 
       if (
@@ -89,6 +106,45 @@ export function CreatePostForm({
         }}
       >
         <FieldGroup className="space-y-4">
+          {communityId ? (
+            <Field>
+              <FieldLabel>{t("destinationLabel")}</FieldLabel>
+              <p className="text-sm text-muted-foreground">
+                {communityName ?? t("communityDestination")}
+              </p>
+            </Field>
+          ) : (
+            <Controller
+              name="destination"
+              control={form.control}
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel htmlFor="post-destination">
+                    {t("destinationLabel")}
+                  </FieldLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger id="post-destination">
+                      <SelectValue placeholder={t("destinationPlaceholder")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="public">
+                        {t("publicDestination")}
+                      </SelectItem>
+                      {myCommunities?.map((community) => (
+                        <SelectItem key={community._id} value={community._id}>
+                          {community.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    {t("destinationHelp")}
+                  </p>
+                </Field>
+              )}
+            />
+          )}
+
           {/* Titre */}
           <Controller
             name="title"

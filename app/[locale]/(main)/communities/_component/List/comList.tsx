@@ -3,6 +3,7 @@
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 import { useConvexAuth, useMutation } from "convex/react";
+import { useTranslations } from "next-intl";
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -17,6 +18,7 @@ import { usePostsQuery } from "./usePostsQuery";
 
 export default function ComList() {
   const { isAuthenticated } = useConvexAuth();
+  const t = useTranslations("communities");
   const likePost = useMutation(api.posts.likes.mutations.likePost);
   const [seed] = useState(() => crypto.randomUUID());
 
@@ -48,7 +50,9 @@ export default function ComList() {
 
   return (
     <div>
-      <ModeToggle mode={mode} onChange={handleModeChange} />
+      <div className="max-w-4xl mx-auto flex items-center justify-between gap-4 px-4 pt-7 pb-3">
+        <ModeToggle mode={mode} onChangeAction={handleModeChange} />
+      </div>
 
       {result === undefined ? (
         <ComListSkeleton />

@@ -14,12 +14,14 @@ import { CommunityPostCard } from "./communitypostcard";
 interface CommunityPostListProps {
   communitySlug: string;
   communityId: Id<"communities">;
+  communityName?: string;
   isMember: boolean;
 }
 
 export function CommunityPostList({
   communitySlug,
   communityId,
+  communityName,
   isMember,
 }: CommunityPostListProps) {
   const { isAuthenticated } = useConvexAuth();
@@ -55,6 +57,7 @@ export function CommunityPostList({
         {isAuthenticated && isMember && (
           <CreatePostDialog
             communityId={communityId}
+            communityName={communityName}
             trigger={
               <span className="text-primary hover:underline cursor-pointer text-sm">
                 {t("firstToPost")}

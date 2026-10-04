@@ -168,7 +168,10 @@ export default function CommunityClient() {
                   <div className="hidden sm:flex items-center gap-2 shrink-0">
                     {isMember ? (
                       <>
-                        <CreatePostDialog communityId={community._id} />
+                        <CreatePostDialog
+                          communityId={community._id}
+                          communityName={community.name}
+                        />
                         {isMember.role !== "admin" && (
                           <Button
                             variant="outline"
@@ -225,7 +228,10 @@ export default function CommunityClient() {
                 <div className="flex sm:hidden items-center gap-2 mt-3 flex-wrap">
                   {isMember ? (
                     <>
-                      <CreatePostDialog communityId={community._id} />
+                      <CreatePostDialog
+                        communityId={community._id}
+                        communityName={community.name}
+                      />
                       {isMember.role !== "admin" && (
                         <Button
                           variant="outline"
@@ -312,6 +318,7 @@ export default function CommunityClient() {
         <CommunityPostList
           communitySlug={community.slug}
           communityId={community._id}
+          communityName={community.name}
           isMember={!!isMember}
         />
       </div>
