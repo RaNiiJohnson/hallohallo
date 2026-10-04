@@ -50,6 +50,7 @@ export const createListing = authMutation({
     extras: v.array(v.string()),
     availableFrom: v.optional(v.number()),
   },
+  returns: v.id("RealestateListing"),
   handler: async (ctx, args) => {
     const user = ctx.user;
 
@@ -87,6 +88,7 @@ export const createListing = authMutation({
 
 export const deleteListing = authMutation({
   args: { listingId: v.id("RealestateListing") },
+  returns: v.null(),
   handler: async (ctx, { listingId }) => {
     const listing = await ctx.db.get(listingId);
     if (!listing) throwNotFound("Listing not found");
@@ -135,6 +137,7 @@ export const deleteListing = authMutation({
 
     // 4. Deletes the ad itself
     await ctx.db.delete(listingId);
+    return null;
   },
 });
 
@@ -153,11 +156,13 @@ export const updateListing = authMutation({
         ),
       ),
       listingMode: v.optional(v.union(v.literal("rent"), v.literal("sale"))),
-      location: v.optional(v.object({ lat: v.number(), lng: v.number() })),
+      location: v.optional(
+        v.union(v.object({ lat: v.number(), lng: v.number() }), v.null()),
+      ),
       city: v.optional(v.string()),
       price: v.optional(v.number()),
-      charges: v.optional(v.number()),
-      deposit: v.optional(v.number()),
+      charges: v.optional(v.union(v.number(), v.null())),
+      deposit: v.optional(v.union(v.number(), v.null())),
       period: v.optional(v.literal("month")),
       area: v.optional(v.number()),
       bedrooms: v.optional(v.number()),
@@ -167,9 +172,10 @@ export const updateListing = authMutation({
       images: v.optional(v.array(imageValidator)),
       description: v.optional(v.string()),
       extras: v.optional(v.array(v.string())),
-      availableFrom: v.optional(v.number()),
+      availableFrom: v.optional(v.union(v.number(), v.null())),
     }),
   },
+  returns: v.null(),
   handler: async (ctx, { listingId, patch }) => {
     const listing = await ctx.db.get(listingId);
     if (!listing) throwNotFound("Listing not found");
@@ -180,14 +186,25 @@ export const updateListing = authMutation({
       throwForbidden("Not allowed to update this listing");
     }
 
-    if (patch.images) {
+    const { location, charges, deposit, availableFrom, ...otherFields } = patch;
+    const normalizedPatch = {
+      ...otherFields,
+      ...(location !== undefined ? { location: location ?? undefined } : {}),
+      ...(charges !== undefined ? { charges: charges ?? undefined } : {}),
+      ...(deposit !== undefined ? { deposit: deposit ?? undefined } : {}),
+      ...(availableFrom !== undefined
+        ? { availableFrom: availableFrom ?? undefined }
+        : {}),
+    };
+
+    if (normalizedPatch.images) {
       const oldKeys = new Set(
         (listing.images ?? [])
           .filter((img) => img.storageId)
           .map((img) => img.storageId!),
       );
       const newKeys = new Set(
-        patch.images
+        normalizedPatch.images
           .filter((img) => img.storageId)
           .map((img) => img.storageId!),
       );
@@ -205,13 +222,14 @@ export const updateListing = authMutation({
       }
     }
 
-    const updatedListing = { ...listing, ...patch };
+    const updatedListing = { ...listing, ...normalizedPatch };
     const searchAllContent = `${updatedListing.title} ${updatedListing.propertyType} ${updatedListing.city} ${updatedListing.listingMode} ${updatedListing.description}`;
 
     await ctx.db.patch(listingId, {
-      ...patch,
+      ...normalizedPatch,
       searchAll: searchAllContent,
       updatedAt: Date.now(),
     });
+    return null;
   },
 });

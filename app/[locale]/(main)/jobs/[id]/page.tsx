@@ -254,15 +254,17 @@ export default function JobDetailsPage() {
                     <p className="text-sm text-muted-foreground">
                       {t("details.salary")}
                     </p>
-                    <SalaryDisplay salary={jobOffer.salary} />{" "}
-                    <span className="text-primary text-xs font-normal">
-                      /
-                      {t(
-                        `labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<
-                          typeof t
-                        >[0],
-                      )}
-                    </span>
+                    <div className="flex items-baseline gap-0.5">
+                      <SalaryDisplay salary={jobOffer.salary} />
+                      <span className="text-primary text-xs font-normal">
+                        /
+                        {t(
+                          `labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<
+                            typeof t
+                          >[0],
+                        )}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="space-y-1">
@@ -422,15 +424,17 @@ export default function JobDetailsPage() {
                   <span className="text-sm text-muted-foreground">
                     {t("details.salary")}
                   </span>
-                  <SalaryDisplay salary={jobOffer.salary} />
-                  <span className="text-primary text-xs font-normal">
-                    /
-                    {t(
-                      `labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<
-                        typeof t
-                      >[0],
-                    )}
-                  </span>
+                  <div className="flex items-baseline gap-0.5">
+                    <SalaryDisplay salary={jobOffer.salary} />
+                    <span className="text-primary text-xs font-normal">
+                      /
+                      {t(
+                        `labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<
+                          typeof t
+                        >[0],
+                      )}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-between py-3">

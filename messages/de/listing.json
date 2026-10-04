@@ -47,11 +47,20 @@
       "title": "Anzeige veröffentlichen",
       "desc": "Fülle das folgende Formular aus, um deine Immobilie anzubieten."
     },
+    "edit": {
+      "trigger": "Bearbeiten",
+      "title": "Anzeige bearbeiten",
+      "description": "Aktualisiere die Informationen und Fotos deiner Anzeige."
+    },
     "delete": {
+      "trigger": "Löschen",
       "title": "Anzeige löschen?",
       "desc": "Diese Aktion kann nicht rückgängig gemacht werden. Die Anzeige wird dauerhaft gelöscht.",
       "cancel": "Abbrechen",
-      "confirm": "Anzeige löschen"
+      "confirm": "Anzeige löschen",
+      "submitting": "Wird gelöscht...",
+      "successToast": "Anzeige erfolgreich gelöscht",
+      "errorToast": "Fehler beim Löschen der Anzeige"
     }
   },
   "form": {
@@ -64,6 +73,7 @@
       "location": "Standort",
       "mainInfo": "Hauptinformationen",
       "conditions": "Bedingungen",
+      "conditionsOptional": "Bedingungen (optional)",
       "media": "Inhalt & Medien"
     },
     "labels": {
@@ -85,9 +95,11 @@
       "availableFrom": "Verfügbar ab",
       "description": "Beschreibung *",
       "descHint": "Eine gute Beschreibung erhöht deine Chancen, schnell einen Mieter zu finden.",
+      "markdownHint": "Markdown-Formatierung wird unterstützt",
       "photos": "Fotos der Immobilie",
       "photosDesc": "Füge bis zu {maxFiles} Fotos hinzu (max. {maxSize}MB pro Foto)",
-      "photosAdded": "Hinzugefügte Fotos ({count})"
+      "photosAdded": "Hinzugefügte Fotos ({count})",
+      "existingPhoto": "Vorhandenes Foto"
     },
     "placeholders": {
       "title": "Z.B. Helle 3-Zimmer-Wohnung im Zentrum",
@@ -119,6 +131,9 @@
     "messages": {
       "success": "Anzeige erfolgreich veröffentlicht!",
       "error": "Fehler beim Veröffentlichen der Anzeige",
+      "updateSuccess": "Anzeige erfolgreich aktualisiert!",
+      "updateError": "Fehler beim Aktualisieren der Anzeige",
+      "imagesRequired": "Füge der Anzeige mindestens ein Foto hinzu",
       "imageUploadError": "Fehler beim Hochladen des Bildes",
       "chars": "Zeichen"
     },
@@ -128,6 +143,9 @@
       "next": "Weiter",
       "publish": "Anzeige veröffentlichen",
       "publishing": "Wird veröffentlicht...",
+      "clearDate": "Datum löschen",
+      "save": "Änderungen speichern",
+      "saving": "Wird gespeichert...",
       "removeExtra": "{extra} entfernen"
     },
     "aria": {

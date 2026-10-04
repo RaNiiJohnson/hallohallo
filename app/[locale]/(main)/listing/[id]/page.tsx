@@ -12,15 +12,18 @@ import { ArrowLeft, Heart } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { notFound, useParams } from "next/navigation";
 import { toast } from "sonner";
+import { DeleteListingDialog } from "../_component/dialogs/deleteListingDialog";
 import { PropertyPageSkeleton } from "../_component/skeleton";
+import { EditListingDialog } from "./components/EditListingDialog";
 import { PropertyDetails } from "./components/PropertyDetails";
 import { SimilarListings } from "./components/SimilarListings";
 
 export default function PropertyPage() {
   const params = useParams<{ id: string }>();
-  const { isAuthenticated } = useConvexAuth();
+  const { isAuthenticated, isLoading } = useConvexAuth();
   const t = useTranslations("listing");
   const toggleBookmark = useMutation(api.bookmarks.mutations.toggleBookmark);
+  const user = useQuery(api.auth.auth.getCurrentUser);
 
   const property = useQuery(api.listings.queries.getListingWithContact, {
     slug: params.id,
@@ -33,6 +36,9 @@ export default function PropertyPage() {
   if (property === null) {
     notFound();
   }
+
+  const canManage =
+    !isLoading && (user?._id === property.authorId || user?.role === "admin");
 
   return (
     <div className="min-h-screen bg-background">
@@ -47,35 +53,40 @@ export default function PropertyPage() {
 
         <div className="flex items-center gap-2">
           <ButtonGroup>
+            {canManage && <DeleteListingDialog listingId={property._id} />}
             <ShareButton text={property.title} />
-            {isAuthenticated && (
-              <Button
-                variant="secondary"
-                size="sm"
-                className={`flex items-center gap-2 ${property.isBookmarked ? "text-red-500 hover:text-red-600 bg-red-500/10 hover:bg-red-500/20" : ""}`}
-                onClick={async () => {
-                  try {
-                    await toggleBookmark({
-                      resourceId: property._id as Id<"RealestateListing">,
-                      resourceType: "realEstate",
-                    });
-                    toast.success(
-                      property.isBookmarked
-                        ? t("details.bookmarkRemove")
-                        : t("details.bookmarkAdd"),
-                    );
-                  } catch {
-                    toast.error(t("details.bookmarkError"));
-                  }
-                }}
-              >
-                <Heart
-                  className={`h-4 w-4 ${property.isBookmarked ? "fill-current" : ""}`}
-                />
-                <span className="max-sm:hidden">
-                  {t("details.bookmarkBtn")}
-                </span>
-              </Button>
+            {canManage ? (
+              <EditListingDialog listing={property} />
+            ) : (
+              isAuthenticated && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className={`flex items-center gap-2 ${property.isBookmarked ? "text-red-500 hover:text-red-600 bg-red-500/10 hover:bg-red-500/20" : ""}`}
+                  onClick={async () => {
+                    try {
+                      await toggleBookmark({
+                        resourceId: property._id as Id<"RealestateListing">,
+                        resourceType: "realEstate",
+                      });
+                      toast.success(
+                        property.isBookmarked
+                          ? t("details.bookmarkRemove")
+                          : t("details.bookmarkAdd"),
+                      );
+                    } catch {
+                      toast.error(t("details.bookmarkError"));
+                    }
+                  }}
+                >
+                  <Heart
+                    className={`h-4 w-4 ${property.isBookmarked ? "fill-current" : ""}`}
+                  />
+                  <span className="max-sm:hidden">
+                    {t("details.bookmarkBtn")}
+                  </span>
+                </Button>
+              )
             )}
           </ButtonGroup>
         </div>

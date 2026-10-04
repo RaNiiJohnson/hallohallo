@@ -57,6 +57,8 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
 
   const title = data?.title ?? property.title;
   const city = data?.city ?? property.city;
+  const formatNumber = (value: number) =>
+    new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(value);
 
   return (
     <div className="space-y-8">
@@ -147,7 +149,9 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                 <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                   <Bed className="h-5 w-5 text-primary" />
                   <div>
-                    <div className="font-medium">{property.bedrooms}</div>
+                    <div className="font-medium tabular-nums">
+                      {formatNumber(property.bedrooms)}
+                    </div>
                     <div className="text-xs text-muted-foreground">
                       {tListing("details.bedrooms")}
                     </div>
@@ -157,7 +161,9 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                 <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                   <Bath className="h-5 w-5 text-primary" />
                   <div>
-                    <div className="font-medium">{property.bathrooms}</div>
+                    <div className="font-medium tabular-nums">
+                      {formatNumber(property.bathrooms)}
+                    </div>
                     <div className="text-xs text-muted-foreground">
                       {tListing("details.bathrooms")}
                     </div>
@@ -167,7 +173,10 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                 <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                   <Square className="h-5 w-5 text-primary" />
                   <div>
-                    <div className="font-medium">{property.area}m²</div>
+                    <div className="font-medium tabular-nums whitespace-nowrap">
+                      {formatNumber(property.area)}
+                      {"\u00a0"}m²
+                    </div>
                     <div className="text-xs text-muted-foreground">
                       {tListing("details.area")}
                     </div>
@@ -176,11 +185,13 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
 
                 <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                   <div className="h-5 w-5 text-primary font-bold text-sm flex items-center justify-center">
-                    {property.floor}
+                    {formatNumber(property.floor)}
                   </div>
                   <div>
                     <div className="font-medium">
-                      {tListing("details.floor", { floor: property.floor })}
+                      {tListing("details.floor", {
+                        floor: formatNumber(property.floor),
+                      })}
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {tListing("details.level")}

@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import * as z from "zod";
 
@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import {
   InputGroup,
   InputGroupAddon,
+  InputGroupInput,
   InputGroupText,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
@@ -54,9 +55,11 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+import { MarkdownHint } from "@/components/markdown-hint";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import { useTypedR2Upload } from "@/hooks/use-r2-typed-upload";
 import { LocationPicker } from "@/lib/LocationPicker";
+import type { ListingListDetails } from "@/lib/convexTypes";
 import { api } from "@convex/_generated/api";
 import imageCompression from "browser-image-compression";
 
@@ -70,11 +73,29 @@ export const listingTypeValues = [
 
 export const listingModeValues = ["rent", "sale"] as const;
 
+const missingImagePreview =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect width='100%25' height='100%25' fill='%23e5e7eb'/%3E%3C/svg%3E";
+
+function formatLocalCalendarDate(timestamp: number) {
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function parseLocalCalendarDate(value: string) {
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
 interface ListingFormProps {
+  listing?: ListingListDetails;
   onSuccess?: () => void;
 }
 
-export function ListingForm({ onSuccess }: ListingFormProps) {
+export function ListingForm({ listing, onSuccess }: ListingFormProps) {
   const t = useTranslations("listing");
 
   const { upload: uploadListingImages } = useTypedR2Upload(
@@ -84,6 +105,8 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
   );
 
   const createListing = useMutation(api.listings.mutations.createListing);
+  const updateListing = useMutation(api.listings.mutations.updateListing);
+  const isEditing = listing !== undefined;
 
   const formSchema = z.object({
     title: z.string().min(1, t("form.validation.titleReq")),
@@ -126,6 +149,31 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
   const maxSize = maxSizeMB * 1024 * 1024;
   const maxFiles = 10;
 
+  const initialImageEntries = useMemo(
+    () =>
+      (listing?.images ?? []).map((image, index) => {
+        const url = image.url || image.secureUrl || missingImagePreview;
+        const id = `existing-image-${index}`;
+        return {
+          id,
+          image,
+          file: {
+            id,
+            name: `${t("form.labels.existingPhoto")} ${index + 1}`,
+            size: 0,
+            type: "image/jpeg",
+            url,
+          },
+        };
+      }),
+    [listing, t],
+  );
+
+  const existingImagesByFileId = useMemo(
+    () => new Map(initialImageEntries.map(({ id, image }) => [id, image])),
+    [initialImageEntries],
+  );
+
   const [
     { files, isDragging, errors: uploadErrors },
     {
@@ -135,10 +183,12 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
       handleDrop,
       openFileDialog,
       removeFile,
+      clearFiles,
       getInputProps,
     },
   ] = useFileUpload({
     accept: "image/png,image/jpeg,image/jpg,image/webp",
+    initialFiles: initialImageEntries.map(({ file }) => file),
     maxFiles,
     maxSize,
     multiple: true,
@@ -147,22 +197,25 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "",
-      propertyType: "apartment",
-      listingMode: "rent",
-      city: "",
-      price: "",
-      charges: "",
-      deposit: "",
-      area: "",
-      bathrooms: "",
-      bedrooms: "",
-      floor: "",
-      pets: false,
-      images: [],
-      description: "",
-      extras: [],
-      availableFrom: "",
+      title: listing?.title ?? "",
+      propertyType: listing?.propertyType ?? "apartment",
+      listingMode: listing?.listingMode ?? "rent",
+      location: listing?.location,
+      city: listing?.city ?? "",
+      price: listing ? String(listing.price) : "",
+      charges: listing?.charges !== undefined ? String(listing.charges) : "",
+      deposit: listing?.deposit !== undefined ? String(listing.deposit) : "",
+      area: listing ? String(listing.area) : "",
+      bathrooms: listing ? String(listing.bathrooms) : "",
+      bedrooms: listing ? String(listing.bedrooms) : "",
+      floor: listing ? String(listing.floor) : "",
+      pets: listing?.pets ?? false,
+      images: listing?.images ?? [],
+      description: listing?.description ?? "",
+      extras: listing?.extras ?? [],
+      availableFrom: listing?.availableFrom
+        ? formatLocalCalendarDate(listing.availableFrom)
+        : "",
     },
   });
 
@@ -173,7 +226,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
     t("form.steps.type"),
     t("form.steps.location"),
     t("form.steps.mainInfo"),
-    t("form.steps.conditions"),
+    t("form.steps.conditionsOptional"),
     t("form.steps.media"),
   ];
 
@@ -229,7 +282,12 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
   };
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    if (files.length === 0) return;
+    const requiresImage = !isEditing || (listing?.images.length ?? 0) > 0;
+    if (requiresImage && files.length === 0) {
+      toast.error(t("form.messages.imagesRequired"));
+      return;
+    }
+
     try {
       const uploadPromises = files.map(async (file) => {
         if (file.file instanceof File) {
@@ -239,33 +297,39 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             useWebWorker: true,
           });
 
-          // Upload to R2, returns the storageId (object key)
           const storageId = await uploadListingImages(compressedFile);
           if (!storageId) {
             throw new Error("Erreur lors de l'upload de l'image");
           }
 
-          // Store storageId — the URL is generated server-side via r2.getUrl in queries
           return { storageId };
         }
 
+        const existingImage = existingImagesByFileId.get(file.id);
+        if (!existingImage) {
+          throw new Error("Existing image metadata not found");
+        }
+
+        // Never persist a temporary signed R2 URL. R2 images are identified by
+        // their stable storageId; legacy Cloudinary images keep their metadata.
+        if (existingImage.storageId) {
+          return { storageId: existingImage.storageId };
+        }
+
         return {
-          storageId: file.file.id,
-          url: file.file.url,
+          publicId: existingImage.publicId,
+          secureUrl: existingImage.secureUrl || existingImage.url,
         };
       });
 
       const images = await Promise.all(uploadPromises);
-
-      await createListing({
+      const isRental = data.listingMode === "rent";
+      const values = {
         title: data.title,
         propertyType: data.propertyType,
         listingMode: data.listingMode,
-        location: data.location,
         city: data.city,
         price: Number(data.price),
-        charges: data.charges ? Number(data.charges) : undefined,
-        deposit: data.deposit ? Number(data.deposit) : undefined,
         area: Number(data.area),
         bedrooms: Number(data.bedrooms),
         bathrooms: Number(data.bathrooms),
@@ -273,18 +337,45 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
         pets: data.pets,
         description: data.description,
         extras: data.extras ?? [],
-        availableFrom: data.availableFrom
-          ? new Date(data.availableFrom).getTime()
-          : undefined,
         images,
-      });
+      };
 
-      toast.success(t("form.messages.success"));
+      if (listing) {
+        await updateListing({
+          listingId: listing._id,
+          patch: {
+            ...values,
+            location: data.location ?? null,
+            charges: isRental && data.charges ? Number(data.charges) : null,
+            deposit: isRental && data.deposit ? Number(data.deposit) : null,
+            availableFrom: data.availableFrom
+              ? parseLocalCalendarDate(data.availableFrom).getTime()
+              : null,
+          },
+        });
+      } else {
+        await createListing({
+          ...values,
+          location: data.location,
+          charges: isRental && data.charges ? Number(data.charges) : undefined,
+          deposit: isRental && data.deposit ? Number(data.deposit) : undefined,
+          availableFrom: data.availableFrom
+            ? parseLocalCalendarDate(data.availableFrom).getTime()
+            : undefined,
+        });
+      }
+
+      toast.success(
+        t(isEditing ? "form.messages.updateSuccess" : "form.messages.success"),
+      );
       form.reset();
+      clearFiles();
       setCurrentStep(1);
       onSuccess?.();
     } catch {
-      toast.error(t("form.messages.error"));
+      toast.error(
+        t(isEditing ? "form.messages.updateError" : "form.messages.error"),
+      );
     }
   }
 
@@ -475,16 +566,17 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                     : t("form.labels.priceRent")}
                 </FieldLabel>
                 <InputGroup>
-                  <Input
+                  <InputGroupInput
                     {...field}
                     id="price"
                     type="number"
+                    inputMode="decimal"
                     min="0"
+                    step="0.01"
                     aria-invalid={fieldState.invalid}
-                    placeholder={t("form.placeholders.price")}
                     autoComplete="off"
                   />
-                  <InputGroupAddon align="inline-end">
+                  <InputGroupAddon align="inline-end" variant="boxed">
                     <InputGroupText>€</InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
@@ -502,16 +594,17 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="area">{t("form.labels.area")}</FieldLabel>
                 <InputGroup>
-                  <Input
+                  <InputGroupInput
                     {...field}
                     id="area"
                     type="number"
+                    inputMode="decimal"
                     min="0"
+                    step="0.1"
                     aria-invalid={fieldState.invalid}
-                    placeholder={t("form.placeholders.area")}
                     autoComplete="off"
                   />
-                  <InputGroupAddon align="inline-end">
+                  <InputGroupAddon align="inline-end" variant="boxed">
                     <InputGroupText>m²</InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
@@ -522,7 +615,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             )}
           />
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Controller
               name="bedrooms"
               control={form.control}
@@ -535,9 +628,10 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                     {...field}
                     id="bedrooms"
                     type="number"
+                    inputMode="numeric"
                     min="0"
+                    step="1"
                     aria-invalid={fieldState.invalid}
-                    placeholder={t("form.placeholders.bedrooms")}
                     autoComplete="off"
                   />
                   {fieldState.invalid && (
@@ -559,9 +653,10 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                     {...field}
                     id="bathrooms"
                     type="number"
+                    inputMode="numeric"
                     min="0"
+                    step="1"
                     aria-invalid={fieldState.invalid}
-                    placeholder={t("form.placeholders.bathrooms")}
                     autoComplete="off"
                   />
                   {fieldState.invalid && (
@@ -583,9 +678,10 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                     {...field}
                     id="floor"
                     type="number"
+                    inputMode="numeric"
                     min="0"
+                    step="1"
                     aria-invalid={fieldState.invalid}
-                    placeholder={t("form.placeholders.floor")}
                     autoComplete="off"
                   />
                   {fieldState.invalid && (
@@ -600,7 +696,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
         {/* ─── Step 4: Conditions ─── */}
         <FieldSet className={`space-y-4 ${currentStep !== 4 ? "hidden" : ""}`}>
           {listingMode === "rent" && (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Controller
                 name="deposit"
                 control={form.control}
@@ -610,16 +706,17 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                       {t("form.labels.deposit")}
                     </FieldLabel>
                     <InputGroup>
-                      <Input
+                      <InputGroupInput
                         {...field}
                         id="deposit"
                         type="number"
+                        inputMode="decimal"
                         min="0"
+                        step="0.01"
                         aria-invalid={fieldState.invalid}
-                        placeholder={t("form.placeholders.deposit")}
                         autoComplete="off"
                       />
-                      <InputGroupAddon align="inline-end">
+                      <InputGroupAddon align="inline-end" variant="boxed">
                         <InputGroupText>€</InputGroupText>
                       </InputGroupAddon>
                     </InputGroup>
@@ -639,16 +736,17 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                       {t("form.labels.charges")}
                     </FieldLabel>
                     <InputGroup>
-                      <Input
+                      <InputGroupInput
                         {...field}
                         id="charges"
                         type="number"
+                        inputMode="decimal"
                         min="0"
+                        step="0.01"
                         aria-invalid={fieldState.invalid}
-                        placeholder={t("form.placeholders.charges")}
                         autoComplete="off"
                       />
-                      <InputGroupAddon align="inline-end">
+                      <InputGroupAddon align="inline-end" variant="boxed">
                         <InputGroupText>€/mois</InputGroupText>
                       </InputGroupAddon>
                     </InputGroup>
@@ -685,7 +783,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             control={form.control}
             render={({ field, fieldState }) => {
               const selectedDate = field.value
-                ? new Date(field.value)
+                ? parseLocalCalendarDate(field.value)
                 : undefined;
 
               return (
@@ -721,13 +819,27 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                         captionLayout="dropdown"
                         onSelect={(date) => {
                           if (date) {
-                            field.onChange(date.toISOString().split("T")[0]);
+                            field.onChange(
+                              formatLocalCalendarDate(date.getTime()),
+                            );
                           }
                           setCalendarOpen(false);
                         }}
                       />
                     </PopoverContent>
                   </Popover>
+                  {selectedDate && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="mt-1 h-auto px-0 text-muted-foreground hover:text-foreground"
+                      onClick={() => field.onChange("")}
+                    >
+                      <XIcon className="size-3.5" />
+                      {t("form.actions.clearDate")}
+                    </Button>
+                  )}
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -766,6 +878,7 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                   </InputGroupAddon>
                 </InputGroup>
                 <FieldDescription>{t("form.labels.descHint")}</FieldDescription>
+                <MarkdownHint label={t("form.labels.markdownHint")} />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -833,9 +946,10 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
                           aria-label={t("form.aria.removeImage", {
                             name: file.file.name,
                           })}
-                          className="-top-2 -right-2 absolute size-6 z-10 rounded-full border-2 border-background shadow-none focus-visible:border-background"
+                          className="absolute right-2 top-2 z-10 size-7 rounded-full border border-border bg-background/90 text-foreground shadow-sm backdrop-blur-sm hover:bg-background"
                           onClick={() => removeFile(file.id)}
                           size="icon"
+                          variant="secondary"
                         >
                           <XIcon className="size-3.5" />
                         </Button>
@@ -970,8 +1084,8 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             className="flex items-center gap-2"
           >
             {form.formState.isSubmitting
-              ? t("form.actions.publishing")
-              : t("form.actions.publish")}
+              ? t(isEditing ? "form.actions.saving" : "form.actions.publishing")
+              : t(isEditing ? "form.actions.save" : "form.actions.publish")}
           </Button>
         )}
       </Field>

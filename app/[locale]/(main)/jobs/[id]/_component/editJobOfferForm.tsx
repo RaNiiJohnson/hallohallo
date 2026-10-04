@@ -1,8 +1,9 @@
 "use client";
 
+import { MarkdownHint } from "@/components/markdown-hint";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -36,17 +37,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { JobOfferDetails } from "@/lib/convexTypes";
+import { api } from "@convex/_generated/api";
+import { useMutation } from "convex/react";
 import { ChevronLeft, ChevronRight, XIcon } from "lucide-react";
 import { toast } from "sonner";
-import { JobOfferDetails } from "@/lib/convexTypes";
-import { useMutation } from "convex/react";
-import { api } from "@convex/_generated/api";
 
-import {
-  jobTypeValues,
-  contractTypeValues,
-} from "../../_component/forms/jobOfferForm";
 import { LocationPicker } from "@/lib/LocationPicker";
+import {
+  contractTypeValues,
+  jobTypeValues,
+} from "../../_component/forms/jobOfferForm";
 
 interface EditJobOfferFormProps {
   jobOffer: JobOfferDetails;
@@ -75,9 +76,7 @@ export function EditJobOfferForm({
     duration: z.string().min(1, t("form.validation.durationReq")),
     startDate: z.string().min(1, t("form.validation.startDateReq")),
     company: z.string().min(1, t("form.validation.companyReq")),
-    description: z
-      .string()
-      .min(10, t("form.validation.descMin")),
+    description: z.string().min(10, t("form.validation.descMin")),
     certificates: z
       .array(
         z.object({
@@ -196,9 +195,14 @@ export function EditJobOfferForm({
       <div className="space-y-2">
         <div className="flex justify-between text-sm text-muted-foreground">
           <span>
-            {t("form.progress.step", { current: currentStep, total: totalSteps })}
+            {t("form.progress.step", {
+              current: currentStep,
+              total: totalSteps,
+            })}
           </span>
-          <span>{t("form.progress.completed", { progress: Math.round(progress) })}</span>
+          <span>
+            {t("form.progress.completed", { progress: Math.round(progress) })}
+          </span>
         </div>
         <Progress value={progress} className="w-full" />
         <h3 className="text-lg font-medium">{stepTitles[currentStep - 1]}</h3>
@@ -244,7 +248,9 @@ export function EditJobOfferForm({
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="job-company">{t("form.labels.company")}</FieldLabel>
+                <FieldLabel htmlFor="job-company">
+                  {t("form.labels.company")}
+                </FieldLabel>
                 <Input
                   {...field}
                   id="job-company"
@@ -264,18 +270,24 @@ export function EditJobOfferForm({
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="job-type">{t("form.labels.jobType")}</FieldLabel>
+                <FieldLabel htmlFor="job-type">
+                  {t("form.labels.jobType")}
+                </FieldLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger
                     id="job-type"
                     aria-invalid={fieldState.invalid}
                   >
-                    <SelectValue placeholder={t("form.placeholders.selectType")} />
+                    <SelectValue
+                      placeholder={t("form.placeholders.selectType")}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {jobTypeValues.map((type) => (
                       <SelectItem key={type} value={type}>
-                        {t(`labels.jobTypes.${type}` as Parameters<typeof t>[0])}
+                        {t(
+                          `labels.jobTypes.${type}` as Parameters<typeof t>[0],
+                        )}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -305,12 +317,18 @@ export function EditJobOfferForm({
                     id="job-contract"
                     aria-invalid={fieldState.invalid}
                   >
-                    <SelectValue placeholder={t("form.placeholders.selectContract")} />
+                    <SelectValue
+                      placeholder={t("form.placeholders.selectContract")}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {contractTypeValues.map((contract) => (
                       <SelectItem key={contract} value={contract}>
-                        {t(`labels.contracts.${contract}` as Parameters<typeof t>[0])}
+                        {t(
+                          `labels.contracts.${contract}` as Parameters<
+                            typeof t
+                          >[0],
+                        )}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -327,7 +345,9 @@ export function EditJobOfferForm({
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="job-city">{t("form.labels.city")}</FieldLabel>
+                <FieldLabel htmlFor="job-city">
+                  {t("form.labels.city")}
+                </FieldLabel>
                 <Input
                   {...field}
                   id="job-city"
@@ -349,9 +369,7 @@ export function EditJobOfferForm({
             render={({ field }) => (
               <Field>
                 <FieldLabel>{t("form.labels.mapPosition")}</FieldLabel>
-                <FieldDescription>
-                  {t("form.labels.mapDesc")}
-                </FieldDescription>
+                <FieldDescription>{t("form.labels.mapDesc")}</FieldDescription>
                 <LocationPicker
                   value={field.value}
                   onChange={field.onChange}
@@ -381,22 +399,31 @@ export function EditJobOfferForm({
               </Field>
             )}
           />
-          <div className="flex gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_180px]">
             <Controller
               name="salary"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field className="flex-1" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="job-salary">{t("form.labels.salary")}</FieldLabel>
-                  <Input
-                    {...field}
-                    id="job-salary"
-                    type="number"
-                    min="0"
-                    aria-invalid={fieldState.invalid}
-                    placeholder={t("form.placeholders.amount")}
-                    autoComplete="off"
-                  />
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="job-salary">
+                    {t("form.labels.salary")}
+                  </FieldLabel>
+                  <InputGroup>
+                    <InputGroupInput
+                      {...field}
+                      id="job-salary"
+                      type="number"
+                      inputMode="decimal"
+                      min="0"
+                      step="0.01"
+                      aria-invalid={fieldState.invalid}
+                      placeholder={t("form.placeholders.amount")}
+                      autoComplete="off"
+                    />
+                    <InputGroupAddon align="inline-end" variant="boxed">
+                      <InputGroupText>€</InputGroupText>
+                    </InputGroupAddon>
+                  </InputGroup>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -408,19 +435,29 @@ export function EditJobOfferForm({
               name="salaryPeriod"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field className="w-[180px]" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="salary-period">{t("form.labels.period")}</FieldLabel>
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="salary-period">
+                    {t("form.labels.period")}
+                  </FieldLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger
                       id="salary-period"
                       aria-invalid={fieldState.invalid}
                     >
-                      <SelectValue placeholder={t("form.placeholders.period")} />
+                      <SelectValue
+                        placeholder={t("form.placeholders.period")}
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="month">€/{t("labels.salaryPeriods.month")}</SelectItem>
-                      <SelectItem value="year">€/{t("labels.salaryPeriods.year")}</SelectItem>
-                      <SelectItem value="hour">€/{t("labels.salaryPeriods.hour")}</SelectItem>
+                      <SelectItem value="month">
+                        €/{t("labels.salaryPeriods.month")}
+                      </SelectItem>
+                      <SelectItem value="year">
+                        €/{t("labels.salaryPeriods.year")}
+                      </SelectItem>
+                      <SelectItem value="hour">
+                        €/{t("labels.salaryPeriods.hour")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   {fieldState.invalid && (
@@ -436,7 +473,9 @@ export function EditJobOfferForm({
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="job-duration">{t("form.labels.duration")}</FieldLabel>
+                <FieldLabel htmlFor="job-duration">
+                  {t("form.labels.duration")}
+                </FieldLabel>
                 <Input
                   {...field}
                   id="job-duration"
@@ -461,7 +500,9 @@ export function EditJobOfferForm({
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="job-description">{t("form.labels.description")}</FieldLabel>
+                <FieldLabel htmlFor="job-description">
+                  {t("form.labels.description")}
+                </FieldLabel>
                 <InputGroup>
                   <InputGroupTextarea
                     {...field}
@@ -477,9 +518,8 @@ export function EditJobOfferForm({
                     </InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
-                <FieldDescription>
-                  {t("form.labels.descHint")}
-                </FieldDescription>
+                <FieldDescription>{t("form.labels.descHint")}</FieldDescription>
+                <MarkdownHint label={t("form.labels.markdownHint")} />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -490,10 +530,10 @@ export function EditJobOfferForm({
 
         {/* Step 4 */}
         <FieldSet className={`gap-4 ${currentStep !== 4 ? "hidden" : ""}`}>
-          <FieldLegend variant="label">{t("form.labels.certificates")}</FieldLegend>
-          <FieldDescription>
-            {t("form.labels.certDesc")}
-          </FieldDescription>
+          <FieldLegend variant="label">
+            {t("form.labels.certificates")}
+          </FieldLegend>
+          <FieldDescription>{t("form.labels.certDesc")}</FieldDescription>
           <FieldGroup className="gap-4">
             {fields.map((field, index) => (
               <Controller

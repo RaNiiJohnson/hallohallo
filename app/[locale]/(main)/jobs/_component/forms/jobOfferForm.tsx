@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Controller, FieldPath, useFieldArray, useForm } from "react-hook-form";
 import * as z from "zod";
 
+import { MarkdownHint } from "@/components/markdown-hint";
 import {
   Field,
   FieldContent,
@@ -453,24 +454,31 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             }}
           />
 
-          <div className="flex gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_180px]">
             <Controller
               name="salary"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field className="flex-1" data-invalid={fieldState.invalid}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="job-salary">
                     {t("form.labels.salary")}
                   </FieldLabel>
-                  <Input
-                    {...field}
-                    id="job-salary"
-                    type="number"
-                    min="0"
-                    aria-invalid={fieldState.invalid}
-                    placeholder={t("form.placeholders.amount")}
-                    autoComplete="off"
-                  />
+                  <InputGroup>
+                    <InputGroupInput
+                      {...field}
+                      id="job-salary"
+                      type="number"
+                      inputMode="decimal"
+                      min="0"
+                      step="0.01"
+                      aria-invalid={fieldState.invalid}
+                      placeholder={t("form.placeholders.amount")}
+                      autoComplete="off"
+                    />
+                    <InputGroupAddon align="inline-end" variant="boxed">
+                      <InputGroupText>€</InputGroupText>
+                    </InputGroupAddon>
+                  </InputGroup>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -482,7 +490,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
               name="salaryPeriod"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field className="w-[180px]" data-invalid={fieldState.invalid}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="salary-period">
                     {t("form.labels.period")}
                   </FieldLabel>
@@ -497,13 +505,13 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="month">
-                        €/{t("labels.salaryPeriods.month")}
+                        /{t("labels.salaryPeriods.month")}
                       </SelectItem>
                       <SelectItem value="year">
-                        €/{t("labels.salaryPeriods.year")}
+                        /{t("labels.salaryPeriods.year")}
                       </SelectItem>
                       <SelectItem value="hour">
-                        €/{t("labels.salaryPeriods.hour")}
+                        /{t("labels.salaryPeriods.hour")}
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -566,6 +574,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
                   </InputGroupAddon>
                 </InputGroup>
                 <FieldDescription>{t("form.labels.descHint")}</FieldDescription>
+                <MarkdownHint label={t("form.labels.markdownHint")} />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
