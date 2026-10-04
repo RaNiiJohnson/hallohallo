@@ -50,7 +50,7 @@ export default function ComList() {
 
   return (
     <div>
-      <div className="max-w-4xl mx-auto flex items-center justify-between gap-4 px-4 pt-7 pb-3">
+      <div className="max-w-4xl mx-auto flex items-center justify-between gap-4 px-4 p-3 border-b">
         <ModeToggle mode={mode} onChangeAction={handleModeChange} />
       </div>
 
