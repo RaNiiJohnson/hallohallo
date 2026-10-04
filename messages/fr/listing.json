@@ -47,11 +47,20 @@
       "title": "Publier une annonce",
       "desc": "Remplissez le formulaire ci-dessous pour proposer votre bien immobilier."
     },
+    "edit": {
+      "trigger": "Modifier",
+      "title": "Modifier l'annonce",
+      "description": "Mettez à jour les informations et les photos de votre annonce."
+    },
     "delete": {
+      "trigger": "Supprimer",
       "title": "Supprimer l'annonce ?",
-      "desc": "Cette action est irréversible. L'annonce sera définitivement supprimée.",
+      "desc": "Cette action est irréversible. L'annonce et ses photos seront définitivement supprimées.",
       "cancel": "Annuler",
-      "confirm": "Supprimer l'annonce"
+      "confirm": "Supprimer l'annonce",
+      "submitting": "Suppression...",
+      "successToast": "Annonce supprimée avec succès",
+      "errorToast": "Erreur lors de la suppression de l'annonce"
     }
   },
   "form": {
@@ -87,7 +96,8 @@
       "descHint": "Une bonne description augmente vos chances de trouver un locataire rapidement.",
       "photos": "Photos du bien",
       "photosDesc": "Ajoutez jusqu'à {maxFiles} photos (max. {maxSize}MB chacune)",
-      "photosAdded": "Photos ajoutées ({count})"
+      "photosAdded": "Photos ajoutées ({count})",
+      "existingPhoto": "Photo existante"
     },
     "placeholders": {
       "title": "Ex: Appartement 3 pièces lumineux, centre-ville",
@@ -119,6 +129,9 @@
     "messages": {
       "success": "Annonce publiée avec succès !",
       "error": "Erreur lors de la publication de l'annonce",
+      "updateSuccess": "Annonce modifiée avec succès !",
+      "updateError": "Erreur lors de la modification de l'annonce",
+      "imagesRequired": "Ajoutez au moins une photo à l'annonce",
       "imageUploadError": "Erreur lors de l'upload de l'image",
       "chars": "caractères"
     },
@@ -128,6 +141,8 @@
       "next": "Suivant",
       "publish": "Publier l'annonce",
       "publishing": "Publication...",
+      "save": "Enregistrer les modifications",
+      "saving": "Enregistrement...",
       "removeExtra": "Supprimer {extra}"
     },
     "aria": {

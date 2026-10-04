@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import * as z from "zod";
 
@@ -57,6 +57,7 @@ import { toast } from "sonner";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import { useTypedR2Upload } from "@/hooks/use-r2-typed-upload";
 import { LocationPicker } from "@/lib/LocationPicker";
+import type { ListingListDetails } from "@/lib/convexTypes";
 import { api } from "@convex/_generated/api";
 import imageCompression from "browser-image-compression";
 
@@ -70,11 +71,15 @@ export const listingTypeValues = [
 
 export const listingModeValues = ["rent", "sale"] as const;
 
+const missingImagePreview =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect width='100%25' height='100%25' fill='%23e5e7eb'/%3E%3C/svg%3E";
+
 interface ListingFormProps {
+  listing?: ListingListDetails;
   onSuccess?: () => void;
 }
 
-export function ListingForm({ onSuccess }: ListingFormProps) {
+export function ListingForm({ listing, onSuccess }: ListingFormProps) {
   const t = useTranslations("listing");
 
   const { upload: uploadListingImages } = useTypedR2Upload(
@@ -84,6 +89,8 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
   );
 
   const createListing = useMutation(api.listings.mutations.createListing);
+  const updateListing = useMutation(api.listings.mutations.updateListing);
+  const isEditing = listing !== undefined;
 
   const formSchema = z.object({
     title: z.string().min(1, t("form.validation.titleReq")),
@@ -126,6 +133,31 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
   const maxSize = maxSizeMB * 1024 * 1024;
   const maxFiles = 10;
 
+  const initialImageEntries = useMemo(
+    () =>
+      (listing?.images ?? []).map((image, index) => {
+        const url = image.url || image.secureUrl || missingImagePreview;
+        const id = `existing-image-${index}`;
+        return {
+          id,
+          image,
+          file: {
+            id,
+            name: `${t("form.labels.existingPhoto")} ${index + 1}`,
+            size: 0,
+            type: "image/jpeg",
+            url,
+          },
+        };
+      }),
+    [listing, t],
+  );
+
+  const existingImagesByFileId = useMemo(
+    () => new Map(initialImageEntries.map(({ id, image }) => [id, image])),
+    [initialImageEntries],
+  );
+
   const [
     { files, isDragging, errors: uploadErrors },
     {
@@ -135,10 +167,12 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
       handleDrop,
       openFileDialog,
       removeFile,
+      clearFiles,
       getInputProps,
     },
   ] = useFileUpload({
     accept: "image/png,image/jpeg,image/jpg,image/webp",
+    initialFiles: initialImageEntries.map(({ file }) => file),
     maxFiles,
     maxSize,
     multiple: true,
@@ -147,22 +181,25 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "",
-      propertyType: "apartment",
-      listingMode: "rent",
-      city: "",
-      price: "",
-      charges: "",
-      deposit: "",
-      area: "",
-      bathrooms: "",
-      bedrooms: "",
-      floor: "",
-      pets: false,
-      images: [],
-      description: "",
-      extras: [],
-      availableFrom: "",
+      title: listing?.title ?? "",
+      propertyType: listing?.propertyType ?? "apartment",
+      listingMode: listing?.listingMode ?? "rent",
+      location: listing?.location,
+      city: listing?.city ?? "",
+      price: listing ? String(listing.price) : "",
+      charges: listing?.charges !== undefined ? String(listing.charges) : "",
+      deposit: listing?.deposit !== undefined ? String(listing.deposit) : "",
+      area: listing ? String(listing.area) : "",
+      bathrooms: listing ? String(listing.bathrooms) : "",
+      bedrooms: listing ? String(listing.bedrooms) : "",
+      floor: listing ? String(listing.floor) : "",
+      pets: listing?.pets ?? false,
+      images: listing?.images ?? [],
+      description: listing?.description ?? "",
+      extras: listing?.extras ?? [],
+      availableFrom: listing?.availableFrom
+        ? new Date(listing.availableFrom).toISOString().slice(0, 10)
+        : "",
     },
   });
 
@@ -229,7 +266,11 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
   };
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    if (files.length === 0) return;
+    if (files.length === 0) {
+      toast.error(t("form.messages.imagesRequired"));
+      return;
+    }
+
     try {
       const uploadPromises = files.map(async (file) => {
         if (file.file instanceof File) {
@@ -239,33 +280,38 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             useWebWorker: true,
           });
 
-          // Upload to R2, returns the storageId (object key)
           const storageId = await uploadListingImages(compressedFile);
           if (!storageId) {
             throw new Error("Erreur lors de l'upload de l'image");
           }
 
-          // Store storageId — the URL is generated server-side via r2.getUrl in queries
           return { storageId };
         }
 
+        const existingImage = existingImagesByFileId.get(file.id);
+        if (!existingImage) {
+          throw new Error("Existing image metadata not found");
+        }
+
+        // Never persist a temporary signed R2 URL. R2 images are identified by
+        // their stable storageId; legacy Cloudinary images keep their metadata.
+        if (existingImage.storageId) {
+          return { storageId: existingImage.storageId };
+        }
+
         return {
-          storageId: file.file.id,
-          url: file.file.url,
+          publicId: existingImage.publicId,
+          secureUrl: existingImage.secureUrl || existingImage.url,
         };
       });
 
       const images = await Promise.all(uploadPromises);
-
-      await createListing({
+      const values = {
         title: data.title,
         propertyType: data.propertyType,
         listingMode: data.listingMode,
-        location: data.location,
         city: data.city,
         price: Number(data.price),
-        charges: data.charges ? Number(data.charges) : undefined,
-        deposit: data.deposit ? Number(data.deposit) : undefined,
         area: Number(data.area),
         bedrooms: Number(data.bedrooms),
         bathrooms: Number(data.bathrooms),
@@ -273,18 +319,45 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
         pets: data.pets,
         description: data.description,
         extras: data.extras ?? [],
-        availableFrom: data.availableFrom
-          ? new Date(data.availableFrom).getTime()
-          : undefined,
         images,
-      });
+      };
 
-      toast.success(t("form.messages.success"));
+      if (listing) {
+        await updateListing({
+          listingId: listing._id,
+          patch: {
+            ...values,
+            location: data.location ?? null,
+            charges: data.charges ? Number(data.charges) : null,
+            deposit: data.deposit ? Number(data.deposit) : null,
+            availableFrom: data.availableFrom
+              ? new Date(data.availableFrom).getTime()
+              : null,
+          },
+        });
+      } else {
+        await createListing({
+          ...values,
+          location: data.location,
+          charges: data.charges ? Number(data.charges) : undefined,
+          deposit: data.deposit ? Number(data.deposit) : undefined,
+          availableFrom: data.availableFrom
+            ? new Date(data.availableFrom).getTime()
+            : undefined,
+        });
+      }
+
+      toast.success(
+        t(isEditing ? "form.messages.updateSuccess" : "form.messages.success"),
+      );
       form.reset();
+      clearFiles();
       setCurrentStep(1);
       onSuccess?.();
     } catch {
-      toast.error(t("form.messages.error"));
+      toast.error(
+        t(isEditing ? "form.messages.updateError" : "form.messages.error"),
+      );
     }
   }
 
@@ -970,8 +1043,8 @@ export function ListingForm({ onSuccess }: ListingFormProps) {
             className="flex items-center gap-2"
           >
             {form.formState.isSubmitting
-              ? t("form.actions.publishing")
-              : t("form.actions.publish")}
+              ? t(isEditing ? "form.actions.saving" : "form.actions.publishing")
+              : t(isEditing ? "form.actions.save" : "form.actions.publish")}
           </Button>
         )}
       </Field>

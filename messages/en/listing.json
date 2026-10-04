@@ -47,11 +47,20 @@
       "title": "Publish an ad",
       "desc": "Fill out the form below to offer your property."
     },
+    "edit": {
+      "trigger": "Edit",
+      "title": "Edit listing",
+      "description": "Update your listing information and photos."
+    },
     "delete": {
+      "trigger": "Delete",
       "title": "Delete listing?",
-      "desc": "This action cannot be undone. The listing will be permanently deleted.",
+      "desc": "This action cannot be undone. The listing and its photos will be permanently deleted.",
       "cancel": "Cancel",
-      "confirm": "Delete listing"
+      "confirm": "Delete listing",
+      "submitting": "Deleting...",
+      "successToast": "Listing deleted successfully",
+      "errorToast": "Error deleting the listing"
     }
   },
   "form": {
@@ -87,7 +96,8 @@
       "descHint": "A good description increases your chances of finding a tenant quickly.",
       "photos": "Property photos",
       "photosDesc": "Add up to {maxFiles} photos (max {maxSize}MB each)",
-      "photosAdded": "Added photos ({count})"
+      "photosAdded": "Added photos ({count})",
+      "existingPhoto": "Existing photo"
     },
     "placeholders": {
       "title": "E.g. Bright 3-room apartment, downtown",
@@ -119,6 +129,9 @@
     "messages": {
       "success": "Listing published successfully!",
       "error": "Error while publishing the listing",
+      "updateSuccess": "Listing updated successfully!",
+      "updateError": "Error while updating the listing",
+      "imagesRequired": "Add at least one photo to the listing",
       "imageUploadError": "Error uploading image",
       "chars": "characters"
     },
@@ -128,6 +141,8 @@
       "next": "Next",
       "publish": "Publish listing",
       "publishing": "Publishing...",
+      "save": "Save changes",
+      "saving": "Saving...",
       "removeExtra": "Remove {extra}"
     },
     "aria": {

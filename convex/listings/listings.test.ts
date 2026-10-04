@@ -45,6 +45,8 @@ describe("Listings", () => {
       location: { lat: 0, lng: 0 },
       city: "City",
       price: 1000,
+      charges: 100,
+      deposit: 2000,
       area: 50,
       bedrooms: 2,
       bathrooms: 1,
@@ -53,6 +55,7 @@ describe("Listings", () => {
       images: [],
       description: "Listing Description",
       extras: [],
+      availableFrom: 1_800_000_000_000,
     });
 
     const listing = await t.run(async (ctx) => await ctx.db.get(listingId));
@@ -64,5 +67,34 @@ describe("Listings", () => {
       slug: listingSlug,
     });
     expect(result?.title).toBe("Listing Title");
+  });
+
+  it("updates a listing and clears optional fields", async () => {
+    await t.mutation(api.listings.mutations.updateListing, {
+      listingId,
+      patch: {
+        title: "Updated Listing",
+        location: null,
+        charges: null,
+        deposit: null,
+        availableFrom: null,
+      },
+    });
+
+    const listing = await t.run(async (ctx) => await ctx.db.get(listingId));
+
+    expect(listing?.title).toBe("Updated Listing");
+    expect(listing?.location).toBeUndefined();
+    expect(listing?.charges).toBeUndefined();
+    expect(listing?.deposit).toBeUndefined();
+    expect(listing?.availableFrom).toBeUndefined();
+    expect(listing?.searchAll).toContain("Updated Listing");
+  });
+
+  it("deletes a listing", async () => {
+    await t.mutation(api.listings.mutations.deleteListing, { listingId });
+
+    const listing = await t.run(async (ctx) => await ctx.db.get(listingId));
+    expect(listing).toBeNull();
   });
 });
