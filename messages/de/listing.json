@@ -73,6 +73,7 @@
       "location": "Standort",
       "mainInfo": "Hauptinformationen",
       "conditions": "Bedingungen",
+      "conditionsOptional": "Bedingungen (optional)",
       "media": "Inhalt & Medien"
     },
     "labels": {
@@ -94,6 +95,7 @@
       "availableFrom": "Verfügbar ab",
       "description": "Beschreibung *",
       "descHint": "Eine gute Beschreibung erhöht deine Chancen, schnell einen Mieter zu finden.",
+      "markdownHint": "Markdown-Formatierung wird unterstützt",
       "photos": "Fotos der Immobilie",
       "photosDesc": "Füge bis zu {maxFiles} Fotos hinzu (max. {maxSize}MB pro Foto)",
       "photosAdded": "Hinzugefügte Fotos ({count})",

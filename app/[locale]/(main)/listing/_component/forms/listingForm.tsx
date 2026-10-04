@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import {
   InputGroup,
   InputGroupAddon,
+  InputGroupInput,
   InputGroupText,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
@@ -54,6 +55,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+import { MarkdownHint } from "@/components/markdown-hint";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import { useTypedR2Upload } from "@/hooks/use-r2-typed-upload";
 import { LocationPicker } from "@/lib/LocationPicker";
@@ -210,7 +212,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
     t("form.steps.type"),
     t("form.steps.location"),
     t("form.steps.mainInfo"),
-    t("form.steps.conditions"),
+    t("form.steps.conditionsOptional"),
     t("form.steps.media"),
   ];
 
@@ -548,16 +550,17 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
                     : t("form.labels.priceRent")}
                 </FieldLabel>
                 <InputGroup>
-                  <Input
+                  <InputGroupInput
                     {...field}
                     id="price"
                     type="number"
+                    inputMode="decimal"
                     min="0"
+                    step="0.01"
                     aria-invalid={fieldState.invalid}
-                    placeholder={t("form.placeholders.price")}
                     autoComplete="off"
                   />
-                  <InputGroupAddon align="inline-end">
+                  <InputGroupAddon align="inline-end" variant="boxed">
                     <InputGroupText>€</InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
@@ -575,16 +578,17 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="area">{t("form.labels.area")}</FieldLabel>
                 <InputGroup>
-                  <Input
+                  <InputGroupInput
                     {...field}
                     id="area"
                     type="number"
+                    inputMode="decimal"
                     min="0"
+                    step="0.1"
                     aria-invalid={fieldState.invalid}
-                    placeholder={t("form.placeholders.area")}
                     autoComplete="off"
                   />
-                  <InputGroupAddon align="inline-end">
+                  <InputGroupAddon align="inline-end" variant="boxed">
                     <InputGroupText>m²</InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
@@ -595,7 +599,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
             )}
           />
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Controller
               name="bedrooms"
               control={form.control}
@@ -608,9 +612,10 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
                     {...field}
                     id="bedrooms"
                     type="number"
+                    inputMode="numeric"
                     min="0"
+                    step="1"
                     aria-invalid={fieldState.invalid}
-                    placeholder={t("form.placeholders.bedrooms")}
                     autoComplete="off"
                   />
                   {fieldState.invalid && (
@@ -632,9 +637,10 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
                     {...field}
                     id="bathrooms"
                     type="number"
+                    inputMode="numeric"
                     min="0"
+                    step="1"
                     aria-invalid={fieldState.invalid}
-                    placeholder={t("form.placeholders.bathrooms")}
                     autoComplete="off"
                   />
                   {fieldState.invalid && (
@@ -656,9 +662,10 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
                     {...field}
                     id="floor"
                     type="number"
+                    inputMode="numeric"
                     min="0"
+                    step="1"
                     aria-invalid={fieldState.invalid}
-                    placeholder={t("form.placeholders.floor")}
                     autoComplete="off"
                   />
                   {fieldState.invalid && (
@@ -673,7 +680,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
         {/* ─── Step 4: Conditions ─── */}
         <FieldSet className={`space-y-4 ${currentStep !== 4 ? "hidden" : ""}`}>
           {listingMode === "rent" && (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Controller
                 name="deposit"
                 control={form.control}
@@ -683,16 +690,17 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
                       {t("form.labels.deposit")}
                     </FieldLabel>
                     <InputGroup>
-                      <Input
+                      <InputGroupInput
                         {...field}
                         id="deposit"
                         type="number"
+                        inputMode="decimal"
                         min="0"
+                        step="0.01"
                         aria-invalid={fieldState.invalid}
-                        placeholder={t("form.placeholders.deposit")}
                         autoComplete="off"
                       />
-                      <InputGroupAddon align="inline-end">
+                      <InputGroupAddon align="inline-end" variant="boxed">
                         <InputGroupText>€</InputGroupText>
                       </InputGroupAddon>
                     </InputGroup>
@@ -712,16 +720,17 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
                       {t("form.labels.charges")}
                     </FieldLabel>
                     <InputGroup>
-                      <Input
+                      <InputGroupInput
                         {...field}
                         id="charges"
                         type="number"
+                        inputMode="decimal"
                         min="0"
+                        step="0.01"
                         aria-invalid={fieldState.invalid}
-                        placeholder={t("form.placeholders.charges")}
                         autoComplete="off"
                       />
-                      <InputGroupAddon align="inline-end">
+                      <InputGroupAddon align="inline-end" variant="boxed">
                         <InputGroupText>€/mois</InputGroupText>
                       </InputGroupAddon>
                     </InputGroup>
@@ -839,6 +848,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
                   </InputGroupAddon>
                 </InputGroup>
                 <FieldDescription>{t("form.labels.descHint")}</FieldDescription>
+                <MarkdownHint label={t("form.labels.markdownHint")} />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -906,9 +916,10 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
                           aria-label={t("form.aria.removeImage", {
                             name: file.file.name,
                           })}
-                          className="-top-2 -right-2 absolute size-6 z-10 rounded-full border-2 border-background shadow-none focus-visible:border-background"
+                          className="absolute right-2 top-2 z-10 size-7 rounded-full border border-border bg-background/90 text-foreground shadow-sm backdrop-blur-sm hover:bg-background"
                           onClick={() => removeFile(file.id)}
                           size="icon"
+                          variant="secondary"
                         >
                           <XIcon className="size-3.5" />
                         </Button>

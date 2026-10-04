@@ -1,3 +1,7 @@
+"use client";
+
+import { useLocale } from "next-intl";
+
 export interface ParsedSalary {
   amount: string;
   period: string;
@@ -37,7 +41,8 @@ interface SalaryDisplayProps {
   className?: string;
 }
 
-export function SalaryDisplay({ salary, className }: SalaryDisplayProps) {
+export function SalaryDisplay({ salary, className = "" }: SalaryDisplayProps) {
+  const locale = useLocale();
   const parsed = parseSalary(typeof salary === "string" ? salary : null);
 
   if (parsed.isNegotiable) {
@@ -48,14 +53,27 @@ export function SalaryDisplay({ salary, className }: SalaryDisplayProps) {
     );
   }
 
-  if (typeof salary === "number") {
+  const numericSalary =
+    typeof salary === "number"
+      ? salary
+      : parsed.amount
+        ? Number(parsed.amount)
+        : Number.NaN;
+
+  if (Number.isFinite(numericSalary)) {
+    const formatted = new Intl.NumberFormat(locale, {
+      maximumFractionDigits: 2,
+    }).format(numericSalary);
+
     return (
       <span className={`font-medium ${className}`}>
         <span className="font-semibold">
-          {salary.toLocaleString()}
-          <span className="text-primary ml-0.5">€</span>
+          {formatted}
+          <span className="text-primary">{"\u00a0"}€</span>
         </span>
       </span>
     );
   }
+
+  return <span className={className}>{salary}</span>;
 }

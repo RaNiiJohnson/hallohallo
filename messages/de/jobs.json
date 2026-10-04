@@ -48,6 +48,7 @@
       "duration": "Dauer *",
       "description": "Beschreibung *",
       "descHint": "Beschreiben Sie die Position, die Aufgaben und die erforderlichen Fähigkeiten",
+      "markdownHint": "Markdown-Formatierung wird unterstützt",
       "certificates": "Erforderliche Zertifikate",
       "certDesc": "Fügen Sie bis zu 5 erforderliche Zertifikate für diese Stelle hinzu (optional)."
     },

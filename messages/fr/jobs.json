@@ -48,6 +48,7 @@
       "duration": "Durée *",
       "description": "Description *",
       "descHint": "Décrivez le poste, les missions et les compétences requises",
+      "markdownHint": "Mise en forme Markdown prise en charge",
       "certificates": "Certificats requis",
       "certDesc": "Ajoutez jusqu'à 5 certificats requis pour ce poste (optionnel)."
     },

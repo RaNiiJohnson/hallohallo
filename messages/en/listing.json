@@ -73,6 +73,7 @@
       "location": "Location",
       "mainInfo": "Main information",
       "conditions": "Conditions",
+      "conditionsOptional": "Conditions (optional)",
       "media": "Content & media"
     },
     "labels": {
@@ -94,6 +95,7 @@
       "availableFrom": "Available from",
       "description": "Description *",
       "descHint": "A good description increases your chances of finding a tenant quickly.",
+      "markdownHint": "Markdown formatting is supported",
       "photos": "Property photos",
       "photosDesc": "Add up to {maxFiles} photos (max {maxSize}MB each)",
       "photosAdded": "Added photos ({count})",

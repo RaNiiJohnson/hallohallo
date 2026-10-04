@@ -73,6 +73,7 @@
       "location": "Localisation",
       "mainInfo": "Informations principales",
       "conditions": "Conditions",
+      "conditionsOptional": "Conditions (optionnel)",
       "media": "Contenu & médias"
     },
     "labels": {
@@ -94,6 +95,7 @@
       "availableFrom": "Disponible à partir du",
       "description": "Description *",
       "descHint": "Une bonne description augmente vos chances de trouver un locataire rapidement.",
+      "markdownHint": "Mise en forme Markdown prise en charge",
       "photos": "Photos du bien",
       "photosDesc": "Ajoutez jusqu'à {maxFiles} photos (max. {maxSize}MB chacune)",
       "photosAdded": "Photos ajoutées ({count})",

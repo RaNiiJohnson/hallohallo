@@ -48,6 +48,7 @@
       "duration": "Duration *",
       "description": "Description *",
       "descHint": "Describe the position, missions, and required skills",
+      "markdownHint": "Markdown formatting is supported",
       "certificates": "Required certificates",
       "certDesc": "Add up to 5 required certificates for this role (optional)."
     },
