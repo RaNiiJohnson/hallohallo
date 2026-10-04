@@ -25,6 +25,10 @@ export function PostCard({
 }) {
   const timeT = useTimeTranslations();
   const te = useTranslations("common");
+  const tc = useTranslations("communities");
+  const postHref = post.communitySlug
+    ? `/communities/${post.communitySlug}/${post.slug}`
+    : `/posts/${post.slug}`;
 
   const translatePost = useAction(api.posts.translate.translatePost);
   const { data, activeLang, pendingLang, translate, reset } =
@@ -55,19 +59,20 @@ export function PostCard({
             </span>
           </Link>
           <ChevronRight className="size-3 text-muted-foreground/50" />
-          <Link
-            href={`/communities/${post.communitySlug}`}
-            className="text-primary font-medium hover:underline"
-          >
-            {post.communityName}
-          </Link>
+          {post.communitySlug && post.communityName ? (
+            <Link
+              href={`/communities/${post.communitySlug}`}
+              className="text-primary font-medium hover:underline"
+            >
+              {post.communityName}
+            </Link>
+          ) : (
+            <span className="font-medium">{tc("publicPost")}</span>
+          )}
         </div>
       </div>
 
-      <Link
-        href={`/communities/${post.communitySlug}/${post.slug}`}
-        className="block group"
-      >
+      <Link href={postHref} className="block group">
         <h2 className="font-bold text-foreground text-xl leading-snug group-hover:underline">
           {title}
         </h2>
@@ -83,7 +88,7 @@ export function PostCard({
 
       <div className="flex items-center gap-1 mt-2">
         <Link
-          href={`/communities/${post.communitySlug}/${post.slug}#comments`}
+          href={`${postHref}#comments`}
           className={buttonVariants({
             variant: "ghost",
             size: "sm",
@@ -108,7 +113,7 @@ export function PostCard({
           text={post.title}
           url={
             typeof window !== "undefined"
-              ? `${window.location.origin}/communities/${post.communitySlug}/${post.slug}`
+              ? `${window.location.origin}${postHref}`
               : ""
           }
           variant="ghost"

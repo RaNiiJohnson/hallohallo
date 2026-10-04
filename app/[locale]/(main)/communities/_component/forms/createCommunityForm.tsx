@@ -18,20 +18,21 @@ import {
   InputGroupText,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// Privacy controls are intentionally paused while every community is public.
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import { api } from "@convex/_generated/api";
 import { useMutation } from "convex/react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-const privacyValues = ["public", "private", "secret"] as const;
+// const privacyValues = ["public", "private", "secret"] as const;
 
 interface CreateCommunityFormProps {
   onSuccess?: () => void;
@@ -50,7 +51,7 @@ export function CreateCommunityForm({ onSuccess }: CreateCommunityFormProps) {
       .string()
       .min(10, t("errorDescMin"))
       .max(200, t("errorDescMax")),
-    privacy: z.enum(privacyValues),
+    // privacy: z.enum(privacyValues),
   });
 
   type FormSchema = z.infer<typeof formSchema>;
@@ -60,7 +61,7 @@ export function CreateCommunityForm({ onSuccess }: CreateCommunityFormProps) {
     defaultValues: {
       name: "",
       description: "",
-      privacy: "public",
+      // privacy: "public",
     },
   });
 
@@ -69,7 +70,6 @@ export function CreateCommunityForm({ onSuccess }: CreateCommunityFormProps) {
       const { slug } = await createCommunity({
         name: data.name,
         description: data.description,
-        privacy: data.privacy,
       });
       toast.success(t("successToast"));
       form.reset();
@@ -146,38 +146,10 @@ export function CreateCommunityForm({ onSuccess }: CreateCommunityFormProps) {
             )}
           />
 
-          {/* Privacy */}
-          <Controller
-            name="privacy"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="community-privacy">
-                  {t("privacyLabel")}
-                </FieldLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger
-                    id="community-privacy"
-                    aria-invalid={fieldState.invalid}
-                  >
-                    <SelectValue placeholder={t("privacyPlaceholder")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {privacyValues.map((privacy) => (
-                      <SelectItem key={privacy} value={privacy}>
-                        {t(
-                          `privacy${privacy.charAt(0).toUpperCase() + privacy.slice(1)}` as const,
-                        )}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
+          {/*
+            Privacy controls are paused until private and secret communities
+            receive complete server-side access rules.
+          */}
         </FieldGroup>
       </form>
 

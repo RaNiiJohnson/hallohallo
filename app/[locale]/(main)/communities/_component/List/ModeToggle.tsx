@@ -1,13 +1,16 @@
-"use client";
-
-import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/button-group";
-import clsx from "clsx";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   ArrowDownNarrowWide,
   ArrowUpNarrowWide,
   Bookmark,
   Flame,
+  ListFilter,
   Shuffle,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -23,30 +26,33 @@ const FILTERS: { mode: SortMode; icon: React.ElementType }[] = [
 
 export function ModeToggle({
   mode,
-  onChange,
+  onChangeAction,
 }: {
   mode: SortMode;
-  onChange: (m: SortMode) => void;
+  onChangeAction: (m: SortMode) => void;
 }) {
   const t = useTranslations("sortMode");
+  const tc = useTranslations("communities");
 
   return (
-    <ButtonGroup className="flex w-full md:w-fit justify-between items-center px-4 py-3 max-w-4xl mx-auto">
-      {FILTERS.map(({ mode: m, icon: Icon }) => (
-        <Button
-          key={m}
-          variant={mode === m ? "default" : "outline"}
-          size="xs"
-          className={clsx(
-            "gap-1.5 flex-1 md:flex-initial",
-            mode === m ? "text-primary-foreground" : "text-muted-foreground",
-          )}
-          onClick={() => onChange(m)}
-        >
-          <Icon size={14} />
-          <span className="md:block hidden">{t(m)}</span>
-        </Button>
-      ))}
-    </ButtonGroup>
+    <Select
+      value={mode}
+      onValueChange={(value) => onChangeAction(value as SortMode)}
+    >
+      <SelectTrigger size="sm" aria-label={tc("sortLabel")}>
+        <ListFilter className="size-4 text-muted-foreground" />
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent align="end">
+        {FILTERS.map(({ mode: itemMode, icon: Icon }) => (
+          <SelectItem key={itemMode} value={itemMode}>
+            <span className="flex items-center gap-2">
+              <Icon className="size-3.5" />
+              {t(itemMode)}
+            </span>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

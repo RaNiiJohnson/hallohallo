@@ -30,7 +30,7 @@ import { PostBookmarkButton } from "../../_component/List/PostBookmarkButton";
 import SkeletonPost from "./skeleton";
 
 export default function PostClient() {
-  const { postSlug, communitySlug } = useParams();
+  const { postSlug } = useParams();
   const router = useRouter();
   const post = useQuery(api.posts.queries.getPostWithMeta, {
     slug: postSlug as string,
@@ -138,7 +138,9 @@ export default function PostClient() {
     try {
       await deletePost({ postId: post._id });
       toast.success(t("postDeleted"));
-      router.push(`/communities/${communitySlug}`);
+      router.push(
+        post.communitySlug ? `/communities/${post.communitySlug}` : "/communities",
+      );
     } catch {
       toast.error(t("deleteError"));
     } finally {
