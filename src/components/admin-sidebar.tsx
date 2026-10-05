@@ -25,6 +25,8 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
 import { righteous } from "@/web/fonts";
 import { Logo } from "@/web/logo";
+import { api } from "@convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
 import {
   BarChart,
   Briefcase,
@@ -39,44 +41,44 @@ import {
   Users,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const t = useTranslations("admin");
   const router = useRouter();
   const pathname = usePathname();
   const { isMobile, setOpenMobile } = useSidebar();
-
-  // Mocked user for now
-  const user = {
-    name: "Admin",
-    email: "super_admin@hallo.com",
-    image: "",
-    role: "super_admin",
-  };
+  const user = useQuery(api.auth.auth.getCurrentUser);
+  const userName = user?.name ?? t("sidebar.loadingUser");
+  const userImage =
+    user?.image?.startsWith("http") || user?.image?.startsWith("/")
+      ? user.image
+      : "";
 
   const navGroups = [
     {
-      label: "PRINCIPAL",
+      label: t("sidebar.main"),
       items: [
-        { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
-        { title: "Utilisateurs", url: "/admin/users", icon: Users },
-        { title: "Modération", url: "/admin/moderation", icon: ShieldAlert, badge: "5" },
+        { title: t("sidebar.dashboard"), url: "/admin", icon: LayoutDashboard },
+        { title: t("sidebar.users"), url: "/admin/users", icon: Users },
+        { title: t("sidebar.moderation"), url: "/admin/moderation", icon: ShieldAlert, badge: "5" },
       ],
     },
     {
-      label: "CONTENU",
+      label: t("sidebar.content"),
       items: [
-        { title: "Offres d'emploi", url: "/admin/jobs", icon: Briefcase },
-        { title: "Immobilier", url: "/admin/listing", icon: Building },
-        { title: "Communautés", url: "/admin/communities", icon: Users },
+        { title: t("sidebar.jobs"), url: "/admin/jobs", icon: Briefcase },
+        { title: t("sidebar.listing"), url: "/admin/listing", icon: Building },
+        { title: t("sidebar.communities"), url: "/admin/communities", icon: Users },
       ],
     },
     {
-      label: "SYSTÈME",
+      label: t("sidebar.system"),
       items: [
-        { title: "Statistiques", url: "/admin/statistics", icon: BarChart },
-        { title: "Paramètres", url: "/admin/settings", icon: Settings },
-        { title: "Audit log", url: "/admin/audit", icon: ShieldCheck },
+        { title: t("sidebar.statistics"), url: "/admin/statistics", icon: BarChart },
+        { title: t("sidebar.settings"), url: "/admin/settings", icon: Settings },
+        { title: t("sidebar.audit"), url: "/admin/audit", icon: ShieldCheck },
       ],
     },
   ];
@@ -109,7 +111,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
                   <span className={`${righteous.className} text-lg text-primary leading-none`}>
                     Hallo Hallo
                   </span>
-                  <span className="text-xs text-muted-foreground">Admin panel</span>
+                  <span className="text-xs text-muted-foreground">{t("panel")}</span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -171,14 +173,16 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
                   <Avatar className="h-8 w-8 rounded-lg bg-primary/20">
-                    <AvatarImage src={user.image || ""} alt={user.name || ""} />
+                    <AvatarImage src={userImage} alt={userName} />
                     <AvatarFallback className="rounded-lg text-primary font-semibold">
-                      {user.name.substring(0, 2).toUpperCase()}
+                      {userName.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">{user.name}</span>
-                    <span className="truncate text-xs text-muted-foreground">{user.role}</span>
+                    <span className="truncate font-semibold">{userName}</span>
+                    <span className="truncate text-xs text-muted-foreground">
+                      {user?.email ?? ""}
+                    </span>
                   </div>
                   <ChevronsUpDown className="ml-auto size-4" />
                 </SidebarMenuButton>
@@ -196,7 +200,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
                     onClick={() => isMobile && setOpenMobile(false)}
                   >
                     <User className="mr-2 size-4" />
-                    Retour au site
+                    {t("sidebar.returnSite")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -205,7 +209,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
                   className="cursor-pointer text-destructive focus:bg-destructive focus:text-destructive-foreground focus:opacity-90"
                 >
                   <LogOut className="mr-2 size-4" />
-                  <span>Déconnexion</span>
+                  <span>{t("sidebar.logout")}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
