@@ -45,11 +45,11 @@ export function PostCard({
       <div className="flex sm:flex-row flex-col text-xs text-muted-foreground mb-2">
         <div className="flex flex-wrap items-center gap-1.5">
           <Link
-            href={`/hl/${post.author.slug}`}
+            href={`/hl/${post.author?.slug ?? ""}`}
             className="flex items-center gap-1.5 group/author"
           >
             <Avatar className="size-5">
-              <AvatarImage src={post.author.image ?? "/random-user.png"} />
+              <AvatarImage src={post.author?.image ?? "/random-user.png"} />
               <AvatarFallback className="text-[10px]">
                 {post.authorName?.slice(0, 2)?.toUpperCase()}
               </AvatarFallback>

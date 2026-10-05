@@ -101,4 +101,29 @@ describe("Chat", () => {
     });
     expect(deletedMsg).toBeNull();
   });
+
+  it("should refuse messages outside the user's communities", async () => {
+    const otherCommunityId = await t.run(async (ctx) => {
+      const id = await ctx.db.insert("communities", {
+        slug: "other-community",
+        name: "Other Community",
+        description: "Private membership boundary",
+        authorId: "anotherUserId",
+        privacy: "public",
+      });
+      await ctx.db.insert("communityMessages", {
+        communityId: id,
+        authorId: "anotherUserId",
+        content: "Not for this member",
+      });
+      return id;
+    });
+
+    await expect(
+      t.query(api.chat.queries.getMessages, {
+        communityId: otherCommunityId,
+        paginationOpts: { cursor: null, numItems: 10 },
+      }),
+    ).rejects.toThrow("Community membership required");
+  });
 });

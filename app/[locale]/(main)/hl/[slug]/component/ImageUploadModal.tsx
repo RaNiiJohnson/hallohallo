@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import { cn } from "@/lib/utils";
-import { Id } from "@convex/betterAuth/_generated/dataModel";
 import { Camera, ImageIcon, Loader2, Upload, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
@@ -20,7 +19,7 @@ import { useTransition } from "react";
 type ImageType = "profile" | "cover";
 
 interface ImageUploadModalProps {
-  userId: Id<"user">;
+  userId: string;
   imageType: ImageType;
   open: boolean;
   onOpenChange: (open: boolean) => void;

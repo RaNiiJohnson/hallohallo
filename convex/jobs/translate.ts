@@ -1,7 +1,8 @@
 import { v } from "convex/values";
 import { api, internal } from "../_generated/api";
-import { action, internalMutation, query } from "../functions";
+import { authAction, internalMutation, query } from "../functions";
 import { languageValidator } from "../translations/shared";
+import { enforceTranslationLimits } from "../translations/security";
 import { translateWithOpenAI } from "../translations/translate.lib";
 
 type JobFields = { title: string; description: string; city: string };
@@ -71,7 +72,7 @@ export const saveTranslation = internalMutation({
 });
 
 // ---------- Action ----------
-export const translateJob = action({
+export const translateJob = authAction({
   args: { jobId: v.id("JobOffer"), targetLanguage: languageValidator },
   returns: v.object({
     title: v.string(),
@@ -95,6 +96,11 @@ export const translateJob = action({
         city: cached.city,
       };
     }
+
+    await enforceTranslationLimits(ctx, {
+      userId: ctx.user._id,
+      resourceKey: `job:${args.jobId}:${args.targetLanguage}:${job.updatedAt}`,
+    });
 
     const translated = await translateWithOpenAI(
       "job",

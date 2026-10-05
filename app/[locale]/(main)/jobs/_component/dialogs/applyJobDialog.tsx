@@ -109,7 +109,6 @@ export function ApplyJobDialog({
 
         await applyToJob({
           jobId: jobOffer._id,
-          cvStorageId: cvStorageId,
           coverLetter: coverLetter.trim() || undefined,
         });
 

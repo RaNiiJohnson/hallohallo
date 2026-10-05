@@ -1,7 +1,8 @@
 import { v } from "convex/values";
 import { render } from "react-email";
-import { api } from "../_generated/api";
+import { api, internal } from "../_generated/api";
 import { authAction } from "../functions";
+import { r2 } from "../integrations/r2";
 import { resend } from "../sendEmails";
 import { throwForbidden, throwNotFound } from "../utils/errors";
 import NewApplicationEmail from "./CvTemplate";
@@ -9,9 +10,9 @@ import NewApplicationEmail from "./CvTemplate";
 export const applyToJob = authAction({
   args: {
     jobId: v.id("JobOffer"),
-    cvStorageId: v.string(),
     coverLetter: v.optional(v.string()),
   },
+  returns: v.null(),
   handler: async (ctx, args) => {
     const user = ctx.user;
 
@@ -25,19 +26,18 @@ export const applyToJob = authAction({
         throwNotFound("Job not found");
       }
 
-      const cvUrl = await ctx.runQuery(api.jobs.queries.getR2FileUrl, {
-        storageId: args.cvStorageId,
-      });
+      if (!user.cv) throwNotFound("CV not found");
+      const cvUrl = await r2.getUrl(user.cv);
       if (!cvUrl) {
         throwNotFound("CV not found");
       }
 
       let contactEmail = job.contact?.email;
       if (!contactEmail) {
-        const authorUser = await ctx.runQuery(api.auth.users.getUserById, {
-          id: job.authorId,
-        });
-        contactEmail = authorUser?.email;
+        contactEmail =
+          (await ctx.runQuery(internal.auth.users.getContactEmailById, {
+            id: job.authorId,
+          })) ?? undefined;
       }
       if (!contactEmail) {
         throwNotFound("No contact email found for this job.");
@@ -63,6 +63,8 @@ export const applyToJob = authAction({
         subject: `Nouvelle candidature pour: ${job.title}`,
         html,
       });
+
+      return null;
 
       // await posthog.capture(ctx, {
       //   distinctId,

@@ -1,7 +1,11 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
 import { authMutation } from "../functions";
-import { r2 } from "../integrations/r2";
+import {
+  assertVerifiedUpload,
+  consumeUploadGrant,
+  r2,
+} from "../integrations/r2";
 import { throwForbidden, throwNotFound } from "../utils/errors";
 
 const imageValidator = v.object({
@@ -58,6 +62,17 @@ export const createListing = authMutation({
       throwForbidden("Only providers or admins can publish listings");
     }
 
+    const uploadedKeys = args.images.flatMap((image) =>
+      image.storageId ? [image.storageId] : [],
+    );
+    for (const key of new Set(uploadedKeys)) {
+      await assertVerifiedUpload(ctx, {
+        key,
+        userId: user._id,
+        kind: "listing",
+      });
+    }
+
     const searchAllContent = `${args.title} ${args.propertyType} ${args.listingMode} ${args.city} ${args.description}`;
 
     const listingId = await ctx.db.insert("RealestateListing", {
@@ -69,6 +84,10 @@ export const createListing = authMutation({
       searchAll: searchAllContent,
       currency: "EUR",
     });
+
+    for (const key of new Set(uploadedKeys)) {
+      await consumeUploadGrant(ctx, key);
+    }
 
     // await posthog.capture(ctx, {
     //   distinctId: posthogDistinctId(user._id),
@@ -209,6 +228,15 @@ export const updateListing = authMutation({
           .map((img) => img.storageId!),
       );
       const removedKeys = [...oldKeys].filter((k) => !newKeys.has(k));
+      const addedKeys = [...newKeys].filter((k) => !oldKeys.has(k));
+
+      for (const key of addedKeys) {
+        await assertVerifiedUpload(ctx, {
+          key,
+          userId: ctx.user._id,
+          kind: "listing",
+        });
+      }
 
       const results = await Promise.allSettled(
         removedKeys.map((key) => r2.deleteObject(ctx, key)),
@@ -219,6 +247,10 @@ export const updateListing = authMutation({
           `updateListing ${listingId}: ${failed.length} ancienne(s) image(s) R2 non supprimée(s)`,
           failed,
         );
+      }
+
+      for (const key of addedKeys) {
+        await consumeUploadGrant(ctx, key);
       }
     }
 

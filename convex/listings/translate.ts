@@ -1,7 +1,8 @@
 import { v } from "convex/values";
 import { api, internal } from "../_generated/api";
-import { action, internalMutation, query } from "../functions";
+import { authAction, internalMutation, query } from "../functions";
 import { languageValidator } from "../translations/shared";
+import { enforceTranslationLimits } from "../translations/security";
 import { translateWithOpenAI } from "../translations/translate.lib";
 
 type ListingFields = {
@@ -68,7 +69,7 @@ export const saveTranslation = internalMutation({
   },
 });
 
-export const translateListing = action({
+export const translateListing = authAction({
   args: {
     listingId: v.id("RealestateListing"),
     targetLanguage: languageValidator,
@@ -95,6 +96,11 @@ export const translateListing = action({
         city: cached.city,
       };
     }
+
+    await enforceTranslationLimits(ctx, {
+      userId: ctx.user._id,
+      resourceKey: `listing:${args.listingId}:${args.targetLanguage}:${listing.updatedAt}`,
+    });
 
     const translated = await translateWithOpenAI(
       "listing",

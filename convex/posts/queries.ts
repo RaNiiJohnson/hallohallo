@@ -12,7 +12,6 @@ import {
   postSortedByLikes,
 } from "../aggregates";
 import { authComponent } from "../auth/auth";
-import { UserType } from "../betterAuth/users";
 
 type AuthUser = Awaited<ReturnType<typeof authComponent.safeGetAuthUser>>;
 
@@ -282,7 +281,7 @@ export const getSortedPosts = query({
           if (existingBookmark) isBookmarked = true;
         }
 
-        const author: UserType = await ctx.runQuery(
+        const author = await ctx.runQuery(
           components.betterAuth.users.getUserById,
           { id: post.authorId },
         );

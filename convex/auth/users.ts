@@ -1,14 +1,14 @@
 import { partial } from "convex-helpers/validators";
 import { v } from "convex/values";
 import { components } from "../_generated/api";
+import type { Doc as BetterAuthDoc } from "../betterAuth/_generated/dataModel";
 import { UserType, userValidator } from "../betterAuth/users";
-import { authMutation, query } from "../functions";
+import { publicUserValidator } from "../betterAuth/publicUser";
+import { authMutation, internalQuery, query } from "../functions";
 import { authComponent } from "./auth";
 
 const editableUserFields = userValidator.pick(
   "name",
-  "image",
-  "coverImage",
   "slug",
   "headline",
   "bio",
@@ -26,12 +26,9 @@ const editableUserFields = userValidator.pick(
   "isServiceProvider",
   "isPublic",
   "showEmail",
-  "showPhone",
-  "cv",
-  "userType",
 );
 
-export type UserWithRoleType = UserType & {
+export type UserWithRoleType = BetterAuthDoc<"user"> & {
   id: string;
   role?: string | undefined;
   banned: boolean | null;
@@ -41,11 +38,14 @@ export type UserWithRoleType = UserType & {
 
 export const getUserBySlug = query({
   args: { slug: v.string() },
+  returns: v.union(publicUserValidator, v.null()),
   handler: async (ctx, { slug }) => {
-    const user: UserType = await ctx.runQuery(
+    const viewer = await authComponent.safeGetAuthUser(ctx);
+    const user: UserType | null = await ctx.runQuery(
       components.betterAuth.users.getUserBySlug,
       {
         slug,
+        viewerId: viewer?._id,
       },
     );
 
@@ -59,11 +59,14 @@ export const getUserBySlug = query({
 
 export const getUserById = query({
   args: { id: v.string() },
+  returns: v.union(publicUserValidator, v.null()),
   handler: async (ctx, { id }) => {
-    const user: UserType = await ctx.runQuery(
+    const viewer = await authComponent.safeGetAuthUser(ctx);
+    const user: UserType | null = await ctx.runQuery(
       components.betterAuth.users.getUserById,
       {
         id,
+        viewerId: viewer?._id,
       },
     );
 
@@ -77,6 +80,7 @@ export const getUserById = query({
 
 export const getAllUsers = query({
   args: {},
+  returns: v.array(publicUserValidator),
   handler: async (ctx) => {
     const users: UserType[] = await ctx.runQuery(
       components.betterAuth.users.getAllUsers,
@@ -91,6 +95,16 @@ export const getAllUsers = query({
 
     // Resolve image URLs in this context
     return filtered;
+  },
+});
+
+export const getContactEmailById = internalQuery({
+  args: { id: v.string() },
+  returns: v.union(v.string(), v.null()),
+  handler: async (ctx, { id }) => {
+    return await ctx.runQuery(components.betterAuth.users.getContactEmailById, {
+      id,
+    });
   },
 });
 

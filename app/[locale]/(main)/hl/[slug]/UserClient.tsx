@@ -30,7 +30,7 @@ export default function UserClient({
     return notFound();
   }
 
-  const isOwnProfile = currentUser?.email === user.email;
+  const isOwnProfile = currentUser?._id === user._id;
 
   return (
     <div className="lg:max-w-4xl mx-auto my-4 lg:space-y-4 sm:space-y-2 space-y-1.5 sm:px-0">

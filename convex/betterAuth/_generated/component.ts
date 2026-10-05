@@ -1203,19 +1203,107 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
       >;
     };
     users: {
-      getAllUsers: FunctionReference<"query", "internal", {}, any, Name>;
-      getUserById: FunctionReference<
+      getAllUsers: FunctionReference<
+        "query",
+        "internal",
+        {},
+        Array<{
+          _id: string;
+          arrivalDate?: null | number;
+          bio?: null | string;
+          city?: null | string;
+          company?: null | string;
+          country?: null | string;
+          coverImage?: null | string;
+          email?: string;
+          experienceYears?: null | number;
+          field?: null | string;
+          hasCv?: boolean;
+          headline?: null | string;
+          image?: null | string;
+          industry?: null | string;
+          isPublic: boolean;
+          isServiceProvider?: null | boolean;
+          journey?: null | Array<string>;
+          name: string;
+          roles?: null | Array<string>;
+          showEmail: boolean;
+          skills?: null | Array<string>;
+          slug?: null | string;
+          status?: null | string;
+          userType?: null | string;
+        }>,
+        Name
+      >;
+      getContactEmailById: FunctionReference<
         "query",
         "internal",
         { id: string },
-        any,
+        string | null,
+        Name
+      >;
+      getUserById: FunctionReference<
+        "query",
+        "internal",
+        { id: string; viewerId?: string },
+        {
+          _id: string;
+          arrivalDate?: null | number;
+          bio?: null | string;
+          city?: null | string;
+          company?: null | string;
+          country?: null | string;
+          coverImage?: null | string;
+          email?: string;
+          experienceYears?: null | number;
+          field?: null | string;
+          hasCv?: boolean;
+          headline?: null | string;
+          image?: null | string;
+          industry?: null | string;
+          isPublic: boolean;
+          isServiceProvider?: null | boolean;
+          journey?: null | Array<string>;
+          name: string;
+          roles?: null | Array<string>;
+          showEmail: boolean;
+          skills?: null | Array<string>;
+          slug?: null | string;
+          status?: null | string;
+          userType?: null | string;
+        } | null,
         Name
       >;
       getUserBySlug: FunctionReference<
         "query",
         "internal",
-        { slug: string },
-        any,
+        { slug: string; viewerId?: string },
+        {
+          _id: string;
+          arrivalDate?: null | number;
+          bio?: null | string;
+          city?: null | string;
+          company?: null | string;
+          country?: null | string;
+          coverImage?: null | string;
+          email?: string;
+          experienceYears?: null | number;
+          field?: null | string;
+          hasCv?: boolean;
+          headline?: null | string;
+          image?: null | string;
+          industry?: null | string;
+          isPublic: boolean;
+          isServiceProvider?: null | boolean;
+          journey?: null | Array<string>;
+          name: string;
+          roles?: null | Array<string>;
+          showEmail: boolean;
+          skills?: null | Array<string>;
+          slug?: null | string;
+          status?: null | string;
+          userType?: null | string;
+        } | null,
         Name
       >;
       updateUser: FunctionReference<

@@ -1,14 +1,30 @@
-import { paginationOptsValidator } from "convex/server";
+import { paginationOptsValidator, paginationResultValidator } from "convex/server";
 import { v } from "convex/values";
-import { query } from "../_generated/server";
+import schema from "../schema";
+import { authQuery, query } from "../functions";
 import { authComponent } from "../auth/auth";
+import { throwForbidden, throwNotFound } from "../utils/errors";
 
-export const getMessages = query({
+export const getMessages = authQuery({
   args: {
     communityId: v.id("communities"),
     paginationOpts: paginationOptsValidator,
   },
+  returns: paginationResultValidator(schema.doc("communityMessages")),
   handler: async (ctx, args) => {
+    const community = await ctx.db.get(args.communityId);
+    if (!community) throwNotFound("Community not found");
+
+    const membership = await ctx.db
+      .query("communityMembers")
+      .withIndex("by_userId_communityId", (q) =>
+        q.eq("userId", ctx.user._id).eq("communityId", args.communityId),
+      )
+      .unique();
+    if (!membership) {
+      throwForbidden("Community membership required");
+    }
+
     return await ctx.db
       .query("communityMessages")
       .withIndex("by_communityId", (q) => q.eq("communityId", args.communityId))

@@ -66,7 +66,6 @@ function buildDefaultValues(user: UserType) {
     isServiceProvider: !!user.isServiceProvider,
     isPublic: user.isPublic ?? true,
     showEmail: !!user.showEmail,
-    showPhone: !!user.showPhone,
   };
 }
 
@@ -96,7 +95,6 @@ export function ProfileEditForm({ user, onSaved }: ProfileEditFormProps) {
     isServiceProvider: z.boolean(),
     isPublic: z.boolean(),
     showEmail: z.boolean(),
-    showPhone: z.boolean(),
   });
 
   type FormSchema = z.infer<typeof formSchema>;
@@ -130,7 +128,6 @@ export function ProfileEditForm({ user, onSaved }: ProfileEditFormProps) {
           isServiceProvider: data.isServiceProvider,
           isPublic: data.isPublic,
           showEmail: data.showEmail,
-          showPhone: data.showPhone,
         },
       });
       toast.success(t("saveSuccess"));
@@ -190,7 +187,7 @@ export function ProfileEditForm({ user, onSaved }: ProfileEditFormProps) {
               <FieldLabel htmlFor="profile-email">
                 {t("editForm.email")}
               </FieldLabel>
-              <Input id="profile-email" value={user.email} disabled />
+              <Input id="profile-email" value={user.email ?? ""} disabled />
             </Field>
 
             <Controller
@@ -547,21 +544,6 @@ export function ProfileEditForm({ user, onSaved }: ProfileEditFormProps) {
               )}
             />
 
-            <Controller
-              name="showPhone"
-              control={form.control}
-              render={({ field }) => (
-                <Field orientation="horizontal" className="py-2">
-                  <p className="font-medium text-sm">
-                    {t("editForm.showPhone")}
-                  </p>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </Field>
-              )}
-            />
           </FieldGroup>
         </FieldGroup>
       </form>
