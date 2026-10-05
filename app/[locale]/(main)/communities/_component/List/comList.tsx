@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
+import { shouldShowPostPagination } from "@/lib/post-pagination";
 
 import { ComListSkeleton } from "./ComListSkeleton";
 import { EmptyCommunities } from "./EmptyCommunities";
@@ -38,7 +39,8 @@ export default function ComList() {
   );
 
   const handleLike = async (postId: Id<"posts">) => {
-    if (!isAuthenticated) return toast.error("Connectez-vous pour liker");
+    if (!isAuthenticated)
+      return toast.error(t("community.loginToLike"));
     await likePost({ postId });
   };
 
@@ -63,7 +65,7 @@ export default function ComList() {
           {result.posts.length === 0 ? (
             <div className="px-4 mt-4">
               <p className="text-muted-foreground mb-4 text-center">
-                Aucun post pour le moment.
+                {t("community.emptyPosts")}
               </p>
             </div>
           ) : (
@@ -72,7 +74,7 @@ export default function ComList() {
             ))
           )}
 
-          {result.posts.length > PAGE_SIZE && (
+          {shouldShowPostPagination(result) && (
             <PostPagination
               mode={mode}
               result={result}

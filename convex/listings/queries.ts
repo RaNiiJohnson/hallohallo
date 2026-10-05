@@ -9,6 +9,7 @@ import { DataModel, Id } from "../_generated/dataModel";
 import { authComponent } from "../auth/auth";
 import { query } from "../functions";
 import { r2 } from "../integrations/r2";
+import { resolveListingImages } from "./imageUrls";
 
 // Resolve R2 storageId keys to signed URLs.
 // Falls back to the old Cloudinary secureUrl for existing records.
@@ -20,17 +21,7 @@ async function resolveImages(
     secureUrl?: string;
   }>,
 ) {
-  return Promise.all(
-    images.map(async (img) => {
-      if (img.storageId) {
-        // r2.getUrl generates a signed URL for the given object key
-        const url = await r2.getUrl(img.storageId);
-        return { ...img, url: url ?? img.secureUrl ?? "" };
-      }
-      // Legacy Cloudinary record: keep secureUrl as url
-      return { ...img, url: img.secureUrl ?? "" };
-    }),
-  );
+  return await resolveListingImages(images, (key) => r2.getUrl(key));
 }
 
 export const getListingWithContact = query({
@@ -82,7 +73,11 @@ export const getListingMetadata = query({
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .unique();
 
-    return listing;
+    if (!listing) return null;
+    return {
+      ...listing,
+      images: await resolveImages(listing.images ?? []),
+    };
   },
 });
 
