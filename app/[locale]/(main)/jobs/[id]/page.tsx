@@ -18,7 +18,6 @@ import { useAction, useConvexAuth } from "convex/react";
 import {
   ArrowLeft,
   Award,
-  Bookmark,
   Briefcase,
   Building2,
   ChevronRight,
@@ -33,6 +32,7 @@ import { toast } from "sonner";
 import { ApplyJobDialog } from "../_component/dialogs/applyJobDialog";
 import DeleteJobDialog from "../_component/dialogs/deleteJobDialog";
 import { SalaryDisplay } from "../_component/salary";
+import { JobBookmarkButton } from "../_component/JobBookmarkButton";
 import { JobDetailsSkeleton } from "../_component/skeleton";
 import { EditJobDialog } from "./_component/editJobDialog";
 
@@ -202,9 +202,11 @@ export default function JobDetailsPage() {
 
                     <ShareButton text={jobOffer.title} jobPage={true} />
 
-                    <Button variant="outline" size="sm">
-                      <Bookmark className="w-4 h-4" />
-                    </Button>
+                    <JobBookmarkButton
+                      jobId={jobOffer._id}
+                      initialBookmark={jobOffer.isBookmarked}
+                      className="mt-0 h-8 w-8"
+                    />
                   </ButtonGroup>
                 )}
               </div>

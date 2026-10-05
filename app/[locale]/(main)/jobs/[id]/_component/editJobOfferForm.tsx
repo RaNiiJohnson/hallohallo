@@ -44,6 +44,7 @@ import { ChevronLeft, ChevronRight, XIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { LocationPicker } from "@/lib/LocationPicker";
+import { runMutationWorkflow } from "@/lib/mutation-workflow";
 import {
   contractTypeValues,
   jobTypeValues,
@@ -59,7 +60,7 @@ export function EditJobOfferForm({
   onSuccess,
 }: EditJobOfferFormProps) {
   const t = useTranslations("jobs");
-  const uptdateJob = useMutation(api.jobs.mutations.updateJob);
+  const updateJob = useMutation(api.jobs.mutations.updateJob);
   const [currentStep, setCurrentStep] = useState(1);
 
   const formSchema = z.object({
@@ -162,31 +163,37 @@ export function EditJobOfferForm({
     }
   };
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    try {
-      uptdateJob({
-        id: jobOffer._id,
-        title: data.title,
-        type: data.type,
-        location: data.location,
-        contractType: data.contractType,
-        city: data.city,
-        duration: data.duration,
-        startDate: data.startDate,
-        company: data.company,
-        description: data.description,
-        certificates:
-          data.certificates
-            ?.map((cert) => cert.certificate)
-            .filter((cert) => cert.trim() !== "") || [],
-        salary: Number(data.salary),
-        salaryPeriod: data.salaryPeriod,
-      });
-      toast.success(t("form.messages.success"));
-      onSuccess?.();
-    } catch {
-      toast.error(t("form.messages.error"));
-    }
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    await runMutationWorkflow({
+      mutation: () =>
+        updateJob({
+          id: jobOffer._id,
+          title: data.title,
+          type: data.type,
+          location: data.location,
+          contractType: data.contractType,
+          city: data.city,
+          duration: data.duration,
+          startDate: data.startDate,
+          company: data.company,
+          description: data.description,
+          certificates:
+            data.certificates
+              ?.map((cert) => cert.certificate)
+              .filter((cert) => cert.trim() !== "") || [],
+          salary: Number(data.salary),
+          salaryPeriod: data.salaryPeriod,
+        }),
+      onSuccess: () => {
+        toast.success(t("form.messages.success"));
+        onSuccess?.();
+      },
+      onError: (error) => {
+        toast.error(t("form.messages.error"), {
+          description: error instanceof Error ? error.message : undefined,
+        });
+      },
+    });
   }
 
   return (
