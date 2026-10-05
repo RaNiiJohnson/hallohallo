@@ -28,6 +28,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
+import { getAccountNavigation } from "@/lib/navigation-routes";
 import { righteous } from "@/web/fonts";
 import { Logo } from "@/web/logo";
 import { api } from "@convex/_generated/api";
@@ -41,7 +42,6 @@ import {
   Home,
   LogOut,
   Menu,
-  Settings,
   Shield,
   User,
   Users,
@@ -487,26 +487,18 @@ function AuthControls({
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link
-                  href={`/hl/${user.slug}`}
-                  className="cursor-pointer"
-                  onClick={onNavigate}
-                >
-                  <User className="size-4" />
-                  {t("auth.profile")}
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link
-                  href="/settings"
-                  className="cursor-pointer"
-                  onClick={onNavigate}
-                >
-                  <Settings className="size-4" />
-                  {t("auth.settings")}
-                </Link>
-              </DropdownMenuItem>
+              {getAccountNavigation(user.slug).map((item) => (
+                <DropdownMenuItem asChild key={item.key}>
+                  <Link
+                    href={item.href}
+                    className="cursor-pointer"
+                    onClick={onNavigate}
+                  >
+                    <User className="size-4" />
+                    {t(`auth.${item.key}`)}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={onLogOut}

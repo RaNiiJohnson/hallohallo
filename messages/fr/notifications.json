@@ -1,0 +1,19 @@
+{
+  "title": "Notifications",
+  "description": "Vos notifications récentes",
+  "empty": "Aucune notification",
+  "markAllRead": "Tout marquer comme lu",
+  "open": "Ouvrir les notifications",
+  "close": "Fermer les notifications",
+  "someone": "Quelqu’un",
+  "fallback": "Nouvelle activité",
+  "messages": {
+    "new_comment": "{name} a commenté votre publication",
+    "new_reply": "{name} a répondu à votre commentaire",
+    "new_like": "{name} a aimé votre publication",
+    "new_comment_like": "{name} a aimé votre commentaire",
+    "new_reply_like": "{name} a aimé votre réponse",
+    "new_member": "{name} a rejoint votre communauté",
+    "leave_community": "{name} a quitté votre communauté"
+  }
+}

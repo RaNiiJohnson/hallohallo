@@ -1,0 +1,19 @@
+{
+  "title": "Benachrichtigungen",
+  "description": "Deine neuesten Benachrichtigungen",
+  "empty": "Keine Benachrichtigungen",
+  "markAllRead": "Alle als gelesen markieren",
+  "open": "Benachrichtigungen öffnen",
+  "close": "Benachrichtigungen schließen",
+  "someone": "Jemand",
+  "fallback": "Neue Aktivität",
+  "messages": {
+    "new_comment": "{name} hat deinen Beitrag kommentiert",
+    "new_reply": "{name} hat auf deinen Kommentar geantwortet",
+    "new_like": "{name} gefällt dein Beitrag",
+    "new_comment_like": "{name} gefällt dein Kommentar",
+    "new_reply_like": "{name} gefällt deine Antwort",
+    "new_member": "{name} ist deiner Community beigetreten",
+    "leave_community": "{name} hat deine Community verlassen"
+  }
+}

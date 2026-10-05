@@ -27,6 +27,13 @@
     "allTypes": "Alle",
     "bookmarked": "Gespeicherte"
   },
+  "bookmark": {
+    "added": "Stellenangebot gespeichert",
+    "removed": "Stellenangebot aus Favoriten entfernt",
+    "error": "Favorit konnte nicht aktualisiert werden",
+    "addLabel": "Zu Favoriten hinzufügen",
+    "removeLabel": "Aus Favoriten entfernen"
+  },
   "form": {
     "steps": {
       "basicInfo": "Grundlegende Informationen",

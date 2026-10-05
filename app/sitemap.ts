@@ -1,11 +1,10 @@
 import { MetadataRoute } from "next";
+import { sitemapRoutes } from "../src/lib/navigation-routes";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://hallomada.de";
 
-  const routes = ["", "/jobs", "/listings", "/communities"];
-
-  return routes.map((route) => ({
+  return sitemapRoutes.map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: route === "" ? "monthly" : "weekly",

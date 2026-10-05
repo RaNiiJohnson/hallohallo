@@ -131,7 +131,6 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          rm -rf .vercel
           pnpm dlx vercel@latest link \
             --yes \
             --scope="$VERCEL_ORG_ID" \
@@ -204,7 +203,6 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          rm -rf .vercel
           pnpm dlx vercel@latest link \
             --yes \
             --scope="$VERCEL_ORG_ID" \

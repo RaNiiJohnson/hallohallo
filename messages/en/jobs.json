@@ -27,6 +27,13 @@
     "allTypes": "All",
     "bookmarked": "Bookmarked"
   },
+  "bookmark": {
+    "added": "Job saved",
+    "removed": "Job removed from favorites",
+    "error": "Unable to update favorite",
+    "addLabel": "Add to favorites",
+    "removeLabel": "Remove from favorites"
+  },
   "form": {
     "steps": {
       "basicInfo": "Basic info",
