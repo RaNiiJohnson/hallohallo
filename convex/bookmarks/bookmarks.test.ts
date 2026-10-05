@@ -65,4 +65,76 @@ describe("Bookmarks", () => {
     });
     expect(result2.bookmarked).toBe(false);
   });
+
+  it("refuses a resource id whose table does not match its type", async () => {
+    await expect(
+      t.mutation(api.bookmarks.mutations.toggleBookmark, {
+        resourceId: postId,
+        resourceType: "job",
+      }),
+    ).rejects.toThrow("Resource type and identifier do not match");
+  });
+
+  it("refuses a resource that no longer exists", async () => {
+    await t.run(async (ctx) => await ctx.db.delete(postId));
+
+    await expect(
+      t.mutation(api.bookmarks.mutations.toggleBookmark, {
+        resourceId: postId,
+        resourceType: "post",
+      }),
+    ).rejects.toThrow("Bookmark resource not found");
+  });
+
+  it("removes every legacy duplicate and preserves logical uniqueness", async () => {
+    await t.run(async (ctx) => {
+      await ctx.db.insert("bookmarks", {
+        userId: "testUserId",
+        resourceId: postId,
+        resourceType: "post",
+      });
+      await ctx.db.insert("bookmarks", {
+        userId: "testUserId",
+        resourceId: postId,
+        resourceType: "post",
+      });
+    });
+
+    const removed = await t.mutation(
+      api.bookmarks.mutations.toggleBookmark,
+      { resourceId: postId, resourceType: "post" },
+    );
+    expect(removed.bookmarked).toBe(false);
+
+    const afterRemoval = await t.query(
+      api.bookmarks.queries.getMyBookmarks,
+      {},
+    );
+    expect(afterRemoval).toHaveLength(0);
+
+    await t.mutation(api.bookmarks.mutations.toggleBookmark, {
+      resourceId: postId,
+      resourceType: "post",
+    });
+    const afterInsert = await t.query(
+      api.bookmarks.queries.getMyBookmarks,
+      {},
+    );
+    expect(afterInsert).toHaveLength(1);
+  });
+
+  it("bounds the public bookmark list", async () => {
+    await t.run(async (ctx) => {
+      for (let index = 0; index < 105; index += 1) {
+        await ctx.db.insert("bookmarks", {
+          userId: "testUserId",
+          resourceId: postId,
+          resourceType: "post",
+        });
+      }
+    });
+
+    const bookmarks = await t.query(api.bookmarks.queries.getMyBookmarks, {});
+    expect(bookmarks).toHaveLength(100);
+  });
 });

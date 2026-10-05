@@ -109,6 +109,38 @@ describe("Jobs", () => {
     expect(result).toBeNull();
   });
 
+  it("deletes job translations, contact information, and bookmarks", async () => {
+    const descendants = await t.run(async (ctx) => {
+      const translationId = await ctx.db.insert("jobTranslations", {
+        jobId,
+        language: "en",
+        title: "Translation",
+        city: "City",
+        description: "Description",
+        sourceUpdatedAt: Date.now(),
+      });
+      const contactId = await ctx.db.insert("JobContactInfo", {
+        jobId,
+        email: "owner@example.com",
+      });
+      const bookmarkId = await ctx.db.insert("bookmarks", {
+        userId: "bookmark-owner",
+        resourceId: jobId,
+        resourceType: "job",
+      });
+      return { translationId, contactId, bookmarkId };
+    });
+
+    await t.mutation(api.jobs.mutations.deleteJob, { id: jobId });
+
+    await t.run(async (ctx) => {
+      expect(await ctx.db.get(jobId)).toBeNull();
+      for (const id of Object.values(descendants)) {
+        expect(await ctx.db.get(id)).toBeNull();
+      }
+    });
+  });
+
   it("should refuse deletion by another authenticated user", async () => {
     authState.user._id = "anotherUserId";
     authState.user.id = "anotherUserId";
