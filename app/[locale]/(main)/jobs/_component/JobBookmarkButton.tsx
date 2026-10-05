@@ -8,6 +8,7 @@ import { useMutation } from "convex/react";
 import { Bookmark } from "lucide-react";
 import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 interface JobBookmarkButtonProps {
   jobId: string;
@@ -20,6 +21,7 @@ export const JobBookmarkButton = ({
   initialBookmark = false,
   className,
 }: JobBookmarkButtonProps) => {
+  const t = useTranslations("jobs.bookmark");
   const [optimisticIsBookmarked, setOptimisticIsBookmarked] = useOptimistic(
     initialBookmark,
     (_, newState: boolean) => newState,
@@ -42,11 +44,9 @@ export const JobBookmarkButton = ({
           resourceId: jobId as Id<"JobOffer">,
           resourceType: "job",
         });
-        toast.success(
-          newState ? "Offre enregistrée" : "Offre retirée des favoris",
-        );
+        toast.success(newState ? t("added") : t("removed"));
       } catch {
-        toast.error("Une erreur est survenue");
+        toast.error(t("error"));
       }
     });
   };
@@ -68,7 +68,7 @@ export const JobBookmarkButton = ({
         className={cn("w-4 h-4", optimisticIsBookmarked && "fill-current")}
       />
       <span className="sr-only">
-        {optimisticIsBookmarked ? "Retirer des favoris" : "Ajouter aux favoris"}
+        {optimisticIsBookmarked ? t("removeLabel") : t("addLabel")}
       </span>
     </Button>
   );

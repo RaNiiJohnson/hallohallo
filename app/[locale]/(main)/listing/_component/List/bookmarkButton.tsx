@@ -8,6 +8,7 @@ import { useMutation } from "convex/react";
 import { Heart } from "lucide-react";
 import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 interface BookmarkButtonProps {
   listingId: string;
@@ -20,6 +21,7 @@ export const BookmarkButton = ({
   initialBookmark = false,
   className,
 }: BookmarkButtonProps) => {
+  const t = useTranslations("listing.details");
   const [optimisticIsBookmarked, setOptimisticIsBookmarked] = useOptimistic(
     initialBookmark,
     (_, newState: boolean) => newState,
@@ -42,11 +44,9 @@ export const BookmarkButton = ({
           resourceId: listingId as Id<"RealestateListing">,
           resourceType: "realEstate",
         });
-        toast.success(
-          newState ? "Offre enregistrée" : "Offre retirée des favoris",
-        );
+        toast.success(newState ? t("bookmarkAdd") : t("bookmarkRemove"));
       } catch {
-        toast.error("Une erreur est survenue");
+        toast.error(t("bookmarkError"));
       }
     });
   };
@@ -67,7 +67,9 @@ export const BookmarkButton = ({
         <Heart className="size-4" />
       )}
       <span className="sr-only">
-        {optimisticIsBookmarked ? "Retirer des favoris" : "Ajouter aux favoris"}
+        {optimisticIsBookmarked
+          ? t("bookmarkRemoveLabel")
+          : t("bookmarkAddLabel")}
       </span>
     </Button>
   );

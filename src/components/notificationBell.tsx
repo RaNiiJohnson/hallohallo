@@ -21,6 +21,7 @@ import { useQuery } from "convex-helpers/react/cache";
 import { useConvexAuth, useMutation } from "convex/react";
 import { Bell, X } from "lucide-react";
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 const notificationIcon: Record<string, string> = {
   new_comment: "💬",
@@ -36,6 +37,7 @@ export function NotificationWidget() {
   const { isAuthenticated } = useConvexAuth();
   const { activeWidget, openWidget, closeWidget } = useWidget();
   const timeT = useTimeTranslations();
+  const t = useTranslations("notifications");
   const isMobile = useIsMobile();
 
   const isOpen = activeWidget === "notifications";
@@ -81,7 +83,7 @@ export function NotificationWidget() {
       {!notifications || notifications.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
           <Bell size={32} className="mb-2 opacity-40" />
-          <p className="text-sm">Aucune notification</p>
+          <p className="text-sm">{t("empty")}</p>
         </div>
       ) : (
         notifications.map((notif) => {
@@ -107,7 +109,10 @@ export function NotificationWidget() {
               </span>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-foreground leading-snug wrap-break-word">
-                  {notif.message}
+                  {t(
+                    `messages.${notif.type}` as Parameters<typeof t>[0],
+                    { name: notif.fromUserName ?? t("someone") },
+                  )}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   {getRelativeTime(notif._creationTime, timeT)}
@@ -130,6 +135,7 @@ export function NotificationWidget() {
           {!isOpen && (
             <button
               onClick={() => openWidget("notifications")}
+              aria-label={t("open")}
               className="relative w-12 h-12 rounded-full bg-card border border-border text-foreground flex items-center justify-center shadow-lg hover:bg-muted transition-colors"
             >
               <Bell size={18} />
@@ -150,16 +156,16 @@ export function NotificationWidget() {
               className="h-[85vh] p-0 flex flex-col rounded-t-2xl overflow-hidden border-t border-border bg-background"
               showCloseButton={false}
             >
-              <SheetTitle className="sr-only">Notifications</SheetTitle>
+              <SheetTitle className="sr-only">{t("title")}</SheetTitle>
               <SheetDescription className="sr-only">
-                Notifications
+                {t("description")}
               </SheetDescription>
               {/* Header */}
               <div className="flex items-center justify-between px-4 py-3.5 border-b border-border bg-card shrink-0">
                 <div className="flex items-center gap-2">
                   <Bell size={16} className="text-foreground" />
                   <span className="text-sm font-semibold text-foreground">
-                    Notifications
+                    {t("title")}
                   </span>
                   {unreadCount != null && unreadCount > 0 && (
                     <span className="bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full font-medium">
@@ -173,11 +179,12 @@ export function NotificationWidget() {
                       onClick={() => markAllRead()}
                       className="text-xs text-muted-foreground hover:text-foreground transition-colors py-1 px-2 hover:bg-muted rounded-md"
                     >
-                      Tout lu
+                      {t("markAllRead")}
                     </button>
                   )}
                   <button
                     onClick={() => closeWidget("notifications")}
+                    aria-label={t("close")}
                     className="text-muted-foreground hover:text-foreground transition-colors p-1 hover:bg-muted rounded-md"
                   >
                     <X className="size-5" />
@@ -191,7 +198,10 @@ export function NotificationWidget() {
       ) : (
         <Popover open={isOpen} onOpenChange={handleOpenChange}>
           <PopoverTrigger asChild>
-            <button className="relative w-12 h-12 rounded-full bg-card border border-border text-foreground flex items-center justify-center shadow-lg hover:bg-muted transition-colors">
+            <button
+              aria-label={t("open")}
+              className="relative w-12 h-12 rounded-full bg-card border border-border text-foreground flex items-center justify-center shadow-lg hover:bg-muted transition-colors"
+            >
               <Bell size={18} />
               {!isOpen && unreadCount != null && unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-medium">
@@ -212,7 +222,7 @@ export function NotificationWidget() {
               <div className="flex items-center gap-2">
                 <Bell size={15} className="text-foreground" />
                 <span className="text-sm font-semibold text-foreground">
-                  Notifications
+                  {t("title")}
                 </span>
                 {unreadCount != null && unreadCount > 0 && (
                   <span className="bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full font-medium">
@@ -225,7 +235,7 @@ export function NotificationWidget() {
                   onClick={() => markAllRead()}
                   className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  Tout lu
+                  {t("markAllRead")}
                 </button>
               )}
             </div>

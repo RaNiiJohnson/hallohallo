@@ -1,0 +1,19 @@
+{
+  "title": "Notifications",
+  "description": "Your recent notifications",
+  "empty": "No notifications",
+  "markAllRead": "Mark all as read",
+  "open": "Open notifications",
+  "close": "Close notifications",
+  "someone": "Someone",
+  "fallback": "New activity",
+  "messages": {
+    "new_comment": "{name} commented on your post",
+    "new_reply": "{name} replied to your comment",
+    "new_like": "{name} liked your post",
+    "new_comment_like": "{name} liked your comment",
+    "new_reply_like": "{name} liked your reply",
+    "new_member": "{name} joined your community",
+    "leave_community": "{name} left your community"
+  }
+}

@@ -197,6 +197,8 @@
     "bookmarkRemove": "Aus Favoriten entfernt",
     "bookmarkError": "Fehler beim Aktualisieren des Favoriten",
     "bookmarkBtn": "Favoriten",
+    "bookmarkAddLabel": "Zu Favoriten hinzufügen",
+    "bookmarkRemoveLabel": "Aus Favoriten entfernen",
     "featuresTitle": "Eigenschaften",
     "level": "Ebene",
     "available": "Verfügbar:",
