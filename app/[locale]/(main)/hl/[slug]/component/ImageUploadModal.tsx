@@ -10,16 +10,20 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useFileUpload } from "@/hooks/use-file-upload";
+import { useTypedR2Upload } from "@/hooks/use-r2-typed-upload";
 import { cn } from "@/lib/utils";
+import { api } from "@convex/_generated/api";
+import { useMutation } from "convex/react";
 import { Camera, ImageIcon, Loader2, Upload, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 type ImageType = "profile" | "cover";
 
 interface ImageUploadModalProps {
-  userId: string;
   imageType: ImageType;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -28,17 +32,25 @@ interface ImageUploadModalProps {
 }
 
 export function ImageUploadModal({
-  //   userId,
   imageType,
   open,
   onOpenChange,
   currentImageUrl,
-  // onSuccess,
+  onSuccess,
 }: ImageUploadModalProps) {
-  // const updateUser = useMutation(api.auth.users.updateUser);
   const t = useTranslations("profile.upload");
-
-  const [isPending] = useTransition();
+  const router = useRouter();
+  const [isPending, setIsPending] = useState(false);
+  const replaceProfileImage = useMutation(
+    api.integrations.r2.replaceProfileImage,
+  );
+  const { upload: uploadImage } = useTypedR2Upload(
+    imageType === "profile"
+      ? api.integrations.r2.generatePdpUploadUrl
+      : api.integrations.r2.generatePdcUploadUrl,
+    api.integrations.r2.syncMetadata,
+    { accept: "image/jpeg,image/png,image/webp,image/avif" },
+  );
 
   const [
     { files, isDragging, errors },
@@ -53,15 +65,32 @@ export function ImageUploadModal({
       clearFiles,
     },
   ] = useFileUpload({
-    accept: "image/*",
+    accept: "image/jpeg,image/png,image/webp,image/avif",
     maxSize: 5 * 1024 * 1024, // 5MB max
+    maxFiles: 1,
   });
 
   const selectedFile = files[0]?.file instanceof File ? files[0].file : null;
   const previewUrl = files[0]?.preview || null;
 
-  const handleUpload = () => {
-    if (!selectedFile) return;
+  const handleUpload = async () => {
+    if (!selectedFile || isPending) return;
+    setIsPending(true);
+    try {
+      const key = await uploadImage(selectedFile);
+      await replaceProfileImage({ key, imageType });
+      toast.success(t("toast.success"));
+      clearFiles();
+      onOpenChange(false);
+      onSuccess?.();
+      router.refresh();
+    } catch (error) {
+      toast.error(t("toast.uploadError"), {
+        description: error instanceof Error ? error.message : t("toast.error"),
+      });
+    } finally {
+      setIsPending(false);
+    }
   };
 
   const handleClose = () => {

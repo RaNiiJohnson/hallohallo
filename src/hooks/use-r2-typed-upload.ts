@@ -35,6 +35,47 @@ interface UseTypedR2UploadOptions {
   accept?: string;
 }
 
+type GenerateUploadUrl = (args: {
+  contentType: string;
+}) => Promise<{ key: string; url: string }>;
+type SyncMetadata = (args: { key: string }) => Promise<unknown>;
+
+function acceptsMimeType(contentType: string, accept?: string) {
+  if (!accept) return true;
+  return accept.split(",").some((entry) => {
+    const allowed = entry.trim();
+    return allowed.endsWith("/*")
+      ? contentType.startsWith(allowed.slice(0, -1))
+      : contentType === allowed;
+  });
+}
+
+export async function uploadTypedFile(
+  file: File,
+  generateUrl: GenerateUploadUrl,
+  syncMetadata: SyncMetadata,
+  options?: UseTypedR2UploadOptions,
+  request: typeof fetch = fetch,
+): Promise<string> {
+  if (!acceptsMimeType(file.type, options?.accept)) {
+    throw new Error(`File type not allowed: ${file.type}`);
+  }
+
+  const { url, key } = await generateUrl({ contentType: file.type });
+  const response = await request(url, {
+    method: "PUT",
+    headers: { "Content-Type": file.type },
+    body: file,
+  });
+
+  if (!response.ok) {
+    throw new Error(`R2 upload failed: ${response.status} ${response.statusText}`);
+  }
+
+  await syncMetadata({ key });
+  return key;
+}
+
 /**
  * Generic hook to upload a file to R2 through a custom
  * "generateXUploadUrl" mutation (so the key is prefixed with a
@@ -54,28 +95,7 @@ export function useTypedR2Upload(
   const sync = useAction(syncMetadata);
 
   async function upload(file: File): Promise<string> {
-    if (options?.accept && !file.type.match(options.accept)) {
-      throw new Error(`File type not allowed: ${file.type}`);
-    }
-
-    // 1. Request a signed URL + a prefixed key (e.g. "cv/uuid.pdf")
-    const { url, key } = await generateUrl({ contentType: file.type });
-
-    // 2. Upload the file directly to R2 via the signed URL
-    const res = await fetch(url, {
-      method: "PUT",
-      headers: { "Content-Type": file.type },
-      body: file,
-    });
-
-    if (!res.ok) {
-      throw new Error(`R2 upload failed: ${res.status} ${res.statusText}`);
-    }
-
-    // 3. Sync metadata back on the Convex side
-    await sync({ key });
-
-    return key;
+    return await uploadTypedFile(file, generateUrl, sync, options);
   }
 
   return { upload };

@@ -138,6 +138,16 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
     description: z.string().min(10, t("form.validation.descMin")),
     extras: z.array(z.string()).optional(),
     availableFrom: z.string().optional(),
+    contactEmail: z
+      .string()
+      .trim()
+      .email(t("form.validation.emailInvalid"))
+      .or(z.literal("")),
+    contactPhone: z
+      .string()
+      .trim()
+      .regex(/^\+?[0-9 ()-]{6,30}$/, t("form.validation.phoneInvalid"))
+      .or(z.literal("")),
   });
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -216,6 +226,8 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
       availableFrom: listing?.availableFrom
         ? formatLocalCalendarDate(listing.availableFrom)
         : "",
+      contactEmail: listing?.contact?.email ?? "",
+      contactPhone: listing?.contact?.phone ?? "",
     },
   });
 
@@ -339,10 +351,15 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
         extras: data.extras ?? [],
         images,
       };
+      const contact = {
+        email: data.contactEmail.trim() || undefined,
+        phone: data.contactPhone.trim() || undefined,
+      };
 
       if (listing) {
         await updateListing({
           listingId: listing._id,
+          contact,
           patch: {
             ...values,
             location: data.location ?? null,
@@ -356,6 +373,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
       } else {
         await createListing({
           ...values,
+          contact,
           location: data.location,
           charges: isRental && data.charges ? Number(data.charges) : undefined,
           deposit: isRental && data.deposit ? Number(data.deposit) : undefined,
@@ -847,6 +865,54 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
               );
             }}
           />
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Controller
+              name="contactPhone"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="contactPhone">
+                    {t("form.labels.contactPhone")}
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="contactPhone"
+                    type="tel"
+                    autoComplete="tel"
+                    placeholder={t("form.placeholders.contactPhone")}
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="contactEmail"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="contactEmail">
+                    {t("form.labels.contactEmail")}
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="contactEmail"
+                    type="email"
+                    autoComplete="email"
+                    placeholder={t("form.placeholders.contactEmail")}
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </div>
         </FieldSet>
 
         {/* ─── Step 5: Contenu & médias ─── */}

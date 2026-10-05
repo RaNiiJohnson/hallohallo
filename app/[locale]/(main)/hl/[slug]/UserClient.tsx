@@ -163,14 +163,12 @@ export default function UserClient({
 
       {/* Image Upload Modals - inchangé */}
       <ImageUploadModal
-        userId={user._id}
         imageType="profile"
         open={profileImageModalOpen}
         onOpenChange={setProfileImageModalOpen}
         currentImageUrl={user.image}
       />
       <ImageUploadModal
-        userId={user._id}
         imageType="cover"
         open={coverImageModalOpen}
         onOpenChange={setCoverImageModalOpen}
