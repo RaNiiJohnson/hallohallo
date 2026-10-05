@@ -93,6 +93,8 @@
       "charges": "Nebenkosten",
       "pets": "Haustiere erlaubt",
       "availableFrom": "Verfügbar ab",
+      "contactPhone": "Kontakttelefon (optional)",
+      "contactEmail": "Kontakt-E-Mail (optional)",
       "description": "Beschreibung *",
       "descHint": "Eine gute Beschreibung erhöht deine Chancen, schnell einen Mieter zu finden.",
       "markdownHint": "Markdown-Formatierung wird unterstützt",
@@ -114,6 +116,8 @@
       "deposit": "Z.B. 1700",
       "charges": "Z.B. 150",
       "selectDate": "Datum auswählen",
+      "contactPhone": "+49 151 23456789",
+      "contactEmail": "vermieter@example.com",
       "description": "Beschreibe die Immobilie: allgemeiner Zustand, Ausstattung, Helligkeit, Nähe zu Verkehrsmitteln und Geschäften…",
       "photosDrop": "Ziehe deine Fotos hierher",
       "extras": "Z.B. Parkplatz, Balkon, Keller..."
@@ -126,7 +130,9 @@
       "bedroomsReq": "Die Anzahl der Schlafzimmer ist erforderlich",
       "bathroomsReq": "Die Anzahl der Badezimmer ist erforderlich",
       "floorReq": "Die Etage ist erforderlich",
-      "descMin": "Die Beschreibung muss mindestens 10 Zeichen lang sein"
+      "descMin": "Die Beschreibung muss mindestens 10 Zeichen lang sein",
+      "emailInvalid": "Gib eine gültige E-Mail-Adresse ein",
+      "phoneInvalid": "Gib eine gültige Telefonnummer ein"
     },
     "messages": {
       "success": "Anzeige erfolgreich veröffentlicht!",
@@ -207,6 +213,7 @@
     "call": "Anrufen",
     "sendMessage": "Nachricht senden",
     "contactOwner": "Eigentümer kontaktieren",
+    "contactUnavailable": "Kontaktdaten nicht verfügbar",
     "phone": "Telefon:",
     "email": "E-Mail:"
   },

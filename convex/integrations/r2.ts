@@ -262,6 +262,45 @@ export const uploadCvAndDeleteOld = authMutation({
   },
 });
 
+export const replaceProfileImage = authMutation({
+  args: {
+    key: v.string(),
+    imageType: v.union(v.literal("profile"), v.literal("cover")),
+  },
+  returns: v.null(),
+  handler: async (ctx, { key, imageType }) => {
+    const kind: UploadKind = imageType;
+    await assertVerifiedUpload(ctx, {
+      key,
+      userId: ctx.user._id,
+      kind,
+    });
+
+    const field = imageType === "profile" ? "image" : "coverImage";
+    const previousKey = ctx.user[field];
+
+    await ctx.runMutation(components.betterAuth.users.updateUser, {
+      id: ctx.user._id,
+      patch: { [field]: key },
+    });
+    await consumeUploadGrant(ctx, key);
+
+    const expectedPrefix = `${kind}/`;
+    if (
+      previousKey &&
+      previousKey !== key &&
+      previousKey.startsWith(expectedPrefix)
+    ) {
+      try {
+        await r2.deleteObject(ctx, previousKey);
+      } catch (error) {
+        console.error(`Unable to delete replaced ${imageType} image`, error);
+      }
+    }
+    return null;
+  },
+});
+
 export const deleteCv = authMutation({
   args: {},
   returns: v.null(),

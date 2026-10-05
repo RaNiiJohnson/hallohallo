@@ -10,6 +10,7 @@ import { ListingListDetails } from "@/lib/convexTypes";
 import { formatDateWithFallback } from "@/lib/date";
 import { LocationMap } from "@/lib/LocationMap";
 import { truncateText } from "@/lib/utils";
+import { getListingContactLinks } from "@/lib/listing-contact";
 import { api } from "@convex/_generated/api";
 import { useAction } from "convex/react";
 import {
@@ -59,6 +60,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
   const city = data?.city ?? property.city;
   const formatNumber = (value: number) =>
     new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(value);
+  const contactLinks = getListingContactLinks(property.contact);
 
   return (
     <div className="space-y-8">
@@ -320,32 +322,44 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
 
               {/* Boutons de contact */}
               <div className="space-y-3">
-                {property.contact?.phone && (
-                  <Button className="w-full flex items-center gap-2" size="lg">
-                    <Phone className="h-4 w-4" />
-                    {tListing("details.call")}
+                {contactLinks.phoneHref && (
+                  <Button asChild className="w-full" size="lg">
+                    <a
+                      href={contactLinks.phoneHref}
+                      className="flex items-center gap-2"
+                    >
+                      <Phone className="h-4 w-4" />
+                      {tListing("details.call")}
+                    </a>
                   </Button>
                 )}
 
-                {property.contact?.email && (
+                {contactLinks.emailHref && (
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full"
+                    size="lg"
+                  >
+                    <a
+                      href={contactLinks.emailHref}
+                      className="flex items-center gap-2"
+                    >
+                      <Mail className="h-4 w-4" />
+                      {tListing("details.sendMessage")}
+                    </a>
+                  </Button>
+                )}
+
+                {!contactLinks.phoneHref && !contactLinks.emailHref && (
                   <Button
                     variant="outline"
                     className="w-full flex items-center gap-2"
                     size="lg"
+                    disabled
                   >
                     <Mail className="h-4 w-4" />
-                    {tListing("details.sendMessage")}
-                  </Button>
-                )}
-
-                {!property.contact?.phone && !property.contact?.email && (
-                  <Button
-                    variant="outline"
-                    className="w-full flex items-center gap-2"
-                    size="lg"
-                  >
-                    <Mail className="h-4 w-4" />
-                    {tListing("details.contactOwner")}
+                    {tListing("details.contactUnavailable")}
                   </Button>
                 )}
               </div>

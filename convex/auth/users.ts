@@ -6,6 +6,17 @@ import { UserType, userValidator } from "../betterAuth/users";
 import { publicUserValidator } from "../betterAuth/publicUser";
 import { authMutation, internalQuery, query } from "../functions";
 import { authComponent } from "./auth";
+import { r2 } from "../integrations/r2";
+
+async function resolveProfileImages(user: UserType): Promise<UserType> {
+  const [image, coverImage] = await Promise.all([
+    user.image?.startsWith("profile/") ? r2.getUrl(user.image) : user.image,
+    user.coverImage?.startsWith("cover/")
+      ? r2.getUrl(user.coverImage)
+      : user.coverImage,
+  ]);
+  return { ...user, image, coverImage };
+}
 
 const editableUserFields = userValidator.pick(
   "name",
@@ -51,9 +62,7 @@ export const getUserBySlug = query({
 
     if (!user) return null;
 
-    return {
-      ...user,
-    };
+    return await resolveProfileImages(user);
   },
 });
 
@@ -72,9 +81,7 @@ export const getUserById = query({
 
     if (!user) return null;
 
-    return {
-      ...user,
-    };
+    return await resolveProfileImages(user);
   },
 });
 
@@ -94,7 +101,7 @@ export const getAllUsers = query({
       : users;
 
     // Resolve image URLs in this context
-    return filtered;
+    return await Promise.all(filtered.map(resolveProfileImages));
   },
 });
 

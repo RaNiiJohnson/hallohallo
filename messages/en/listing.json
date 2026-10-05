@@ -93,6 +93,8 @@
       "charges": "Charges",
       "pets": "Pets allowed",
       "availableFrom": "Available from",
+      "contactPhone": "Contact phone (optional)",
+      "contactEmail": "Contact email (optional)",
       "description": "Description *",
       "descHint": "A good description increases your chances of finding a tenant quickly.",
       "markdownHint": "Markdown formatting is supported",
@@ -114,6 +116,8 @@
       "deposit": "E.g. 1700",
       "charges": "E.g. 150",
       "selectDate": "Select a date",
+      "contactPhone": "+49 151 23456789",
+      "contactEmail": "owner@example.com",
       "description": "Describe the property: general condition, amenities, brightness, proximity to transport and shops…",
       "photosDrop": "Drag your photos here",
       "extras": "E.g. Parking, Balcony, Cellar..."
@@ -126,7 +130,9 @@
       "bedroomsReq": "Number of bedrooms is required",
       "bathroomsReq": "Number of bathrooms is required",
       "floorReq": "Floor is required",
-      "descMin": "Description must be at least 10 characters long"
+      "descMin": "Description must be at least 10 characters long",
+      "emailInvalid": "Enter a valid email address",
+      "phoneInvalid": "Enter a valid phone number"
     },
     "messages": {
       "success": "Listing published successfully!",
@@ -207,6 +213,7 @@
     "call": "Call",
     "sendMessage": "Send message",
     "contactOwner": "Contact owner",
+    "contactUnavailable": "Contact details unavailable",
     "phone": "Phone:",
     "email": "Email:"
   },

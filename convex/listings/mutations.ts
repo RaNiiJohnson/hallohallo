@@ -6,7 +6,11 @@ import {
   consumeUploadGrant,
   r2,
 } from "../integrations/r2";
-import { throwForbidden, throwNotFound } from "../utils/errors";
+import {
+  throwForbidden,
+  throwNotFound,
+  throwValidationError,
+} from "../utils/errors";
 
 const imageValidator = v.object({
   storageId: v.optional(v.string()),
@@ -14,6 +18,30 @@ const imageValidator = v.object({
   publicId: v.optional(v.string()),
   secureUrl: v.optional(v.string()),
 });
+
+const contactValidator = v.object({
+  phone: v.optional(v.string()),
+  email: v.optional(v.string()),
+});
+
+type ListingContactInput = {
+  phone?: string;
+  email?: string;
+};
+
+function normalizeContact(contact: ListingContactInput | undefined) {
+  const phone = contact?.phone?.trim() || undefined;
+  const email = contact?.email?.trim().toLowerCase() || undefined;
+
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throwValidationError("Invalid contact email");
+  }
+  if (phone && !/^\+?[0-9 ()-]{6,30}$/.test(phone)) {
+    throwValidationError("Invalid contact phone number");
+  }
+
+  return { phone, email };
+}
 
 export const createListing = authMutation({
   args: {
@@ -53,10 +81,13 @@ export const createListing = authMutation({
     description: v.string(),
     extras: v.array(v.string()),
     availableFrom: v.optional(v.number()),
+    contact: v.optional(contactValidator),
   },
   returns: v.id("RealestateListing"),
   handler: async (ctx, args) => {
     const user = ctx.user;
+    const { contact, ...listingArgs } = args;
+    const normalizedContact = normalizeContact(contact);
 
     if (user.userType !== "provider" && user.role !== "admin") {
       throwForbidden("Only providers or admins can publish listings");
@@ -76,7 +107,7 @@ export const createListing = authMutation({
     const searchAllContent = `${args.title} ${args.propertyType} ${args.listingMode} ${args.city} ${args.description}`;
 
     const listingId = await ctx.db.insert("RealestateListing", {
-      ...args,
+      ...listingArgs,
       slug: generatedSlug(args.title),
       authorId: user._id,
       authorName: user.name,
@@ -87,6 +118,14 @@ export const createListing = authMutation({
 
     for (const key of new Set(uploadedKeys)) {
       await consumeUploadGrant(ctx, key);
+    }
+
+    if (normalizedContact.phone || normalizedContact.email) {
+      await ctx.db.insert("RealestateContactInfo", {
+        listingId,
+        listing: args.title,
+        ...normalizedContact,
+      });
     }
 
     // await posthog.capture(ctx, {
@@ -163,6 +202,7 @@ export const deleteListing = authMutation({
 export const updateListing = authMutation({
   args: {
     listingId: v.id("RealestateListing"),
+    contact: v.optional(contactValidator),
     patch: v.object({
       title: v.optional(v.string()),
       propertyType: v.optional(
@@ -195,7 +235,7 @@ export const updateListing = authMutation({
     }),
   },
   returns: v.null(),
-  handler: async (ctx, { listingId, patch }) => {
+  handler: async (ctx, { listingId, patch, contact }) => {
     const listing = await ctx.db.get(listingId);
     if (!listing) throwNotFound("Listing not found");
 
@@ -262,6 +302,33 @@ export const updateListing = authMutation({
       searchAll: searchAllContent,
       updatedAt: Date.now(),
     });
+
+    const existingContact = await ctx.db
+      .query("RealestateContactInfo")
+      .withIndex("by_listingId", (q) => q.eq("listingId", listingId))
+      .unique();
+
+    if (contact !== undefined) {
+      const normalizedContact = normalizeContact(contact);
+      if (!normalizedContact.phone && !normalizedContact.email) {
+        if (existingContact) await ctx.db.delete(existingContact._id);
+      } else if (existingContact) {
+        await ctx.db.patch(existingContact._id, {
+          ...normalizedContact,
+          listing: updatedListing.title,
+        });
+      } else {
+        await ctx.db.insert("RealestateContactInfo", {
+          listingId,
+          listing: updatedListing.title,
+          ...normalizedContact,
+        });
+      }
+    } else if (existingContact && patch.title !== undefined) {
+      await ctx.db.patch(existingContact._id, {
+        listing: updatedListing.title,
+      });
+    }
     return null;
   },
 });

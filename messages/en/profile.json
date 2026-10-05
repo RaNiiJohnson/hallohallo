@@ -48,7 +48,7 @@
     "change": "Change",
     "dragDrop": "Drag and drop an image here",
     "clickToSelect": "or click to select",
-    "maxSize": "PNG, JPG, GIF up to 5MB",
+    "maxSize": "PNG, JPG, WEBP or AVIF up to 5MB",
     "removeImage": "Remove image",
     "preview": "Preview",
     "currentImage": "Current image",

@@ -225,12 +225,8 @@ export const listListingsByCity = query({
 
     return Promise.all(
       listings.map(async (listing) => {
-        const contact = await ctx.db
-          .query("RealestateContactInfo")
-          .withIndex("by_listingId", (q) => q.eq("listingId", listing._id))
-          .unique();
         const images = await resolveImages(listing.images ?? []);
-        return { ...listing, images, contact };
+        return { ...listing, images };
       }),
     );
   },

@@ -82,4 +82,24 @@ describe("R2 upload security", () => {
       }),
     ).rejects.toThrow("Upload key is not verified for the current user");
   });
+
+  it("rejects a verified image key created for the wrong profile image kind", async () => {
+    await t.run(async (ctx) => {
+      await ctx.db.insert("uploadGrants", {
+        key: "cover/image.png",
+        userId: "testUserId",
+        kind: "cover",
+        expectedContentType: "image/png",
+        maxSize: 5 * 1024 * 1024,
+        verified: true,
+      });
+    });
+
+    await expect(
+      t.mutation(api.integrations.r2.replaceProfileImage, {
+        key: "cover/image.png",
+        imageType: "profile",
+      }),
+    ).rejects.toThrow("Upload key is not verified for the current user");
+  });
 });
