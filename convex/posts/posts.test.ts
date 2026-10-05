@@ -141,6 +141,65 @@ describe("Posts", () => {
     expect(result).toBeNull();
   });
 
+  it("deletes every post descendant, bookmark, and translation", async () => {
+    const descendants = await t.run(async (ctx) => {
+      const likeId = await ctx.db.insert("postLikes", {
+        userId: "liker",
+        postId,
+      });
+      const commentId = await ctx.db.insert("postComments", {
+        authorId: "commenter",
+        authorName: "Commenter",
+        postId,
+        content: "Comment",
+      });
+      const commentLikeId = await ctx.db.insert("postCommentLikes", {
+        userId: "comment-liker",
+        commentId,
+      });
+      const replyId = await ctx.db.insert("postCommentReplies", {
+        authorId: "replier",
+        authorName: "Replier",
+        commentId,
+        content: "Reply",
+      });
+      const replyLikeId = await ctx.db.insert("postCommentReplyLikes", {
+        userId: "reply-liker",
+        replyId,
+      });
+      const bookmarkId = await ctx.db.insert("bookmarks", {
+        userId: "bookmark-owner",
+        resourceId: postId,
+        resourceType: "post",
+      });
+      const translationId = await ctx.db.insert("postTranslations", {
+        postId,
+        language: "en",
+        title: "Translated",
+        content: "Translated content",
+        sourceUpdatedAt: Date.now(),
+      });
+      return {
+        likeId,
+        commentId,
+        commentLikeId,
+        replyId,
+        replyLikeId,
+        bookmarkId,
+        translationId,
+      };
+    });
+
+    await t.action(api.posts.actions.deletePost, { postId });
+
+    await t.run(async (ctx) => {
+      expect(await ctx.db.get(postId)).toBeNull();
+      for (const id of Object.values(descendants)) {
+        expect(await ctx.db.get(id)).toBeNull();
+      }
+    });
+  });
+
   it("should not create a post when the rate limit is reached", async () => {
     vi.mocked(limiter.limit).mockResolvedValueOnce({
       ok: false,

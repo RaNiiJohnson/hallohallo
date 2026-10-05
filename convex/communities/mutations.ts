@@ -97,7 +97,7 @@ export const joinCommunity = authMutation({
 
     const existing = await ctx.db
       .query("communityMembers")
-      .withIndex("by_userId_communityId", (q) =>
+      .withIndex("by_userId_and_communityId", (q) =>
         q.eq("userId", user._id).eq("communityId", args.communityId),
       )
       .unique();
@@ -145,7 +145,7 @@ export const leaveCommunity = authMutation({
 
     const member = await ctx.db
       .query("communityMembers")
-      .withIndex("by_userId_communityId", (q) =>
+      .withIndex("by_userId_and_communityId", (q) =>
         q.eq("userId", user._id).eq("communityId", args.communityId),
       )
       .unique();

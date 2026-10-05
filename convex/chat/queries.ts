@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import schema from "../schema";
 import { authQuery, query } from "../functions";
 import { authComponent } from "../auth/auth";
+import type { Id } from "../_generated/dataModel";
 import { throwForbidden, throwNotFound } from "../utils/errors";
 
 export const getMessages = authQuery({
@@ -17,7 +18,7 @@ export const getMessages = authQuery({
 
     const membership = await ctx.db
       .query("communityMembers")
-      .withIndex("by_userId_communityId", (q) =>
+      .withIndex("by_userId_and_communityId", (q) =>
         q.eq("userId", ctx.user._id).eq("communityId", args.communityId),
       )
       .unique();
@@ -35,6 +36,8 @@ export const getMessages = authQuery({
 
 // Return just the communityIds that have unread messages
 export const getCommunitiesWithUnread = query({
+  args: {},
+  returns: v.array(v.id("communities")),
   handler: async (ctx) => {
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) return [];
@@ -42,9 +45,9 @@ export const getCommunitiesWithUnread = query({
     const memberships = await ctx.db
       .query("communityMembers")
       .withIndex("by_userId", (q) => q.eq("userId", user._id))
-      .collect();
+      .take(100);
 
-    const unreadCommunityIds: string[] = [];
+    const unreadCommunityIds: Id<"communities">[] = [];
 
     await Promise.all(
       memberships.map(async (member) => {
@@ -53,15 +56,11 @@ export const getCommunitiesWithUnread = query({
         const hasUnread = await ctx.db
           .query("communityMessages")
           .withIndex("by_communityId", (q) =>
-            q.eq("communityId", member.communityId),
+            q
+              .eq("communityId", member.communityId)
+              .gt("_creationTime", lastReadAt),
           )
-          .filter((q) =>
-            q.and(
-              q.gt(q.field("_creationTime"), lastReadAt),
-              q.neq(q.field("authorId"), user._id),
-            ),
-          )
-          .first(); // Check if there are unread messages
+          .first();
 
         if (hasUnread) {
           unreadCommunityIds.push(member.communityId);

@@ -81,4 +81,49 @@ describe("Communities", () => {
     });
     expect(result).toBeNull();
   });
+
+  it("deletes community descendants recursively", async () => {
+    const descendants = await t.run(async (ctx) => {
+      const messageId = await ctx.db.insert("communityMessages", {
+        communityId,
+        authorId: "testUserId",
+        content: "Message",
+      });
+      const postId = await ctx.db.insert("posts", {
+        slug: "cascade-post",
+        title: "Cascade post",
+        content: "Content",
+        communityId,
+        scope: "community",
+        authorId: "testUserId",
+      });
+      const bookmarkId = await ctx.db.insert("bookmarks", {
+        userId: "testUserId",
+        resourceId: postId,
+        resourceType: "post",
+      });
+      const translationId = await ctx.db.insert("postTranslations", {
+        postId,
+        language: "de",
+        title: "Titel",
+        content: "Inhalt",
+        sourceUpdatedAt: Date.now(),
+      });
+      return { messageId, postId, bookmarkId, translationId };
+    });
+
+    await t.action(api.communities.actions.deleteCommunity, {
+      id: communityId,
+    });
+
+    await t.run(async (ctx) => {
+      expect(await ctx.db.get(communityId)).toBeNull();
+      for (const id of Object.values(descendants)) {
+        expect(await ctx.db.get(id)).toBeNull();
+      }
+    });
+    expect(
+      await t.query(api.communities.queries.getMyCommunities, {}),
+    ).toHaveLength(0);
+  });
 });

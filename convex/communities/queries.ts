@@ -1,4 +1,3 @@
-import { getManyFrom } from "convex-helpers/server/relationships";
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import {
@@ -9,6 +8,7 @@ import {
 } from "../aggregates";
 import { authComponent } from "../auth/auth";
 import { internalQuery, query } from "../functions";
+import schema from "../schema";
 
 export const isMember = query({
   args: { communityId: v.id("communities") },
@@ -18,7 +18,7 @@ export const isMember = query({
 
     const member = await ctx.db
       .query("communityMembers")
-      .withIndex("by_userId_communityId", (q) =>
+      .withIndex("by_userId_and_communityId", (q) =>
         q.eq("userId", user._id).eq("communityId", args.communityId),
       )
       .unique();
@@ -41,6 +41,8 @@ export const getAllCommunities = query({
 });
 
 export const getTopCommunities = query({
+  args: {},
+  returns: v.array(schema.doc("communities")),
   handler: async (ctx) => {
     const communities = await ctx.db.query("communities").order("desc").take(3);
 
@@ -81,9 +83,10 @@ export const getCommunitiesPreview = query({
               user
                 ? ctx.db
                     .query("postLikes")
-                    .withIndex("by_postId", (q) => q.eq("postId", post._id))
-                    .filter((q) => q.eq(q.field("userId"), user._id))
-                    .first()
+                    .withIndex("by_postId_and_userId", (q) =>
+                      q.eq("postId", post._id).eq("userId", user._id),
+                    )
+                    .unique()
                     .then((l) => !!l)
                 : Promise.resolve(false),
             ]);
@@ -121,6 +124,8 @@ export const getCommunity = query({
 });
 
 export const getMyCommunities = query({
+  args: {},
+  returns: v.array(schema.doc("communities")),
   handler: async (ctx) => {
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) return [];
@@ -128,13 +133,16 @@ export const getMyCommunities = query({
     const memberships = await ctx.db
       .query("communityMembers")
       .withIndex("by_userId", (q) => q.eq("userId", user._id))
-      .collect();
+      .take(100);
 
     const communities = await Promise.all(
       memberships.map((m) => ctx.db.get(m.communityId)),
     );
 
-    return communities.filter(Boolean);
+    return communities.filter(
+      (community): community is NonNullable<typeof community> =>
+        community !== null,
+    );
   },
 });
 
@@ -159,7 +167,7 @@ export const getMyCommunitiesForPosting = query({
     const memberships = await ctx.db
       .query("communityMembers")
       .withIndex("by_userId", (q) => q.eq("userId", user._id))
-      .collect();
+      .take(100);
 
     const communities = await Promise.all(
       memberships.map(async (membership) => {
@@ -196,13 +204,13 @@ export const getCommunityWithPosts = query({
       communityPostsCount.count(ctx, { namespace: community._id }),
     ]);
 
-    const posts = await getManyFrom(
-      ctx.db,
-      "posts",
-      "by_communityId",
-      community._id,
-      "communityId",
-    );
+    const posts = await ctx.db
+      .query("posts")
+      .withIndex("by_communityId", (q) =>
+        q.eq("communityId", community._id),
+      )
+      .order("desc")
+      .take(100);
 
     const postsWithLikes = await Promise.all(
       posts.map(async (post) => {
@@ -211,9 +219,10 @@ export const getCommunityWithPosts = query({
           user
             ? ctx.db
                 .query("postLikes")
-                .withIndex("by_postId", (q) => q.eq("postId", post._id))
-                .filter((q) => q.eq(q.field("userId"), user._id))
-                .first()
+                .withIndex("by_postId_and_userId", (q) =>
+                  q.eq("postId", post._id).eq("userId", user._id),
+                )
+                .unique()
                 .then((l) => !!l)
             : Promise.resolve(false),
         ]);
@@ -254,6 +263,7 @@ export const getCommunityDetails = query({
 });
 
 export const getMe = query({
+  args: {},
   handler: async (ctx) => {
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) return null;
@@ -295,17 +305,21 @@ export const getCommunityPosts = query({
         if (user) {
           const existingLike = await ctx.db
             .query("postLikes")
-            .withIndex("by_postId", (q) => q.eq("postId", post._id))
-            .filter((q) => q.eq(q.field("userId"), user._id))
-            .first();
+            .withIndex("by_postId_and_userId", (q) =>
+              q.eq("postId", post._id).eq("userId", user._id),
+            )
+            .unique();
           if (existingLike) userHasLiked = true;
 
           const existingBookmark = await ctx.db
             .query("bookmarks")
-            .withIndex("by_user_resource", (q) =>
-              q.eq("userId", user._id).eq("resourceId", post._id),
+            .withIndex("by_userId_and_resourceType_and_resourceId", (q) =>
+              q
+                .eq("userId", user._id)
+                .eq("resourceType", "post")
+                .eq("resourceId", post._id),
             )
-            .first();
+            .unique();
           if (existingBookmark) isBookmarked = true;
         }
 

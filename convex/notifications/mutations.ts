@@ -1,19 +1,52 @@
 import { v } from "convex/values";
+import { internal } from "../_generated/api";
+import type { MutationCtx } from "../_generated/server";
 import { authMutation, internalMutation } from "../functions";
 import { throwForbidden, throwNotFound } from "../utils/errors";
 
+async function markUnreadBatch(ctx: MutationCtx, userId: string) {
+  const unread = await ctx.db
+    .query("notifications")
+    .withIndex("by_userId_read", (q) =>
+      q.eq("userId", userId).eq("read", false),
+    )
+    .take(100);
+
+  for (const notification of unread) {
+    await ctx.db.patch(notification._id, { read: true });
+  }
+  return unread.length;
+}
+
 export const markAllRead = authMutation({
+  args: {},
+  returns: v.null(),
   handler: async (ctx) => {
-    const user = ctx.user;
+    const processed = await markUnreadBatch(ctx, ctx.user._id);
+    if (processed === 100) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.notifications.mutations.continueMarkAllRead,
+        { userId: ctx.user._id },
+      );
+    }
+    return null;
+  },
+});
 
-    const unread = await ctx.db
-      .query("notifications")
-      .withIndex("by_userId_read", (q) =>
-        q.eq("userId", user._id).eq("read", false),
-      )
-      .collect();
-
-    await Promise.all(unread.map((n) => ctx.db.patch(n._id, { read: true })));
+export const continueMarkAllRead = internalMutation({
+  args: { userId: v.string() },
+  returns: v.null(),
+  handler: async (ctx, { userId }) => {
+    const processed = await markUnreadBatch(ctx, userId);
+    if (processed === 100) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.notifications.mutations.continueMarkAllRead,
+        { userId },
+      );
+    }
+    return null;
   },
 });
 

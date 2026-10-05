@@ -1,4 +1,5 @@
-import { internalMutation, query } from "./_generated/server";
+import { internalMutation, internalQuery } from "./_generated/server";
+import { v } from "convex/values";
 import {
   communityMembersCount,
   communityPostsCount,
@@ -12,8 +13,17 @@ import {
 /**
  * Diagnostic query: compare real post count vs aggregate counts.
  */
-export const checkSync = query({
+export const checkSync = internalQuery({
   args: {},
+  returns: v.object({
+    realPostCount: v.number(),
+    aggregates: v.object({
+      shuffle: v.number(),
+      date: v.number(),
+      likes: v.number(),
+    }),
+    inSync: v.boolean(),
+  }),
   handler: async (ctx) => {
     const allPosts = await ctx.db.query("posts").collect();
     const realCount = allPosts.length;

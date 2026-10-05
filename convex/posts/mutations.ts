@@ -22,7 +22,7 @@ export const createPost = authMutation({
     if (args.communityId) {
       const membership = await ctx.db
         .query("communityMembers")
-        .withIndex("by_userId_communityId", (q) =>
+        .withIndex("by_userId_and_communityId", (q) =>
           q.eq("userId", userId).eq("communityId", args.communityId!),
         )
         .unique();

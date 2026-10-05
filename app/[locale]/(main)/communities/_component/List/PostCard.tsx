@@ -44,20 +44,32 @@ export function PostCard({
     <div className="block px-4 py-4 hover:bg-muted/30 transition-colors border-b border-border bg-background max-w-4xl mx-auto">
       <div className="flex sm:flex-row flex-col text-xs text-muted-foreground mb-2">
         <div className="flex flex-wrap items-center gap-1.5">
-          <Link
-            href={`/hl/${post.author?.slug ?? ""}`}
-            className="flex items-center gap-1.5 group/author"
-          >
-            <Avatar className="size-5">
-              <AvatarImage src={post.author?.image ?? "/random-user.png"} />
-              <AvatarFallback className="text-[10px]">
-                {post.authorName?.slice(0, 2)?.toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-foreground/80 group-hover/author:text-foreground group-hover/author:underline">
+          {post.author.slug ? (
+            <Link
+              href={`/hl/${post.author.slug}`}
+              className="flex items-center gap-1.5 group/author"
+            >
+              <Avatar className="size-5">
+                <AvatarImage src={post.author.image ?? "/random-user.png"} />
+                <AvatarFallback className="text-[10px]">
+                  {post.authorName?.slice(0, 2)?.toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-foreground/80 group-hover/author:text-foreground group-hover/author:underline">
+                {post.authorName}
+              </span>
+            </Link>
+          ) : (
+            <span className="flex items-center gap-1.5 text-foreground/80">
+              <Avatar className="size-5">
+                <AvatarImage src={post.author.image ?? "/random-user.png"} />
+                <AvatarFallback className="text-[10px]">
+                  {post.authorName?.slice(0, 2)?.toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
               {post.authorName}
             </span>
-          </Link>
+          )}
           <ChevronRight className="size-3 text-muted-foreground/50" />
           {post.communitySlug && post.communityName ? (
             <Link

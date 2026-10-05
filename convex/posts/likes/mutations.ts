@@ -11,9 +11,10 @@ export const likePost = authMutation({
 
     const existing = await ctx.db
       .query("postLikes")
-      .withIndex("by_postId", (q) => q.eq("postId", args.postId))
-      .filter((q) => q.eq(q.field("userId"), user._id))
-      .first();
+      .withIndex("by_postId_and_userId", (q) =>
+        q.eq("postId", args.postId).eq("userId", user._id),
+      )
+      .unique();
 
     if (existing) {
       await ctx.db.delete(existing._id);
@@ -90,9 +91,10 @@ export const likeComment = authMutation({
 
     const existing = await ctx.db
       .query("postCommentLikes")
-      .withIndex("by_commentId", (q) => q.eq("commentId", args.commentId))
-      .filter((q) => q.eq(q.field("userId"), user._id))
-      .first();
+      .withIndex("by_commentId_and_userId", (q) =>
+        q.eq("commentId", args.commentId).eq("userId", user._id),
+      )
+      .unique();
 
     if (existing) {
       await ctx.db.delete(existing._id);
@@ -150,9 +152,10 @@ export const likeReply = authMutation({
 
     const existing = await ctx.db
       .query("postCommentReplyLikes")
-      .withIndex("by_replyId", (q) => q.eq("replyId", args.replyId))
-      .filter((q) => q.eq(q.field("userId"), user._id))
-      .first();
+      .withIndex("by_replyId_and_userId", (q) =>
+        q.eq("replyId", args.replyId).eq("userId", user._id),
+      )
+      .unique();
 
     if (existing) {
       await ctx.db.delete(existing._id);

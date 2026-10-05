@@ -1,7 +1,9 @@
 import { authComponent } from "../auth/auth";
 import { query } from "../functions";
+import { v } from "convex/values";
 
 export const getMyNotifications = query({
+  args: {},
   handler: async (ctx) => {
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) return [];
@@ -15,6 +17,8 @@ export const getMyNotifications = query({
 });
 
 export const getUnreadCount = query({
+  args: {},
+  returns: v.union(v.number(), v.null()),
   handler: async (ctx) => {
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) return null;
@@ -24,7 +28,7 @@ export const getUnreadCount = query({
       .withIndex("by_userId_read", (q) =>
         q.eq("userId", user._id).eq("read", false),
       )
-      .collect();
+      .take(100);
 
     return unread.length;
   },
