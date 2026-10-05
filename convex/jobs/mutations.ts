@@ -163,6 +163,20 @@ export const deleteJob = authMutation({
       .collect();
     await Promise.all(translations.map((t) => ctx.db.delete(t._id)));
 
+    const contact = await ctx.db
+      .query("JobContactInfo")
+      .withIndex("by_jobId", (q) => q.eq("jobId", args.id))
+      .unique();
+    if (contact) await ctx.db.delete(contact._id);
+
+    const bookmarks = await ctx.db
+      .query("bookmarks")
+      .withIndex("by_resourceId", (q) => q.eq("resourceId", args.id))
+      .collect();
+    for (const bookmark of bookmarks) {
+      await ctx.db.delete(bookmark._id);
+    }
+
     await ctx.db.delete("JobOffer", args.id);
 
     // await posthog.capture(ctx, {

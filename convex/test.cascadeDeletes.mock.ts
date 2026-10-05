@@ -17,17 +17,38 @@ vi.mock("./cascadeDeletes", async (importOriginal) => {
   const actual = await importOriginal<typeof import("./cascadeDeletes")>();
   return {
     ...actual,
-    // `convex-test` does not execute component functions. Delete the root
-    // document through the same internal helper so action tests still verify
-    // their observable behaviour. Relationship traversal belongs to the
-    // component's own integration tests.
     runCascadeDelete: vi.fn(
       async (ctx: ActionCtx, table: string, id: string) => {
-        await ctx.runMutation(internal.cascadeHelpers.deleteDocument, {
-          table,
-          id,
-        });
-        return { [table]: 1 };
+        const counts: Record<string, number> = {};
+
+        const visit = async (targetTable: string, targetId: string) => {
+          const relationships = actual.cascadeRelationships.filter(
+            (relationship) => relationship.targetTable === targetTable,
+          );
+          for (const relationship of relationships) {
+            const childIds = await ctx.runQuery(
+              internal.cascadeHelpers.resolveChildren,
+              {
+                sourceTable: relationship.sourceTable,
+                indexName: relationship.indexName,
+                fieldName: relationship.fieldName,
+                parentId: targetId,
+              },
+            );
+            for (const childId of childIds) {
+              await visit(relationship.sourceTable, childId);
+            }
+          }
+
+          await ctx.runMutation(internal.cascadeHelpers.deleteDocument, {
+            table: targetTable,
+            id: targetId,
+          });
+          counts[targetTable] = (counts[targetTable] ?? 0) + 1;
+        };
+
+        await visit(table, id);
+        return counts;
       },
     ),
   };

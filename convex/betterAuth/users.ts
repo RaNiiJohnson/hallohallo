@@ -12,7 +12,7 @@ export const getAllUsers = query({
   args: {},
   returns: v.array(publicUserValidator),
   handler: async (ctx) => {
-    const users = await ctx.db.query("user").collect();
+    const users = await ctx.db.query("user").take(100);
     return users
       .filter((user) => user.isPublic !== false)
       .map((user) => projectPublicUser(user));

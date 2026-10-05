@@ -47,10 +47,13 @@ export const getListingWithContact = query({
     if (user) {
       const existingBookmark = await ctx.db
         .query("bookmarks")
-        .withIndex("by_user_resource", (q) =>
-          q.eq("userId", user._id).eq("resourceId", listing._id),
+        .withIndex("by_userId_and_resourceType_and_resourceId", (q) =>
+          q
+            .eq("userId", user._id)
+            .eq("resourceType", "realEstate")
+            .eq("resourceId", listing._id),
         )
-        .first();
+        .unique();
       if (existingBookmark) isBookmarked = true;
     }
 
@@ -116,8 +119,9 @@ export const getListing = query({
       if (!user) return { page: [], isDone: true, continueCursor: "" };
       const bookmarksPage = await ctx.db
         .query("bookmarks")
-        .withIndex("by_userId", (q) => q.eq("userId", user._id))
-        .filter((q) => q.eq(q.field("resourceType"), "realEstate"))
+        .withIndex("by_userId_and_resourceType", (q) =>
+          q.eq("userId", user._id).eq("resourceType", "realEstate"),
+        )
         .order("desc")
         .paginate(args.paginationOpts);
 
@@ -192,10 +196,13 @@ export const getListing = query({
         if (user) {
           const existingBookmark = await ctx.db
             .query("bookmarks")
-            .withIndex("by_user_resource", (q) =>
-              q.eq("userId", user._id).eq("resourceId", listing._id),
+            .withIndex("by_userId_and_resourceType_and_resourceId", (q) =>
+              q
+                .eq("userId", user._id)
+                .eq("resourceType", "realEstate")
+                .eq("resourceId", listing._id),
             )
-            .first();
+            .unique();
           if (existingBookmark) isBookmarked = true;
         }
         const images = await resolveImages(listing.images ?? []);
@@ -213,7 +220,8 @@ export const listListingsByCity = query({
     const listings = await ctx.db
       .query("RealestateListing")
       .withIndex("by_city", (q) => q.eq("city", args.city))
-      .collect();
+      .order("desc")
+      .take(50);
 
     return Promise.all(
       listings.map(async (listing) => {

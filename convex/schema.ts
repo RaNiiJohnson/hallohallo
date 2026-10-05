@@ -166,7 +166,12 @@ export default defineSchema({
     ),
   })
     .index("by_userId", ["userId"])
-    .index("by_user_resource", ["userId", "resourceId"])
+    .index("by_userId_and_resourceType", ["userId", "resourceType"])
+    .index("by_userId_and_resourceType_and_resourceId", [
+      "userId",
+      "resourceType",
+      "resourceId",
+    ])
     .index("by_resourceId", ["resourceId"]),
 
   communities: defineTable({
@@ -200,7 +205,7 @@ export default defineSchema({
   })
     .index("by_userId", ["userId"])
     .index("by_communityId", ["communityId"])
-    .index("by_userId_communityId", ["userId", "communityId"]),
+    .index("by_userId_and_communityId", ["userId", "communityId"]),
 
   // Posts
 
@@ -231,7 +236,8 @@ export default defineSchema({
     postId: v.id("posts"),
   })
     .index("by_userId", ["userId"])
-    .index("by_postId", ["postId"]),
+    .index("by_postId", ["postId"])
+    .index("by_postId_and_userId", ["postId", "userId"]),
 
   postComments: defineTable({
     authorId: v.string(),
@@ -247,7 +253,8 @@ export default defineSchema({
     commentId: v.id("postComments"),
   })
     .index("by_userId", ["userId"])
-    .index("by_commentId", ["commentId"]),
+    .index("by_commentId", ["commentId"])
+    .index("by_commentId_and_userId", ["commentId", "userId"]),
 
   postCommentReplies: defineTable({
     authorId: v.string(),
@@ -263,7 +270,8 @@ export default defineSchema({
     replyId: v.id("postCommentReplies"),
   })
     .index("by_userId", ["userId"])
-    .index("by_replyId", ["replyId"]),
+    .index("by_replyId", ["replyId"])
+    .index("by_replyId_and_userId", ["replyId", "userId"]),
 
   // Translations
 

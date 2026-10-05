@@ -25,10 +25,13 @@ export const getJobWithContact = query({
     if (user) {
       const existingBookmark = await ctx.db
         .query("bookmarks")
-        .withIndex("by_user_resource", (q) =>
-          q.eq("userId", user._id).eq("resourceId", job._id),
+        .withIndex("by_userId_and_resourceType_and_resourceId", (q) =>
+          q
+            .eq("userId", user._id)
+            .eq("resourceType", "job")
+            .eq("resourceId", job._id),
         )
-        .first();
+        .unique();
       if (existingBookmark) isBookmarked = true;
     }
 
@@ -102,8 +105,9 @@ export const getJobs = query({
       }
       const bookmarksPage = await ctx.db
         .query("bookmarks")
-        .withIndex("by_userId", (q) => q.eq("userId", user._id))
-        .filter((q) => q.eq(q.field("resourceType"), "job"))
+        .withIndex("by_userId_and_resourceType", (q) =>
+          q.eq("userId", user._id).eq("resourceType", "job"),
+        )
         .order("desc")
         .paginate(args.paginationOpts);
 
@@ -143,10 +147,13 @@ export const getJobs = query({
           if (user) {
             const existingBookmark = await ctx.db
               .query("bookmarks")
-              .withIndex("by_user_resource", (q) =>
-                q.eq("userId", user._id).eq("resourceId", job._id),
+              .withIndex("by_userId_and_resourceType_and_resourceId", (q) =>
+                q
+                  .eq("userId", user._id)
+                  .eq("resourceType", "job")
+                  .eq("resourceId", job._id),
               )
-              .first();
+              .unique();
             if (existingBookmark) isBookmarked = true;
           }
           return { ...job, isBookmarked };
@@ -194,10 +201,13 @@ export const getJobs = query({
         if (user) {
           const existingBookmark = await ctx.db
             .query("bookmarks")
-            .withIndex("by_user_resource", (q) =>
-              q.eq("userId", user._id).eq("resourceId", job._id),
+            .withIndex("by_userId_and_resourceType_and_resourceId", (q) =>
+              q
+                .eq("userId", user._id)
+                .eq("resourceType", "job")
+                .eq("resourceId", job._id),
             )
-            .first();
+            .unique();
           if (existingBookmark) isBookmarked = true;
         }
         return { ...job, isBookmarked };

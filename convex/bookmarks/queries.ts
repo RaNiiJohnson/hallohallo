@@ -1,4 +1,3 @@
-import { Id } from "../_generated/dataModel";
 import { authQuery } from "../functions";
 
 export const getMyBookmarks = authQuery({
@@ -7,16 +6,18 @@ export const getMyBookmarks = authQuery({
     const bookmarks = await ctx.db
       .query("bookmarks")
       .withIndex("by_userId", (q) => q.eq("userId", ctx.user._id))
-      .collect();
+      .order("desc")
+      .take(100);
 
     return Promise.all(
       bookmarks.map(async (b) => {
-        const details =
+        const resourceId =
           b.resourceType === "job"
-            ? await ctx.db.get(b.resourceId as Id<"JobOffer">)
+            ? ctx.db.normalizeId("JobOffer", b.resourceId)
             : b.resourceType === "realEstate"
-              ? await ctx.db.get(b.resourceId as Id<"RealestateListing">)
-              : await ctx.db.get(b.resourceId as Id<"posts">);
+              ? ctx.db.normalizeId("RealestateListing", b.resourceId)
+              : ctx.db.normalizeId("posts", b.resourceId);
+        const details = resourceId ? await ctx.db.get(resourceId) : null;
 
         return { ...b, details };
       }),

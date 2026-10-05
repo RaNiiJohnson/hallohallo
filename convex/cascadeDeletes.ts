@@ -15,8 +15,8 @@ import { ActionCtx } from "./_generated/server";
  *       │   ├── postCommentLikes   (by_commentId → commentId)
  *       │   └── postCommentReplies (by_commentId → commentId)
  *       │       └── postCommentReplyLikes (by_replyId → replyId)
- *       └── (bookmarks avec resourceId de type posts sont ignorés par le component
- *            car l'index by_user_resource n'est pas un FK simple vers posts)
+ *       ├── bookmarks        (by_resourceId → resourceId)
+ *       └── postTranslations (by_post → postId)
  */
 export const cascadeRelationships = [
   {
@@ -58,6 +58,18 @@ export const cascadeRelationships = [
     indexName: "by_postId",
     fieldName: "postId",
   },
+  {
+    sourceTable: "bookmarks",
+    targetTable: "posts",
+    indexName: "by_resourceId",
+    fieldName: "resourceId",
+  },
+  {
+    sourceTable: "postTranslations",
+    targetTable: "posts",
+    indexName: "by_post",
+    fieldName: "postId",
+  },
 
   // --- postComments → children ---
   {
@@ -79,6 +91,26 @@ export const cascadeRelationships = [
     targetTable: "postCommentReplies",
     indexName: "by_replyId",
     fieldName: "replyId",
+  },
+
+  // --- jobs → children ---
+  {
+    sourceTable: "jobTranslations",
+    targetTable: "JobOffer",
+    indexName: "by_job",
+    fieldName: "jobId",
+  },
+  {
+    sourceTable: "JobContactInfo",
+    targetTable: "JobOffer",
+    indexName: "by_jobId",
+    fieldName: "jobId",
+  },
+  {
+    sourceTable: "bookmarks",
+    targetTable: "JobOffer",
+    indexName: "by_resourceId",
+    fieldName: "resourceId",
   },
 ];
 

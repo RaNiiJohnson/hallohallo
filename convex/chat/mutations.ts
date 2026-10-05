@@ -7,13 +7,15 @@ export const sendMessage = authMutation({
     communityId: v.id("communities"),
     content: v.string(),
   },
+  returns: v.null(),
   handler: async (ctx, args) => {
     const user = ctx.user;
     const member = await ctx.db
       .query("communityMembers")
-      .withIndex("by_userId", (q) => q.eq("userId", user._id))
-      .filter((q) => q.eq(q.field("communityId"), args.communityId))
-      .first();
+      .withIndex("by_userId_and_communityId", (q) =>
+        q.eq("userId", user._id).eq("communityId", args.communityId),
+      )
+      .unique();
 
     if (!member) throw new Error("Not a member");
 
@@ -28,6 +30,7 @@ export const sendMessage = authMutation({
     await ctx.db.patch(member._id, {
       lastReadAt: Date.now(),
     });
+    return null;
 
     // await posthog.capture(ctx, {
     //   distinctId: posthogDistinctId(user._id),
@@ -44,13 +47,15 @@ export const editMessage = authMutation({
     communityId: v.id("communities"),
     content: v.string(),
   },
+  returns: v.null(),
   handler: async (ctx, args) => {
     const user = ctx.user;
     const member = await ctx.db
       .query("communityMembers")
-      .withIndex("by_userId", (q) => q.eq("userId", user._id))
-      .filter((q) => q.eq(q.field("communityId"), args.communityId))
-      .first();
+      .withIndex("by_userId_and_communityId", (q) =>
+        q.eq("userId", user._id).eq("communityId", args.communityId),
+      )
+      .unique();
 
     if (!member) throw new Error("Not a member");
 
@@ -63,6 +68,7 @@ export const editMessage = authMutation({
       content: args.content,
       editedAt: Date.now(),
     });
+    return null;
   },
 });
 
@@ -71,13 +77,15 @@ export const deleteMessage = authMutation({
     id: v.id("communityMessages"),
     communityId: v.id("communities"),
   },
+  returns: v.null(),
   handler: async (ctx, args) => {
     const user = ctx.user;
     const member = await ctx.db
       .query("communityMembers")
-      .withIndex("by_userId", (q) => q.eq("userId", user._id))
-      .filter((q) => q.eq(q.field("communityId"), args.communityId))
-      .first();
+      .withIndex("by_userId_and_communityId", (q) =>
+        q.eq("userId", user._id).eq("communityId", args.communityId),
+      )
+      .unique();
 
     if (!member) throwForbidden("Not a member");
 
@@ -87,20 +95,24 @@ export const deleteMessage = authMutation({
     if (message.authorId !== user._id) throwForbidden("Not authorized");
 
     await ctx.db.delete(args.id);
+    return null;
   },
 });
 
 export const markAsRead = authMutation({
   args: { communityId: v.id("communities") },
+  returns: v.null(),
   handler: async (ctx, args) => {
     const user = ctx.user;
     const member = await ctx.db
       .query("communityMembers")
-      .withIndex("by_userId", (q) => q.eq("userId", user._id))
-      .filter((q) => q.eq(q.field("communityId"), args.communityId))
-      .first();
+      .withIndex("by_userId_and_communityId", (q) =>
+        q.eq("userId", user._id).eq("communityId", args.communityId),
+      )
+      .unique();
 
-    if (!member) return;
+    if (!member) return null;
     await ctx.db.patch(member._id, { lastReadAt: Date.now() });
+    return null;
   },
 });
