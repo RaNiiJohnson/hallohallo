@@ -1,22 +1,53 @@
 {
   "panel": "Administration",
-  "globalSearch": "Globale Suche...",
   "sidebar": {
-    "main": "Hauptbereich",
-    "content": "Inhalte",
-    "system": "System",
+    "navigation": "Navigation",
     "dashboard": "Dashboard",
     "users": "Benutzer",
-    "moderation": "Moderation",
-    "jobs": "Stellenangebote",
-    "listing": "Immobilien",
-    "communities": "Communities",
-    "statistics": "Statistiken",
-    "settings": "Einstellungen",
     "audit": "Admin-Protokoll",
+    "analytics": "PostHog-Analytics",
     "returnSite": "Zurück zur Website",
     "logout": "Abmelden",
     "loadingUser": "Administrator wird geladen"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Die operativen Informationen, die heute wichtig sind.",
+    "lastUpdated": "Zuletzt aktualisiert: {date}",
+    "refresh": "Aktualisieren",
+    "errorTitle": "Dashboard kann nicht geladen werden",
+    "errorDescription": "Die administrativen Kennzahlen konnten nicht geladen werden.",
+    "retry": "Erneut versuchen",
+    "metrics": {
+      "total": "Mitglieder",
+      "totalHelper": "Gesamtzahl der Konten",
+      "new": "Neue Mitglieder — {days} Tage",
+      "newHelper": "Seit dem {date}",
+      "banned": "Gesperrte Mitglieder",
+      "bannedHelper": "Derzeit gesperrte Konten"
+    },
+    "recent": {
+      "title": "Neueste Mitglieder",
+      "description": "Die fünf zuletzt erstellten Konten.",
+      "viewAll": "Alle anzeigen",
+      "emptyTitle": "Noch keine Mitglieder",
+      "emptyDescription": "Neue Konten werden hier angezeigt."
+    },
+    "actions": {
+      "title": "Schnellaktionen",
+      "description": "Öffnen Sie die administrativen Werkzeuge mit echten Daten.",
+      "usersTitle": "Benutzer verwalten",
+      "usersDescription": "Konten suchen, filtern und verwalten.",
+      "analyticsTitle": "PostHog öffnen",
+      "analyticsDescription": "Produktaktivität und -nutzung analysieren.",
+      "analyticsUnconfigured": "Setzen Sie NEXT_PUBLIC_POSTHOG_DASHBOARD_URL, um diesen Link zu aktivieren."
+    }
+  },
+  "audit": {
+    "title": "Admin-Protokoll",
+    "description": "Sicherer Verlauf sensibler administrativer Aktionen.",
+    "pendingTitle": "Aktivierung des Protokolls läuft",
+    "pendingDescription": "Es werden keine fiktiven Daten angezeigt. Die sichere Aufzeichnung von Aktionen folgt im nächsten Schritt."
   },
   "users": {
     "title": "Benutzer",

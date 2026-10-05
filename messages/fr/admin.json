@@ -1,22 +1,53 @@
 {
   "panel": "Administration",
-  "globalSearch": "Recherche globale...",
   "sidebar": {
-    "main": "Principal",
-    "content": "Contenu",
-    "system": "Système",
+    "navigation": "Navigation",
     "dashboard": "Dashboard",
     "users": "Utilisateurs",
-    "moderation": "Modération",
-    "jobs": "Offres d'emploi",
-    "listing": "Immobilier",
-    "communities": "Communautés",
-    "statistics": "Statistiques",
-    "settings": "Paramètres",
     "audit": "Journal administratif",
+    "analytics": "Analytics PostHog",
     "returnSite": "Retour au site",
     "logout": "Déconnexion",
     "loadingUser": "Chargement de l'administrateur"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Les informations opérationnelles utiles aujourd'hui.",
+    "lastUpdated": "Dernière actualisation : {date}",
+    "refresh": "Actualiser",
+    "errorTitle": "Impossible de charger le dashboard",
+    "errorDescription": "Les métriques administratives n'ont pas pu être chargées.",
+    "retry": "Réessayer",
+    "metrics": {
+      "total": "Membres",
+      "totalHelper": "Nombre total de comptes",
+      "new": "Nouveaux inscrits — {days} jours",
+      "newHelper": "Depuis le {date}",
+      "banned": "Membres bannis",
+      "bannedHelper": "Comptes actuellement bannis"
+    },
+    "recent": {
+      "title": "Derniers inscrits",
+      "description": "Les cinq comptes créés le plus récemment.",
+      "viewAll": "Voir tout",
+      "emptyTitle": "Aucun membre inscrit",
+      "emptyDescription": "Les nouveaux comptes apparaîtront ici."
+    },
+    "actions": {
+      "title": "Actions rapides",
+      "description": "Accédez aux outils administratifs réels.",
+      "usersTitle": "Gérer les utilisateurs",
+      "usersDescription": "Rechercher, filtrer et administrer les comptes.",
+      "analyticsTitle": "Ouvrir PostHog",
+      "analyticsDescription": "Consulter l'activité et l'adoption produit.",
+      "analyticsUnconfigured": "Configurez NEXT_PUBLIC_POSTHOG_DASHBOARD_URL pour activer ce lien."
+    }
+  },
+  "audit": {
+    "title": "Journal administratif",
+    "description": "Historique sécurisé des actions administratives sensibles.",
+    "pendingTitle": "Journal en cours d'activation",
+    "pendingDescription": "Aucune donnée fictive n'est affichée. L'enregistrement sécurisé des actions sera ajouté dans la prochaine étape."
   },
   "users": {
     "title": "Utilisateurs",

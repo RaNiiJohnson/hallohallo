@@ -1,22 +1,53 @@
 {
   "panel": "Admin panel",
-  "globalSearch": "Global search...",
   "sidebar": {
-    "main": "Main",
-    "content": "Content",
-    "system": "System",
+    "navigation": "Navigation",
     "dashboard": "Dashboard",
     "users": "Users",
-    "moderation": "Moderation",
-    "jobs": "Job offers",
-    "listing": "Real estate",
-    "communities": "Communities",
-    "statistics": "Statistics",
-    "settings": "Settings",
     "audit": "Admin log",
+    "analytics": "PostHog analytics",
     "returnSite": "Back to site",
     "logout": "Sign out",
     "loadingUser": "Loading administrator"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "The operational information that matters today.",
+    "lastUpdated": "Last updated: {date}",
+    "refresh": "Refresh",
+    "errorTitle": "Unable to load the dashboard",
+    "errorDescription": "The administrative metrics could not be loaded.",
+    "retry": "Try again",
+    "metrics": {
+      "total": "Members",
+      "totalHelper": "Total number of accounts",
+      "new": "New members — {days} days",
+      "newHelper": "Since {date}",
+      "banned": "Banned members",
+      "bannedHelper": "Currently banned accounts"
+    },
+    "recent": {
+      "title": "Latest members",
+      "description": "The five most recently created accounts.",
+      "viewAll": "View all",
+      "emptyTitle": "No members yet",
+      "emptyDescription": "New accounts will appear here."
+    },
+    "actions": {
+      "title": "Quick actions",
+      "description": "Open the administrative tools backed by real data.",
+      "usersTitle": "Manage users",
+      "usersDescription": "Search, filter, and administer accounts.",
+      "analyticsTitle": "Open PostHog",
+      "analyticsDescription": "Review product activity and adoption.",
+      "analyticsUnconfigured": "Set NEXT_PUBLIC_POSTHOG_DASHBOARD_URL to enable this link."
+    }
+  },
+  "audit": {
+    "title": "Admin log",
+    "description": "Secure history of sensitive administrative actions.",
+    "pendingTitle": "Audit log activation in progress",
+    "pendingDescription": "No fictional data is displayed. Secure action recording will be added in the next step."
   },
   "users": {
     "title": "Users",

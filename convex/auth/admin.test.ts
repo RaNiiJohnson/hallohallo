@@ -49,7 +49,13 @@ vi.mock("./auth", async (importOriginal) => {
     }
     if (query.filterField) {
       const field = query.filterField as keyof TestUser;
-      users = users.filter((user) => user[field] === query.filterValue);
+      users = users.filter((user) => {
+        const value = user[field];
+        if (query.filterOperator === "gte") {
+          return Number(value) >= Number(query.filterValue);
+        }
+        return value === query.filterValue;
+      });
     }
     const direction = query.sortDirection === "desc" ? -1 : 1;
     if (query.sortBy) {
@@ -198,6 +204,83 @@ describe("admin user management", () => {
       sortBy: "email",
       sortDirection: "asc",
     });
+  });
+
+  it("calculates dashboard metrics from Better Auth totals", async () => {
+    const dashboard = await t.query(api.auth.admin.getDashboard, {
+      windowStart: 200,
+      asOf: 1_000,
+    });
+
+    expect(dashboard).toMatchObject({
+      totalMembers: 3,
+      newMembers: 2,
+      bannedMembers: 1,
+      windowStart: 200,
+      asOf: 1_000,
+    });
+    expect(dashboard.recentMembers.map((member) => member.id)).toEqual([
+      "admin-1",
+      "user-2",
+      "user-1",
+    ]);
+    expect(authState.listQueries).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          filterField: "createdAt",
+          filterValue: 200,
+          filterOperator: "gte",
+        }),
+        expect.objectContaining({
+          filterField: "banned",
+          filterValue: true,
+          filterOperator: "eq",
+        }),
+      ]),
+    );
+  });
+
+  it("bounds the recent dashboard list to five members", async () => {
+    authState.users = Array.from({ length: 8 }, (_, index) =>
+      user({
+        id: `user-${index}`,
+        name: `User ${index}`,
+        email: `user-${index}@example.com`,
+        createdAt: index,
+      }),
+    );
+
+    const dashboard = await t.query(api.auth.admin.getDashboard, {
+      windowStart: 0,
+      asOf: 1_000,
+    });
+
+    expect(dashboard.totalMembers).toBe(8);
+    expect(dashboard.recentMembers).toHaveLength(5);
+    expect(dashboard.recentMembers.map((member) => member.id)).toEqual([
+      "user-7",
+      "user-6",
+      "user-5",
+      "user-4",
+      "user-3",
+    ]);
+  });
+
+  it("refuses invalid dashboard windows and non-admin access", async () => {
+    await expect(
+      t.query(api.auth.admin.getDashboard, {
+        windowStart: 1_001,
+        asOf: 1_000,
+      }),
+    ).rejects.toThrow("between 0 and 31 days");
+
+    authState.actor.role = "user";
+    await expect(
+      t.query(api.auth.admin.getDashboard, {
+        windowStart: 0,
+        asOf: 1_000,
+      }),
+    ).rejects.toThrow("Admin access required");
   });
 
   it("rejects invalid roles and user types at the public boundary", async () => {

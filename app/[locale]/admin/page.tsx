@@ -1,253 +1,349 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/navigation";
-import { ArrowRight, Briefcase, Building, Check, Flag, X } from "lucide-react";
+import { getPostHogDashboardUrl } from "@/lib/admin-navigation";
+import { api } from "@convex/_generated/api";
+import type { FunctionReturnType } from "convex/server";
+import { useConvex } from "convex/react";
+import {
+  ArrowRight,
+  Ban,
+  ExternalLink,
+  RefreshCw,
+  UserPlus,
+  Users,
+} from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+const WINDOW_DAYS = 7;
+const WINDOW_MS = WINDOW_DAYS * 24 * 60 * 60 * 1000;
+const POSTHOG_DASHBOARD_URL = getPostHogDashboardUrl(
+  process.env.NEXT_PUBLIC_POSTHOG_DASHBOARD_URL,
+);
+
+type DashboardData = FunctionReturnType<typeof api.auth.admin.getDashboard>;
+
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-6" aria-label="Loading dashboard">
+      <div className="space-y-2">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-4 w-72 max-w-full" />
+      </div>
+      <div className="grid gap-4 sm:grid-cols-3">
+        {Array.from({ length: 3 }, (_, index) => (
+          <div key={index} className="rounded-xl border bg-card p-5">
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="mt-4 h-9 w-20" />
+            <Skeleton className="mt-3 h-3 w-36" />
+          </div>
+        ))}
+      </div>
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)]">
+        <div className="rounded-xl border bg-card p-5">
+          <Skeleton className="h-6 w-40" />
+          <div className="mt-5 space-y-4">
+            {Array.from({ length: 5 }, (_, index) => (
+              <div key={index} className="flex items-center gap-3">
+                <Skeleton className="size-9 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-36" />
+                  <Skeleton className="h-3 w-52 max-w-full" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="rounded-xl border bg-card p-5">
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="mt-5 h-20 w-full" />
+          <Skeleton className="mt-3 h-20 w-full" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function AdminDashboardPage() {
-  const kpis = [
-    {
-      title: "Membres",
-      value: "1 284",
-      subtext: "+12 ce mois",
-      trend: "up",
-    },
-    {
-      title: "Offres actives",
-      value: "47",
-      subtext: "+3 cette semaine",
-      trend: "up",
-    },
-    {
-      title: "Annonces immo",
-      value: "23",
-      subtext: "-2 expirées",
-      trend: "down",
-    },
-    {
-      title: "Signalements",
-      value: "5",
-      subtext: "à traiter",
-      trend: "neutral",
-      isAlert: true,
-    },
-  ];
+  const t = useTranslations("admin.dashboard");
+  const locale = useLocale();
+  const convex = useConvex();
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const recentUsers = [
-    {
-      initials: "RR",
-      name: "Rivo Rakoto",
-      location: "Berlin",
-      time: "il y a 2h",
-      status: "actif",
-    },
-    {
-      initials: "FM",
-      name: "Fara Miora",
-      location: "Munich",
-      time: "il y a 5h",
-      status: "actif",
-    },
-    {
-      initials: "HV",
-      name: "Haja Vola",
-      location: "Hamburg",
-      time: "hier",
-      status: "en attente",
-    },
-    {
-      initials: "TA",
-      name: "Tiana Andriana",
-      location: "Frankfurt",
-      time: "hier",
-      status: "actif",
-    },
-  ];
+  const fetchDashboard = useCallback(() => {
+    const asOf = Date.now();
+    return convex.query(api.auth.admin.getDashboard, {
+      windowStart: asOf - WINDOW_MS,
+      asOf,
+    });
+  }, [convex]);
 
-  const moderationItems = [
+  const refreshDashboard = useCallback(async () => {
+    setError(null);
+    if (data) setIsRefreshing(true);
+    else setIsLoading(true);
+
+    try {
+      const result = await fetchDashboard();
+      setData(result);
+    } catch {
+      setError(t("errorDescription"));
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  }, [data, fetchDashboard, t]);
+
+  useEffect(() => {
+    let active = true;
+
+    void fetchDashboard()
+      .then((result) => {
+        if (!active) return;
+        setData(result);
+      })
+      .catch(() => {
+        if (!active) return;
+        setError(t("errorDescription"));
+      })
+      .finally(() => {
+        if (!active) return;
+        setIsLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [fetchDashboard, t]);
+
+  const dateFormatter = useMemo(
+    () => new Intl.DateTimeFormat(locale, { dateStyle: "medium" }),
+    [locale],
+  );
+  const updatedFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat(locale, {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }),
+    [locale],
+  );
+
+  if (isLoading && !data) return <DashboardSkeleton />;
+
+  if (!data) {
+    return (
+      <div className="flex min-h-[55vh] items-center justify-center">
+        <div className="max-w-md rounded-xl border bg-card p-8 text-center">
+          <h2 className="text-xl font-semibold">{t("errorTitle")}</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {error ?? t("errorDescription")}
+          </p>
+          <Button className="mt-5" onClick={() => void refreshDashboard()}>
+            {t("retry")}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const metrics = [
     {
-      id: 1,
-      type: "job",
-      icon: Briefcase,
-      title: "Développeur Full Stack - Berlin",
-      meta: "Offre • soumise il y a 1h",
-      actions: ["Approuver", "Rejeter"],
-      color: "bg-blue-500/10 text-blue-500",
+      key: "total",
+      label: t("metrics.total"),
+      value: data.totalMembers,
+      helper: t("metrics.totalHelper"),
+      icon: Users,
     },
     {
-      id: 2,
-      type: "listing",
-      icon: Building,
-      title: "Colocation 3P à Munich centre",
-      meta: "Immobilier • soumise il y a 3h",
-      actions: ["Approuver", "Rejeter"],
-      color: "bg-emerald-500/10 text-emerald-500",
+      key: "new",
+      label: t("metrics.new", { days: WINDOW_DAYS }),
+      value: data.newMembers,
+      helper: t("metrics.newHelper", {
+        date: dateFormatter.format(new Date(data.windowStart)),
+      }),
+      icon: UserPlus,
     },
     {
-      id: 3,
-      type: "report",
-      icon: Flag,
-      title: "Signalement : contenu inapproprié",
-      meta: "Forum • signalé il y a 6h",
-      actions: ["Ignorer", "Supprimer"],
-      color: "bg-destructive/10 text-destructive",
+      key: "banned",
+      label: t("metrics.banned"),
+      value: data.bannedMembers,
+      helper: t("metrics.bannedHelper"),
+      icon: Ban,
     },
   ];
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight">Dashboard</h2>
-        <p className="text-muted-foreground">
-          Vue d&apos;ensemble de l&apos;activité sur Hallo Hallo.
-        </p>
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">{t("title")}</h2>
+          <p className="text-muted-foreground">{t("description")}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {t("lastUpdated", {
+              date: updatedFormatter.format(new Date(data.asOf)),
+            })}
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => void refreshDashboard()}
+          disabled={isRefreshing}
+          className="gap-2"
+        >
+          <RefreshCw
+            className={`size-4 ${isRefreshing ? "animate-spin" : ""}`}
+          />
+          {t("refresh")}
+        </Button>
       </div>
 
-      {/* KPIs */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {kpis.map((kpi, i) => (
-          <div
-            key={i}
-            className="rounded-xl border bg-card p-6 shadow-sm flex flex-col justify-between"
-          >
-            <h3 className="text-sm font-medium text-muted-foreground">
-              {kpi.title}
-            </h3>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-3xl font-bold">{kpi.value}</span>
+      {error ? (
+        <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+          {error}
+        </div>
+      ) : null}
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        {metrics.map((metric) => (
+          <div key={metric.key} className="rounded-xl border bg-card p-5">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-sm font-medium text-muted-foreground">
+                {metric.label}
+              </h3>
+              <metric.icon className="size-4 text-muted-foreground" />
             </div>
-            <p
-              className={`text-xs mt-1 ${
-                kpi.trend === "up"
-                  ? "text-emerald-500"
-                  : kpi.isAlert
-                    ? "text-destructive"
-                    : "text-muted-foreground"
-              }`}
-            >
-              {kpi.subtext}
+            <p className="mt-3 text-3xl font-semibold tracking-tight tabular-nums">
+              {metric.value.toLocaleString(locale)}
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              {metric.helper}
             </p>
           </div>
         ))}
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Derniers Inscrits */}
-        <div className="rounded-xl border bg-card p-6 shadow-sm flex flex-col">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold">Derniers inscrits</h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              asChild
-              className="text-sm text-primary"
-            >
-              <Link href="/admin/users">
-                Voir tout <ArrowRight className="ml-1 size-3" />
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)]">
+        <section className="rounded-xl border bg-card p-5">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h3 className="font-semibold">{t("recent.title")}</h3>
+              <p className="text-sm text-muted-foreground">
+                {t("recent.description")}
+              </p>
+            </div>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/admin/users" className="gap-1">
+                {t("recent.viewAll")}
+                <ArrowRight className="size-3.5" />
               </Link>
             </Button>
           </div>
 
-          <div className="space-y-4">
-            {recentUsers.map((user, i) => (
-              <div key={i} className="flex items-center justify-between group">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`flex size-10 items-center justify-center rounded-full text-sm font-medium ${
-                      user.status === "en attente"
-                        ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                        : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                    }`}
-                  >
-                    {user.initials}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium leading-none">
-                      {user.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {user.location} • {user.time}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                      user.status === "actif"
-                        ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
-                        : "bg-amber-500/15 text-amber-700 dark:text-amber-400"
-                    }`}
-                  >
-                    {user.status}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* File de modération */}
-        <div className="rounded-xl border bg-card p-6 shadow-sm flex flex-col">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              File de modération
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-destructive/10 text-[10px] font-medium text-destructive">
-                5
-              </span>
-            </h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              asChild
-              className="text-sm text-primary"
-            >
-              <Link href="/admin/moderation">
-                Tout traiter <ArrowRight className="ml-1 size-3" />
-              </Link>
-            </Button>
-          </div>
-
-          <div className="space-y-4">
-            {moderationItems.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-start gap-4 rounded-lg border p-4 bg-background/50 transition-colors hover:bg-muted/50"
-              >
+          {data.recentMembers.length === 0 ? (
+            <div className="mt-5 rounded-lg border border-dashed p-8 text-center">
+              <p className="font-medium">{t("recent.emptyTitle")}</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {t("recent.emptyDescription")}
+              </p>
+            </div>
+          ) : (
+            <div className="mt-5 divide-y">
+              {data.recentMembers.map((member) => (
                 <div
-                  className={`mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md ${item.color}`}
+                  key={member.id}
+                  className="flex items-center gap-3 py-3 first:pt-0 last:pb-0"
                 >
-                  <item.icon className="size-4" />
-                </div>
-                <div className="flex-1 space-y-1">
-                  <p className="text-sm font-medium leading-none">
-                    {item.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{item.meta}</p>
-
-                  <div className="flex items-center gap-2 pt-2">
-                    <Button size="sm" variant="outline" className="h-7 text-xs">
-                      {item.actions[0] === "Approuver" && (
-                        <Check className="mr-1 size-3 text-emerald-500" />
-                      )}
-                      {item.actions[0]}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-7 text-xs border-destructive/20 text-destructive hover:bg-destructive/10"
-                    >
-                      {item.actions[1] === "Rejeter" ||
-                      item.actions[1] === "Supprimer" ? (
-                        <X className="mr-1 size-3" />
-                      ) : null}
-                      {item.actions[1]}
-                    </Button>
+                  <Avatar className="size-9">
+                    <AvatarImage src={member.image ?? ""} alt={member.name} />
+                    <AvatarFallback>
+                      {member.name.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{member.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {member.email}
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p className="text-xs text-muted-foreground">
+                      {dateFormatter.format(new Date(member.createdAt))}
+                    </p>
+                    {member.city ? (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {member.city}
+                      </p>
+                    ) : null}
                   </div>
                 </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="rounded-xl border bg-card p-5">
+          <h3 className="font-semibold">{t("actions.title")}</h3>
+          <p className="text-sm text-muted-foreground">
+            {t("actions.description")}
+          </p>
+          <div className="mt-5 space-y-3">
+            <Button variant="outline" className="h-auto w-full justify-between p-4" asChild>
+              <Link href="/admin/users">
+                <span className="text-left">
+                  <span className="block font-medium">
+                    {t("actions.usersTitle")}
+                  </span>
+                  <span className="mt-1 block text-xs font-normal text-muted-foreground">
+                    {t("actions.usersDescription")}
+                  </span>
+                </span>
+                <ArrowRight className="size-4" />
+              </Link>
+            </Button>
+
+            {POSTHOG_DASHBOARD_URL ? (
+              <Button
+                variant="outline"
+                className="h-auto w-full justify-between p-4"
+                asChild
+              >
+                <a
+                  href={POSTHOG_DASHBOARD_URL}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  <span className="text-left">
+                    <span className="block font-medium">
+                      {t("actions.analyticsTitle")}
+                    </span>
+                    <span className="mt-1 block text-xs font-normal text-muted-foreground">
+                      {t("actions.analyticsDescription")}
+                    </span>
+                  </span>
+                  <ExternalLink className="size-4" />
+                </a>
+              </Button>
+            ) : (
+              <div className="rounded-lg border border-dashed p-4">
+                <p className="text-sm font-medium">
+                  {t("actions.analyticsTitle")}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {t("actions.analyticsUnconfigured")}
+                </p>
               </div>
-            ))}
+            )}
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );
