@@ -46,8 +46,40 @@
   "audit": {
     "title": "Admin-Protokoll",
     "description": "Sicherer Verlauf sensibler administrativer Aktionen.",
-    "pendingTitle": "Aktivierung des Protokolls läuft",
-    "pendingDescription": "Es werden keine fiktiven Daten angezeigt. Die sichere Aufzeichnung von Aktionen folgt im nächsten Schritt."
+    "loading": "Admin-Protokoll wird geladen",
+    "emptyTitle": "Keine administrativen Aktionen aufgezeichnet",
+    "emptyDescription": "Erfolgreiche Kontoerstellungen und administrative Änderungen werden hier angezeigt.",
+    "loadMore": "Mehr anzeigen",
+    "loadingMore": "Wird geladen...",
+    "columns": {
+      "action": "Aktion",
+      "administrator": "Administrator",
+      "target": "Ziel",
+      "date": "Datum"
+    },
+    "actions": {
+      "user_created": "Benutzer erstellt",
+      "user_banned": "Benutzer gesperrt",
+      "user_unbanned": "Benutzer entsperrt",
+      "user_role_changed": "Rolle geändert",
+      "user_type_changed": "Typ geändert"
+    },
+    "targetTypes": {
+      "user": "Benutzer"
+    },
+    "details": {
+      "role": "Neue Rolle: {value}",
+      "userType": "Neuer Typ: {value}"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "user": "Benutzer"
+    },
+    "userTypes": {
+      "admin": "Administrator",
+      "seeker": "Suchender",
+      "provider": "Anbieter"
+    }
   },
   "users": {
     "title": "Benutzer",

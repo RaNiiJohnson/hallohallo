@@ -80,22 +80,49 @@ vi.mock("./auth", async (importOriginal) => {
     banUser: vi.fn(async ({ body }: { body: { userId: string } }) => {
       authState.calls.push(`ban:${body.userId}`);
       if (authState.failBan) throw new Error("server refused ban");
+      const target = authState.users.find((user) => user.id === body.userId);
+      if (target) target.banned = true;
     }),
     unbanUser: vi.fn(async ({ body }: { body: { userId: string } }) => {
       authState.calls.push(`unban:${body.userId}`);
+      const target = authState.users.find((user) => user.id === body.userId);
+      if (target) target.banned = false;
     }),
     setRole: vi.fn(
       async ({ body }: { body: { userId: string; role: "admin" | "user" } }) => {
         authState.calls.push(`role:${body.userId}:${body.role}`);
+        const target = authState.users.find((user) => user.id === body.userId);
+        if (target) target.role = body.role;
       },
     ),
     adminUpdateUser: vi.fn(
       async ({ body }: { body: { userId: string; data: { userType: string } } }) => {
         authState.calls.push(`type:${body.userId}:${body.data.userType}`);
+        const target = authState.users.find((user) => user.id === body.userId);
+        if (
+          target &&
+          (body.data.userType === "admin" ||
+            body.data.userType === "seeker" ||
+            body.data.userType === "provider")
+        ) {
+          target.userType = body.data.userType;
+        }
       },
     ),
-    createUser: vi.fn(async ({ body }: { body: { email: string } }) => {
+    createUser: vi.fn(async ({
+      body,
+    }: {
+      body: { email: string; name: string; role: "admin" | "user" };
+    }) => {
       authState.calls.push(`create:${body.email}`);
+      return {
+        user: {
+          id: "created-user",
+          name: body.name,
+          email: body.email,
+          role: body.role,
+        },
+      };
     }),
   };
 
@@ -281,6 +308,131 @@ describe("admin user management", () => {
         asOf: 1_000,
       }),
     ).rejects.toThrow("Admin access required");
+  });
+
+  it("records every successful sensitive user administration action", async () => {
+    await t.mutation(api.auth.admin.banUser, { userId: "user-1" });
+    await t.mutation(api.auth.admin.unbanUser, { userId: "user-1" });
+    await t.mutation(api.auth.admin.setUserRole, {
+      userId: "user-1",
+      role: "admin",
+    });
+    await t.mutation(api.auth.admin.setUserType, {
+      userId: "user-1",
+      userType: "provider",
+    });
+    await t.mutation(api.auth.admin.createUser, {
+      email: "new-user@example.com",
+      password: "not-recorded-password",
+      name: "New User",
+      role: "user",
+      userType: "seeker",
+    });
+
+    const audit = await t.query(api.adminAudit.list, {
+      paginationOpts: { numItems: 20, cursor: null },
+    });
+
+    expect(audit.page).toHaveLength(5);
+    expect(audit.page.map((event) => event.action)).toEqual(
+      expect.arrayContaining([
+        "user_created",
+        "user_banned",
+        "user_unbanned",
+        "user_role_changed",
+        "user_type_changed",
+      ]),
+    );
+    expect(audit.page).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          administratorId: "actor-admin",
+          administratorLabel: "Current Admin",
+          targetType: "user",
+        }),
+        expect.objectContaining({
+          action: "user_role_changed",
+          metadata: { role: "admin" },
+        }),
+        expect.objectContaining({
+          action: "user_type_changed",
+          metadata: { userType: "provider" },
+        }),
+      ]),
+    );
+
+    const serializedAudit = JSON.stringify(audit.page);
+    expect(serializedAudit).not.toContain("not-recorded-password");
+    expect(serializedAudit).not.toContain("new-user@example.com");
+    expect(serializedAudit).not.toMatch(/token|password|cv|signedUrl/i);
+  });
+
+  it("does not record a success event when the operation fails", async () => {
+    authState.failBan = true;
+
+    await expect(
+      t.mutation(api.auth.admin.banUser, { userId: "user-1" }),
+    ).rejects.toThrow("server refused ban");
+
+    const audit = await t.query(api.adminAudit.list, {
+      paginationOpts: { numItems: 20, cursor: null },
+    });
+    expect(audit.page).toEqual([]);
+  });
+
+  it("does not record unchanged administrative state as an action", async () => {
+    await t.mutation(api.auth.admin.unbanUser, { userId: "user-1" });
+    await t.mutation(api.auth.admin.setUserRole, {
+      userId: "user-1",
+      role: "user",
+    });
+    await t.mutation(api.auth.admin.setUserType, {
+      userId: "user-1",
+      userType: "seeker",
+    });
+
+    const audit = await t.query(api.adminAudit.list, {
+      paginationOpts: { numItems: 20, cursor: null },
+    });
+    expect(audit.page).toEqual([]);
+  });
+
+  it("refuses audit access to a non-admin", async () => {
+    authState.actor.role = "user";
+
+    await expect(
+      t.query(api.adminAudit.list, {
+        paginationOpts: { numItems: 20, cursor: null },
+      }),
+    ).rejects.toThrow("Admin access required");
+  });
+
+  it("paginates audit events in reverse chronological order", async () => {
+    await t.run(async (ctx) => {
+      for (const occurredAt of [100, 300, 200]) {
+        await ctx.db.insert("adminAuditEvents", {
+          administratorId: "actor-admin",
+          action: "user_banned",
+          targetType: "user",
+          targetId: `user-${occurredAt}`,
+          occurredAt,
+        });
+      }
+    });
+
+    const firstPage = await t.query(api.adminAudit.list, {
+      paginationOpts: { numItems: 2, cursor: null },
+    });
+    const secondPage = await t.query(api.adminAudit.list, {
+      paginationOpts: {
+        numItems: 2,
+        cursor: firstPage.continueCursor,
+      },
+    });
+
+    expect(firstPage.page.map((event) => event.occurredAt)).toEqual([300, 200]);
+    expect(secondPage.page.map((event) => event.occurredAt)).toEqual([100]);
+    expect(secondPage.isDone).toBe(true);
   });
 
   it("rejects invalid roles and user types at the public boundary", async () => {

@@ -1,5 +1,9 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import {
+  adminAuditActionValidator,
+  adminAuditMetadataValidator,
+} from "./adminAuditValues";
 
 export default defineSchema({
   service_provider: defineTable({
@@ -352,4 +356,15 @@ export default defineSchema({
   })
     .index("by_key", ["key"])
     .index("by_userId", ["userId"]),
+
+  adminAuditEvents: defineTable({
+    administratorId: v.string(),
+    administratorLabel: v.optional(v.string()),
+    action: adminAuditActionValidator,
+    targetType: v.literal("user"),
+    targetId: v.string(),
+    targetLabel: v.optional(v.string()),
+    occurredAt: v.number(),
+    metadata: v.optional(adminAuditMetadataValidator),
+  }).index("by_occurredAt", ["occurredAt"]),
 });

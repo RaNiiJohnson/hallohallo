@@ -1,5 +1,11 @@
 import { Infer, v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
+import { internal } from "../_generated/api";
+import type { MutationCtx } from "../_generated/server";
+import type {
+  AdminAuditAction,
+  AdminAuditMetadata,
+} from "../adminAuditValues";
 import { adminAction, adminMutation, adminQuery } from "../functions";
 import { throwForbidden } from "../utils/errors";
 import { authComponent, createAuth } from "./auth";
@@ -55,6 +61,33 @@ const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 50;
 const MAX_DASHBOARD_WINDOW_MS = 31 * 24 * 60 * 60 * 1000;
 
+type AdminAuditContext = {
+  user: { _id: string; name?: string | null };
+  runMutation: MutationCtx["runMutation"];
+};
+
+async function recordAdminAudit(
+  ctx: AdminAuditContext,
+  event: {
+    action: AdminAuditAction;
+    targetId: string;
+    targetLabel?: string;
+    metadata?: AdminAuditMetadata;
+  },
+) {
+  const administratorLabel = ctx.user.name?.trim();
+  const targetLabel = event.targetLabel?.trim();
+
+  await ctx.runMutation(internal.adminAudit.record, {
+    administratorId: ctx.user._id,
+    ...(administratorLabel ? { administratorLabel } : {}),
+    action: event.action,
+    targetId: event.targetId,
+    ...(targetLabel ? { targetLabel } : {}),
+    ...(event.metadata ? { metadata: event.metadata } : {}),
+  });
+}
+
 function toTimestamp(value: unknown): number {
   if (typeof value === "number" && Number.isFinite(value)) return value;
   if (value instanceof Date) return value.getTime();
@@ -94,7 +127,7 @@ async function assertNotLastAdministrator(
   userId: string,
 ) {
   const target = await auth.api.getUser({ query: { id: userId }, headers });
-  if (target.role !== "admin") return;
+  if (target.role !== "admin") return target;
 
   const administrators = await auth.api.listUsers({
     query: {
@@ -110,6 +143,8 @@ async function assertNotLastAdministrator(
   if (administrators.total <= 1) {
     throwForbidden("The last administrator cannot be demoted or deleted.");
   }
+
+  return target;
 }
 
 export const listUsers = adminQuery({
@@ -254,9 +289,19 @@ export const banUser = adminMutation({
       throwForbidden("Cannot ban your own account.");
     }
     const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
+    const target = await auth.api.getUser({
+      query: { id: args.userId },
+      headers,
+    });
+    if (target.banned === true) return null;
     await auth.api.banUser({
       body: { userId: args.userId, banReason: "Policy violation" },
       headers,
+    });
+    await recordAdminAudit(ctx, {
+      action: "user_banned",
+      targetId: args.userId,
+      targetLabel: target.name,
     });
     return null;
   },
@@ -270,7 +315,17 @@ export const unbanUser = adminMutation({
       throwForbidden("Cannot perform this action on your own account.");
     }
     const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
+    const target = await auth.api.getUser({
+      query: { id: args.userId },
+      headers,
+    });
+    if (target.banned !== true) return null;
     await auth.api.unbanUser({ body: { userId: args.userId }, headers });
+    await recordAdminAudit(ctx, {
+      action: "user_unbanned",
+      targetId: args.userId,
+      targetLabel: target.name,
+    });
     return null;
   },
 });
@@ -283,12 +338,23 @@ export const setUserRole = adminMutation({
       throwForbidden("Cannot change your own administrator role.");
     }
     const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
-    if (args.role !== "admin") {
-      await assertNotLastAdministrator(auth, headers, args.userId);
-    }
+    const target =
+      args.role === "admin"
+        ? await auth.api.getUser({
+            query: { id: args.userId },
+            headers,
+          })
+        : await assertNotLastAdministrator(auth, headers, args.userId);
+    if (target.role === args.role) return null;
     await auth.api.setRole({
       body: { userId: args.userId, role: args.role },
       headers,
+    });
+    await recordAdminAudit(ctx, {
+      action: "user_role_changed",
+      targetId: args.userId,
+      targetLabel: target.name,
+      metadata: { role: args.role },
     });
     return null;
   },
@@ -299,9 +365,22 @@ export const setUserType = adminMutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
+    const target = await auth.api.getUser({
+      query: { id: args.userId },
+      headers,
+    });
+    const currentUserType = (target as unknown as Record<string, unknown>)
+      .userType;
+    if (currentUserType === args.userType) return null;
     await auth.api.adminUpdateUser({
       body: { userId: args.userId, data: { userType: args.userType } },
       headers,
+    });
+    await recordAdminAudit(ctx, {
+      action: "user_type_changed",
+      targetId: args.userId,
+      targetLabel: target.name,
+      metadata: { userType: args.userType },
     });
     return null;
   },
@@ -318,7 +397,7 @@ export const createUser = adminMutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
-    await auth.api.createUser({
+    const created = await auth.api.createUser({
       body: {
         email: args.email,
         password: args.password,
@@ -334,6 +413,12 @@ export const createUser = adminMutation({
         },
       },
       headers,
+    });
+    await recordAdminAudit(ctx, {
+      action: "user_created",
+      targetId: created.user.id,
+      targetLabel: args.name,
+      metadata: { role: args.role, userType: args.userType },
     });
     return null;
   },
