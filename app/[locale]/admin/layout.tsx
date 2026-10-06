@@ -39,13 +39,6 @@ export default async function AdminLayout({
               </h1>
             </div>
             <div className="flex items-center gap-2">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder={t("globalSearch")}
-                  className="hidden md:block h-8 w-64 rounded-md border border-border bg-muted/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                />
-              </div>
               <LocaleSwitcher />
               <ThemeToggle />
             </div>

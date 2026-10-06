@@ -53,6 +53,7 @@ export type AdminUser = Infer<typeof adminUserValidator>;
 
 const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 50;
+const MAX_DASHBOARD_WINDOW_MS = 31 * 24 * 60 * 60 * 1000;
 
 function toTimestamp(value: unknown): number {
   if (typeof value === "number" && Number.isFinite(value)) return value;
@@ -168,6 +169,79 @@ export const listUsers = adminQuery({
       total: result.total,
       limit,
       offset,
+    };
+  },
+});
+
+export const getDashboard = adminQuery({
+  args: {
+    windowStart: v.number(),
+    asOf: v.number(),
+  },
+  returns: v.object({
+    totalMembers: v.number(),
+    newMembers: v.number(),
+    bannedMembers: v.number(),
+    recentMembers: v.array(adminUserValidator),
+    windowStart: v.number(),
+    asOf: v.number(),
+  }),
+  handler: async (ctx, args) => {
+    const windowDuration = args.asOf - args.windowStart;
+    if (
+      !Number.isFinite(args.windowStart) ||
+      !Number.isFinite(args.asOf) ||
+      args.windowStart < 0 ||
+      windowDuration < 0 ||
+      windowDuration > MAX_DASHBOARD_WINDOW_MS
+    ) {
+      throw new Error("Dashboard time window must be between 0 and 31 days.");
+    }
+
+    const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
+    const [members, newMembers, bannedMembers] = await Promise.all([
+      auth.api.listUsers({
+        query: {
+          limit: 5,
+          offset: 0,
+          sortBy: "createdAt",
+          sortDirection: "desc",
+        },
+        headers,
+      }),
+      auth.api.listUsers({
+        query: {
+          limit: 1,
+          offset: 0,
+          filterField: "createdAt",
+          filterValue: args.windowStart,
+          filterOperator: "gte",
+        },
+        headers,
+      }),
+      auth.api.listUsers({
+        query: {
+          limit: 1,
+          offset: 0,
+          filterField: "banned",
+          filterValue: true,
+          filterOperator: "eq",
+        },
+        headers,
+      }),
+    ]);
+
+    return {
+      totalMembers: members.total,
+      newMembers: newMembers.total,
+      bannedMembers: bannedMembers.total,
+      recentMembers: members.users
+        .slice(0, 5)
+        .map((user) =>
+          projectAdminUser(user as unknown as Record<string, unknown>),
+        ),
+      windowStart: args.windowStart,
+      asOf: args.asOf,
     };
   },
 });
