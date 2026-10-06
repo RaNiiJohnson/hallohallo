@@ -46,8 +46,40 @@
   "audit": {
     "title": "Journal administratif",
     "description": "Historique sécurisé des actions administratives sensibles.",
-    "pendingTitle": "Journal en cours d'activation",
-    "pendingDescription": "Aucune donnée fictive n'est affichée. L'enregistrement sécurisé des actions sera ajouté dans la prochaine étape."
+    "loading": "Chargement du journal administratif",
+    "emptyTitle": "Aucune action administrative enregistrée",
+    "emptyDescription": "Les créations de comptes et les changements administratifs réussis apparaîtront ici.",
+    "loadMore": "Afficher plus",
+    "loadingMore": "Chargement...",
+    "columns": {
+      "action": "Action",
+      "administrator": "Administrateur",
+      "target": "Cible",
+      "date": "Date"
+    },
+    "actions": {
+      "user_created": "Utilisateur créé",
+      "user_banned": "Utilisateur banni",
+      "user_unbanned": "Utilisateur débanni",
+      "user_role_changed": "Rôle modifié",
+      "user_type_changed": "Type modifié"
+    },
+    "targetTypes": {
+      "user": "Utilisateur"
+    },
+    "details": {
+      "role": "Nouveau rôle : {value}",
+      "userType": "Nouveau type : {value}"
+    },
+    "roles": {
+      "admin": "Administrateur",
+      "user": "Utilisateur"
+    },
+    "userTypes": {
+      "admin": "Administrateur",
+      "seeker": "Chercheur",
+      "provider": "Fournisseur"
+    }
   },
   "users": {
     "title": "Utilisateurs",

@@ -46,8 +46,40 @@
   "audit": {
     "title": "Admin log",
     "description": "Secure history of sensitive administrative actions.",
-    "pendingTitle": "Audit log activation in progress",
-    "pendingDescription": "No fictional data is displayed. Secure action recording will be added in the next step."
+    "loading": "Loading the admin log",
+    "emptyTitle": "No administrative actions recorded",
+    "emptyDescription": "Successful account creation and administrative changes will appear here.",
+    "loadMore": "Show more",
+    "loadingMore": "Loading...",
+    "columns": {
+      "action": "Action",
+      "administrator": "Administrator",
+      "target": "Target",
+      "date": "Date"
+    },
+    "actions": {
+      "user_created": "User created",
+      "user_banned": "User banned",
+      "user_unbanned": "User unbanned",
+      "user_role_changed": "Role changed",
+      "user_type_changed": "Type changed"
+    },
+    "targetTypes": {
+      "user": "User"
+    },
+    "details": {
+      "role": "New role: {value}",
+      "userType": "New type: {value}"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "user": "User"
+    },
+    "userTypes": {
+      "admin": "Administrator",
+      "seeker": "Seeker",
+      "provider": "Provider"
+    }
   },
   "users": {
     "title": "Users",
