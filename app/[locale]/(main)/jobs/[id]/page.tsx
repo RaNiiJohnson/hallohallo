@@ -31,7 +31,7 @@ import { notFound, useParams } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { ApplyJobDialog } from "../_component/dialogs/applyJobDialog";
-import DeleteJobDialog from "../_component/dialogs/deleteJobDialog";
+import { JobLifecycleActions } from "../_component/jobLifecycleActions";
 import { SalaryDisplay } from "../_component/salary";
 import { JobBookmarkButton } from "../_component/JobBookmarkButton";
 import { JobDetailsSkeleton } from "../_component/skeleton";
@@ -51,6 +51,10 @@ export default function JobDetailsPage() {
   const jobOffer = useQuery(api.jobs.queries.getJobWithContact, {
     slug: id as string,
   });
+  const applicationEmailStatus = useQuery(
+    api.jobs.queries.hasCurrentUserAppliedToJob,
+    jobOffer ? { jobId: jobOffer._id } : "skip",
+  );
 
   // const translated = useTranslatedJob(jobOffer);
 
@@ -78,6 +82,8 @@ export default function JobDetailsPage() {
   const city = data?.city ?? jobOffer.city;
 
   const isAuthor = user?._id === jobOffer.authorId;
+  const isAcceptingApplications =
+    jobOffer.status === undefined || jobOffer.status === "active";
 
   return (
     <div className="min-h-screen bg-muted/50">
@@ -189,28 +195,73 @@ export default function JobDetailsPage() {
                   <Skeleton className="w-[250px] h-[42px] rounded-full border border-muted select-none pointer-events-none" />
                 ) : isAuthor ? (
                   <ButtonGroup>
-                    <DeleteJobDialog jobId={jobOffer._id} />
+                    <JobLifecycleActions
+                      jobId={jobOffer._id}
+                      status={jobOffer.status}
+                    />
                     <ShareButton text={jobOffer.title} jobPage={true} />
                     <EditJobDialog jobOffer={jobOffer} />
                   </ButtonGroup>
                 ) : (
                   <ButtonGroup>
                     {isAuthenticated ? (
-                      <ApplyJobDialog jobOffer={jobOffer}>
-                        <Button variant="default" size="sm" className="gap-2">
+                      isAcceptingApplications ? (
+                        applicationEmailStatus === "failed" ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2"
+                            disabled
+                          >
+                            <Mail className="w-4 h-4" />
+                            {t("details.applicationDeliveryFailed")}
+                          </Button>
+                        ) : applicationEmailStatus !== "none" ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2"
+                            disabled
+                          >
+                            <Mail className="w-4 h-4" />
+                            {t("details.alreadyApplied")}
+                          </Button>
+                        ) : (
+                          <ApplyJobDialog jobOffer={jobOffer}>
+                            <Button
+                              variant="default"
+                              size="sm"
+                              className="gap-2"
+                              disabled={applicationEmailStatus === undefined}
+                            >
+                              <Mail className="w-4 h-4" />
+                              {t("details.apply")}
+                            </Button>
+                          </ApplyJobDialog>
+                        )
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-2"
+                          disabled
+                        >
                           <Mail className="w-4 h-4" />
-                          {t("details.apply")}
+                          {t("details.closed")}
                         </Button>
-                      </ApplyJobDialog>
+                      )
                     ) : (
                       <Button
                         variant="default"
                         size="sm"
                         className="gap-2"
+                        disabled={!isAcceptingApplications}
                         onClick={requireAuthentication}
                       >
                         <Mail className="w-4 h-4" />
-                        {t("details.apply")}
+                        {isAcceptingApplications
+                          ? t("details.apply")
+                          : t("details.closed")}
                       </Button>
                     )}
 

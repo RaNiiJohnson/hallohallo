@@ -1,7 +1,22 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
-import { authMutation } from "../functions";
-import { throwForbidden, throwNotFound } from "../utils/errors";
+import { authMutation, internalMutation } from "../functions";
+import { assertVerifiedUpload, consumeUploadGrant } from "../integrations/r2";
+import {
+  throwForbidden,
+  throwNotFound,
+  throwValidationError,
+} from "../utils/errors";
+
+const jobStatusValidator = v.union(
+  v.literal("active"),
+  v.literal("closed"),
+  v.literal("archived"),
+);
+
+function isJobActive(status: "active" | "closed" | "archived" | undefined) {
+  return status === undefined || status === "active";
+}
 
 export const createJob = authMutation({
   args: {
@@ -58,6 +73,7 @@ export const createJob = authMutation({
       slug: generatedSlug(args.title),
       authorId: user._id,
       authorName: user.name,
+      status: "active",
       updatedAt: Date.now(),
       searchAll: searchAllContent,
     });
@@ -157,33 +173,105 @@ export const deleteJob = authMutation({
       throwForbidden("Not allowed to delete this job");
     }
 
-    const translations = await ctx.db
-      .query("jobTranslations")
-      .withIndex("by_job", (q) => q.eq("jobId", args.id))
-      .collect();
-    await Promise.all(translations.map((t) => ctx.db.delete(t._id)));
-
-    const contact = await ctx.db
-      .query("JobContactInfo")
-      .withIndex("by_jobId", (q) => q.eq("jobId", args.id))
-      .unique();
-    if (contact) await ctx.db.delete(contact._id);
-
-    const bookmarks = await ctx.db
-      .query("bookmarks")
-      .withIndex("by_resourceId", (q) => q.eq("resourceId", args.id))
-      .collect();
-    for (const bookmark of bookmarks) {
-      await ctx.db.delete(bookmark._id);
-    }
-
-    await ctx.db.delete("JobOffer", args.id);
+    await ctx.db.patch(args.id, { status: "archived", updatedAt: Date.now() });
 
     // await posthog.capture(ctx, {
     //   distinctId: posthogDistinctId(user._id),
     //   event: "job_deleted",
     //   properties: { job_id: args.id },
     // });
+    return null;
+  },
+});
+
+export const setJobStatus = authMutation({
+  args: { id: v.id("JobOffer"), status: jobStatusValidator },
+  returns: v.null(),
+  handler: async (ctx, { id, status }) => {
+    const job = await ctx.db.get(id);
+    if (!job) throwNotFound("Job not found");
+    if (job.authorId !== ctx.user._id && ctx.user.role !== "admin") {
+      throwForbidden("Not allowed to change this job status");
+    }
+    await ctx.db.patch(id, { status, updatedAt: Date.now() });
+    return null;
+  },
+});
+
+export const submitApplication = internalMutation({
+  args: {
+    jobId: v.id("JobOffer"),
+    applicationCvKey: v.optional(v.string()),
+    coverLetter: v.optional(v.string()),
+    candidateId: v.string(),
+    profileCv: v.optional(v.string()),
+  },
+  handler: async (
+    ctx,
+    { jobId, applicationCvKey, coverLetter, candidateId, profileCv },
+  ) => {
+    const job = await ctx.db.get(jobId);
+    if (!job) throwNotFound("Job not found");
+    if (!isJobActive(job.status)) {
+      throwValidationError("This job is no longer accepting applications");
+    }
+    if (job.authorId === candidateId) {
+      throwForbidden("You cannot apply to your own job");
+    }
+
+    const existing = await ctx.db
+      .query("jobApplications")
+      .withIndex("by_jobId_and_candidateId", (q) =>
+        q.eq("jobId", jobId).eq("candidateId", candidateId),
+      )
+      .unique();
+    if (existing) {
+      throwValidationError("You have already applied to this job");
+    }
+
+    const cvKey = applicationCvKey ?? profileCv;
+    if (!cvKey) throwNotFound("CV not found");
+    if (applicationCvKey) {
+      await assertVerifiedUpload(ctx, {
+        key: applicationCvKey,
+        userId: candidateId,
+        kind: "applicationCv",
+      });
+    }
+
+    const applicationId = await ctx.db.insert("jobApplications", {
+      jobId,
+      candidateId,
+      cvKey,
+      coverLetter,
+      appliedAt: Date.now(),
+      emailStatus: "pending",
+    });
+    if (applicationCvKey) await consumeUploadGrant(ctx, applicationCvKey);
+
+    const contact = await ctx.db
+      .query("JobContactInfo")
+      .withIndex("by_jobId", (q) => q.eq("jobId", jobId))
+      .unique();
+
+    return {
+      applicationId,
+      jobTitle: job.title,
+      authorId: job.authorId,
+      contactEmail: contact?.email,
+      cvKey,
+    };
+  },
+});
+
+export const updateApplicationEmailStatus = internalMutation({
+  args: {
+    id: v.id("jobApplications"),
+    emailStatus: v.union(v.literal("sent"), v.literal("failed")),
+  },
+  returns: v.null(),
+  handler: async (ctx, { id, emailStatus }) => {
+    await ctx.db.patch(id, { emailStatus });
     return null;
   },
 });

@@ -3,7 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { Controller, FieldPath, useFieldArray, useForm } from "react-hook-form";
+import {
+  Controller,
+  FieldPath,
+  useFieldArray,
+  useForm,
+  useWatch,
+} from "react-hook-form";
 import * as z from "zod";
 
 import { MarkdownHint } from "@/components/markdown-hint";
@@ -72,6 +78,24 @@ export const contractTypeValues = [
 
 export const salaryPeriodValues = ["hour", "month", "year"] as const;
 
+type JobType = (typeof jobTypeValues)[number];
+type ContractType = (typeof contractTypeValues)[number];
+
+export const contractTypesByJobType: Record<JobType, readonly ContractType[]> = {
+  auPair: ["CDD"],
+  training: ["apprenticeship"],
+  voluntary: ["FSJ/FOJ/BFD"],
+  internship: ["CDD", "fullTime", "partTime"],
+  miniJob: ["partTime"],
+  job: ["CDI", "CDD", "fullTime", "partTime", "apprenticeship"],
+  freelance: ["freelance"],
+  scholarship: ["CDD"],
+};
+
+export function contractTypesForJobType(jobType: JobType) {
+  return contractTypesByJobType[jobType];
+}
+
 interface JobOfferFormProps {
   onSuccess?: () => void;
 }
@@ -116,7 +140,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
     defaultValues: {
       title: "",
       type: "auPair",
-      contractType: "CDI",
+      contractType: "CDD",
       city: "",
       duration: "",
       startDate: "",
@@ -132,6 +156,8 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
     control: form.control,
     name: "certificates",
   });
+  const selectedJobType = useWatch({ control: form.control, name: "type" });
+  const availableContractTypes = contractTypesForJobType(selectedJobType);
 
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
@@ -291,7 +317,19 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
                 <FieldLabel htmlFor="job-type">
                   {t("form.labels.jobType")}
                 </FieldLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    const jobType = value as JobType;
+                    field.onChange(jobType);
+                    const contractTypes = contractTypesForJobType(jobType);
+                    if (!contractTypes.includes(form.getValues("contractType"))) {
+                      form.setValue("contractType", contractTypes[0], {
+                        shouldValidate: true,
+                      });
+                    }
+                  }}
+                >
                   <SelectTrigger
                     id="job-type"
                     aria-invalid={fieldState.invalid}
@@ -340,7 +378,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
                     />
                   </SelectTrigger>
                   <SelectContent>
-                    {contractTypeValues.map((contract) => (
+                    {availableContractTypes.map((contract) => (
                       <SelectItem key={contract} value={contract}>
                         {t(
                           `labels.contracts.${contract}` as Parameters<

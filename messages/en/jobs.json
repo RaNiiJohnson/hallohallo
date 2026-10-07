@@ -128,7 +128,10 @@
     "backToList": "Back to offers",
     "breadcrumb": "Opportunities",
     "you": "You",
-    "have": "have"
+    "have": "have",
+    "closed": "Applications closed",
+    "alreadyApplied": "Application already sent",
+    "applicationDeliveryFailed": "Application saved — delivery not confirmed"
   },
   "dialogs": {
     "publish": {
@@ -149,12 +152,21 @@
       "successToast": "Offer deleted successfully",
       "errorToast": "Error deleting the offer"
     },
+    "lifecycle": {
+      "close": "Close offer",
+      "reopen": "Reopen",
+      "archive": "Archive",
+      "restore": "Restore",
+      "success": "Offer status updated.",
+      "error": "Unable to update the offer status."
+    },
     "apply": {
       "application": "APPLICATION",
       "cvLabel": "CV *",
       "cvHint": "(PDF, max 5 MB)",
-      "noProfileCv": "You do not have a CV on your profile yet. Please upload one to apply.",
+      "noProfileCv": "You do not have a profile CV yet. Add a CV for this application only.",
       "profileCvUsed": "Your profile CV will be used by default.",
+      "applicationCvUsed": "This CV will only be used for this application. Your profile CV will not be changed.",
       "dropHere": "Drop your PDF here or",
       "browse": "browse",
       "maxSize": "PDF only • max 5 MB",

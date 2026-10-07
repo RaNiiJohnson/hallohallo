@@ -60,6 +60,14 @@ export default defineSchema({
     ),
     authorId: v.string(),
     authorName: v.optional(v.string()),
+    // Optional during the rollout so existing offers remain visible as active.
+    status: v.optional(
+      v.union(
+        v.literal("active"),
+        v.literal("closed"),
+        v.literal("archived"),
+      ),
+    ),
     updatedAt: v.number(),
     searchAll: v.optional(v.string()),
   })
@@ -349,6 +357,7 @@ export default defineSchema({
       v.literal("listing"),
       v.literal("profile"),
       v.literal("cover"),
+      v.literal("applicationCv"),
     ),
     expectedContentType: v.string(),
     maxSize: v.number(),
@@ -356,6 +365,22 @@ export default defineSchema({
   })
     .index("by_key", ["key"])
     .index("by_userId", ["userId"]),
+
+  jobApplications: defineTable({
+    jobId: v.id("JobOffer"),
+    candidateId: v.string(),
+    cvKey: v.string(),
+    coverLetter: v.optional(v.string()),
+    appliedAt: v.number(),
+    emailStatus: v.union(
+      v.literal("pending"),
+      v.literal("sent"),
+      v.literal("failed"),
+    ),
+  })
+    .index("by_jobId_and_candidateId", ["jobId", "candidateId"])
+    .index("by_candidateId", ["candidateId"])
+    .index("by_cvKey", ["cvKey"]),
 
   adminAuditEvents: defineTable({
     administratorId: v.string(),

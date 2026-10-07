@@ -128,7 +128,10 @@
     "backToList": "Retour aux offres",
     "breadcrumb": "Opportunités",
     "you": "Vous",
-    "have": "avez"
+    "have": "avez",
+    "closed": "Candidatures closes",
+    "alreadyApplied": "Candidature déjà envoyée",
+    "applicationDeliveryFailed": "Candidature enregistrée — envoi non confirmé"
   },
   "dialogs": {
     "publish": {
@@ -149,12 +152,21 @@
       "successToast": "Offre supprimée avec succès",
       "errorToast": "Erreur lors de la suppression de l'offre"
     },
+    "lifecycle": {
+      "close": "Clôturer l'offre",
+      "reopen": "Relancer",
+      "archive": "Archiver",
+      "restore": "Restaurer",
+      "success": "Statut de l'offre mis à jour.",
+      "error": "Impossible de mettre à jour le statut de l'offre."
+    },
     "apply": {
       "application": "CANDIDATURE",
       "cvLabel": "CV *",
       "cvHint": "(PDF, max 5 MB)",
-      "noProfileCv": "Vous n'avez pas encore de CV sur votre profil. Veuillez en télécharger un pour postuler.",
+      "noProfileCv": "Vous n'avez pas encore de CV de profil. Ajoutez un CV uniquement pour cette candidature.",
       "profileCvUsed": "Votre CV de profil sera utilisé par défaut.",
+      "applicationCvUsed": "Ce CV sera utilisé uniquement pour cette candidature. Votre CV de profil ne sera pas modifié.",
       "dropHere": "Déposez votre PDF ici ou",
       "browse": "parcourir",
       "maxSize": "PDF uniquement • max 5 Mo",

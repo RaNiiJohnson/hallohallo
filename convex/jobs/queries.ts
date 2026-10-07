@@ -4,6 +4,10 @@ import { Id } from "../_generated/dataModel";
 import { authComponent } from "../auth/auth";
 import { query } from "../functions";
 
+function isVisibleJob(job: { status?: "active" | "closed" | "archived" }) {
+  return job.status === undefined || job.status === "active";
+}
+
 export const getJobWithContact = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
@@ -14,13 +18,21 @@ export const getJobWithContact = query({
 
     if (!job) return null;
 
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (
+      job.status === "archived" &&
+      user?._id !== job.authorId &&
+      user?.role !== "admin"
+    ) {
+      return null;
+    }
+
     // Récupération rapide via l'index
     const contact = await ctx.db
       .query("JobContactInfo")
       .withIndex("by_jobId", (q) => q.eq("jobId", job._id))
       .unique();
 
-    const user = await authComponent.safeGetAuthUser(ctx);
     let isBookmarked = false;
     if (user) {
       const existingBookmark = await ctx.db
@@ -52,6 +64,28 @@ export const getJobWithContactById = query({
       .unique();
 
     return { ...job, contact };
+  },
+});
+
+export const hasCurrentUserAppliedToJob = query({
+  args: { jobId: v.id("JobOffer") },
+  returns: v.union(
+    v.literal("none"),
+    v.literal("pending"),
+    v.literal("sent"),
+    v.literal("failed"),
+  ),
+  handler: async (ctx, { jobId }) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) return "none";
+
+    const application = await ctx.db
+      .query("jobApplications")
+      .withIndex("by_jobId_and_candidateId", (q) =>
+        q.eq("jobId", jobId).eq("candidateId", user._id),
+      )
+      .unique();
+    return application?.emailStatus ?? "none";
   },
 });
 
@@ -122,7 +156,7 @@ export const getJobs = query({
       );
 
       const filteredPage = enrichedPage.filter(
-        (j): j is NonNullable<typeof j> => j !== null,
+        (j): j is NonNullable<typeof j> => j !== null && isVisibleJob(j),
       );
       return { ...bookmarksPage, page: filteredPage };
     }
@@ -160,7 +194,10 @@ export const getJobs = query({
         }),
       );
 
-      return { ...results, page: enrichedPage };
+      return {
+        ...results,
+        page: enrichedPage.filter(isVisibleJob),
+      };
     }
 
     // CAS 2 : Pas de recherche textuelle -> Utilisation des index de filtrage
@@ -188,7 +225,7 @@ export const getJobs = query({
 
     // Filtre manuel si les deux (type ET contract) sont présents sans searchTerm
     // (car Convex ne supporte qu'un seul index à la fois)
-    let pageFiltered = results.page;
+    let pageFiltered = results.page.filter(isVisibleJob);
     if (type && contractType) {
       pageFiltered = pageFiltered.filter(
         (job) => job.contractType === contractType,

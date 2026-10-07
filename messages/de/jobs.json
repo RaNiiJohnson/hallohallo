@@ -128,7 +128,10 @@
     "backToList": "Zurück zu den Angeboten",
     "breadcrumb": "Stellenangebote",
     "you": "Sie",
-    "have": "haben"
+    "have": "haben",
+    "closed": "Bewerbungen geschlossen",
+    "alreadyApplied": "Bewerbung bereits gesendet",
+    "applicationDeliveryFailed": "Bewerbung gespeichert — Versand nicht bestätigt"
   },
   "dialogs": {
     "publish": {
@@ -149,12 +152,21 @@
       "successToast": "Angebot erfolgreich gelöscht",
       "errorToast": "Fehler beim Löschen des Angebots"
     },
+    "lifecycle": {
+      "close": "Angebot schließen",
+      "reopen": "Wieder öffnen",
+      "archive": "Archivieren",
+      "restore": "Wiederherstellen",
+      "success": "Angebotsstatus aktualisiert.",
+      "error": "Angebotsstatus konnte nicht aktualisiert werden."
+    },
     "apply": {
       "application": "BEWERBUNG",
       "cvLabel": "LEBENSLAUF *",
       "cvHint": "(PDF, max 5 MB)",
-      "noProfileCv": "Sie haben noch keinen Lebenslauf in Ihrem Profil. Bitte laden Sie einen hoch, um sich zu bewerben.",
+      "noProfileCv": "Sie haben noch keinen Profil-Lebenslauf. Fügen Sie einen Lebenslauf nur für diese Bewerbung hinzu.",
       "profileCvUsed": "Ihr Profil-Lebenslauf wird standardmäßig verwendet.",
+      "applicationCvUsed": "Dieser Lebenslauf wird nur für diese Bewerbung verwendet. Ihr Profil-Lebenslauf wird nicht geändert.",
       "dropHere": "Legen Sie Ihre PDF hier ab oder",
       "browse": "durchsuchen",
       "maxSize": "Nur PDF • max 5 MB",
