@@ -2,11 +2,10 @@
 
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
-import { useConvexAuth, useMutation } from "convex/react";
+import { useMutation } from "convex/react";
 import { useTranslations } from "next-intl";
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
 import { useState } from "react";
-import { toast } from "sonner";
 import { shouldShowPostPagination } from "@/lib/post-pagination";
 
 import { ComListSkeleton } from "./ComListSkeleton";
@@ -18,7 +17,6 @@ import { PAGE_SIZE, SortMode } from "./types";
 import { usePostsQuery } from "./usePostsQuery";
 
 export default function ComList() {
-  const { isAuthenticated } = useConvexAuth();
   const t = useTranslations("communities");
   const likePost = useMutation(api.posts.likes.mutations.likePost);
   const [seed] = useState(() => crypto.randomUUID());
@@ -39,8 +37,6 @@ export default function ComList() {
   );
 
   const handleLike = async (postId: Id<"posts">) => {
-    if (!isAuthenticated)
-      return toast.error(t("community.loginToLike"));
     await likePost({ postId });
   };
 

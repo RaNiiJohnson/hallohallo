@@ -19,13 +19,15 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Link } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
+import { getLocalizedCallbackUrl } from "@/lib/auth-return-to";
 import { Loader2 } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 
-export function SigninForm() {
+export function SigninForm({ returnTo }: { returnTo: string }) {
   const router = useRouter();
+  const locale = useLocale();
   const t = useTranslations("auth.login.form");
   const tToast = useTranslations("auth.login.toast");
 
@@ -56,10 +58,11 @@ export function SigninForm() {
       email: values.email,
       password: values.password,
       rememberMe: values.rememberMe,
+      callbackURL: getLocalizedCallbackUrl(locale, returnTo),
       fetchOptions: {
         onSuccess: () => {
           toast.success(tToast("success"));
-          router.push("/");
+          router.replace(returnTo);
         },
         onError: (error) => {
           toast.error(error ? error.error.message : tToast("error"));
@@ -70,7 +73,7 @@ export function SigninForm() {
 
   return (
     <div className="space-y-6">
-      <GoogleButton label={t("googleSignIn")} />
+      <GoogleButton label={t("googleSignIn")} returnTo={returnTo} />
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">

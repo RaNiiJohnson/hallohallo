@@ -46,7 +46,6 @@ export function CommentItem({
   const isOwner = currentUserId && comment.authorId === currentUserId;
 
   const handleLike = async () => {
-    if (!isAuthenticated) return toast.error(t("loginToLike"));
     await likeComment({ commentId: comment._id });
   };
 

@@ -6,9 +6,13 @@ import { Link } from "@/i18n/navigation";
 import { ArrowLeftIcon, MailIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { getAuthHref, getSafeReturnTo } from "@/lib/auth-return-to";
 
 function VerifyEmailContent() {
   const t = useTranslations("auth.verifyEmail");
+  const searchParams = useSearchParams();
+  const returnTo = getSafeReturnTo(searchParams.get("returnTo"));
 
   return (
     <div>
@@ -37,7 +41,7 @@ function VerifyEmailContent() {
             <p className="text-sm text-muted-foreground">
               {t("hasAccount")}{" "}
               <Link
-                href="/login"
+                href={getAuthHref("/login", returnTo)}
                 className="font-medium text-primary hover:underline"
               >
                 {t("login")}

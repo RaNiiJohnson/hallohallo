@@ -5,10 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeftIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { getAuthHref, getSafeReturnTo } from "@/lib/auth-return-to";
 import { SignupForm } from "./signup-form";
 
-export default function SignupPage() {
+function SignupPageContent() {
   const t = useTranslations("auth.register");
+  const searchParams = useSearchParams();
+  const returnTo = getSafeReturnTo(searchParams.get("returnTo"));
 
   return (
     <div>
@@ -26,12 +31,12 @@ export default function SignupPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            <SignupForm />
+            <SignupForm returnTo={returnTo} />
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
                 {t("hasAccount")}{" "}
                 <Link
-                  href="/login"
+                  href={getAuthHref("/login", returnTo)}
                   className="font-medium text-primary hover:underline"
                 >
                   {t("login")}
@@ -42,5 +47,13 @@ export default function SignupPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupPageContent />
+    </Suspense>
   );
 }

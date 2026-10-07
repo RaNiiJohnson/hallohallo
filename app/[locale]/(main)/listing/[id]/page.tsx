@@ -3,6 +3,7 @@
 import { ShareButton } from "@/components/ShareButton";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
+import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
 import { Link } from "@/i18n/navigation";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
@@ -21,6 +22,7 @@ import { SimilarListings } from "./components/SimilarListings";
 export default function PropertyPage() {
   const params = useParams<{ id: string }>();
   const { isAuthenticated, isLoading } = useConvexAuth();
+  const requireAuthentication = useAuthRequiredAction();
   const t = useTranslations("listing");
   const toggleBookmark = useMutation(api.bookmarks.mutations.toggleBookmark);
   const user = useQuery(api.auth.auth.getCurrentUser);
@@ -58,12 +60,16 @@ export default function PropertyPage() {
             {canManage ? (
               <EditListingDialog listing={property} />
             ) : (
-              isAuthenticated && (
                 <Button
                   variant="secondary"
                   size="sm"
                   className={`flex items-center gap-2 ${property.isBookmarked ? "text-red-500 hover:text-red-600 bg-red-500/10 hover:bg-red-500/20" : ""}`}
                   onClick={async () => {
+                    if (!isAuthenticated) {
+                      requireAuthentication();
+                      return;
+                    }
+
                     try {
                       await toggleBookmark({
                         resourceId: property._id as Id<"RealestateListing">,
@@ -86,7 +92,6 @@ export default function PropertyPage() {
                     {t("details.bookmarkBtn")}
                   </span>
                 </Button>
-              )
             )}
           </ButtonGroup>
         </div>

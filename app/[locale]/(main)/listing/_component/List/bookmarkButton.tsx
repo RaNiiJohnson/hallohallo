@@ -1,10 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
 import { cn } from "@/lib/utils";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
-import { useMutation } from "convex/react";
+import { useConvexAuth, useMutation } from "convex/react";
 import { Heart } from "lucide-react";
 import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
@@ -21,6 +22,8 @@ export const BookmarkButton = ({
   initialBookmark = false,
   className,
 }: BookmarkButtonProps) => {
+  const { isAuthenticated } = useConvexAuth();
+  const requireAuthentication = useAuthRequiredAction();
   const t = useTranslations("listing.details");
   const [optimisticIsBookmarked, setOptimisticIsBookmarked] = useOptimistic(
     initialBookmark,
@@ -59,7 +62,7 @@ export const BookmarkButton = ({
         "absolute top-2 right-2 rounded-md z-10 bg-white/70 backdrop-blur-sm text-red-500 transition-all group-hover:scale-110 hover:bg-white/90 hover:text-red-600",
         className,
       )}
-      onClick={handleToggle}
+      onClick={isAuthenticated ? handleToggle : requireAuthentication}
     >
       {optimisticIsBookmarked ? (
         <Heart className="size-4 fill-current" />

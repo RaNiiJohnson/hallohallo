@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useManualTranslate } from "@/hooks/use-manual-translate";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
@@ -20,7 +20,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CommentItem } from "../../_component/commentItem";
@@ -54,7 +54,6 @@ export default function PostClient() {
 
   const timeT = useTimeTranslations();
   const t = useTranslations("communities.post");
-  const tc = useTranslations("communities.community");
   const te = useTranslations("common");
 
   // const translated = useTranslatedPost(post);
@@ -85,7 +84,6 @@ export default function PostClient() {
   const isPostOwner = currentUserId && post.authorId === currentUserId;
 
   const handleLikePost = async () => {
-    if (!isAuthenticated) return toast.error(tc("loginToLike"));
     await likePost({ postId: post._id });
   };
 

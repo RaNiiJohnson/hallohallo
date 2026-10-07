@@ -1,10 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
 import { cn } from "@/lib/utils";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
-import { useMutation } from "convex/react";
+import { useConvexAuth, useMutation } from "convex/react";
 import { Bookmark } from "lucide-react";
 import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
@@ -21,6 +22,8 @@ export const JobBookmarkButton = ({
   initialBookmark = false,
   className,
 }: JobBookmarkButtonProps) => {
+  const { isAuthenticated } = useConvexAuth();
+  const requireAuthentication = useAuthRequiredAction();
   const t = useTranslations("jobs.bookmark");
   const [optimisticIsBookmarked, setOptimisticIsBookmarked] = useOptimistic(
     initialBookmark,
@@ -62,7 +65,7 @@ export const JobBookmarkButton = ({
           : "text-muted-foreground hover:bg-muted hover:text-foreground",
         className,
       )}
-      onClick={handleToggle}
+      onClick={isAuthenticated ? handleToggle : requireAuthentication}
     >
       <Bookmark
         className={cn("w-4 h-4", optimisticIsBookmarked && "fill-current")}

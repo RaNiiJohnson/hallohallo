@@ -20,6 +20,7 @@ vi.mock("../auth/auth", async (importOriginal) => {
       safeGetAuthUser: vi.fn().mockResolvedValue({
         _id: "testUserId",
         name: "Test User",
+        emailVerified: true,
       }),
     },
   };

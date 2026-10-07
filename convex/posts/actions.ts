@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { internal } from "../_generated/api";
 import { action, internalMutation } from "../_generated/server";
-import { authComponent } from "../auth/auth";
+import { assertEmailVerified, authComponent } from "../auth/auth";
 import { runCascadeDelete } from "../cascadeDeletes";
 
 export const _verifyDeleteAuth = internalMutation({
@@ -9,6 +9,7 @@ export const _verifyDeleteAuth = internalMutation({
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) throw new Error("Not authenticated");
+    assertEmailVerified(user);
 
     const post = await ctx.db.get(args.id);
     if (!post) throw new Error("Post not found");
