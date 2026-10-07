@@ -322,7 +322,7 @@ export default function JobDetailsPage() {
                       {t("details.salary")}
                     </p>
                     <div className="flex items-baseline gap-0.5">
-                      <SalaryDisplay salary={jobOffer.salary} />
+                      <SalaryDisplay salary={jobOffer.salary ?? ""} />
                       <span className="text-primary text-xs font-normal">
                         /
                         {t(
@@ -338,7 +338,7 @@ export default function JobDetailsPage() {
                     <p className="text-sm text-muted-foreground">
                       {t("details.duration")}
                     </p>
-                    <p className="font-semibold">{jobOffer.duration}</p>
+                    <p className="font-semibold">{jobOffer.duration ?? "—"}</p>
                   </div>
 
                   <div className="space-y-1">
@@ -365,7 +365,7 @@ export default function JobDetailsPage() {
                     <p className="text-sm text-muted-foreground">
                       {t("details.startDate")}
                     </p>
-                    <p className="font-semibold">{jobOffer.startDate}</p>
+                    <p className="font-semibold">{jobOffer.startDate ?? "—"}</p>
                   </div>
                 </div>
               </div>
@@ -483,7 +483,7 @@ export default function JobDetailsPage() {
                     {t("details.duration")}
                   </span>
                   <span className="font-semibold text-sm">
-                    {jobOffer.duration}
+                    {jobOffer.duration ?? "—"}
                   </span>
                 </div>
 
@@ -492,7 +492,7 @@ export default function JobDetailsPage() {
                     {t("details.salary")}
                   </span>
                   <div className="flex items-baseline gap-0.5">
-                    <SalaryDisplay salary={jobOffer.salary} />
+                    <SalaryDisplay salary={jobOffer.salary ?? ""} />
                     <span className="text-primary text-xs font-normal">
                       /
                       {t(

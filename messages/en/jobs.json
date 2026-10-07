@@ -47,6 +47,15 @@
       "jobType": "Job type *",
       "contractType": "Contract type *",
       "city": "City / Location *",
+      "workMode": "Work mode *",
+      "remoteLocation": "Residence area or constraints (optional)",
+      "contactEmail": "Application contact email *",
+      "sector": "Sector / category (optional)",
+      "trainingRequirements": "School or training requirement (optional)",
+      "weeklyHours": "Weekly working hours (optional)",
+      "applicationDeadline": "Application deadline (optional)",
+      "benefits": "Benefits (optional)",
+      "externalApplicationUrl": "External application link (optional)",
       "mapPosition": "Map position (optional)",
       "mapDesc": "Click on the map to pinpoint the exact location of the role. The city will update automatically.",
       "startDate": "Start date *",
@@ -70,7 +79,9 @@
       "duration": "Ex: 6 months, 2 years, Open-ended",
       "description": "Describe the position, missions, required skills...",
       "cert": "Ex: Driving license B, German B2...",
-      "period": "Period"
+      "period": "Period",
+      "remoteLocation": "E.g. Germany, EU, or time zone",
+      "contactEmail": "hiring@organisation.de"
     },
     "actions": {
       "addCert": "Add certificate",
@@ -97,7 +108,8 @@
       "descMin": "The description must contain at least 10 characters",
       "certMin": "Add at least one certificate.",
       "certMax": "You can add up to 5 certificates.",
-      "salaryReq": "The salary is required"
+      "salaryReq": "The salary is required",
+      "contactEmailReq": "A valid application contact email is required"
     }
   },
   "details": {
@@ -206,6 +218,11 @@
       "partTime": "Part time",
       "freelance": "Freelance",
       "apprenticeship": "Apprenticeship"
+    },
+    "workModes": {
+      "onSite": "On-site",
+      "hybrid": "Hybrid",
+      "remote": "Remote"
     },
     "salaryPeriods": {
       "hour": "hour",

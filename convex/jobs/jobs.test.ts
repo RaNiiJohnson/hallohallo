@@ -59,7 +59,9 @@ describe("Jobs", () => {
       salaryPeriod: "hour",
       type: "job",
       contractType: "fullTime",
+      workMode: "onSite",
       city: "City",
+      contactEmail: "employer@example.com",
       duration: "Duration",
       startDate: "2022-01-01",
       certificates: [],
@@ -83,6 +85,37 @@ describe("Jobs", () => {
       slug: jobSlug,
     });
     expect(result?.title).toBe("Job Title");
+    expect(result?.contact?.email).toBe("employer@example.com");
+  });
+
+  it("rejects a contract that is incompatible with the job type", async () => {
+    await expect(
+      t.mutation(api.jobs.mutations.createJob, {
+        title: "Invalid freelance job",
+        description: "A job with an invalid contract combination.",
+        company: "Job Company",
+        type: "freelance",
+        contractType: "CDI",
+        workMode: "remote",
+        city: "",
+        contactEmail: "employer@example.com",
+      }),
+    ).rejects.toThrow("not available for the selected job type");
+  });
+
+  it("allows a remote job without a city", async () => {
+    await expect(
+      t.mutation(api.jobs.mutations.createJob, {
+        title: "Remote Job",
+        description: "A remote job without a city.",
+        company: "Job Company",
+        type: "job",
+        contractType: "CDI",
+        workMode: "remote",
+        city: "",
+        contactEmail: "employer@example.com",
+      }),
+    ).resolves.toBeTruthy();
   });
 
   it("should update a job", async () => {
@@ -96,10 +129,12 @@ describe("Jobs", () => {
       salaryPeriod: "hour",
       type: "job",
       contractType: "fullTime",
+      workMode: "onSite",
       city: "City",
       duration: "Duration",
       startDate: "2022-01-01",
       certificates: [],
+      contactEmail: "employer@example.com",
     });
 
     const result = await t.query(api.jobs.queries.getJobWithContact, {
@@ -278,7 +313,9 @@ describe("Jobs", () => {
       salaryPeriod: "hour",
       type: "job",
       contractType: "fullTime",
+      workMode: "onSite",
       city: "City",
+      contactEmail: "employer@example.com",
       duration: "Duration",
       startDate: "2022-01-01",
       certificates: [],

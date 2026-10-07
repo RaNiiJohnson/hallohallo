@@ -1,5 +1,10 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
+import {
+  isContractTypeAllowedForJobType,
+  type ContractType,
+  type JobType,
+} from "../../src/lib/job-offer-options";
 import { authComponent } from "../auth/auth";
 import { authMutation, internalMutation } from "../functions";
 import { assertVerifiedUpload, consumeUploadGrant } from "../integrations/r2";
@@ -15,6 +20,36 @@ const jobStatusValidator = v.union(
   v.literal("archived"),
 );
 
+const jobTypeValidator = v.union(
+  v.literal("auPair"), v.literal("training"), v.literal("voluntary"),
+  v.literal("internship"), v.literal("miniJob"), v.literal("job"),
+  v.literal("freelance"), v.literal("scholarship"),
+);
+const contractTypeValidator = v.union(
+  v.literal("CDI"), v.literal("CDD"), v.literal("FSJ/FOJ/BFD"),
+  v.literal("fullTime"), v.literal("partTime"), v.literal("freelance"),
+  v.literal("apprenticeship"),
+);
+const jobContactEmailValidator = v.string();
+
+function assertValidJobInput(args: {
+  type: JobType;
+  contractType: ContractType;
+  workMode: "onSite" | "hybrid" | "remote";
+  city: string;
+  contactEmail: string;
+}) {
+  if (!isContractTypeAllowedForJobType(args.type, args.contractType)) {
+    throwValidationError("This contract type is not available for the selected job type");
+  }
+  if (args.workMode !== "remote" && !args.city.trim()) {
+    throwValidationError("City is required for on-site and hybrid jobs");
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(args.contactEmail.trim())) {
+    throwValidationError("Invalid application contact email");
+  }
+}
+
 function isJobActive(status: "active" | "closed" | "archived" | undefined) {
   return status === undefined || status === "active";
 }
@@ -22,43 +57,35 @@ function isJobActive(status: "active" | "closed" | "archived" | undefined) {
 export const createJob = authMutation({
   args: {
     title: v.string(),
-    type: v.union(
-      v.literal("auPair"),
-      v.literal("training"),
-      v.literal("voluntary"),
-      v.literal("internship"),
-      v.literal("miniJob"),
-      v.literal("job"),
-      v.literal("freelance"),
-      v.literal("scholarship"),
-    ),
+    type: jobTypeValidator,
     location: v.optional(
       v.object({
         lat: v.number(),
         lng: v.number(),
       }),
     ),
-    contractType: v.union(
-      v.literal("CDI"),
-      v.literal("CDD"),
-      v.literal("FSJ/FOJ/BFD"),
-      v.literal("fullTime"),
-      v.literal("partTime"),
-      v.literal("freelance"),
-      v.literal("apprenticeship"),
-    ),
+    contractType: contractTypeValidator,
     city: v.string(),
-    duration: v.string(),
-    startDate: v.string(),
+    workMode: v.union(v.literal("onSite"), v.literal("hybrid"), v.literal("remote")),
+    remoteLocation: v.optional(v.string()),
+    duration: v.optional(v.string()),
+    startDate: v.optional(v.string()),
+    applicationDeadline: v.optional(v.string()),
     company: v.string(),
     description: v.string(),
-    certificates: v.array(v.string()),
-    salary: v.number(),
-    salaryPeriod: v.union(
+    certificates: v.optional(v.array(v.string())),
+    salary: v.optional(v.number()),
+    salaryPeriod: v.optional(v.union(
       v.literal("hour"),
       v.literal("month"),
       v.literal("year"),
-    ),
+    )),
+    sector: v.optional(v.string()),
+    benefits: v.optional(v.string()),
+    externalApplicationUrl: v.optional(v.string()),
+    weeklyHours: v.optional(v.number()),
+    trainingRequirements: v.optional(v.string()),
+    contactEmail: jobContactEmailValidator,
   },
   handler: async (ctx, args) => {
     const user = ctx.user;
@@ -66,17 +93,24 @@ export const createJob = authMutation({
     if (user.userType !== "provider" && user.role !== "admin") {
       throwForbidden("Only providers or admins can publish jobs");
     }
+    assertValidJobInput(args);
+    const { contactEmail, ...jobArgs } = args;
 
     const searchAllContent = `${args.title} ${args.type} ${args.city} ${args.contractType} ${args.description}`;
 
     const job = await ctx.db.insert("JobOffer", {
-      ...args,
+      ...jobArgs,
+      certificates: args.certificates ?? [],
       slug: generatedSlug(args.title),
       authorId: user._id,
       authorName: user.name,
       status: "active",
       updatedAt: Date.now(),
       searchAll: searchAllContent,
+    });
+    await ctx.db.insert("JobContactInfo", {
+      jobId: job,
+      email: contactEmail.trim().toLowerCase(),
     });
 
     // await posthog.capture(ctx, {
@@ -98,43 +132,35 @@ export const updateJob = authMutation({
   args: {
     id: v.id("JobOffer"),
     title: v.string(),
-    type: v.union(
-      v.literal("auPair"),
-      v.literal("training"),
-      v.literal("voluntary"),
-      v.literal("internship"),
-      v.literal("miniJob"),
-      v.literal("job"),
-      v.literal("freelance"),
-      v.literal("scholarship"),
-    ),
+    type: jobTypeValidator,
     location: v.optional(
       v.object({
         lat: v.number(),
         lng: v.number(),
       }),
     ),
-    contractType: v.union(
-      v.literal("CDI"),
-      v.literal("CDD"),
-      v.literal("FSJ/FOJ/BFD"),
-      v.literal("fullTime"),
-      v.literal("partTime"),
-      v.literal("freelance"),
-      v.literal("apprenticeship"),
-    ),
+    contractType: contractTypeValidator,
     city: v.string(),
-    duration: v.string(),
-    startDate: v.string(),
+    workMode: v.union(v.literal("onSite"), v.literal("hybrid"), v.literal("remote")),
+    remoteLocation: v.optional(v.string()),
+    duration: v.optional(v.string()),
+    startDate: v.optional(v.string()),
+    applicationDeadline: v.optional(v.string()),
     company: v.string(),
     description: v.string(),
-    certificates: v.array(v.string()),
-    salary: v.number(),
-    salaryPeriod: v.union(
+    certificates: v.optional(v.array(v.string())),
+    salary: v.optional(v.number()),
+    salaryPeriod: v.optional(v.union(
       v.literal("hour"),
       v.literal("month"),
       v.literal("year"),
-    ),
+    )),
+    sector: v.optional(v.string()),
+    benefits: v.optional(v.string()),
+    externalApplicationUrl: v.optional(v.string()),
+    weeklyHours: v.optional(v.number()),
+    trainingRequirements: v.optional(v.string()),
+    contactEmail: v.optional(jobContactEmailValidator),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db.get(args.id);
@@ -147,7 +173,12 @@ export const updateJob = authMutation({
     }
 
     // Remove id from args before updating because it's not a field of the document
-    const { id, ...updateData } = args;
+    const { id, contactEmail, ...updateData } = args;
+    if (contactEmail) {
+      assertValidJobInput({ ...args, contactEmail });
+    } else if (!isContractTypeAllowedForJobType(args.type, args.contractType)) {
+      throwValidationError("This contract type is not available for the selected job type");
+    }
 
     const searchAllContent = `${args.title} ${args.type} ${args.city} ${args.contractType} ${args.description}`;
 
@@ -156,6 +187,11 @@ export const updateJob = authMutation({
       searchAll: searchAllContent,
       updatedAt: Date.now(),
     });
+    if (contactEmail) {
+      const currentContact = await ctx.db.query("JobContactInfo").withIndex("by_jobId", (q) => q.eq("jobId", id)).unique();
+      if (currentContact) await ctx.db.patch(currentContact._id, { email: contactEmail.trim().toLowerCase() });
+      else await ctx.db.insert("JobContactInfo", { jobId: id, email: contactEmail.trim().toLowerCase() });
+    }
   },
 });
 

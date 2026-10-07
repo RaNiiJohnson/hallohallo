@@ -101,7 +101,7 @@ export function JobList() {
                 {/* Company */}
                 <div className="flex items-center gap-1 mb-2">
                   <SalaryDisplay
-                    salary={job.salary}
+                    salary={job.salary ?? ""}
                     className="text-foreground"
                   />
                   <span className="text-primary text-xs font-normal">

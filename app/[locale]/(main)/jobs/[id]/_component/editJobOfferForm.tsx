@@ -108,7 +108,7 @@ export function EditJobOfferForm({
         jobOffer?.certificates && jobOffer?.certificates?.length > 0
           ? jobOffer?.certificates.map((cert) => ({ certificate: cert }))
           : [{ certificate: "" }],
-      salary: jobOffer?.salary.toString(),
+      salary: jobOffer?.salary?.toString() ?? "",
       salaryPeriod: jobOffer?.salaryPeriod,
     },
   });
@@ -176,6 +176,7 @@ export function EditJobOfferForm({
           location: data.location,
           contractType: data.contractType,
           city: data.city,
+          workMode: jobOffer.workMode ?? "onSite",
           duration: data.duration,
           startDate: data.startDate,
           company: data.company,

@@ -47,6 +47,15 @@
       "jobType": "Type d'offre *",
       "contractType": "Type de contrat *",
       "city": "Ville / Localité *",
+      "workMode": "Mode de travail *",
+      "remoteLocation": "Zone de résidence ou contraintes (facultatif)",
+      "contactEmail": "E-mail de réception des candidatures *",
+      "sector": "Secteur / catégorie (facultatif)",
+      "trainingRequirements": "Établissement ou formation souhaitée (facultatif)",
+      "weeklyHours": "Volume horaire hebdomadaire (facultatif)",
+      "applicationDeadline": "Date limite de candidature (facultatif)",
+      "benefits": "Avantages (facultatif)",
+      "externalApplicationUrl": "Lien externe de candidature (facultatif)",
       "mapPosition": "Position sur la carte (optionnel)",
       "mapDesc": "Cliquez sur la carte pour indiquer la position exacte du poste. La ville sera mise à jour automatiquement.",
       "startDate": "Date de début *",
@@ -70,7 +79,9 @@
       "duration": "Ex: 6 mois, 2 ans, Indéterminée",
       "description": "Décrivez le poste, les missions, les compétences requises...",
       "cert": "Ex: Permis B, Allemand B2...",
-      "period": "Période"
+      "period": "Période",
+      "remoteLocation": "Ex. Allemagne, UE ou fuseau horaire",
+      "contactEmail": "recrutement@organisation.de"
     },
     "actions": {
       "addCert": "Ajouter un certificat",
@@ -97,7 +108,8 @@
       "descMin": "La description doit contenir au moins 10 caractères",
       "certMin": "Ajoutez au moins un certificat.",
       "certMax": "Vous pouvez ajouter jusqu'à 5 certificats.",
-      "salaryReq": "Le salaire est requis"
+      "salaryReq": "Le salaire est requis",
+      "contactEmailReq": "Un e-mail de réception valide est requis"
     }
   },
   "details": {
@@ -206,6 +218,11 @@
       "partTime": "Temps partiel",
       "freelance": "Freelance",
       "apprenticeship": "Apprentissage"
+    },
+    "workModes": {
+      "onSite": "Sur site",
+      "hybrid": "Hybride",
+      "remote": "À distance"
     },
     "salaryPeriods": {
       "hour": "heure",
