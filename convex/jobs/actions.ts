@@ -38,11 +38,7 @@ export const applyToJob = authAction({
 
       const application = await ctx.runMutation(
         internal.jobs.mutations.submitApplication,
-        {
-          ...args,
-          candidateId: user._id,
-          profileCv: user.cv ?? undefined,
-        },
+        args,
       );
 
       try {

@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
+import { authComponent } from "../auth/auth";
 import { authMutation, internalMutation } from "../functions";
 import { assertVerifiedUpload, consumeUploadGrant } from "../integrations/r2";
 import {
@@ -203,13 +204,12 @@ export const submitApplication = internalMutation({
     jobId: v.id("JobOffer"),
     applicationCvKey: v.optional(v.string()),
     coverLetter: v.optional(v.string()),
-    candidateId: v.string(),
-    profileCv: v.optional(v.string()),
   },
-  handler: async (
-    ctx,
-    { jobId, applicationCvKey, coverLetter, candidateId, profileCv },
-  ) => {
+  handler: async (ctx, { jobId, applicationCvKey, coverLetter }) => {
+    const candidate = await authComponent.safeGetAuthUser(ctx);
+    if (!candidate) throwForbidden("Authentication required");
+    const candidateId = candidate._id;
+
     const job = await ctx.db.get(jobId);
     if (!job) throwNotFound("Job not found");
     if (!isJobActive(job.status)) {
@@ -229,7 +229,7 @@ export const submitApplication = internalMutation({
       throwValidationError("You have already applied to this job");
     }
 
-    const cvKey = applicationCvKey ?? profileCv;
+    const cvKey = applicationCvKey ?? candidate.cv ?? undefined;
     if (!cvKey) throwNotFound("CV not found");
     if (applicationCvKey) {
       await assertVerifiedUpload(ctx, {

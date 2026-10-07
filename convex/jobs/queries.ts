@@ -1,11 +1,15 @@
-import { paginationOptsValidator } from "convex/server";
+import { FilterBuilder, paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
-import { Id } from "../_generated/dataModel";
+import { DataModel, Id } from "../_generated/dataModel";
 import { authComponent } from "../auth/auth";
 import { query } from "../functions";
 
 function isVisibleJob(job: { status?: "active" | "closed" | "archived" }) {
   return job.status === undefined || job.status === "active";
+}
+
+function visibleJobFilter(q: FilterBuilder<DataModel["JobOffer"]>) {
+  return q.or(q.eq(q.field("status"), "active"), q.eq(q.field("status"), undefined));
 }
 
 export const getJobWithContact = query({
@@ -173,7 +177,9 @@ export const getJobs = query({
         });
 
       // avant: return await searchResult.collect();
-      const results = await searchResult.paginate(args.paginationOpts);
+      const results = await searchResult
+        .filter(visibleJobFilter)
+        .paginate(args.paginationOpts);
 
       const enrichedPage = await Promise.all(
         results.page.map(async (job) => {
@@ -196,7 +202,7 @@ export const getJobs = query({
 
       return {
         ...results,
-        page: enrichedPage.filter(isVisibleJob),
+        page: enrichedPage,
       };
     }
 
@@ -209,23 +215,26 @@ export const getJobs = query({
         .query("JobOffer")
         .withIndex("by_type", (q) => q.eq("type", type))
         .order("desc")
+        .filter(visibleJobFilter)
         .paginate(args.paginationOpts);
     } else if (contractType) {
       results = await ctx.db
         .query("JobOffer")
         .withIndex("by_contract", (q) => q.eq("contractType", contractType))
         .order("desc")
+        .filter(visibleJobFilter)
         .paginate(args.paginationOpts);
     } else {
       results = await ctx.db
         .query("JobOffer")
         .order("desc")
+        .filter(visibleJobFilter)
         .paginate(args.paginationOpts);
     }
 
     // Filtre manuel si les deux (type ET contract) sont présents sans searchTerm
     // (car Convex ne supporte qu'un seul index à la fois)
-    let pageFiltered = results.page.filter(isVisibleJob);
+    let pageFiltered = results.page;
     if (type && contractType) {
       pageFiltered = pageFiltered.filter(
         (job) => job.contractType === contractType,

@@ -32,6 +32,7 @@ vi.mock("../auth/auth", async (importOriginal) => {
         _id: authState.user._id,
         name: authState.user.name,
         userType: authState.user.userType,
+        cv: authState.user.cv,
       })),
     },
   };
@@ -74,8 +75,6 @@ describe("Jobs", () => {
   }) {
     return await t.mutation(internal.jobs.mutations.submitApplication, {
       ...args,
-      candidateId: authState.user._id,
-      profileCv: authState.user.cv ?? undefined,
     });
   }
 
@@ -262,6 +261,34 @@ describe("Jobs", () => {
     });
 
     expect(result.page.some((job) => job._id === jobId)).toBe(false);
+  });
+
+  it("continues past closed offers when paginating public jobs", async () => {
+    await t.mutation(api.jobs.mutations.setJobStatus, {
+      id: jobId,
+      status: "closed",
+    });
+
+    const activeJobId = await t.mutation(api.jobs.mutations.createJob, {
+      title: "Active Job",
+      description: "Job Description",
+      company: "Job Company",
+      location: { lat: 0, lng: 0 },
+      salary: 0,
+      salaryPeriod: "hour",
+      type: "job",
+      contractType: "fullTime",
+      city: "City",
+      duration: "Duration",
+      startDate: "2022-01-01",
+      certificates: [],
+    });
+
+    const result = await t.query(api.jobs.queries.getJobs, {
+      paginationOpts: { cursor: null, numItems: 1 },
+    });
+
+    expect(result.page.map((job) => job._id)).toContain(activeJobId);
   });
 
   it("does not allow the generic profile mutation to replace the CV key", async () => {
