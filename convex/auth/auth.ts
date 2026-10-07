@@ -261,6 +261,12 @@ export const getCurrentUser = query({
   },
 });
 
+export function assertEmailVerified(user: { emailVerified?: boolean }) {
+  if (!user.emailVerified) {
+    throwForbidden("Email verification required");
+  }
+}
+
 export async function requireAuth(ctx: AuthCtx) {
   // `safeGetAuthUser` resolves the actual Convex `user` document.  That is the
   // shape used throughout this app (`_id`, custom profile fields, etc.), unlike
@@ -277,6 +283,8 @@ export async function requireAuth(ctx: AuthCtx) {
   ) {
     throwForbidden("Account banned");
   }
+
+  assertEmailVerified(user);
 
   return { user };
 }

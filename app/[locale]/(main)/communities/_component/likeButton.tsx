@@ -4,6 +4,7 @@ import { CheckIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
+import { useConvexAuth } from "convex/react";
 
 export function LikeButton({
   initialCount,
@@ -14,6 +15,7 @@ export function LikeButton({
   initialIsLiked?: boolean;
   onLike: () => Promise<unknown> | void;
 }) {
+  const { isAuthenticated } = useConvexAuth();
   const [optimistic, setOptimistic] = useOptimistic(
     { count: initialCount, isLiked: initialIsLiked },
     (_, newState: { count: number; isLiked: boolean }) => newState,
@@ -48,6 +50,7 @@ export function LikeButton({
           : "text-muted-foreground hover:text-green-500 hover:bg-green-500/10"
       }`}
       onClick={handleLike}
+      disabled={!isAuthenticated}
     >
       <CheckIcon
         size={15}

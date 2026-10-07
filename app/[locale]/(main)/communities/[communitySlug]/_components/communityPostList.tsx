@@ -7,7 +7,6 @@ import clsx from "clsx";
 import { usePaginatedQuery } from "convex-helpers/react/cache";
 import { useConvexAuth, useMutation } from "convex/react";
 import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 import { CreatePostDialog } from "../../_component/dialogs/createPostDialog";
 import { CommunityPostCard } from "./communitypostcard";
 
@@ -36,7 +35,6 @@ export function CommunityPostList({
   const likePost = useMutation(api.posts.likes.mutations.likePost);
 
   const handleLike = async (postId: Id<"posts">) => {
-    if (!isAuthenticated) return toast.error(t("loginToLike"));
     await likePost({ postId });
   };
 

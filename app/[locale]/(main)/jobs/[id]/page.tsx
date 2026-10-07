@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useManualTranslate } from "@/hooks/use-manual-translate";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { Link } from "@/i18n/navigation";
+import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
 import { formatDateLong, getRelativeTime } from "@/lib/date";
 import { LocationMap } from "@/lib/LocationMap";
 import { api } from "@convex/_generated/api";
@@ -39,7 +40,8 @@ import { EditJobDialog } from "./_component/editJobDialog";
 export default function JobDetailsPage() {
   const { id } = useParams();
   const user = useQuery(api.auth.auth.getCurrentUser);
-  const { isLoading } = useConvexAuth();
+  const { isAuthenticated, isLoading } = useConvexAuth();
+  const requireAuthentication = useAuthRequiredAction();
 
   const timeT = useTimeTranslations();
   const locale = useLocale();
@@ -193,12 +195,24 @@ export default function JobDetailsPage() {
                   </ButtonGroup>
                 ) : (
                   <ButtonGroup>
-                    <ApplyJobDialog jobOffer={jobOffer}>
-                      <Button variant="default" size="sm" className="gap-2">
+                    {isAuthenticated ? (
+                      <ApplyJobDialog jobOffer={jobOffer}>
+                        <Button variant="default" size="sm" className="gap-2">
+                          <Mail className="w-4 h-4" />
+                          {t("details.apply")}
+                        </Button>
+                      </ApplyJobDialog>
+                    ) : (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="gap-2"
+                        onClick={requireAuthentication}
+                      >
                         <Mail className="w-4 h-4" />
                         {t("details.apply")}
                       </Button>
-                    </ApplyJobDialog>
+                    )}
 
                     <ShareButton text={jobOffer.title} jobPage={true} />
 

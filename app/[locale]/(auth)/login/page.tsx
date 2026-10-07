@@ -6,9 +6,14 @@ import { SigninForm } from "./signin-form";
 import { Button } from "@/components/ui/button";
 import { ArrowLeftIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { getAuthHref, getSafeReturnTo } from "@/lib/auth-return-to";
 
-export default function SigninPage() {
+function SigninPageContent() {
   const t = useTranslations("auth.login");
+  const searchParams = useSearchParams();
+  const returnTo = getSafeReturnTo(searchParams.get("returnTo"));
 
   return (
     <div>
@@ -28,12 +33,12 @@ export default function SigninPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            <SigninForm />
+            <SigninForm returnTo={returnTo} />
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
                 {t("noAccount")}{" "}
                 <Link
-                  href="/register"
+                  href={getAuthHref("/register", returnTo)}
                   className="font-medium text-primary hover:underline"
                 >
                   {t("signUp")}
@@ -44,5 +49,13 @@ export default function SigninPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function SigninPage() {
+  return (
+    <Suspense>
+      <SigninPageContent />
+    </Suspense>
   );
 }

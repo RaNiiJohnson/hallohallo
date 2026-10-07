@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
 import { cn } from "@/lib/utils";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
@@ -21,6 +22,7 @@ export const PostBookmarkButton = ({
   className,
 }: PostBookmarkButtonProps) => {
   const { isAuthenticated } = useConvexAuth();
+  const requireAuthentication = useAuthRequiredAction();
   const [optimisticIsBookmarked, setOptimisticIsBookmarked] = useOptimistic(
     initialBookmark,
     (_, newState: boolean) => newState,
@@ -50,8 +52,6 @@ export const PostBookmarkButton = ({
     });
   };
 
-  if (!isAuthenticated) return null;
-
   return (
     <Button
       variant="ghost"
@@ -63,7 +63,7 @@ export const PostBookmarkButton = ({
           : "text-muted-foreground hover:text-foreground hover:bg-muted",
         className,
       )}
-      onClick={handleToggle}
+      onClick={isAuthenticated ? handleToggle : requireAuthentication}
     >
       <Bookmark
         size={15}

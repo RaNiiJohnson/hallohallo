@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
 import {
   Dialog,
   DialogContent,
@@ -45,6 +46,7 @@ export default function CommunityClient() {
     slug: communitySlug as string,
   });
   const { isAuthenticated } = useConvexAuth();
+  const requireAuthentication = useAuthRequiredAction();
 
   const isMember = useQuery(
     api.communities.queries.isMember,
@@ -164,7 +166,13 @@ export default function CommunityClient() {
                 </div>
 
                 {/* Actions — desktop only */}
-                {isAuthenticated && isMember !== undefined && (
+                {!isAuthenticated ? (
+                  <div className="hidden sm:flex items-center gap-2 shrink-0">
+                    <Button size="sm" onClick={requireAuthentication}>
+                      {t("join")}
+                    </Button>
+                  </div>
+                ) : isMember !== undefined ? (
                   <div className="hidden sm:flex items-center gap-2 shrink-0">
                     {isMember ? (
                       <>
@@ -215,7 +223,7 @@ export default function CommunityClient() {
                       </Button>
                     )}
                   </div>
-                )}
+                ) : null}
               </div>
 
               {/* Description */}
@@ -224,7 +232,13 @@ export default function CommunityClient() {
               </p>
 
               {/* Actions — mobile only (below description) */}
-              {isAuthenticated && isMember !== undefined && (
+              {!isAuthenticated ? (
+                <div className="flex sm:hidden items-center gap-2 mt-3 flex-wrap">
+                  <Button size="sm" onClick={requireAuthentication}>
+                    {t("join")}
+                  </Button>
+                </div>
+              ) : isMember !== undefined ? (
                 <div className="flex sm:hidden items-center gap-2 mt-3 flex-wrap">
                   {isMember ? (
                     <>
@@ -275,7 +289,7 @@ export default function CommunityClient() {
                     </Button>
                   )}
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>

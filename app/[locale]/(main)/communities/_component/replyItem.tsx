@@ -6,7 +6,7 @@ import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
-import { useConvexAuth, useMutation } from "convex/react";
+import { useMutation } from "convex/react";
 import { Pencil, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -34,7 +34,6 @@ export function ReplyItem({
   const likeReply = useMutation(api.posts.likes.mutations.likeReply);
   const updateReply = useMutation(api.posts.comments.mutations.updateReply);
   const deleteReply = useMutation(api.posts.comments.mutations.deleteReply);
-  const { isAuthenticated } = useConvexAuth();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState("");
@@ -49,7 +48,6 @@ export function ReplyItem({
   const isOwner = currentUserId && reply.authorId === currentUserId;
 
   const handleLike = async () => {
-    if (!isAuthenticated) return toast.error(t("loginToLike"));
     await likeReply({ replyId: reply._id });
   };
 

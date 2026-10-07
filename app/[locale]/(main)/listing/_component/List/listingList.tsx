@@ -15,7 +15,6 @@ import { cn } from "@/lib/utils";
 import { api } from "@convex/_generated/api";
 import clsx from "clsx";
 import { usePaginatedQuery } from "convex-helpers/react/cache";
-import { useConvexAuth } from "convex/react";
 import { Briefcase, MapPin } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
@@ -28,7 +27,6 @@ import { ListingItemsSkeleton, ListingListSkeleton } from "../skeleton";
 import { BookmarkButton } from "./bookmarkButton";
 
 export function ListingList() {
-  const { isAuthenticated } = useConvexAuth();
   const t = useTranslations("listing");
   const [filters] = useQueryStates({
     search: parseAsString.withDefault(""),
@@ -185,12 +183,10 @@ export function ListingList() {
                 )}
               </Badge>
 
-              {isAuthenticated && (
-                <BookmarkButton
-                  listingId={list._id}
-                  initialBookmark={list.isBookmarked}
-                />
-              )}
+              <BookmarkButton
+                listingId={list._id}
+                initialBookmark={list.isBookmarked}
+              />
 
               <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>

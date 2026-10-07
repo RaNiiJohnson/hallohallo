@@ -1,13 +1,14 @@
 "use client";
 
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Link } from "@/i18n/navigation";
+import { Button } from "@/components/ui/button";
+import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
 import { useConvexAuth } from "convex/react";
 import { useTranslations } from "next-intl";
 import { PublishListingDialog } from "./dialogs/publishListingDialog";
 
 export function CTAButton() {
   const { isAuthenticated, isLoading } = useConvexAuth();
+  const requireAuthentication = useAuthRequiredAction();
   const t = useTranslations("listing");
 
   if (isLoading) {
@@ -23,8 +24,8 @@ export function CTAButton() {
   }
 
   return (
-    <Link href="/register" className={buttonVariants({ size: "lg" })}>
+    <Button size="lg" onClick={requireAuthentication}>
       {t("cta.registerToPublish")}
-    </Link>
+    </Button>
   );
 }

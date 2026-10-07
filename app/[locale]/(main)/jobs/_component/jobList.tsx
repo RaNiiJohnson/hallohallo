@@ -8,7 +8,6 @@ import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
 import clsx from "clsx";
 import { usePaginatedQuery } from "convex-helpers/react/cache";
-import { useConvexAuth } from "convex/react";
 import { Briefcase, Clock, MapPin } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { parseAsString, useQueryStates } from "nuqs";
@@ -18,7 +17,6 @@ import { SalaryDisplay } from "./salary";
 import { JobPageSkeleton } from "./skeleton";
 
 export function JobList() {
-  const { isAuthenticated } = useConvexAuth();
   const t = useTranslations("jobs");
 
   const [filters] = useQueryStates({
@@ -160,12 +158,10 @@ export function JobList() {
                 <div className="text-xs text-muted-foreground whitespace-nowrap">
                   {getRelativeTime(job._creationTime, timeT)}
                 </div>
-                {isAuthenticated && (
-                  <JobBookmarkButton
-                    jobId={job._id}
-                    initialBookmark={job.isBookmarked}
-                  />
-                )}
+                <JobBookmarkButton
+                  jobId={job._id}
+                  initialBookmark={job.isBookmarked}
+                />
               </div>
             </div>
           </div>

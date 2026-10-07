@@ -17,10 +17,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
+import {
+  getAuthHref,
+  getLocalizedCallbackUrl,
+} from "@/lib/auth-return-to";
 import { Loader2, Sparkles } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 function generateStrongPassword(length = 16) {
@@ -47,7 +51,7 @@ function generateStrongPassword(length = 16) {
   return chars.join("");
 }
 
-export function SignupForm() {
+export function SignupForm({ returnTo }: { returnTo: string }) {
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations("auth.register.form");
@@ -103,10 +107,10 @@ export function SignupForm() {
       email: values.email,
       password: values.password,
       name: values.name,
-      callbackURL: `/${locale}`,
+      callbackURL: getLocalizedCallbackUrl(locale, returnTo),
       fetchOptions: {
         onSuccess: () => {
-          router.push("/verify-email");
+          router.push(getAuthHref("/verify-email", returnTo));
         },
         onError: (error) => {
           toast.error(error ? error.error.message : tToast("error"));
@@ -117,7 +121,7 @@ export function SignupForm() {
 
   return (
     <div className="space-y-6">
-      <GoogleButton label={t("googleSignUp")} />
+      <GoogleButton label={t("googleSignUp")} returnTo={returnTo} />
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">

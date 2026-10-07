@@ -9,7 +9,7 @@ import { Link } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
-import { useAction } from "convex/react";
+import { useAction, useConvexAuth } from "convex/react";
 import { CheckIcon, MessageSquare } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -37,6 +37,7 @@ export function CommunityPostCard({
   communitySlug: string;
   onLikeAction: (postId: Id<"posts">) => void;
 }) {
+  const { isAuthenticated } = useConvexAuth();
   const timeT = useTimeTranslations();
   const t = useTranslations("communities.post");
 
@@ -104,6 +105,7 @@ export function CommunityPostCard({
             e.preventDefault();
             onLikeAction(post._id);
           }}
+          disabled={!isAuthenticated}
         >
           <CheckIcon
             size={15}

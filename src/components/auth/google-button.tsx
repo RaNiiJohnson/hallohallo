@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
+import { getLocalizedCallbackUrl } from "@/lib/auth-return-to";
 import { Loader2 } from "lucide-react";
 import { useLocale } from "next-intl";
 import { useState } from "react";
@@ -36,9 +37,10 @@ function GoogleIcon() {
 
 interface GoogleButtonProps {
   label: string;
+  returnTo: string;
 }
 
-export function GoogleButton({ label }: GoogleButtonProps) {
+export function GoogleButton({ label, returnTo }: GoogleButtonProps) {
   const locale = useLocale();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -46,7 +48,7 @@ export function GoogleButton({ label }: GoogleButtonProps) {
     setIsLoading(true);
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: `/${locale}`,
+      callbackURL: getLocalizedCallbackUrl(locale, returnTo),
     });
     // Note: page redirects to Google, setIsLoading(false) won't be reached
   }

@@ -1,13 +1,14 @@
 "use client";
 
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Link } from "@/i18n/navigation";
+import { Button } from "@/components/ui/button";
+import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
 import { useConvexAuth } from "convex/react";
 import { useTranslations } from "next-intl";
 import { PublishJobDialog } from "./dialogs/publishJobDialog";
 
 export function JobCTAButton() {
   const { isAuthenticated, isLoading } = useConvexAuth();
+  const requireAuthentication = useAuthRequiredAction();
   const t = useTranslations("jobs");
 
   if (isLoading) {
@@ -21,8 +22,8 @@ export function JobCTAButton() {
   }
 
   return (
-    <Link href="/register" className={buttonVariants({ size: "lg" })}>
+    <Button size="lg" onClick={requireAuthentication}>
       {t("signIn")}
-    </Link>
+    </Button>
   );
 }
