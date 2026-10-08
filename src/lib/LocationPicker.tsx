@@ -17,6 +17,7 @@ interface LocationPickerProps {
   onChange: (location: { lat: number; lng: number } | null) => void;
   onCityChange?: (city: string) => void;
   className?: string;
+  privacyMode?: boolean;
 }
 
 // Germany center coordinates
@@ -118,6 +119,7 @@ export function LocationPicker({
   onChange,
   onCityChange,
   className,
+  privacyMode = false,
 }: LocationPickerProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<string>("");
@@ -200,7 +202,9 @@ export function LocationPicker({
         {/* Instructions */}
         {!value && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-md bg-background/90 px-3 py-1.5 text-sm text-muted-foreground shadow-md">
-            Cliquez sur la carte pour sélectionner la position
+            {privacyMode
+              ? "Cliquez pour sélectionner une zone approximative"
+              : "Cliquez sur la carte pour sélectionner la position"}
           </div>
         )}
       </div>
@@ -210,16 +214,18 @@ export function LocationPicker({
         <div className="rounded-md bg-muted/50 p-2 text-sm">
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4 text-muted-foreground" />
-            <span className="font-medium">Position sélectionnée</span>
+            <span className="font-medium">
+              {privacyMode ? "Zone sélectionnée" : "Position sélectionnée"}
+            </span>
           </div>
-          {selectedAddress && (
+          {!privacyMode && selectedAddress && (
             <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
               {selectedAddress}
             </p>
           )}
-          <p className="mt-1 text-xs text-muted-foreground">
+          {!privacyMode && <p className="mt-1 text-xs text-muted-foreground">
             Coordonnées : {value.lat.toFixed(4)}, {value.lng.toFixed(4)}
-          </p>
+          </p>}
         </div>
       )}
     </div>

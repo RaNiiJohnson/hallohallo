@@ -59,6 +59,7 @@ import { MarkdownHint } from "@/components/markdown-hint";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import { useTypedR2Upload } from "@/hooks/use-r2-typed-upload";
 import type { ListingListDetails } from "@/lib/convexTypes";
+import { LocationPicker } from "@/lib/LocationPicker";
 import { api } from "@convex/_generated/api";
 import imageCompression from "browser-image-compression";
 
@@ -112,6 +113,12 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
     title: z.string().min(1, t("form.validation.titleReq")),
     propertyType: z.enum(listingTypeValues),
     listingMode: z.enum(listingModeValues),
+    location: z
+      .object({
+        lat: z.number(),
+        lng: z.number(),
+      })
+      .optional(),
     city: z.string().min(1, t("form.validation.cityReq")),
     neighborhood: z.string().trim().max(80).optional(),
     price: z.string().min(1, t("form.validation.priceReq")),
@@ -219,6 +226,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
       title: listing?.title ?? "",
       propertyType: listing?.propertyType ?? "apartment",
       listingMode: listing?.listingMode ?? "rent",
+      location: listing?.location,
       city: listing?.city ?? "",
       neighborhood: listing?.neighborhood ?? "",
       price: listing ? String(listing.price) : "",
@@ -377,6 +385,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
           contact,
           patch: {
             ...values,
+            location: data.location ?? null,
             charges: isRental && data.charges ? Number(data.charges) : null,
             deposit: isRental && data.deposit ? Number(data.deposit) : null,
             availableFrom: data.availableFrom
@@ -388,6 +397,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
         await createListing({
           ...values,
           contact,
+          location: data.location,
           charges: isRental && data.charges ? Number(data.charges) : undefined,
           deposit: isRental && data.deposit ? Number(data.deposit) : undefined,
           availableFrom: data.availableFrom
@@ -571,6 +581,22 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
                 <FieldLabel htmlFor="neighborhood">{t("form.labels.neighborhood")}</FieldLabel>
                 <Input {...field} id="neighborhood" placeholder={t("form.placeholders.neighborhood")} autoComplete="off" />
                 <FieldDescription>{t("form.labels.neighborhoodHint")}</FieldDescription>
+              </Field>
+            )}
+          />
+          <Controller
+            name="location"
+            control={form.control}
+            render={({ field }) => (
+              <Field>
+                <FieldLabel>{t("form.labels.mapPosition")}</FieldLabel>
+                <FieldDescription>{t("form.labels.mapDesc")}</FieldDescription>
+                <LocationPicker
+                  value={field.value}
+                  onChange={field.onChange}
+                  onCityChange={(city) => form.setValue("city", city)}
+                  privacyMode
+                />
               </Field>
             )}
           />
