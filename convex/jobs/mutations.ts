@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
 import {
   isContractTypeAllowedForJobType,
+  requiresDurationOrStartDate,
   type ContractType,
   type JobType,
 } from "../../src/lib/job-offer-options";
@@ -33,19 +34,34 @@ const contractTypeValidator = v.union(
 const jobContactEmailValidator = v.string();
 
 function assertValidJobInput(args: {
+  title: string;
+  company: string;
+  description: string;
   type: JobType;
   contractType: ContractType;
   workMode: "onSite" | "hybrid" | "remote";
   city: string;
-  contactEmail: string;
-}) {
+  duration?: string;
+  startDate?: string;
+  contactEmail?: string;
+}, options: { requireContactEmail: boolean }) {
+  if (!args.title.trim()) throwValidationError("Job title is required");
+  if (!args.company.trim()) throwValidationError("Company is required");
+  if (!args.description.trim()) throwValidationError("Job description is required");
   if (!isContractTypeAllowedForJobType(args.type, args.contractType)) {
     throwValidationError("This contract type is not available for the selected job type");
   }
   if (args.workMode !== "remote" && !args.city.trim()) {
     throwValidationError("City is required for on-site and hybrid jobs");
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(args.contactEmail.trim())) {
+  if (requiresDurationOrStartDate(args.type, args.contractType)) {
+    if (!args.duration?.trim()) throwValidationError("Duration is required for this job type");
+    if (!args.startDate?.trim()) throwValidationError("Start date is required for this job type");
+  }
+  if (options.requireContactEmail && !args.contactEmail?.trim()) {
+    throwValidationError("Application contact email is required");
+  }
+  if (args.contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(args.contactEmail.trim())) {
     throwValidationError("Invalid application contact email");
   }
 }
@@ -93,7 +109,7 @@ export const createJob = authMutation({
     if (user.userType !== "provider" && user.role !== "admin") {
       throwForbidden("Only providers or admins can publish jobs");
     }
-    assertValidJobInput(args);
+    assertValidJobInput(args, { requireContactEmail: true });
     const { contactEmail, ...jobArgs } = args;
 
     const searchAllContent = `${args.title} ${args.type} ${args.city} ${args.contractType} ${args.description}`;
@@ -174,15 +190,7 @@ export const updateJob = authMutation({
 
     // Remove id from args before updating because it's not a field of the document
     const { id, contactEmail, ...updateData } = args;
-    if (!isContractTypeAllowedForJobType(args.type, args.contractType)) {
-      throwValidationError("This contract type is not available for the selected job type");
-    }
-    if (args.workMode !== "remote" && !args.city.trim()) {
-      throwValidationError("City is required for on-site and hybrid jobs");
-    }
-    if (contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail.trim())) {
-      throwValidationError("Invalid application contact email");
-    }
+    assertValidJobInput(args, { requireContactEmail: false });
 
     const searchAllContent = `${args.title} ${args.type} ${args.city} ${args.contractType} ${args.description}`;
 

@@ -646,7 +646,10 @@ export function EditJobOfferForm({
             <Field><FieldLabel htmlFor="job-deadline">{t("form.labels.applicationDeadline")}</FieldLabel><Input {...field} id="job-deadline" type="date" /></Field>
           )} />
           <Controller name="benefits" control={form.control} render={({ field }) => (
-            <Field><FieldLabel htmlFor="job-benefits">{t("form.labels.benefits")}</FieldLabel><InputGroupTextarea {...field} id="job-benefits" rows={3} /></Field>
+            <Field>
+              <FieldLabel htmlFor="job-benefits">{t("form.labels.benefits")}</FieldLabel>
+              <InputGroup><InputGroupTextarea {...field} id="job-benefits" rows={3} className="min-h-24 resize-y" /></InputGroup>
+            </Field>
           )} />
           <Controller name="externalApplicationUrl" control={form.control} render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}><FieldLabel htmlFor="job-external-application">{t("form.labels.externalApplicationUrl")}</FieldLabel><Input {...field} id="job-external-application" type="url" />{fieldState.invalid && <FieldError errors={[fieldState.error]} />}</Field>

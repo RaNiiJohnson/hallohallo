@@ -121,6 +121,34 @@ describe("Jobs", () => {
     ).resolves.toBeTruthy();
   });
 
+  it("enforces required and conditional fields on the server", async () => {
+    await expect(
+      t.mutation(api.jobs.mutations.createJob, {
+        title: "",
+        description: "A valid description.",
+        company: "Job Company",
+        type: "job",
+        contractType: "CDI",
+        workMode: "remote",
+        city: "",
+        contactEmail: "employer@example.com",
+      }),
+    ).rejects.toThrow("Job title is required");
+
+    await expect(
+      t.mutation(api.jobs.mutations.createJob, {
+        title: "Fixed-term job",
+        description: "A valid description.",
+        company: "Job Company",
+        type: "job",
+        contractType: "CDD",
+        workMode: "remote",
+        city: "",
+        contactEmail: "employer@example.com",
+      }),
+    ).rejects.toThrow("Duration is required for this job type");
+  });
+
   it("enforces job type and location rules when updating", async () => {
     await expect(
       t.mutation(api.jobs.mutations.updateJob, {
