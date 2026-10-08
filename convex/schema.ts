@@ -102,6 +102,14 @@ export default defineSchema({
       v.literal("shared"),
     ),
     listingMode: v.union(v.literal("rent"), v.literal("sale")),
+    // Optional to keep existing listings readable during the safe rollout.
+    status: v.optional(
+      v.union(
+        v.literal("active"),
+        v.literal("closed"),
+        v.literal("archived"),
+      ),
+    ),
     slug: v.string(),
     location: v.optional(
       v.object({

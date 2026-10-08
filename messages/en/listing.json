@@ -52,6 +52,24 @@
       "title": "Edit listing",
       "description": "Update your listing information and photos."
     },
+    "lifecycle": {
+      "close": "Close listing",
+      "reopen": "Reopen",
+      "archive": "Archive",
+      "restore": "Restore",
+      "success": "Listing status updated.",
+      "error": "Unable to update the listing status."
+    },
+    "archive": {
+      "trigger": "Archive",
+      "title": "Archive listing?",
+      "desc": "The listing will be removed from public lists but can be restored.",
+      "cancel": "Cancel",
+      "confirm": "Archive listing",
+      "submitting": "Archiving...",
+      "successToast": "Listing archived successfully",
+      "errorToast": "Unable to archive the listing"
+    },
     "delete": {
       "trigger": "Delete",
       "title": "Delete listing?",
@@ -202,6 +220,7 @@
     "featuresTitle": "Features",
     "level": "Level",
     "available": "Available:",
+    "closed": "Listing closed",
     "pets": "Pets:",
     "petsDenied": "Not allowed",
     "descTitle": "Description",
@@ -212,7 +231,7 @@
     "contactTitle": "Contact",
     "anonymous": "Anonymous",
     "ownerRole": "Owner",
-    "call": "Call",
+    "whatsapp": "Contact on WhatsApp",
     "sendEmail": "Send email",
     "signInToContact": "Sign in to contact",
     "contactOwner": "Contact owner",

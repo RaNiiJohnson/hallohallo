@@ -52,6 +52,24 @@
       "title": "Modifier l'annonce",
       "description": "Mettez à jour les informations et les photos de votre annonce."
     },
+    "lifecycle": {
+      "close": "Clôturer l'annonce",
+      "reopen": "Rouvrir",
+      "archive": "Archiver",
+      "restore": "Restaurer",
+      "success": "Statut de l'annonce mis à jour.",
+      "error": "Impossible de mettre à jour le statut de l'annonce."
+    },
+    "archive": {
+      "trigger": "Archiver",
+      "title": "Archiver l'annonce ?",
+      "desc": "L'annonce sera retirée des listes publiques, mais pourra être restaurée.",
+      "cancel": "Annuler",
+      "confirm": "Archiver l'annonce",
+      "submitting": "Archivage...",
+      "successToast": "Annonce archivée avec succès",
+      "errorToast": "Erreur lors de l'archivage de l'annonce"
+    },
     "delete": {
       "trigger": "Supprimer",
       "title": "Supprimer l'annonce ?",
@@ -202,6 +220,7 @@
     "featuresTitle": "Caractéristiques",
     "level": "Niveau",
     "available": "Disponible :",
+    "closed": "Annonce clôturée",
     "pets": "Animaux :",
     "petsDenied": "Non acceptés",
     "descTitle": "Description",
@@ -212,7 +231,7 @@
     "contactTitle": "Contact",
     "anonymous": "Anonyme",
     "ownerRole": "Propriétaire",
-    "call": "Appeler",
+    "whatsapp": "Contacter sur WhatsApp",
     "sendEmail": "Envoyer un e-mail",
     "signInToContact": "Se connecter pour contacter",
     "contactOwner": "Contacter le propriétaire",

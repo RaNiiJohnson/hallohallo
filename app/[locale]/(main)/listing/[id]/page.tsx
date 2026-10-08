@@ -13,7 +13,7 @@ import { ArrowLeft, Heart } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { notFound, useParams } from "next/navigation";
 import { toast } from "sonner";
-import { DeleteListingDialog } from "../_component/dialogs/deleteListingDialog";
+import { ListingLifecycleActions } from "../_component/listingLifecycleActions";
 import { PropertyPageSkeleton } from "../_component/skeleton";
 import { EditListingDialog } from "./components/EditListingDialog";
 import { PropertyDetails } from "./components/PropertyDetails";
@@ -55,7 +55,12 @@ export default function PropertyPage() {
 
         <div className="flex items-center gap-2">
           <ButtonGroup>
-            {canManage && <DeleteListingDialog listingId={property._id} />}
+            {canManage && (
+              <ListingLifecycleActions
+                listingId={property._id}
+                status={property.status}
+              />
+            )}
             <ShareButton text={property.title} />
             {canManage ? (
               <EditListingDialog listing={property} />

@@ -20,22 +20,22 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 
-interface DeleteListingDialogProps {
+interface ArchiveListingDialogProps {
   listingId: Id<"RealestateListing">;
 }
 
-export function DeleteListingDialog({ listingId }: DeleteListingDialogProps) {
-  const t = useTranslations("listing.dialogs.delete");
+export function ArchiveListingDialog({ listingId }: ArchiveListingDialogProps) {
+  const t = useTranslations("listing.dialogs.archive");
   const router = useRouter();
-  const deleteListing = useMutation(api.listings.mutations.deleteListing);
+  const archiveListing = useMutation(api.listings.mutations.archiveListing);
   const [open, setOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
 
-  async function handleDelete() {
+  async function handleArchive() {
     setIsPending(true);
 
     try {
-      await deleteListing({ listingId });
+      await archiveListing({ listingId });
       toast.success(t("successToast"));
       setOpen(false);
       router.replace("/listing");
@@ -72,7 +72,7 @@ export function DeleteListingDialog({ listingId }: DeleteListingDialogProps) {
           <Button
             variant="destructive"
             disabled={isPending}
-            onClick={handleDelete}
+            onClick={handleArchive}
           >
             {isPending ? (
               <>

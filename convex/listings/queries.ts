@@ -1,4 +1,5 @@
 import {
+  FilterBuilder,
   OrderedQuery,
   paginationOptsValidator,
   Query,
@@ -35,6 +36,23 @@ function withoutPreciseLocation<T extends { location?: unknown }>(listing: T) {
   return publicListing;
 }
 
+type ListingStatus = "active" | "closed" | "archived";
+
+function isVisibleListing(listing: { status?: ListingStatus }) {
+  return listing.status === undefined || listing.status === "active";
+}
+
+function visibleListingFilter(q: FilterBuilder<DataModel["RealestateListing"]>) {
+  return q.or(q.eq(q.field("status"), "active"), q.eq(q.field("status"), undefined));
+}
+
+function canManageListing(
+  listing: { authorId: string },
+  user: { _id: string; role?: string | null } | null | undefined,
+) {
+  return user?._id === listing.authorId || user?.role === "admin";
+}
+
 export const getListingWithContact = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
@@ -45,6 +63,9 @@ export const getListingWithContact = query({
     if (!listing) return null;
 
     const user = await authComponent.safeGetAuthUser(ctx);
+    if (listing.status === "archived" && !canManageListing(listing, user)) {
+      return null;
+    }
     let isBookmarked = false;
     if (user) {
       const existingBookmark = await ctx.db
@@ -92,6 +113,10 @@ export const getListingMetadata = query({
       .unique();
 
     if (!listing) return null;
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (listing.status === "archived" && !canManageListing(listing, user)) {
+      return null;
+    }
     return {
       ...withoutPreciseLocation(listing),
       images: await resolveImages(listing.images ?? []),
@@ -154,7 +179,7 @@ export const getListing = query({
       );
 
       const filteredPage = enrichedPage.filter(
-        (j): j is NonNullable<typeof j> => j !== null,
+        (j): j is NonNullable<typeof j> => j !== null && isVisibleListing(j),
       );
       return { ...bookmarksPage, page: filteredPage };
     }
@@ -188,7 +213,7 @@ export const getListing = query({
 
     // Step 4: Additional filters
     const filtered = orderedQuery.filter((q) => {
-      let expr = q.eq(q.field("_id"), q.field("_id")); // toujours vrai
+      let expr = visibleListingFilter(q);
 
       if (minPrice !== undefined) {
         expr = q.and(expr, q.gte(q.field("price"), minPrice));
@@ -241,6 +266,7 @@ export const listListingsByCity = query({
       .query("RealestateListing")
       .withIndex("by_city", (q) => q.eq("city", args.city))
       .order("desc")
+      .filter(visibleListingFilter)
       .take(50);
 
     return Promise.all(
@@ -269,11 +295,23 @@ export const getSimilarRealEstateListings = query({
     const byCity = await ctx.db
       .query("RealestateListing")
       .withIndex("by_city", (q) => q.eq("city", args.city))
-      .filter((q) => q.neq(q.field("slug"), args.excludeSlug))
+      .filter((q) =>
+        q.and(
+          q.neq(q.field("slug"), args.excludeSlug),
+          visibleListingFilter(q),
+        ),
+      )
       .order("desc")
       .take(args.limit);
 
-    if (byCity.length >= args.limit) return byCity;
+    if (byCity.length >= args.limit) {
+      return Promise.all(
+        byCity.map(async (listing) => {
+          const images = await resolveImages(listing.images ?? []);
+          return { ...withoutPreciseLocation(listing), images };
+        }),
+      );
+    }
 
     const remaining = args.limit - byCity.length;
 
@@ -286,6 +324,7 @@ export const getSimilarRealEstateListings = query({
         q.and(
           q.neq(q.field("slug"), args.excludeSlug),
           q.neq(q.field("city"), args.city), // Avoid duplicates; city already taken.
+          visibleListingFilter(q),
         ),
       )
       .order("desc")

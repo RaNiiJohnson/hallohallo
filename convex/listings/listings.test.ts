@@ -4,7 +4,7 @@ import { convexTest } from "convex-test";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { api } from "../_generated/api";
 import { Id } from "../_generated/dataModel";
-import { authComponent } from "../auth/auth";
+import { authComponent, requireAuth } from "../auth/auth";
 import schema from "../schema";
 import { modules } from "../test.setup";
 
@@ -37,6 +37,14 @@ describe("Listings", () => {
   let listingSlug: string;
 
   beforeEach(async () => {
+    vi.mocked(requireAuth).mockResolvedValue({
+      user: {
+        _id: "testUserId",
+        id: "testUserId",
+        name: "Test User",
+        userType: "provider",
+      },
+    } as never);
     vi.mocked(authComponent.safeGetAuthUser).mockResolvedValue({
       _id: "testUserId",
       emailVerified: false,
@@ -134,7 +142,7 @@ describe("Listings", () => {
         excludeSlug: listingSlug,
         city: "Berlin",
         propertyType: "studio",
-        limit: 5,
+        limit: 1,
       },
     );
     expect(similarResults[0]).not.toHaveProperty("location");
@@ -226,10 +234,89 @@ describe("Listings", () => {
     expect(listing?.searchAll).toContain("Updated Listing");
   });
 
-  it("deletes a listing", async () => {
-    await t.mutation(api.listings.mutations.deleteListing, { listingId });
+  it("keeps a closed listing accessible but out of public results", async () => {
+    await t.mutation(api.listings.mutations.setListingStatus, {
+      listingId,
+      status: "closed",
+    });
 
-    const listing = await t.run(async (ctx) => await ctx.db.get(listingId));
-    expect(listing).toBeNull();
+    await expect(
+      t.query(api.listings.queries.getListingWithContact, { slug: listingSlug }),
+    ).resolves.toMatchObject({ status: "closed" });
+
+    const results = await t.query(api.listings.queries.getListing, {
+      paginationOpts: { cursor: null, numItems: 10 },
+    });
+    expect(results.page.map((listing) => listing._id)).not.toContain(listingId);
+
+    const cityResults = await t.query(
+      api.listings.queries.listListingsByCity,
+      { city: "City" },
+    );
+    expect(cityResults.map((listing) => listing._id)).not.toContain(listingId);
+  });
+
+  it("archives a listing without deleting its associated records", async () => {
+    const descendants = await t.run(async (ctx) => {
+      const translationId = await ctx.db.insert("listingTranslations", {
+        listingId,
+        language: "en",
+        title: "Translation",
+        city: "City",
+        description: "Description",
+        sourceUpdatedAt: Date.now(),
+      });
+      const contactId = await ctx.db.insert("RealestateContactInfo", {
+        listingId,
+        listing: "Listing Title",
+        email: "owner@example.com",
+      });
+      const bookmarkId = await ctx.db.insert("bookmarks", {
+        userId: "bookmark-owner",
+        resourceId: listingId,
+        resourceType: "realEstate",
+      });
+      return { translationId, contactId, bookmarkId };
+    });
+
+    await t.mutation(api.listings.mutations.archiveListing, { listingId });
+
+    await t.run(async (ctx) => {
+      expect((await ctx.db.get(listingId))?.status).toBe("archived");
+      for (const id of Object.values(descendants)) {
+        expect(await ctx.db.get(id)).not.toBeNull();
+      }
+    });
+  });
+
+  it("hides archived listings from other members", async () => {
+    await t.mutation(api.listings.mutations.setListingStatus, {
+      listingId,
+      status: "archived",
+    });
+    vi.mocked(authComponent.safeGetAuthUser).mockResolvedValue({
+      _id: "anotherUserId",
+      emailVerified: true,
+    } as never);
+
+    await expect(
+      t.query(api.listings.queries.getListingWithContact, { slug: listingSlug }),
+    ).resolves.toBeNull();
+    await expect(
+      t.query(api.listings.queries.getListingMetadata, { slug: listingSlug }),
+    ).resolves.toBeNull();
+  });
+
+  it("refuses lifecycle changes by another member", async () => {
+    vi.mocked(requireAuth).mockResolvedValue({
+      user: { _id: "anotherUserId", role: "user" },
+    } as never);
+
+    await expect(
+      t.mutation(api.listings.mutations.setListingStatus, {
+        listingId,
+        status: "closed",
+      }),
+    ).rejects.toThrow("Not allowed to change this listing status");
   });
 });

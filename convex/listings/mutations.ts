@@ -24,6 +24,12 @@ const contactValidator = v.object({
   email: v.optional(v.string()),
 });
 
+const listingStatusValidator = v.union(
+  v.literal("active"),
+  v.literal("closed"),
+  v.literal("archived"),
+);
+
 type ListingContactInput = {
   phone?: string;
   email?: string;
@@ -111,6 +117,7 @@ export const createListing = authMutation({
       slug: generatedSlug(args.title),
       authorId: user._id,
       authorName: user.name,
+      status: "active",
       updatedAt: Date.now(),
       searchAll: searchAllContent,
       currency: "EUR",
@@ -144,7 +151,7 @@ export const createListing = authMutation({
   },
 });
 
-export const deleteListing = authMutation({
+export const archiveListing = authMutation({
   args: { listingId: v.id("RealestateListing") },
   returns: v.null(),
   handler: async (ctx, { listingId }) => {
@@ -157,44 +164,23 @@ export const deleteListing = authMutation({
       throwForbidden("Not allowed to delete this listing");
     }
 
-    // 1. Deletes R2 images (ignores legacy Cloudinary entries without a storageId)
-    const results = await Promise.allSettled(
-      (listing.images ?? [])
-        .filter((img) => img.storageId)
-        .map((img) => r2.deleteObject(ctx, img.storageId!)),
-    );
-    const failed = results.filter((r) => r.status === "rejected");
-    if (failed.length > 0) {
-      console.error(
-        `deleteListing ${listingId}: ${failed.length} image(s) R2 non supprimée(s)`,
-        failed,
-      );
-      // We'll proceed anyway: better an orphaned listing without an image
-      // than an orphaned image without a listing—which would be impossible to find.
+    // Listings are retained by default: contacts, translations, bookmarks and
+    // images remain intact so the owner can restore the record if needed.
+    await ctx.db.patch(listingId, { status: "archived", updatedAt: Date.now() });
+    return null;
+  },
+});
+
+export const setListingStatus = authMutation({
+  args: { listingId: v.id("RealestateListing"), status: listingStatusValidator },
+  returns: v.null(),
+  handler: async (ctx, { listingId, status }) => {
+    const listing = await ctx.db.get(listingId);
+    if (!listing) throwNotFound("Listing not found");
+    if (listing.authorId !== ctx.user._id && ctx.user.role !== "admin") {
+      throwForbidden("Not allowed to change this listing status");
     }
-
-    // 2. Deletes the linked contact
-    const contact = await ctx.db
-      .query("RealestateContactInfo")
-      .withIndex("by_listingId", (q) => q.eq("listingId", listingId))
-      .unique();
-    if (contact) await ctx.db.delete(contact._id);
-
-    const translations = await ctx.db
-      .query("listingTranslations")
-      .withIndex("by_listing", (q) => q.eq("listingId", listingId))
-      .collect();
-    await Promise.all(translations.map((t) => ctx.db.delete(t._id)));
-
-    // 3. Deletes the bookmarks pointing to this listing.
-    const bookmarks = await ctx.db
-      .query("bookmarks")
-      .withIndex("by_resourceId", (q) => q.eq("resourceId", listingId))
-      .collect();
-    await Promise.all(bookmarks.map((b) => ctx.db.delete(b._id)));
-
-    // 4. Deletes the ad itself
-    await ctx.db.delete(listingId);
+    await ctx.db.patch(listingId, { status, updatedAt: Date.now() });
     return null;
   },
 });

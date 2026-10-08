@@ -52,6 +52,24 @@
       "title": "Anzeige bearbeiten",
       "description": "Aktualisiere die Informationen und Fotos deiner Anzeige."
     },
+    "lifecycle": {
+      "close": "Anzeige schließen",
+      "reopen": "Wieder öffnen",
+      "archive": "Archivieren",
+      "restore": "Wiederherstellen",
+      "success": "Anzeigenstatus aktualisiert.",
+      "error": "Anzeigenstatus konnte nicht aktualisiert werden."
+    },
+    "archive": {
+      "trigger": "Archivieren",
+      "title": "Anzeige archivieren?",
+      "desc": "Die Anzeige wird aus öffentlichen Listen entfernt, kann aber wiederhergestellt werden.",
+      "cancel": "Abbrechen",
+      "confirm": "Anzeige archivieren",
+      "submitting": "Wird archiviert...",
+      "successToast": "Anzeige erfolgreich archiviert",
+      "errorToast": "Anzeige konnte nicht archiviert werden"
+    },
     "delete": {
       "trigger": "Löschen",
       "title": "Anzeige löschen?",
@@ -202,6 +220,7 @@
     "featuresTitle": "Eigenschaften",
     "level": "Ebene",
     "available": "Verfügbar:",
+    "closed": "Anzeige geschlossen",
     "pets": "Haustiere:",
     "petsDenied": "Nicht erlaubt",
     "descTitle": "Beschreibung",
@@ -212,7 +231,7 @@
     "contactTitle": "Kontakt",
     "anonymous": "Anonym",
     "ownerRole": "Eigentümer",
-    "call": "Anrufen",
+    "whatsapp": "Über WhatsApp kontaktieren",
     "sendEmail": "E-Mail senden",
     "signInToContact": "Anmelden, um zu kontaktieren",
     "contactOwner": "Eigentümer kontaktieren",

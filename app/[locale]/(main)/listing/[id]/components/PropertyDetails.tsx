@@ -20,8 +20,8 @@ import {
   Calendar,
   Mail,
   MapPin,
+  MessageCircle,
   PawPrint,
-  Phone,
   Square,
   User,
 } from "lucide-react";
@@ -60,6 +60,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
 
   const title = data?.title ?? property.title;
   const city = data?.city ?? property.city;
+  const isActive = property.status === undefined || property.status === "active";
   const formatNumber = (value: number) =>
     new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(value);
   const contactLinks = getListingContactLinks(property.contact);
@@ -97,6 +98,9 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                   >[0],
                 )}
               </Badge>
+              {property.status === "closed" && (
+                <Badge variant="secondary">{tListing("details.closed")}</Badge>
+              )}
             </div>
 
             <div className="mt-2">
@@ -206,19 +210,21 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
 
               {/* Disponibilité et animaux */}
               <div className="mt-6 space-y-3">
-                <div className="flex items-center gap-3">
-                  <Calendar className="h-5 w-5 text-primary" />
-                  <span className="font-medium">
-                    {tListing("details.available")}
-                  </span>
-                  <span>
-                    {formatDateWithFallback(
-                      property.availableFrom,
-                      locale,
-                      t("availableNow"),
-                    )}
-                  </span>
-                </div>
+                {isActive && (
+                  <div className="flex items-center gap-3">
+                    <Calendar className="h-5 w-5 text-primary" />
+                    <span className="font-medium">
+                      {tListing("details.available")}
+                    </span>
+                    <span>
+                      {formatDateWithFallback(
+                        property.availableFrom,
+                        locale,
+                        t("availableNow"),
+                      )}
+                    </span>
+                  </div>
+                )}
 
                 <div className="flex items-center gap-3">
                   <PawPrint className="h-5 w-5 text-primary" />
@@ -324,14 +330,16 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
 
               {/* Boutons de contact */}
               <div className="space-y-3">
-                {contactLinks.phoneHref && (
+                {contactLinks.whatsappHref && (
                   <Button asChild className="w-full" size="lg">
                     <a
-                      href={contactLinks.phoneHref}
+                      href={contactLinks.whatsappHref}
+                      target="_blank"
+                      rel="noreferrer"
                       className="flex items-center gap-2"
                     >
-                      <Phone className="h-4 w-4" />
-                      {tListing("details.call")}
+                      <MessageCircle className="h-4 w-4" />
+                      {tListing("details.whatsapp")}
                     </a>
                   </Button>
                 )}
@@ -365,7 +373,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                   </Button>
                 )}
 
-                {!contactLinks.phoneHref &&
+                {!contactLinks.whatsappHref &&
                   !contactLinks.emailHref &&
                   !property.contactAccessRequired && (
                   <Button
