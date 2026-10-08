@@ -30,6 +30,21 @@ const listingStatusValidator = v.union(
   v.literal("archived"),
 );
 
+type ListingStatus = "active" | "closed" | "archived";
+
+function isAllowedListingTransition(
+  currentStatus: ListingStatus | undefined,
+  nextStatus: ListingStatus,
+) {
+  const current = currentStatus ?? "active";
+  return (
+    (current === "active" && nextStatus === "closed") ||
+    (current === "closed" &&
+      (nextStatus === "active" || nextStatus === "archived")) ||
+    (current === "archived" && nextStatus === "active")
+  );
+}
+
 type ListingContactInput = {
   phone?: string;
   email?: string;
@@ -161,7 +176,10 @@ export const archiveListing = authMutation({
     const isOwner = listing.authorId === ctx.user._id;
     const isAdmin = ctx.user.role === "admin";
     if (!isOwner && !isAdmin) {
-      throwForbidden("Not allowed to delete this listing");
+      throwForbidden("Not allowed to archive this listing");
+    }
+    if (!isAllowedListingTransition(listing.status, "archived")) {
+      throwValidationError("Listing must be closed before it can be archived");
     }
 
     // Listings are retained by default: contacts, translations, bookmarks and
@@ -179,6 +197,9 @@ export const setListingStatus = authMutation({
     if (!listing) throwNotFound("Listing not found");
     if (listing.authorId !== ctx.user._id && ctx.user.role !== "admin") {
       throwForbidden("Not allowed to change this listing status");
+    }
+    if (!isAllowedListingTransition(listing.status, status)) {
+      throwValidationError("Invalid listing status transition");
     }
     await ctx.db.patch(listingId, { status, updatedAt: Date.now() });
     return null;

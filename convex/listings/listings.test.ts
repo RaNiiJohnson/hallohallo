@@ -279,6 +279,10 @@ describe("Listings", () => {
       return { translationId, contactId, bookmarkId };
     });
 
+    await t.mutation(api.listings.mutations.setListingStatus, {
+      listingId,
+      status: "closed",
+    });
     await t.mutation(api.listings.mutations.archiveListing, { listingId });
 
     await t.run(async (ctx) => {
@@ -290,6 +294,10 @@ describe("Listings", () => {
   });
 
   it("hides archived listings from other members", async () => {
+    await t.mutation(api.listings.mutations.setListingStatus, {
+      listingId,
+      status: "closed",
+    });
     await t.mutation(api.listings.mutations.setListingStatus, {
       listingId,
       status: "archived",
@@ -305,6 +313,36 @@ describe("Listings", () => {
     await expect(
       t.query(api.listings.queries.getListingMetadata, { slug: listingSlug }),
     ).resolves.toBeNull();
+  });
+
+  it("enforces the active, closed, archived lifecycle on the server", async () => {
+    await expect(
+      t.mutation(api.listings.mutations.setListingStatus, {
+        listingId,
+        status: "archived",
+      }),
+    ).rejects.toThrow("Invalid listing status transition");
+
+    await expect(
+      t.mutation(api.listings.mutations.archiveListing, { listingId }),
+    ).rejects.toThrow("Listing must be closed before it can be archived");
+
+    await t.mutation(api.listings.mutations.setListingStatus, {
+      listingId,
+      status: "closed",
+    });
+    await t.mutation(api.listings.mutations.setListingStatus, {
+      listingId,
+      status: "archived",
+    });
+    await t.mutation(api.listings.mutations.setListingStatus, {
+      listingId,
+      status: "active",
+    });
+
+    expect((await t.run((ctx) => ctx.db.get(listingId)))?.status).toBe(
+      "active",
+    );
   });
 
   it("refuses lifecycle changes by another member", async () => {
