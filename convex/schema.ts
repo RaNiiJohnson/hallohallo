@@ -118,6 +118,7 @@ export default defineSchema({
       }),
     ),
     city: v.string(),
+    neighborhood: v.optional(v.string()),
 
     price: v.number(),
     charges: v.optional(v.number()),
@@ -390,10 +391,14 @@ export default defineSchema({
     cvKey: v.string(),
     coverLetter: v.optional(v.string()),
     appliedAt: v.number(),
-    emailStatus: v.union(
-      v.literal("pending"),
-      v.literal("sent"),
-      v.literal("failed"),
+    // Optional during the safe rollout: legacy applications predate email
+    // delivery tracking and remain readable until they are backfilled.
+    emailStatus: v.optional(
+      v.union(
+        v.literal("pending"),
+        v.literal("sent"),
+        v.literal("failed"),
+      ),
     ),
   })
     .index("by_jobId_and_candidateId", ["jobId", "candidateId"])

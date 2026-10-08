@@ -69,6 +69,7 @@ describe("Listings", () => {
       description: "Listing Description",
       extras: [],
       availableFrom: 1_800_000_000_000,
+      contact: { email: "provider@example.com" },
     });
 
     const listing = await t.run(async (ctx) => await ctx.db.get(listingId));
@@ -81,7 +82,6 @@ describe("Listings", () => {
     });
     expect(result?.title).toBe("Listing Title");
     expect(result?.contact).toBeNull();
-    expect(result?.location).toBeUndefined();
   });
 
   it("keeps contact details and precise coordinates out of public responses", async () => {
@@ -94,6 +94,7 @@ describe("Listings", () => {
         city: "Berlin",
         location: { lat: 52.52, lng: 13.405 },
         price: 900,
+        availableFrom: 1_800_000_000_000,
         area: 30,
         bedrooms: 1,
         bathrooms: 1,
@@ -117,7 +118,18 @@ describe("Listings", () => {
     });
     expect(result?.contact).toBeNull();
     expect(result?.contactAccessRequired).toBe(true);
+    expect(result?.contactVerificationRequired).toBe(true);
     expect(result?.location).toBeUndefined();
+
+    vi.mocked(authComponent.safeGetAuthUser).mockResolvedValue(null as never);
+    const anonymousResult = await t.query(
+      api.listings.queries.getListingWithContact,
+      { slug: listing!.slug },
+    );
+    expect(anonymousResult?.contact).toBeNull();
+    expect(anonymousResult?.location).toBeUndefined();
+    expect(anonymousResult?.contactAccessRequired).toBe(true);
+    expect(anonymousResult?.contactVerificationRequired).toBe(false);
 
     const cityResults = await t.query(
       api.listings.queries.listListingsByCity,
@@ -160,10 +172,7 @@ describe("Listings", () => {
       phone: "+49 151 23456789",
       email: "owner@example.com",
     });
-    expect(verifiedResult?.location).toMatchObject({
-      lat: 52.52,
-      lng: 13.405,
-    });
+    expect(verifiedResult?.location).toEqual({ lat: 52.52, lng: 13.41 });
   });
 
   it("rejects malformed contact details", async () => {
@@ -182,6 +191,27 @@ describe("Listings", () => {
         contact: { phone: "call-me" },
       }),
     ).rejects.toThrow("Invalid contact phone number");
+  });
+
+  it("requires an email address or WhatsApp number for a new listing", async () => {
+    await expect(
+      t.mutation(api.listings.mutations.createListing, {
+        title: "No contact listing",
+        propertyType: "studio",
+        listingMode: "rent",
+        city: "Berlin",
+        price: 900,
+        availableFrom: 1_800_000_000_000,
+        area: 30,
+        bedrooms: 1,
+        bathrooms: 1,
+        floor: 2,
+        pets: false,
+        images: [],
+        description: "A listing that intentionally omits contact details",
+        extras: [],
+      }),
+    ).rejects.toThrow("An email address or WhatsApp phone number is required");
   });
 
   it("upserts and removes contact details while keeping legacy listings valid", async () => {
@@ -232,6 +262,50 @@ describe("Listings", () => {
     expect(listing?.deposit).toBeUndefined();
     expect(listing?.availableFrom).toBeUndefined();
     expect(listing?.searchAll).toContain("Updated Listing");
+  });
+
+  it("keeps rental deposits out of listings for sale", async () => {
+    const saleListingId = await t.mutation(api.listings.mutations.createListing, {
+      title: "Listing for sale",
+      propertyType: "house",
+      listingMode: "sale",
+      city: "Munich",
+      price: 450_000,
+      charges: 200,
+      deposit: 3_000,
+      availableFrom: 1_800_000_000_000,
+      area: 100,
+      bedrooms: 4,
+      bathrooms: 2,
+      floor: 0,
+      pets: true,
+      images: [],
+      description: "A house offered for sale",
+      extras: [],
+      contact: { phone: "+49 151 23456789" },
+    });
+
+    await t.mutation(api.listings.mutations.updateListing, {
+      listingId,
+      patch: {
+        listingMode: "sale",
+        charges: 150,
+        deposit: 2_000,
+        availableFrom: 1_800_000_000_000,
+      },
+    });
+
+    await t.run(async (ctx) => {
+      const saleListing = await ctx.db.get(saleListingId);
+      const convertedListing = await ctx.db.get(listingId);
+
+      expect(saleListing?.deposit).toBeUndefined();
+      expect(saleListing?.charges).toBe(200);
+      expect(saleListing?.availableFrom).toBe(1_800_000_000_000);
+      expect(convertedListing?.deposit).toBeUndefined();
+      expect(convertedListing?.charges).toBe(150);
+      expect(convertedListing?.availableFrom).toBe(1_800_000_000_000);
+    });
   });
 
   it("keeps a closed listing accessible but out of public results", async () => {

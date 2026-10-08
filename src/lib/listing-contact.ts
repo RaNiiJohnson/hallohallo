@@ -3,9 +3,7 @@ export function getListingContactLinks(contact?: {
   email?: string;
 } | null) {
   return {
-    whatsappHref: contact?.phone
-      ? `https://wa.me/${contact.phone.replace(/\D/g, "")}`
-      : null,
+    whatsappHref: contact?.phone ? `https://wa.me/${contact.phone.replace(/\D/g, "")}` : null,
     emailHref: contact?.email ? `mailto:${contact.email}` : null,
   };
 }

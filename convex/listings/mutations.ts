@@ -31,6 +31,12 @@ const listingStatusValidator = v.union(
 );
 
 type ListingStatus = "active" | "closed" | "archived";
+type ListingMode = "rent" | "sale";
+type RentalTermsInput = {
+  charges?: number | null;
+  deposit?: number | null;
+  availableFrom?: number | null;
+};
 
 function isAllowedListingTransition(
   currentStatus: ListingStatus | undefined,
@@ -43,6 +49,29 @@ function isAllowedListingTransition(
       (nextStatus === "active" || nextStatus === "archived")) ||
     (current === "archived" && nextStatus === "active")
   );
+}
+
+function normalizeRentalTerms(
+  listingMode: ListingMode,
+  { charges, deposit, availableFrom }: RentalTermsInput,
+) {
+  if (listingMode === "sale") {
+    return {
+      deposit: undefined,
+      ...(charges !== undefined ? { charges: charges ?? undefined } : {}),
+      ...(availableFrom !== undefined
+        ? { availableFrom: availableFrom ?? undefined }
+        : {}),
+    };
+  }
+
+  return {
+    ...(charges !== undefined ? { charges: charges ?? undefined } : {}),
+    ...(deposit !== undefined ? { deposit: deposit ?? undefined } : {}),
+    ...(availableFrom !== undefined
+      ? { availableFrom: availableFrom ?? undefined }
+      : {}),
+  };
 }
 
 type ListingContactInput = {
@@ -60,7 +89,6 @@ function normalizeContact(contact: ListingContactInput | undefined) {
   if (phone && !/^\+?[0-9 ()-]{6,30}$/.test(phone)) {
     throwValidationError("Invalid contact phone number");
   }
-
   return { phone, email };
 }
 
@@ -82,6 +110,7 @@ export const createListing = authMutation({
       }),
     ),
     city: v.string(),
+    neighborhood: v.optional(v.string()),
     price: v.number(),
 
     charges: v.optional(v.number()),
@@ -107,8 +136,14 @@ export const createListing = authMutation({
   returns: v.id("RealestateListing"),
   handler: async (ctx, args) => {
     const user = ctx.user;
-    const { contact, ...listingArgs } = args;
+    const { contact, charges, deposit, availableFrom, ...listingArgs } = args;
     const normalizedContact = normalizeContact(contact);
+    if (availableFrom === undefined) {
+      throwValidationError("Availability date is required");
+    }
+    if (!normalizedContact.email && !normalizedContact.phone) {
+      throwValidationError("An email address or WhatsApp phone number is required");
+    }
 
     if (user.userType !== "provider" && user.role !== "admin") {
       throwForbidden("Only providers or admins can publish listings");
@@ -136,6 +171,11 @@ export const createListing = authMutation({
       updatedAt: Date.now(),
       searchAll: searchAllContent,
       currency: "EUR",
+      ...normalizeRentalTerms(args.listingMode, {
+        charges,
+        deposit,
+        availableFrom,
+      }),
     });
 
     for (const key of new Set(uploadedKeys)) {
@@ -226,6 +266,7 @@ export const updateListing = authMutation({
         v.union(v.object({ lat: v.number(), lng: v.number() }), v.null()),
       ),
       city: v.optional(v.string()),
+      neighborhood: v.optional(v.string()),
       price: v.optional(v.number()),
       charges: v.optional(v.union(v.number(), v.null())),
       deposit: v.optional(v.union(v.number(), v.null())),
@@ -253,14 +294,15 @@ export const updateListing = authMutation({
     }
 
     const { location, charges, deposit, availableFrom, ...otherFields } = patch;
+    const nextListingMode = otherFields.listingMode ?? listing.listingMode;
     const normalizedPatch = {
       ...otherFields,
       ...(location !== undefined ? { location: location ?? undefined } : {}),
-      ...(charges !== undefined ? { charges: charges ?? undefined } : {}),
-      ...(deposit !== undefined ? { deposit: deposit ?? undefined } : {}),
-      ...(availableFrom !== undefined
-        ? { availableFrom: availableFrom ?? undefined }
-        : {}),
+      ...normalizeRentalTerms(nextListingMode, {
+        charges,
+        deposit,
+        availableFrom,
+      }),
     };
 
     if (normalizedPatch.images) {

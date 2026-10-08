@@ -264,7 +264,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
           </div>
 
           <ItemSeparator />
-          {/* Location Map - Only show if coordinates exist */}
+          {/* The map is only returned with a rounded position to verified members. */}
           <div>
             <div className="py-6">
               <h2 className="text-xl font-semibold mb-4">
@@ -273,11 +273,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
               <p className="text-sm text-muted-foreground mt-1">{city}</p>
             </div>
             {property.location && (
-              <LocationMap
-                location={property.location}
-                city={property.city}
-                listing={true}
-              />
+              <LocationMap location={property.location} city={property.city} listing approximate />
             )}
           </div>
 
@@ -332,18 +328,12 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
               <div className="space-y-3">
                 {contactLinks.whatsappHref && (
                   <Button asChild className="w-full" size="lg">
-                    <a
-                      href={contactLinks.whatsappHref}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center gap-2"
-                    >
+                    <a href={contactLinks.whatsappHref} target="_blank" rel="noreferrer" className="flex items-center gap-2">
                       <MessageCircle className="h-4 w-4" />
                       {tListing("details.whatsapp")}
                     </a>
                   </Button>
                 )}
-
                 {contactLinks.emailHref && (
                   <Button
                     asChild
@@ -369,12 +359,15 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                     onClick={requireAuthentication}
                   >
                     <Mail className="h-4 w-4" />
-                    {tListing("details.signInToContact")}
+                    {tListing(
+                      property.contactVerificationRequired
+                        ? "details.verifyEmailToContact"
+                        : "details.signInToContact",
+                    )}
                   </Button>
                 )}
 
-                {!contactLinks.whatsappHref &&
-                  !contactLinks.emailHref &&
+                {!contactLinks.whatsappHref && !contactLinks.emailHref &&
                   !property.contactAccessRequired && (
                   <Button
                     variant="outline"
@@ -391,14 +384,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
               {/* Informations de contact */}
               {(property.contact?.phone || property.contact?.email) && (
                 <div className="mt-4 pt-4 border-t space-y-2">
-                  {property.contact.phone && (
-                    <div className="text-sm text-muted-foreground">
-                      <span className="font-medium">
-                        {tListing("details.phone")}
-                      </span>{" "}
-                      {property.contact.phone}
-                    </div>
-                  )}
+                  {property.contact.phone && <div className="text-sm text-muted-foreground"><span className="font-medium">{tListing("details.phone")}</span> {property.contact.phone}</div>}
                   {property.contact.email && (
                     <div className="text-sm text-muted-foreground">
                       <span className="font-medium">

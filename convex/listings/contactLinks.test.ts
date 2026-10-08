@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { getListingContactLinks } from "../../src/lib/listing-contact";
 
 describe("listing contact links", () => {
-  it("creates actionable WhatsApp and email links when contact exists", () => {
+  it("creates WhatsApp and email links when both contacts exist", () => {
     expect(
       getListingContactLinks({
         phone: "+49 151 23456789",

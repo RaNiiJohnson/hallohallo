@@ -13,9 +13,10 @@ interface LocationMapProps {
   location: { lat: number; lng: number };
   city: string;
   listing?: boolean;
+  approximate?: boolean;
 }
 
-export function LocationMap({ location, city, listing }: LocationMapProps) {
+export function LocationMap({ location, city, listing, approximate }: LocationMapProps) {
   // Open in Google Maps
   const openInGoogleMaps = () => {
     const url = `https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lng}`;
@@ -42,7 +43,7 @@ export function LocationMap({ location, city, listing }: LocationMapProps) {
             </MapMarker>
           </Map>
         </div>
-        <div className="p-4">
+        {!approximate && <div className="p-4">
           <div className="flex items-center justify-between gap-4">
             <p className="text-xs text-muted-foreground">
               {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
@@ -57,7 +58,7 @@ export function LocationMap({ location, city, listing }: LocationMapProps) {
               Google Maps
             </Button>
           </div>
-        </div>
+        </div>}
       </div>
     );
   }

@@ -36,6 +36,14 @@ function withoutPreciseLocation<T extends { location?: unknown }>(listing: T) {
   return publicListing;
 }
 
+function approximateLocation(location: { lat: number; lng: number } | undefined) {
+  if (!location) return undefined;
+  return {
+    lat: Math.round(location.lat * 100) / 100,
+    lng: Math.round(location.lng * 100) / 100,
+  };
+}
+
 type ListingStatus = "active" | "closed" | "archived";
 
 function isVisibleListing(listing: { status?: ListingStatus }) {
@@ -94,12 +102,12 @@ export const getListingWithContact = query({
       ...withoutPreciseLocation(listing),
       images,
       isBookmarked,
-      // The precise location and direct contact information are deliberately
-      // omitted until the visitor has both signed in and verified their email.
-      location: canSeeContact ? listing.location : undefined,
-      contact: canSeeContact ? contact : null,
-      contactAccessRequired:
-        !canSeeContact && Boolean(contact?.phone || contact?.email),
+      // Visitors never receive coordinates or contact information. Verified
+      // members receive only a deliberately rounded map position.
+      location: canSeeContact ? approximateLocation(listing.location) : undefined,
+      contact: canSeeContact && contact ? { email: contact.email, phone: contact.phone } : null,
+      contactAccessRequired: !canSeeContact && Boolean(contact?.email || contact?.phone),
+      contactVerificationRequired: Boolean(user && !user.emailVerified && (contact?.email || contact?.phone)),
     };
   },
 });
