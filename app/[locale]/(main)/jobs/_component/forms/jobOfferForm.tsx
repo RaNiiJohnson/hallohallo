@@ -425,7 +425,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="job-city">
-                  {t("form.labels.city")}
+                  {t(selectedWorkMode === "remote" ? "form.labels.cityOptional" : "form.labels.city")}
                 </FieldLabel>
                 <Input
                   {...field}

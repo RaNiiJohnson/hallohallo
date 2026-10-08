@@ -516,11 +516,39 @@ export default function JobDetailsPage() {
                   <p className="text-sm text-primary-foreground/90 mb-4">
                     {t("details.dontMiss")}
                   </p>
-                  <ApplyJobDialog jobOffer={jobOffer}>
-                    <Button variant="secondary" className="w-full" size="lg">
+                  {!isAcceptingApplications ? (
+                    <Button variant="secondary" className="w-full" size="lg" disabled>
+                      {t("details.closed")}
+                    </Button>
+                  ) : !isAuthenticated ? (
+                    <Button
+                      variant="secondary"
+                      className="w-full"
+                      size="lg"
+                      onClick={requireAuthentication}
+                    >
                       {t("details.applyNow")}
                     </Button>
-                  </ApplyJobDialog>
+                  ) : applicationEmailStatus === "failed" ? (
+                    <Button variant="secondary" className="w-full" size="lg" disabled>
+                      {t("details.applicationDeliveryFailed")}
+                    </Button>
+                  ) : applicationEmailStatus !== "none" ? (
+                    <Button variant="secondary" className="w-full" size="lg" disabled>
+                      {t("details.alreadyApplied")}
+                    </Button>
+                  ) : (
+                    <ApplyJobDialog jobOffer={jobOffer}>
+                      <Button
+                        variant="secondary"
+                        className="w-full"
+                        size="lg"
+                        disabled={applicationEmailStatus === undefined}
+                      >
+                        {t("details.applyNow")}
+                      </Button>
+                    </ApplyJobDialog>
+                  )}
                 </div>
               </div>
             )}
