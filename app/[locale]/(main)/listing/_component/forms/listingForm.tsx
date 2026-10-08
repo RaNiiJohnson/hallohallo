@@ -883,23 +883,36 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
             }}
           />
 
+          <Field>
+            <FieldLabel>{t("form.labels.contactMethods")}</FieldLabel>
+            <FieldDescription>{t("form.labels.contactMethodsHint")}</FieldDescription>
+          </Field>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Controller
               name="contactPhone"
               control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
+              render={({ field, fieldState }) => {
+                const isChoiceError =
+                  fieldState.error?.message === t("form.validation.contactReq");
+
+                return (
+                <Field data-invalid={fieldState.invalid && !isChoiceError}>
                   <FieldLabel htmlFor="contactPhone">{t("form.labels.contactPhone")}</FieldLabel>
-                  <Input {...field} id="contactPhone" type="tel" autoComplete="tel" placeholder={t("form.placeholders.contactPhone")} aria-invalid={fieldState.invalid} />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  <Input {...field} id="contactPhone" type="tel" autoComplete="tel" placeholder={t("form.placeholders.contactPhone")} aria-invalid={fieldState.invalid && !isChoiceError} />
+                  {fieldState.invalid && !isChoiceError && <FieldError errors={[fieldState.error]} />}
                 </Field>
-              )}
+                );
+              }}
             />
             <Controller
               name="contactEmail"
               control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
+              render={({ field, fieldState }) => {
+                const isChoiceError =
+                  fieldState.error?.message === t("form.validation.contactReq");
+
+                return (
+                <Field data-invalid={fieldState.invalid && !isChoiceError}>
                   <FieldLabel htmlFor="contactEmail">
                     {t("form.labels.contactEmail")}
                   </FieldLabel>
@@ -909,15 +922,22 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
                     type="email"
                     autoComplete="email"
                     placeholder={t("form.placeholders.contactEmail")}
-                    aria-invalid={fieldState.invalid}
+                    aria-invalid={fieldState.invalid && !isChoiceError}
                   />
-                  {fieldState.invalid && (
+                  {fieldState.invalid && !isChoiceError && (
                     <FieldError errors={[fieldState.error]} />
                   )}
                 </Field>
-              )}
+                );
+              }}
             />
           </div>
+          <FieldError
+            errors={[
+              form.formState.errors.contactPhone,
+              form.formState.errors.contactEmail,
+            ].filter((error) => error?.message === t("form.validation.contactReq"))}
+          />
         </FieldSet>
 
         {/* ─── Step 4: Contenu & médias ─── */}
