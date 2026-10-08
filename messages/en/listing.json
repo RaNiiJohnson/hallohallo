@@ -104,7 +104,6 @@
       "listingMode": "Listing mode *",
       "city": "City / Location *",
       "neighborhood": "Approximate area or postal code (optional)",
-      "neighborhoodHint": "Do not enter an exact address or GPS coordinates.",
       "mapPosition": "Map area (optional)",
       "mapDesc": "Choose a useful search area; the public map will be deliberately approximate.",
       "priceRent": "Monthly rent *",
