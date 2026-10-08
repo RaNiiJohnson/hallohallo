@@ -174,10 +174,14 @@ export const updateJob = authMutation({
 
     // Remove id from args before updating because it's not a field of the document
     const { id, contactEmail, ...updateData } = args;
-    if (contactEmail) {
-      assertValidJobInput({ ...args, contactEmail });
-    } else if (!isContractTypeAllowedForJobType(args.type, args.contractType)) {
+    if (!isContractTypeAllowedForJobType(args.type, args.contractType)) {
       throwValidationError("This contract type is not available for the selected job type");
+    }
+    if (args.workMode !== "remote" && !args.city.trim()) {
+      throwValidationError("City is required for on-site and hybrid jobs");
+    }
+    if (contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail.trim())) {
+      throwValidationError("Invalid application contact email");
     }
 
     const searchAllContent = `${args.title} ${args.type} ${args.city} ${args.contractType} ${args.description}`;

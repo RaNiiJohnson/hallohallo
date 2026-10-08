@@ -80,6 +80,10 @@ export default function JobDetailsPage() {
   const title = data?.title ?? jobOffer.title;
   const description = data?.description ?? jobOffer.description;
   const city = data?.city ?? jobOffer.city;
+  const locationLabel =
+    jobOffer.workMode === "remote"
+      ? jobOffer.remoteLocation || t("labels.workModes.remote")
+      : city;
 
   const isAuthor = user?._id === jobOffer.authorId;
   const isAcceptingApplications =
@@ -185,7 +189,7 @@ export default function JobDetailsPage() {
                 {/* Location */}
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-primary/60" />
-                  <span className="font-medium">{city}</span>
+                  <span className="font-medium">{locationLabel}</span>
                 </div>
               </div>
 
@@ -317,22 +321,15 @@ export default function JobDetailsPage() {
                     </Badge>
                   </div>
 
-                  <div className="space-y-1">
+                  {jobOffer.salary !== undefined && <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
                       {t("details.salary")}
                     </p>
                     <div className="flex items-baseline gap-0.5">
-                      <SalaryDisplay salary={jobOffer.salary ?? ""} />
-                      <span className="text-primary text-xs font-normal">
-                        /
-                        {t(
-                          `labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<
-                            typeof t
-                          >[0],
-                        )}
-                      </span>
+                      <SalaryDisplay salary={jobOffer.salary} />
+                      {jobOffer.salaryPeriod && <span className="text-primary text-xs font-normal">/{t(`labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<typeof t>[0])}</span>}
                     </div>
-                  </div>
+                  </div>}
 
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
@@ -345,7 +342,7 @@ export default function JobDetailsPage() {
                     <p className="text-sm text-muted-foreground">
                       {t("details.location")}
                     </p>
-                    <p className="font-semibold"> {city}</p>
+                    <p className="font-semibold"> {locationLabel}</p>
                   </div>
 
                   <div className="space-y-1">
@@ -440,7 +437,7 @@ export default function JobDetailsPage() {
                     <p className="font-semibold text-lg">
                       {jobOffer.company || t("details.companyName")}
                     </p>
-                    <p className="text-sm text-muted-foreground">{city}</p>
+                    <p className="text-sm text-muted-foreground">{locationLabel}</p>
                   </div>
                 </div>
               </div>
@@ -474,7 +471,7 @@ export default function JobDetailsPage() {
                   </div>
                   <div className="flex items-center text-muted-foreground bg-muted px-2.5 py-0.5 rounded-md">
                     <MapPin className="w-4 h-4 mr-1.5" />
-                    <span className="font-semibold text-sm">{city}</span>
+                    <span className="font-semibold text-sm">{locationLabel}</span>
                   </div>
                 </div>
 
@@ -487,22 +484,15 @@ export default function JobDetailsPage() {
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between py-3 border-b">
+                {jobOffer.salary !== undefined && <div className="flex items-center justify-between py-3 border-b">
                   <span className="text-sm text-muted-foreground">
                     {t("details.salary")}
                   </span>
                   <div className="flex items-baseline gap-0.5">
-                    <SalaryDisplay salary={jobOffer.salary ?? ""} />
-                    <span className="text-primary text-xs font-normal">
-                      /
-                      {t(
-                        `labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<
-                          typeof t
-                        >[0],
-                      )}
-                    </span>
+                    <SalaryDisplay salary={jobOffer.salary} />
+                    {jobOffer.salaryPeriod && <span className="text-primary text-xs font-normal">/{t(`labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<typeof t>[0])}</span>}
                   </div>
-                </div>
+                </div>}
 
                 <div className="flex items-center justify-between py-3">
                   <span className="text-sm text-muted-foreground">

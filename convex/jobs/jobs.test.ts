@@ -85,7 +85,10 @@ describe("Jobs", () => {
       slug: jobSlug,
     });
     expect(result?.title).toBe("Job Title");
-    expect(result?.contact?.email).toBe("employer@example.com");
+    expect(result).not.toHaveProperty("contact");
+    await expect(
+      t.query(api.jobs.queries.getJobContactForEdit, { id: jobId }),
+    ).resolves.toEqual({ email: "employer@example.com" });
   });
 
   it("rejects a contract that is incompatible with the job type", async () => {
@@ -116,6 +119,34 @@ describe("Jobs", () => {
         contactEmail: "employer@example.com",
       }),
     ).resolves.toBeTruthy();
+  });
+
+  it("enforces job type and location rules when updating", async () => {
+    await expect(
+      t.mutation(api.jobs.mutations.updateJob, {
+        id: jobId,
+        title: "Invalid update",
+        description: "Job Description",
+        company: "Job Company",
+        type: "freelance",
+        contractType: "CDI",
+        workMode: "remote",
+        city: "",
+      }),
+    ).rejects.toThrow("not available for the selected job type");
+
+    await expect(
+      t.mutation(api.jobs.mutations.updateJob, {
+        id: jobId,
+        title: "Missing city",
+        description: "Job Description",
+        company: "Job Company",
+        type: "job",
+        contractType: "fullTime",
+        workMode: "onSite",
+        city: "",
+      }),
+    ).rejects.toThrow("City is required for on-site and hybrid jobs");
   });
 
   it("should update a job", async () => {

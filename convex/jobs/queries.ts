@@ -31,12 +31,6 @@ export const getJobWithContact = query({
       return null;
     }
 
-    // Récupération rapide via l'index
-    const contact = await ctx.db
-      .query("JobContactInfo")
-      .withIndex("by_jobId", (q) => q.eq("jobId", job._id))
-      .unique();
-
     let isBookmarked = false;
     if (user) {
       const existingBookmark = await ctx.db
@@ -51,23 +45,26 @@ export const getJobWithContact = query({
       if (existingBookmark) isBookmarked = true;
     }
 
-    return { ...job, contact, isBookmarked };
+    return { ...job, isBookmarked };
   },
 });
 
-export const getJobWithContactById = query({
+export const getJobContactForEdit = query({
   args: { id: v.id("JobOffer") },
   handler: async (ctx, { id }) => {
-    const job = await ctx.db.get(id);
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) return null;
 
-    if (!job) return null;
+    const job = await ctx.db.get(id);
+    if (!job || (job.authorId !== user._id && user.role !== "admin")) {
+      return null;
+    }
 
     const contact = await ctx.db
       .query("JobContactInfo")
       .withIndex("by_jobId", (q) => q.eq("jobId", job._id))
       .unique();
-
-    return { ...job, contact };
+    return { email: contact?.email ?? "" };
   },
 });
 

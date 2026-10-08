@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { render } from "react-email";
-import { api, internal } from "../_generated/api";
+import { internal } from "../_generated/api";
 import { authAction } from "../functions";
 import { r2 } from "../integrations/r2";
 import { resend } from "../sendEmails";
@@ -20,28 +20,23 @@ export const applyToJob = authAction({
     // const distinctId = posthogDistinctId(user._id);
 
     try {
-      const job = await ctx.runQuery(api.jobs.queries.getJobWithContactById, {
-        id: args.jobId,
-      });
-      if (!job) throwNotFound("Job not found");
-
-      let contactEmail = job.contact?.email;
-      if (!contactEmail) {
-        contactEmail =
-          (await ctx.runQuery(internal.auth.users.getContactEmailById, {
-            id: job.authorId,
-          })) ?? undefined;
-      }
-      if (!contactEmail) {
-        throwNotFound("No contact email found for this job.");
-      }
-
       const application = await ctx.runMutation(
         internal.jobs.mutations.submitApplication,
         args,
       );
 
       try {
+        let contactEmail = application.contactEmail;
+        if (!contactEmail) {
+          contactEmail =
+            (await ctx.runQuery(internal.auth.users.getContactEmailById, {
+              id: application.authorId,
+            })) ?? undefined;
+        }
+        if (!contactEmail) {
+          throwNotFound("No contact email found for this job.");
+        }
+
         const cvUrl = await r2.getUrl(application.cvKey);
         if (!cvUrl) throwNotFound("CV not found");
 
