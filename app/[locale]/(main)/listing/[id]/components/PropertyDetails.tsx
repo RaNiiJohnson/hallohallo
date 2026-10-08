@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Item, ItemContent, ItemSeparator } from "@/components/ui/item";
 import { Separator } from "@/components/ui/separator";
 import { useManualTranslate } from "@/hooks/use-manual-translate";
+import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
 import { ListingListDetails } from "@/lib/convexTypes";
 import { formatDateWithFallback } from "@/lib/date";
 import { LocationMap } from "@/lib/LocationMap";
@@ -41,6 +42,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
   const te = useTranslations("common");
 
   const translateListing = useAction(api.listings.translate.translateListing);
+  const requireAuthentication = useAuthRequiredAction();
 
   const { data, activeLang, pendingLang, translate, reset } =
     useManualTranslate(
@@ -346,12 +348,26 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                       className="flex items-center gap-2"
                     >
                       <Mail className="h-4 w-4" />
-                      {tListing("details.sendMessage")}
+                      {tListing("details.sendEmail")}
                     </a>
                   </Button>
                 )}
 
-                {!contactLinks.phoneHref && !contactLinks.emailHref && (
+                {property.contactAccessRequired && (
+                  <Button
+                    variant="outline"
+                    className="w-full flex items-center gap-2"
+                    size="lg"
+                    onClick={requireAuthentication}
+                  >
+                    <Mail className="h-4 w-4" />
+                    {tListing("details.signInToContact")}
+                  </Button>
+                )}
+
+                {!contactLinks.phoneHref &&
+                  !contactLinks.emailHref &&
+                  !property.contactAccessRequired && (
                   <Button
                     variant="outline"
                     className="w-full flex items-center gap-2"
@@ -361,7 +377,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                     <Mail className="h-4 w-4" />
                     {tListing("details.contactUnavailable")}
                   </Button>
-                )}
+                  )}
               </div>
 
               {/* Informations de contact */}

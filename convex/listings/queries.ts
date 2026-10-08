@@ -24,6 +24,17 @@ async function resolveImages(
   return await resolveListingImages(images, (key) => r2.getUrl(key));
 }
 
+/**
+ * Precise map coordinates are sensitive listing data. Keep them out of every
+ * public listing response so adding a new list or metadata query cannot expose
+ * them by accident.
+ */
+function withoutPreciseLocation<T extends { location?: unknown }>(listing: T) {
+  const { location, ...publicListing } = listing;
+  void location;
+  return publicListing;
+}
+
 export const getListingWithContact = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
@@ -56,11 +67,18 @@ export const getListingWithContact = query({
 
     const images = await resolveImages(listing.images ?? []);
 
+    const canSeeContact = user?.emailVerified === true;
+
     return {
-      ...listing,
+      ...withoutPreciseLocation(listing),
       images,
-      contact,
       isBookmarked,
+      // The precise location and direct contact information are deliberately
+      // omitted until the visitor has both signed in and verified their email.
+      location: canSeeContact ? listing.location : undefined,
+      contact: canSeeContact ? contact : null,
+      contactAccessRequired:
+        !canSeeContact && Boolean(contact?.phone || contact?.email),
     };
   },
 });
@@ -75,7 +93,7 @@ export const getListingMetadata = query({
 
     if (!listing) return null;
     return {
-      ...listing,
+      ...withoutPreciseLocation(listing),
       images: await resolveImages(listing.images ?? []),
     };
   },
@@ -126,7 +144,10 @@ export const getListing = query({
             b.resourceId as Id<"RealestateListing">,
           );
           if (!listing) return null;
-          return { ...listing, isBookmarked: true } as typeof listing & {
+          return {
+            ...withoutPreciseLocation(listing),
+            isBookmarked: true,
+          } as Omit<typeof listing, "location"> & {
             isBookmarked: boolean;
           };
         }),
@@ -201,7 +222,11 @@ export const getListing = query({
           if (existingBookmark) isBookmarked = true;
         }
         const images = await resolveImages(listing.images ?? []);
-        return { ...listing, images, isBookmarked };
+        return {
+          ...withoutPreciseLocation(listing),
+          images,
+          isBookmarked,
+        };
       }),
     );
 
@@ -221,7 +246,7 @@ export const listListingsByCity = query({
     return Promise.all(
       listings.map(async (listing) => {
         const images = await resolveImages(listing.images ?? []);
-        return { ...listing, images };
+        return { ...withoutPreciseLocation(listing), images };
       }),
     );
   },
@@ -270,7 +295,7 @@ export const getSimilarRealEstateListings = query({
     return Promise.all(
       combined.map(async (listing) => {
         const images = await resolveImages(listing.images ?? []);
-        return { ...listing, images };
+        return { ...withoutPreciseLocation(listing), images };
       }),
     );
   },

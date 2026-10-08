@@ -4,6 +4,7 @@ import { convexTest } from "convex-test";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { api } from "../_generated/api";
 import { Id } from "../_generated/dataModel";
+import { authComponent } from "../auth/auth";
 import schema from "../schema";
 import { modules } from "../test.setup";
 
@@ -36,6 +37,10 @@ describe("Listings", () => {
   let listingSlug: string;
 
   beforeEach(async () => {
+    vi.mocked(authComponent.safeGetAuthUser).mockResolvedValue({
+      _id: "testUserId",
+      emailVerified: false,
+    } as never);
     t = convexTest(schema, modules);
 
     listingId = await t.mutation(api.listings.mutations.createListing, {
@@ -68,9 +73,10 @@ describe("Listings", () => {
     });
     expect(result?.title).toBe("Listing Title");
     expect(result?.contact).toBeNull();
+    expect(result?.location).toBeUndefined();
   });
 
-  it("creates and exposes validated optional contact details", async () => {
+  it("keeps contact details and precise coordinates out of public responses", async () => {
     const contactListingId = await t.mutation(
       api.listings.mutations.createListing,
       {
@@ -78,6 +84,7 @@ describe("Listings", () => {
         propertyType: "studio",
         listingMode: "rent",
         city: "Berlin",
+        location: { lat: 52.52, lng: 13.405 },
         price: 900,
         area: 30,
         bedrooms: 1,
@@ -100,16 +107,55 @@ describe("Listings", () => {
     const result = await t.query(api.listings.queries.getListingWithContact, {
       slug: listing!.slug,
     });
-    expect(result?.contact).toMatchObject({
-      phone: "+49 151 23456789",
-      email: "owner@example.com",
-    });
+    expect(result?.contact).toBeNull();
+    expect(result?.contactAccessRequired).toBe(true);
+    expect(result?.location).toBeUndefined();
 
     const cityResults = await t.query(
       api.listings.queries.listListingsByCity,
       { city: "Berlin" },
     );
     expect(cityResults[0]).not.toHaveProperty("contact");
+    expect(cityResults[0]).not.toHaveProperty("location");
+
+    const metadata = await t.query(api.listings.queries.getListingMetadata, {
+      slug: listing!.slug,
+    });
+    expect(metadata).not.toHaveProperty("location");
+
+    const paginatedResults = await t.query(api.listings.queries.getListing, {
+      paginationOpts: { cursor: null, numItems: 10 },
+    });
+    expect(paginatedResults.page[0]).not.toHaveProperty("location");
+
+    const similarResults = await t.query(
+      api.listings.queries.getSimilarRealEstateListings,
+      {
+        excludeSlug: listingSlug,
+        city: "Berlin",
+        propertyType: "studio",
+        limit: 5,
+      },
+    );
+    expect(similarResults[0]).not.toHaveProperty("location");
+
+    vi.mocked(authComponent.safeGetAuthUser).mockResolvedValue({
+      _id: "verifiedUserId",
+      emailVerified: true,
+    } as never);
+
+    const verifiedResult = await t.query(
+      api.listings.queries.getListingWithContact,
+      { slug: listing!.slug },
+    );
+    expect(verifiedResult?.contact).toMatchObject({
+      phone: "+49 151 23456789",
+      email: "owner@example.com",
+    });
+    expect(verifiedResult?.location).toMatchObject({
+      lat: 52.52,
+      lng: 13.405,
+    });
   });
 
   it("rejects malformed contact details", async () => {
@@ -142,7 +188,7 @@ describe("Listings", () => {
           slug: listingSlug,
         })
       )?.contact?.email,
-    ).toBe("owner@example.com");
+    ).toBeUndefined();
 
     await t.mutation(api.listings.mutations.updateListing, {
       listingId,
