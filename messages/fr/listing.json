@@ -170,6 +170,15 @@
       "imageUploadError": "Erreur lors de l'upload de l'image",
       "chars": "caractères"
     },
+    "preview": {
+      "title": "Aperçu avant publication",
+      "hint": "Vérifiez les informations publiques ; les coordonnées restent réservées aux membres vérifiés.",
+      "untitled": "Annonce sans titre",
+      "rooms": "pièces",
+      "noDescription": "Aucune description renseignée.",
+      "email": "E-mail de contact",
+      "whatsapp": "WhatsApp"
+    },
     "actions": {
       "addPhoto": "Ajouter",
       "prev": "Précédent",

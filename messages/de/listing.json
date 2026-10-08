@@ -170,6 +170,15 @@
       "imageUploadError": "Fehler beim Hochladen des Bildes",
       "chars": "Zeichen"
     },
+    "preview": {
+      "title": "Vorschau vor der Veröffentlichung",
+      "hint": "Prüfe die öffentlichen Informationen; Kontaktdaten bleiben nur für verifizierte Mitglieder sichtbar.",
+      "untitled": "Anzeige ohne Titel",
+      "rooms": "Zimmer",
+      "noDescription": "Keine Beschreibung angegeben.",
+      "email": "Kontakt-E-Mail",
+      "whatsapp": "WhatsApp"
+    },
     "actions": {
       "addPhoto": "Hinzufügen",
       "prev": "Zurück",

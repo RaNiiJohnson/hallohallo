@@ -214,6 +214,29 @@ describe("Listings", () => {
     ).rejects.toThrow("An email address or WhatsApp phone number is required");
   });
 
+  it("rejects contact details and precise locations in public listing text", async () => {
+    await expect(
+      t.mutation(api.listings.mutations.updateListing, {
+        listingId,
+        patch: { description: "Write to owner@example.com or call +49 151 23456789" },
+      }),
+    ).rejects.toThrow("Public listing text must not include contact details");
+
+    await expect(
+      t.mutation(api.listings.mutations.updateListing, {
+        listingId,
+        patch: { description: "Exact position: 52.5200, 13.4050" },
+      }),
+    ).rejects.toThrow("Public listing text must not include contact details");
+
+    await expect(
+      t.mutation(api.listings.mutations.updateListing, {
+        listingId,
+        patch: { neighborhood: "Hauptstraße 42" },
+      }),
+    ).rejects.toThrow("Public listing text must not include contact details");
+  });
+
   it("upserts and removes contact details while keeping legacy listings valid", async () => {
     await t.mutation(api.listings.mutations.updateListing, {
       listingId,
@@ -409,14 +432,14 @@ describe("Listings", () => {
       listingId,
       status: "archived",
     });
-    await t.mutation(api.listings.mutations.setListingStatus, {
-      listingId,
-      status: "active",
-    });
+    await expect(
+      t.mutation(api.listings.mutations.setListingStatus, {
+        listingId,
+        status: "active",
+      }),
+    ).rejects.toThrow("Invalid listing status transition");
 
-    expect((await t.run((ctx) => ctx.db.get(listingId)))?.status).toBe(
-      "active",
-    );
+    expect((await t.run((ctx) => ctx.db.get(listingId)))?.status).toBe("archived");
   });
 
   it("refuses lifecycle changes by another member", async () => {

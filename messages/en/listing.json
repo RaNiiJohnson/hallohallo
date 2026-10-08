@@ -170,6 +170,15 @@
       "imageUploadError": "Error uploading image",
       "chars": "characters"
     },
+    "preview": {
+      "title": "Preview before publishing",
+      "hint": "Review the public information; contact details remain for verified members only.",
+      "untitled": "Untitled listing",
+      "rooms": "rooms",
+      "noDescription": "No description provided.",
+      "email": "Contact email",
+      "whatsapp": "WhatsApp"
+    },
     "actions": {
       "addPhoto": "Add",
       "prev": "Previous",

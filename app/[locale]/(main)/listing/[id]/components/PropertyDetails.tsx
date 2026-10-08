@@ -7,6 +7,8 @@ import { Item, ItemContent, ItemSeparator } from "@/components/ui/item";
 import { Separator } from "@/components/ui/separator";
 import { useManualTranslate } from "@/hooks/use-manual-translate";
 import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
+import { useRouter } from "@/i18n/navigation";
+import { getAuthHref, getCurrentReturnTo } from "@/lib/auth-return-to";
 import { ListingListDetails } from "@/lib/convexTypes";
 import { formatDateWithFallback } from "@/lib/date";
 import { LocationMap } from "@/lib/LocationMap";
@@ -43,6 +45,12 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
 
   const translateListing = useAction(api.listings.translate.translateListing);
   const requireAuthentication = useAuthRequiredAction();
+  const router = useRouter();
+  const requireEmailVerification = () => {
+    router.push(
+      getAuthHref("/verify-email", getCurrentReturnTo(window.location)),
+    );
+  };
 
   const { data, activeLang, pendingLang, translate, reset } =
     useManualTranslate(
@@ -356,7 +364,11 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                     variant="outline"
                     className="w-full flex items-center gap-2"
                     size="lg"
-                    onClick={requireAuthentication}
+                    onClick={
+                      property.contactVerificationRequired
+                        ? requireEmailVerification
+                        : requireAuthentication
+                    }
                   >
                     <Mail className="h-4 w-4" />
                     {tListing(

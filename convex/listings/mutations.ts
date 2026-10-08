@@ -45,9 +45,7 @@ function isAllowedListingTransition(
   const current = currentStatus ?? "active";
   return (
     (current === "active" && nextStatus === "closed") ||
-    (current === "closed" &&
-      (nextStatus === "active" || nextStatus === "archived")) ||
-    (current === "archived" && nextStatus === "active")
+    (current === "closed" && nextStatus === "archived")
   );
 }
 
@@ -90,6 +88,40 @@ function normalizeContact(contact: ListingContactInput | undefined) {
     throwValidationError("Invalid contact phone number");
   }
   return { phone, email };
+}
+
+const emailPattern = /[^\s@]+@[^\s@]+\.[^\s@]+/i;
+const phonePattern = /\+?\d(?:[\s().-]*\d){5,}/;
+const coordinatePattern = /[-+]?\d{1,2}\.\d{3,}\s*,\s*[-+]?\d{1,3}\.\d{3,}/;
+const addressPattern = /\b(?:\d{1,4}[a-z]?\s+(?:[a-zà-ÿ'-]+\s+){0,4}(?:straße|strasse|street|rue|avenue|avenida|weg|allee|platz)|[a-zà-ÿ'-]*?(?:straße|strasse|street|rue|avenue|avenida|weg|allee|platz)\s+\d{1,4}[a-z]?)\b/i;
+
+function assertPublicTextIsSafe(values: {
+  title: string;
+  city: string;
+  neighborhood?: string;
+  description: string;
+  extras?: string[];
+}) {
+  const text = [
+    values.title,
+    values.city,
+    values.neighborhood,
+    values.description,
+    ...(values.extras ?? []),
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  if (
+    emailPattern.test(text) ||
+    phonePattern.test(text) ||
+    coordinatePattern.test(text) ||
+    addressPattern.test(text)
+  ) {
+    throwValidationError(
+      "Public listing text must not include contact details, GPS coordinates, or an exact address",
+    );
+  }
 }
 
 export const createListing = authMutation({
@@ -144,6 +176,7 @@ export const createListing = authMutation({
     if (!normalizedContact.email && !normalizedContact.phone) {
       throwValidationError("An email address or WhatsApp phone number is required");
     }
+    assertPublicTextIsSafe(listingArgs);
 
     if (user.userType !== "provider" && user.role !== "admin") {
       throwForbidden("Only providers or admins can publish listings");
@@ -344,6 +377,7 @@ export const updateListing = authMutation({
     }
 
     const updatedListing = { ...listing, ...normalizedPatch };
+    assertPublicTextIsSafe(updatedListing);
     const searchAllContent = `${updatedListing.title} ${updatedListing.propertyType} ${updatedListing.city} ${updatedListing.listingMode} ${updatedListing.description}`;
 
     await ctx.db.patch(listingId, {

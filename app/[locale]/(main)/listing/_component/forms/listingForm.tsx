@@ -249,6 +249,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
 
   const listingMode = useWatch({ control: form.control, name: "listingMode" });
   const extras = useWatch({ control: form.control, name: "extras" }) ?? [];
+  const preview = useWatch({ control: form.control });
 
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
@@ -1105,6 +1106,25 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
               </div>
             )}
           </Field>
+          <div className="rounded-lg border bg-muted/30 p-4 space-y-2">
+            <h4 className="font-semibold">{t("form.preview.title")}</h4>
+            <p className="text-sm text-muted-foreground">
+              {t("form.preview.hint")}
+            </p>
+            <div className="space-y-1 text-sm">
+              <p className="font-medium">{preview.title || t("form.preview.untitled")}</p>
+              <p>{[preview.city, preview.neighborhood].filter(Boolean).join(" · ")}</p>
+              <p>
+                {preview.price || "—"} € · {preview.area || "—"} m² · {preview.bedrooms || "—"} {t("form.preview.rooms")}
+              </p>
+              <p className="line-clamp-3">{preview.description || t("form.preview.noDescription")}</p>
+              <p className="text-muted-foreground">
+                {preview.contactEmail && t("form.preview.email")}
+                {preview.contactEmail && preview.contactPhone && " · "}
+                {preview.contactPhone && t("form.preview.whatsapp")}
+              </p>
+            </div>
+          </div>
         </FieldGroup>
       </form>
 
