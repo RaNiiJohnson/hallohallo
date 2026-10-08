@@ -117,7 +117,7 @@
       "charges": "Charges (optional)",
       "pets": "Pets allowed (optional)",
       "availableFrom": "Available from *",
-      "contactPhone": "WhatsApp number (optional)",
+      "contactPhone": "WhatsApp number",
       "contactEmail": "Contact email (optional)",
       "description": "Description *",
       "descHint": "A good description increases your chances of finding a tenant quickly.",

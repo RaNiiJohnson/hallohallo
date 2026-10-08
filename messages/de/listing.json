@@ -117,7 +117,7 @@
       "charges": "Nebenkosten (optional)",
       "pets": "Haustiere erlaubt (optional)",
       "availableFrom": "Verfügbar ab *",
-      "contactPhone": "WhatsApp-Nummer (optional)",
+      "contactPhone": "WhatsApp-Nummer",
       "contactEmail": "Kontakt-E-Mail (optional)",
       "description": "Beschreibung *",
       "descHint": "Eine gute Beschreibung erhöht deine Chancen, schnell einen Mieter zu finden.",
