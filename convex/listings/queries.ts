@@ -102,9 +102,9 @@ export const getListingWithContact = query({
       ...withoutPreciseLocation(listing),
       images,
       isBookmarked,
-      // Visitors never receive coordinates or contact information. Verified
-      // members receive only a deliberately rounded map position.
-      location: canSeeContact ? approximateLocation(listing.location) : undefined,
+      // The detail page can show an optional map for everyone, but only with a
+      // deliberately rounded position. Contact information remains verified-only.
+      location: approximateLocation(listing.location),
       contact: canSeeContact && contact ? { email: contact.email, phone: contact.phone } : null,
       contactAccessRequired: !canSeeContact && Boolean(contact?.email || contact?.phone),
       contactVerificationRequired: Boolean(user && !user.emailVerified && (contact?.email || contact?.phone)),

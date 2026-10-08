@@ -119,7 +119,7 @@ describe("Listings", () => {
     expect(result?.contact).toBeNull();
     expect(result?.contactAccessRequired).toBe(true);
     expect(result?.contactVerificationRequired).toBe(true);
-    expect(result?.location).toBeUndefined();
+    expect(result?.location).toEqual({ lat: 52.52, lng: 13.41 });
 
     vi.mocked(authComponent.safeGetAuthUser).mockResolvedValue(null as never);
     const anonymousResult = await t.query(
@@ -127,7 +127,7 @@ describe("Listings", () => {
       { slug: listing!.slug },
     );
     expect(anonymousResult?.contact).toBeNull();
-    expect(anonymousResult?.location).toBeUndefined();
+    expect(anonymousResult?.location).toEqual({ lat: 52.52, lng: 13.41 });
     expect(anonymousResult?.contactAccessRequired).toBe(true);
     expect(anonymousResult?.contactVerificationRequired).toBe(false);
 

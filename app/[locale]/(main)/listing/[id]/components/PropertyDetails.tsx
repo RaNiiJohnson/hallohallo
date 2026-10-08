@@ -272,7 +272,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
           </div>
 
           <ItemSeparator />
-          {/* The map is only returned with a rounded position to verified members. */}
+          {/* The optional map always uses a deliberately rounded position. */}
           <div>
             <div className="py-6">
               <h2 className="text-xl font-semibold mb-4">
