@@ -218,12 +218,31 @@ describe("Jobs", () => {
   });
 
   it("hides archived jobs from other members", async () => {
+    await t.run(async (ctx) => {
+      await ctx.db.insert("jobTranslations", {
+        jobId,
+        language: "fr",
+        title: "Traduction",
+        city: "Ville",
+        description: "Description",
+        sourceUpdatedAt: Date.now(),
+      });
+    });
     await t.mutation(api.jobs.mutations.deleteJob, { id: jobId });
     authState.user._id = "anotherUserId";
     authState.user.id = "anotherUserId";
 
     await expect(
       t.query(api.jobs.queries.getJobWithContact, { slug: jobSlug }),
+    ).resolves.toBeNull();
+    await expect(
+      t.query(api.jobs.queries.getJobMetadata, { slug: jobSlug }),
+    ).resolves.toBeNull();
+    await expect(
+      t.query(api.jobs.queries.getTranslation, {
+        jobId,
+        language: "fr",
+      }),
     ).resolves.toBeNull();
   });
 

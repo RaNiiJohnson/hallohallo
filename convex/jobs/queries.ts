@@ -97,6 +97,17 @@ export const getJobMetadata = query({
       .query("JobOffer")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .unique();
+    if (!job) return null;
+
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (
+      job.status === "archived" &&
+      user?._id !== job.authorId &&
+      user?.role !== "admin"
+    ) {
+      return null;
+    }
+
     return job;
   },
 });
@@ -268,6 +279,18 @@ export const getTranslation = query({
   },
 
   handler: async (ctx, args) => {
+    const job = await ctx.db.get(args.jobId);
+    if (!job) return null;
+
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (
+      job.status === "archived" &&
+      user?._id !== job.authorId &&
+      user?.role !== "admin"
+    ) {
+      return null;
+    }
+
     return await ctx.db
       .query("jobTranslations")
       .withIndex("by_job_language", (q) =>
