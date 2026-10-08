@@ -580,7 +580,6 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
               <Field>
                 <FieldLabel htmlFor="neighborhood">{t("form.labels.neighborhood")}</FieldLabel>
                 <Input {...field} id="neighborhood" placeholder={t("form.placeholders.neighborhood")} autoComplete="off" />
-                <FieldDescription>{t("form.labels.neighborhoodHint")}</FieldDescription>
               </Field>
             )}
           />

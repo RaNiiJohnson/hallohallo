@@ -103,9 +103,8 @@
       "propertyType": "Type de bien *",
       "listingMode": "Mode d'annonce *",
       "city": "Ville / Localité *",
-      "neighborhood": "Quartier ou code postal approximatif",
-      "neighborhoodHint": "N’indiquez ni adresse exacte ni coordonnées GPS.",
-      "mapPosition": "Zone sur la carte (facultatif)",
+      "neighborhood": "Quartier ou code postal approximatif (optionnel)",
+      "mapPosition": "Zone sur la carte (optionnel)",
       "mapDesc": "Choisissez une zone utile à la recherche ; la carte publique sera volontairement approximative.",
       "priceRent": "Loyer mensuel *",
       "priceSale": "Prix de vente *",
@@ -113,12 +112,12 @@
       "bedrooms": "Chambres *",
       "bathrooms": "Salles de bain *",
       "floor": "Étage *",
-      "deposit": "Caution",
-      "charges": "Charges",
-      "pets": "Animaux de compagnie autorisés",
+      "deposit": "Caution (optionnel)",
+      "charges": "Charges (optionnel)",
+      "pets": "Animaux de compagnie autorisés (optionnel)",
       "availableFrom": "Disponible à partir du *",
-      "contactPhone": "Numéro WhatsApp",
-      "contactEmail": "E-mail de contact",
+      "contactPhone": "Numéro WhatsApp (optionnel)",
+      "contactEmail": "E-mail de contact (optionnel)",
       "description": "Description *",
       "descHint": "Une bonne description augmente vos chances de trouver un locataire rapidement.",
       "markdownHint": "Mise en forme Markdown prise en charge",
@@ -195,7 +194,7 @@
       "removeImage": "Supprimer l'image : {name}"
     },
     "labels_extra": {
-      "extras": "Extras / Équipements",
+      "extras": "Extras / Équipements (optionnel)",
       "extrasDesc": "Ajoutez les équipements et atouts du bien (ex: Parking, Balcon, Cave, Ascenseur...)"
     }
   },

@@ -103,7 +103,7 @@
       "propertyType": "Immobilientyp *",
       "listingMode": "Angebotsart *",
       "city": "Stadt / Ort *",
-      "neighborhood": "Ungefähres Viertel oder Postleitzahl",
+      "neighborhood": "Ungefähres Viertel oder Postleitzahl (optional)",
       "neighborhoodHint": "Keine genaue Adresse oder GPS-Koordinaten eingeben.",
       "mapPosition": "Kartenbereich (optional)",
       "mapDesc": "Wähle einen für die Suche nützlichen Bereich; die öffentliche Karte bleibt bewusst ungenau.",
@@ -113,12 +113,12 @@
       "bedrooms": "Schlafzimmer *",
       "bathrooms": "Badezimmer *",
       "floor": "Etage *",
-      "deposit": "Kaution",
-      "charges": "Nebenkosten",
-      "pets": "Haustiere erlaubt",
+      "deposit": "Kaution (optional)",
+      "charges": "Nebenkosten (optional)",
+      "pets": "Haustiere erlaubt (optional)",
       "availableFrom": "Verfügbar ab *",
-      "contactPhone": "WhatsApp-Nummer",
-      "contactEmail": "Kontakt-E-Mail",
+      "contactPhone": "WhatsApp-Nummer (optional)",
+      "contactEmail": "Kontakt-E-Mail (optional)",
       "description": "Beschreibung *",
       "descHint": "Eine gute Beschreibung erhöht deine Chancen, schnell einen Mieter zu finden.",
       "markdownHint": "Markdown-Formatierung wird unterstützt",
@@ -195,7 +195,7 @@
       "removeImage": "Bild entfernen: {name}"
     },
     "labels_extra": {
-      "extras": "Extras / Ausstattung",
+      "extras": "Extras / Ausstattung (optional)",
       "extrasDesc": "Füge Ausstattungsmerkmale und Vorteile der Immobilie hinzu (z. B. Parkplatz, Balkon, Keller, Aufzug...)"
     }
   },

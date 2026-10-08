@@ -103,7 +103,7 @@
       "propertyType": "Property type *",
       "listingMode": "Listing mode *",
       "city": "City / Location *",
-      "neighborhood": "Approximate area or postal code",
+      "neighborhood": "Approximate area or postal code (optional)",
       "neighborhoodHint": "Do not enter an exact address or GPS coordinates.",
       "mapPosition": "Map area (optional)",
       "mapDesc": "Choose a useful search area; the public map will be deliberately approximate.",
@@ -113,12 +113,12 @@
       "bedrooms": "Bedrooms *",
       "bathrooms": "Bathrooms *",
       "floor": "Floor *",
-      "deposit": "Deposit",
-      "charges": "Charges",
-      "pets": "Pets allowed",
+      "deposit": "Deposit (optional)",
+      "charges": "Charges (optional)",
+      "pets": "Pets allowed (optional)",
       "availableFrom": "Available from *",
-      "contactPhone": "WhatsApp number",
-      "contactEmail": "Contact email",
+      "contactPhone": "WhatsApp number (optional)",
+      "contactEmail": "Contact email (optional)",
       "description": "Description *",
       "descHint": "A good description increases your chances of finding a tenant quickly.",
       "markdownHint": "Markdown formatting is supported",
@@ -195,7 +195,7 @@
       "removeImage": "Remove image: {name}"
     },
     "labels_extra": {
-      "extras": "Extras / Amenities",
+      "extras": "Extras / Amenities (optional)",
       "extrasDesc": "Add property amenities and perks (e.g. Parking, Balcony, Cellar, Elevator...)"
     }
   },
