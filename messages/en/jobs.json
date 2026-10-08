@@ -47,11 +47,21 @@
       "jobType": "Job type *",
       "contractType": "Contract type *",
       "city": "City / Location *",
+      "cityOptional": "City / Location (optional)",
+      "workMode": "Work mode *",
+      "remoteLocation": "Residence area or constraints (optional)",
+      "contactEmail": "Application contact email *",
+      "sector": "Sector / category (optional)",
+      "trainingRequirements": "School or training requirement (optional)",
+      "weeklyHours": "Weekly working hours (optional)",
+      "applicationDeadline": "Application deadline (optional)",
+      "benefits": "Benefits (optional)",
+      "externalApplicationUrl": "External application link (optional)",
       "mapPosition": "Map position (optional)",
       "mapDesc": "Click on the map to pinpoint the exact location of the role. The city will update automatically.",
       "startDate": "Start date *",
-      "salary": "Salary *",
-      "period": "Period *",
+      "salary": "Salary (optional)",
+      "period": "Period (optional)",
       "duration": "Duration *",
       "description": "Description *",
       "descHint": "Describe the position, missions, and required skills",
@@ -70,7 +80,9 @@
       "duration": "Ex: 6 months, 2 years, Open-ended",
       "description": "Describe the position, missions, required skills...",
       "cert": "Ex: Driving license B, German B2...",
-      "period": "Period"
+      "period": "Period",
+      "remoteLocation": "E.g. Germany, EU, or time zone",
+      "contactEmail": "hiring@organisation.de"
     },
     "actions": {
       "addCert": "Add certificate",
@@ -97,7 +109,8 @@
       "descMin": "The description must contain at least 10 characters",
       "certMin": "Add at least one certificate.",
       "certMax": "You can add up to 5 certificates.",
-      "salaryReq": "The salary is required"
+      "salaryReq": "The salary is required",
+      "contactEmailReq": "A valid application contact email is required"
     }
   },
   "details": {
@@ -128,7 +141,10 @@
     "backToList": "Back to offers",
     "breadcrumb": "Opportunities",
     "you": "You",
-    "have": "have"
+    "have": "have",
+    "closed": "Applications closed",
+    "alreadyApplied": "Application already sent",
+    "applicationDeliveryFailed": "Application saved — delivery not confirmed"
   },
   "dialogs": {
     "publish": {
@@ -149,12 +165,21 @@
       "successToast": "Offer deleted successfully",
       "errorToast": "Error deleting the offer"
     },
+    "lifecycle": {
+      "close": "Close offer",
+      "reopen": "Reopen",
+      "archive": "Archive",
+      "restore": "Restore",
+      "success": "Offer status updated.",
+      "error": "Unable to update the offer status."
+    },
     "apply": {
       "application": "APPLICATION",
       "cvLabel": "CV *",
       "cvHint": "(PDF, max 5 MB)",
-      "noProfileCv": "You do not have a CV on your profile yet. Please upload one to apply.",
+      "noProfileCv": "You do not have a profile CV yet. Add a CV for this application only.",
       "profileCvUsed": "Your profile CV will be used by default.",
+      "applicationCvUsed": "This CV will only be used for this application. Your profile CV will not be changed.",
       "dropHere": "Drop your PDF here or",
       "browse": "browse",
       "maxSize": "PDF only • max 5 MB",
@@ -194,6 +219,11 @@
       "partTime": "Part time",
       "freelance": "Freelance",
       "apprenticeship": "Apprenticeship"
+    },
+    "workModes": {
+      "onSite": "On-site",
+      "hybrid": "Hybrid",
+      "remote": "Remote"
     },
     "salaryPeriods": {
       "hour": "hour",

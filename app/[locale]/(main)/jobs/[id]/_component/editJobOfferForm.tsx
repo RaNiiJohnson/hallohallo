@@ -3,8 +3,8 @@
 import { MarkdownHint } from "@/components/markdown-hint";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import * as z from "zod";
 
 import {
@@ -39,16 +39,22 @@ import {
 } from "@/components/ui/select";
 import { JobOfferDetails } from "@/lib/convexTypes";
 import { api } from "@convex/_generated/api";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { ChevronLeft, ChevronRight, XIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { LocationPicker } from "@/lib/LocationPicker";
 import { runMutationWorkflow } from "@/lib/mutation-workflow";
 import {
+  contractTypesForJobType,
   contractTypeValues,
   jobTypeValues,
-} from "../../_component/forms/jobOfferForm";
+  requiresDurationOrStartDate,
+  requiresWeeklyHours,
+  workModeValues,
+} from "@/lib/job-offer-options";
+
+const salaryPeriodValues = ["hour", "month", "year"] as const;
 
 interface EditJobOfferFormProps {
   jobOffer: JobOfferDetails;
@@ -61,6 +67,9 @@ export function EditJobOfferForm({
 }: EditJobOfferFormProps) {
   const t = useTranslations("jobs");
   const updateJob = useMutation(api.jobs.mutations.updateJob);
+  const contact = useQuery(api.jobs.queries.getJobContactForEdit, {
+    id: jobOffer._id,
+  });
   const [currentStep, setCurrentStep] = useState(1);
 
   const formSchema = z.object({
@@ -73,9 +82,12 @@ export function EditJobOfferForm({
       })
       .optional(),
     contractType: z.enum(contractTypeValues),
-    city: z.string().min(1, t("form.validation.cityReq")),
-    duration: z.string().min(1, t("form.validation.durationReq")),
-    startDate: z.string().min(1, t("form.validation.startDateReq")),
+    city: z.string(),
+    workMode: z.enum(workModeValues),
+    remoteLocation: z.string().optional(),
+    duration: z.string().optional(),
+    startDate: z.string().optional(),
+    applicationDeadline: z.string().optional(),
     company: z.string().min(1, t("form.validation.companyReq")),
     description: z.string().min(10, t("form.validation.descMin")),
     certificates: z
@@ -86,8 +98,22 @@ export function EditJobOfferForm({
       )
       .min(0)
       .max(5, t("form.validation.certMax")),
-    salary: z.string().min(1, t("form.validation.salaryReq")),
-    salaryPeriod: z.enum(["hour", "month", "year"]),
+    salary: z.string().optional(),
+    salaryPeriod: z.enum(salaryPeriodValues).optional(),
+    sector: z.string().optional(),
+    benefits: z.string().optional(),
+    externalApplicationUrl: z.string().url().optional().or(z.literal("")),
+    weeklyHours: z.string().optional(),
+    trainingRequirements: z.string().optional(),
+    contactEmail: z.string().email(t("form.validation.contactEmailReq")),
+  }).superRefine((data, ctx) => {
+    if (data.workMode !== "remote" && !data.city.trim()) {
+      ctx.addIssue({ code: "custom", path: ["city"], message: t("form.validation.cityReq") });
+    }
+    if (requiresDurationOrStartDate(data.type, data.contractType)) {
+      if (!data.duration?.trim()) ctx.addIssue({ code: "custom", path: ["duration"], message: t("form.validation.durationReq") });
+      if (!data.startDate?.trim()) ctx.addIssue({ code: "custom", path: ["startDate"], message: t("form.validation.startDateReq") });
+    }
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -99,16 +125,25 @@ export function EditJobOfferForm({
       contractType:
         jobOffer?.contractType as (typeof contractTypeValues)[number],
       city: jobOffer?.city,
+      workMode: jobOffer?.workMode ?? "onSite",
+      remoteLocation: jobOffer?.remoteLocation ?? "",
       duration: jobOffer?.duration,
       startDate: jobOffer?.startDate,
+      applicationDeadline: jobOffer?.applicationDeadline ?? "",
       company: jobOffer?.company,
       description: jobOffer?.description,
       certificates:
         jobOffer?.certificates && jobOffer?.certificates?.length > 0
           ? jobOffer?.certificates.map((cert) => ({ certificate: cert }))
           : [{ certificate: "" }],
-      salary: jobOffer?.salary.toString(),
+      salary: jobOffer?.salary?.toString() ?? "",
       salaryPeriod: jobOffer?.salaryPeriod,
+      sector: jobOffer?.sector ?? "",
+      benefits: jobOffer?.benefits ?? "",
+      externalApplicationUrl: jobOffer?.externalApplicationUrl ?? "",
+      weeklyHours: jobOffer?.weeklyHours?.toString() ?? "",
+      trainingRequirements: jobOffer?.trainingRequirements ?? "",
+      contactEmail: "",
     },
   });
 
@@ -116,6 +151,17 @@ export function EditJobOfferForm({
     control: form.control,
     name: "certificates",
   });
+  const selectedJobType = useWatch({ control: form.control, name: "type" });
+  const selectedContractType = useWatch({ control: form.control, name: "contractType" });
+  const selectedWorkMode = useWatch({ control: form.control, name: "workMode" });
+  const availableContractTypes = contractTypesForJobType(selectedJobType);
+  const contractIsFixed = availableContractTypes.length === 1;
+  const showDurationAndStart = requiresDurationOrStartDate(selectedJobType, selectedContractType);
+  const showWeeklyHours = requiresWeeklyHours(selectedJobType, selectedContractType);
+
+  useEffect(() => {
+    if (contact) form.setValue("contactEmail", contact.email);
+  }, [contact, form]);
 
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
@@ -136,18 +182,14 @@ export function EditJobOfferForm({
         break;
       case 2:
         fieldsToValidate = [
-          "contractType",
-          "city",
-          "startDate",
-          "salary",
-          "duration",
+          "contractType", "city", "workMode",
         ];
         break;
       case 3:
         fieldsToValidate = ["description"];
         break;
       case 4:
-        fieldsToValidate = ["certificates"];
+        fieldsToValidate = ["contactEmail"];
         break;
     }
 
@@ -173,16 +215,25 @@ export function EditJobOfferForm({
           location: data.location,
           contractType: data.contractType,
           city: data.city,
-          duration: data.duration,
-          startDate: data.startDate,
+          workMode: data.workMode,
+          remoteLocation: data.remoteLocation || undefined,
+          duration: data.duration || undefined,
+          startDate: data.startDate || undefined,
+          applicationDeadline: data.applicationDeadline || undefined,
           company: data.company,
           description: data.description,
           certificates:
             data.certificates
               ?.map((cert) => cert.certificate)
               .filter((cert) => cert.trim() !== "") || [],
-          salary: Number(data.salary),
+          salary: data.salary ? Number(data.salary) : undefined,
           salaryPeriod: data.salaryPeriod,
+          sector: data.sector || undefined,
+          benefits: data.benefits || undefined,
+          externalApplicationUrl: data.externalApplicationUrl || undefined,
+          weeklyHours: data.weeklyHours ? Number(data.weeklyHours) : undefined,
+          trainingRequirements: data.trainingRequirements || undefined,
+          contactEmail: data.contactEmail,
         }),
       onSuccess: () => {
         toast.success(t("form.messages.success"));
@@ -280,7 +331,19 @@ export function EditJobOfferForm({
                 <FieldLabel htmlFor="job-type">
                   {t("form.labels.jobType")}
                 </FieldLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    const jobType = value as (typeof jobTypeValues)[number];
+                    field.onChange(jobType);
+                    const contractTypes = contractTypesForJobType(jobType);
+                    if (!contractTypes.includes(form.getValues("contractType"))) {
+                      form.setValue("contractType", contractTypes[0], {
+                        shouldValidate: true,
+                      });
+                    }
+                  }}
+                >
                   <SelectTrigger
                     id="job-type"
                     aria-invalid={fieldState.invalid}
@@ -319,30 +382,50 @@ export function EditJobOfferForm({
                 <FieldLabel htmlFor="job-contract">
                   {t("form.labels.contractType")}
                 </FieldLabel>
+                {contractIsFixed ? (
+                  <div className="flex h-9 items-center rounded-md border bg-muted px-3 text-sm">
+                    {t(`labels.contracts.${field.value}` as Parameters<typeof t>[0])}
+                  </div>
+                ) : (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger id="job-contract" aria-invalid={fieldState.invalid}>
+                      <SelectValue placeholder={t("form.placeholders.selectContract")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableContractTypes.map((contract) => (
+                        <SelectItem key={contract} value={contract}>
+                          {t(`labels.contracts.${contract}` as Parameters<typeof t>[0])}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+
+          <Controller
+            name="workMode"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="job-work-mode">{t("form.labels.workMode")}</FieldLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger
-                    id="job-contract"
-                    aria-invalid={fieldState.invalid}
-                  >
-                    <SelectValue
-                      placeholder={t("form.placeholders.selectContract")}
-                    />
+                  <SelectTrigger id="job-work-mode" aria-invalid={fieldState.invalid}>
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {contractTypeValues.map((contract) => (
-                      <SelectItem key={contract} value={contract}>
-                        {t(
-                          `labels.contracts.${contract}` as Parameters<
-                            typeof t
-                          >[0],
-                        )}
+                    {workModeValues.map((mode) => (
+                      <SelectItem key={mode} value={mode}>
+                        {t(`labels.workModes.${mode}` as Parameters<typeof t>[0])}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
           />
@@ -353,7 +436,7 @@ export function EditJobOfferForm({
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="job-city">
-                  {t("form.labels.city")}
+                  {t(selectedWorkMode === "remote" ? "form.labels.cityOptional" : "form.labels.city")}
                 </FieldLabel>
                 <Input
                   {...field}
@@ -368,6 +451,19 @@ export function EditJobOfferForm({
               </Field>
             )}
           />
+
+          {selectedWorkMode === "remote" && (
+            <Controller
+              name="remoteLocation"
+              control={form.control}
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel htmlFor="job-remote-location">{t("form.labels.remoteLocation")}</FieldLabel>
+                  <Input {...field} id="job-remote-location" placeholder={t("form.placeholders.remoteLocation")} autoComplete="off" />
+                </Field>
+              )}
+            />
+          )}
 
           {/* Location Map Picker */}
           <Controller
@@ -386,7 +482,7 @@ export function EditJobOfferForm({
             )}
           />
 
-          <Controller
+          {showDurationAndStart && <Controller
             name="startDate"
             control={form.control}
             render={({ field, fieldState }) => (
@@ -405,7 +501,7 @@ export function EditJobOfferForm({
                 )}
               </Field>
             )}
-          />
+          />}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_180px]">
             <Controller
               name="salary"
@@ -475,7 +571,7 @@ export function EditJobOfferForm({
             />
           </div>
 
-          <Controller
+          {showDurationAndStart && <Controller
             name="duration"
             control={form.control}
             render={({ field, fieldState }) => (
@@ -495,7 +591,7 @@ export function EditJobOfferForm({
                 )}
               </Field>
             )}
-          />
+          />}
         </FieldGroup>
 
         {/* Step 3 */}
@@ -533,10 +629,46 @@ export function EditJobOfferForm({
               </Field>
             )}
           />
+          <Controller name="sector" control={form.control} render={({ field }) => (
+            <Field><FieldLabel htmlFor="job-sector">{t("form.labels.sector")}</FieldLabel><Input {...field} id="job-sector" /></Field>
+          )} />
+          {(selectedJobType === "internship" || selectedJobType === "training") && (
+            <Controller name="trainingRequirements" control={form.control} render={({ field }) => (
+              <Field><FieldLabel htmlFor="job-training-requirements">{t("form.labels.trainingRequirements")}</FieldLabel><Input {...field} id="job-training-requirements" /></Field>
+            )} />
+          )}
+          {showWeeklyHours && (
+            <Controller name="weeklyHours" control={form.control} render={({ field }) => (
+              <Field><FieldLabel htmlFor="job-weekly-hours">{t("form.labels.weeklyHours")}</FieldLabel><Input {...field} id="job-weekly-hours" type="number" min="0" /></Field>
+            )} />
+          )}
+          <Controller name="applicationDeadline" control={form.control} render={({ field }) => (
+            <Field><FieldLabel htmlFor="job-deadline">{t("form.labels.applicationDeadline")}</FieldLabel><Input {...field} id="job-deadline" type="date" /></Field>
+          )} />
+          <Controller name="benefits" control={form.control} render={({ field }) => (
+            <Field>
+              <FieldLabel htmlFor="job-benefits">{t("form.labels.benefits")}</FieldLabel>
+              <InputGroup><InputGroupTextarea {...field} id="job-benefits" rows={3} className="min-h-24 resize-y" /></InputGroup>
+            </Field>
+          )} />
+          <Controller name="externalApplicationUrl" control={form.control} render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}><FieldLabel htmlFor="job-external-application">{t("form.labels.externalApplicationUrl")}</FieldLabel><Input {...field} id="job-external-application" type="url" />{fieldState.invalid && <FieldError errors={[fieldState.error]} />}</Field>
+          )} />
         </FieldGroup>
 
         {/* Step 4 */}
         <FieldSet className={`gap-4 ${currentStep !== 4 ? "hidden" : ""}`}>
+          <Controller
+            name="contactEmail"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="job-contact-email">{t("form.labels.contactEmail")}</FieldLabel>
+                <Input {...field} id="job-contact-email" type="email" placeholder={t("form.placeholders.contactEmail")} />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
           <FieldLegend variant="label">
             {t("form.labels.certificates")}
           </FieldLegend>

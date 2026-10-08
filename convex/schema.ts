@@ -47,19 +47,37 @@ export default defineSchema({
       v.literal("apprenticeship"),
     ),
     city: v.string(),
-    duration: v.string(),
-    startDate: v.string(),
+    workMode: v.optional(
+      v.union(v.literal("onSite"), v.literal("hybrid"), v.literal("remote")),
+    ),
+    remoteLocation: v.optional(v.string()),
+    duration: v.optional(v.string()),
+    startDate: v.optional(v.string()),
+    applicationDeadline: v.optional(v.string()),
     company: v.string(),
     description: v.string(),
-    certificates: v.array(v.string()),
-    salary: v.number(),
-    salaryPeriod: v.union(
+    certificates: v.optional(v.array(v.string())),
+    salary: v.optional(v.number()),
+    salaryPeriod: v.optional(v.union(
       v.literal("hour"),
       v.literal("month"),
       v.literal("year"),
-    ),
+    )),
+    sector: v.optional(v.string()),
+    benefits: v.optional(v.string()),
+    externalApplicationUrl: v.optional(v.string()),
+    weeklyHours: v.optional(v.number()),
+    trainingRequirements: v.optional(v.string()),
     authorId: v.string(),
     authorName: v.optional(v.string()),
+    // Optional during the rollout so existing offers remain visible as active.
+    status: v.optional(
+      v.union(
+        v.literal("active"),
+        v.literal("closed"),
+        v.literal("archived"),
+      ),
+    ),
     updatedAt: v.number(),
     searchAll: v.optional(v.string()),
   })
@@ -349,6 +367,7 @@ export default defineSchema({
       v.literal("listing"),
       v.literal("profile"),
       v.literal("cover"),
+      v.literal("applicationCv"),
     ),
     expectedContentType: v.string(),
     maxSize: v.number(),
@@ -356,6 +375,22 @@ export default defineSchema({
   })
     .index("by_key", ["key"])
     .index("by_userId", ["userId"]),
+
+  jobApplications: defineTable({
+    jobId: v.id("JobOffer"),
+    candidateId: v.string(),
+    cvKey: v.string(),
+    coverLetter: v.optional(v.string()),
+    appliedAt: v.number(),
+    emailStatus: v.union(
+      v.literal("pending"),
+      v.literal("sent"),
+      v.literal("failed"),
+    ),
+  })
+    .index("by_jobId_and_candidateId", ["jobId", "candidateId"])
+    .index("by_candidateId", ["candidateId"])
+    .index("by_cvKey", ["cvKey"]),
 
   adminAuditEvents: defineTable({
     administratorId: v.string(),

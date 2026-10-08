@@ -47,11 +47,21 @@
       "jobType": "Type d'offre *",
       "contractType": "Type de contrat *",
       "city": "Ville / Localité *",
+      "cityOptional": "Ville / Localité (facultatif)",
+      "workMode": "Mode de travail *",
+      "remoteLocation": "Zone de résidence ou contraintes (facultatif)",
+      "contactEmail": "E-mail de réception des candidatures *",
+      "sector": "Secteur / catégorie (facultatif)",
+      "trainingRequirements": "Établissement ou formation souhaitée (facultatif)",
+      "weeklyHours": "Volume horaire hebdomadaire (facultatif)",
+      "applicationDeadline": "Date limite de candidature (facultatif)",
+      "benefits": "Avantages (facultatif)",
+      "externalApplicationUrl": "Lien externe de candidature (facultatif)",
       "mapPosition": "Position sur la carte (optionnel)",
       "mapDesc": "Cliquez sur la carte pour indiquer la position exacte du poste. La ville sera mise à jour automatiquement.",
       "startDate": "Date de début *",
-      "salary": "Salaire *",
-      "period": "Période *",
+      "salary": "Salaire (facultatif)",
+      "period": "Période (facultatif)",
       "duration": "Durée *",
       "description": "Description *",
       "descHint": "Décrivez le poste, les missions et les compétences requises",
@@ -70,7 +80,9 @@
       "duration": "Ex: 6 mois, 2 ans, Indéterminée",
       "description": "Décrivez le poste, les missions, les compétences requises...",
       "cert": "Ex: Permis B, Allemand B2...",
-      "period": "Période"
+      "period": "Période",
+      "remoteLocation": "Ex. Allemagne, UE ou fuseau horaire",
+      "contactEmail": "recrutement@organisation.de"
     },
     "actions": {
       "addCert": "Ajouter un certificat",
@@ -97,7 +109,8 @@
       "descMin": "La description doit contenir au moins 10 caractères",
       "certMin": "Ajoutez au moins un certificat.",
       "certMax": "Vous pouvez ajouter jusqu'à 5 certificats.",
-      "salaryReq": "Le salaire est requis"
+      "salaryReq": "Le salaire est requis",
+      "contactEmailReq": "Un e-mail de réception valide est requis"
     }
   },
   "details": {
@@ -128,7 +141,10 @@
     "backToList": "Retour aux offres",
     "breadcrumb": "Opportunités",
     "you": "Vous",
-    "have": "avez"
+    "have": "avez",
+    "closed": "Candidatures closes",
+    "alreadyApplied": "Candidature déjà envoyée",
+    "applicationDeliveryFailed": "Candidature enregistrée — envoi non confirmé"
   },
   "dialogs": {
     "publish": {
@@ -149,12 +165,21 @@
       "successToast": "Offre supprimée avec succès",
       "errorToast": "Erreur lors de la suppression de l'offre"
     },
+    "lifecycle": {
+      "close": "Clôturer l'offre",
+      "reopen": "Relancer",
+      "archive": "Archiver",
+      "restore": "Restaurer",
+      "success": "Statut de l'offre mis à jour.",
+      "error": "Impossible de mettre à jour le statut de l'offre."
+    },
     "apply": {
       "application": "CANDIDATURE",
       "cvLabel": "CV *",
       "cvHint": "(PDF, max 5 MB)",
-      "noProfileCv": "Vous n'avez pas encore de CV sur votre profil. Veuillez en télécharger un pour postuler.",
+      "noProfileCv": "Vous n'avez pas encore de CV de profil. Ajoutez un CV uniquement pour cette candidature.",
       "profileCvUsed": "Votre CV de profil sera utilisé par défaut.",
+      "applicationCvUsed": "Ce CV sera utilisé uniquement pour cette candidature. Votre CV de profil ne sera pas modifié.",
       "dropHere": "Déposez votre PDF ici ou",
       "browse": "parcourir",
       "maxSize": "PDF uniquement • max 5 Mo",
@@ -194,6 +219,11 @@
       "partTime": "Temps partiel",
       "freelance": "Freelance",
       "apprenticeship": "Apprentissage"
+    },
+    "workModes": {
+      "onSite": "Sur site",
+      "hybrid": "Hybride",
+      "remote": "À distance"
     },
     "salaryPeriods": {
       "hour": "heure",

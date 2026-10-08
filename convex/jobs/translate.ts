@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { api, internal } from "../_generated/api";
+import { authComponent } from "../auth/auth";
 import { authAction, internalMutation, query } from "../functions";
 import { languageValidator } from "../translations/shared";
 import { enforceTranslationLimits } from "../translations/security";
@@ -13,6 +14,14 @@ export const getSource = query({
   handler: async (ctx, { id }) => {
     const job = await ctx.db.get(id);
     if (!job) return null;
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (
+      job.status === "archived" &&
+      user?._id !== job.authorId &&
+      user?.role !== "admin"
+    ) {
+      return null;
+    }
     return {
       title: job.title,
       description: job.description,
@@ -26,6 +35,16 @@ export const getSource = query({
 export const getTranslation = query({
   args: { jobId: v.id("JobOffer"), language: languageValidator },
   handler: async (ctx, args) => {
+    const job = await ctx.db.get(args.jobId);
+    if (!job) return null;
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (
+      job.status === "archived" &&
+      user?._id !== job.authorId &&
+      user?.role !== "admin"
+    ) {
+      return null;
+    }
     return await ctx.db
       .query("jobTranslations")
       .withIndex("by_job_language", (q) =>

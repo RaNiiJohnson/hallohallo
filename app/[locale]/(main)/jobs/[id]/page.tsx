@@ -31,7 +31,7 @@ import { notFound, useParams } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { ApplyJobDialog } from "../_component/dialogs/applyJobDialog";
-import DeleteJobDialog from "../_component/dialogs/deleteJobDialog";
+import { JobLifecycleActions } from "../_component/jobLifecycleActions";
 import { SalaryDisplay } from "../_component/salary";
 import { JobBookmarkButton } from "../_component/JobBookmarkButton";
 import { JobDetailsSkeleton } from "../_component/skeleton";
@@ -51,6 +51,10 @@ export default function JobDetailsPage() {
   const jobOffer = useQuery(api.jobs.queries.getJobWithContact, {
     slug: id as string,
   });
+  const applicationEmailStatus = useQuery(
+    api.jobs.queries.hasCurrentUserAppliedToJob,
+    jobOffer ? { jobId: jobOffer._id } : "skip",
+  );
 
   // const translated = useTranslatedJob(jobOffer);
 
@@ -76,8 +80,14 @@ export default function JobDetailsPage() {
   const title = data?.title ?? jobOffer.title;
   const description = data?.description ?? jobOffer.description;
   const city = data?.city ?? jobOffer.city;
+  const locationLabel =
+    jobOffer.workMode === "remote"
+      ? jobOffer.remoteLocation || t("labels.workModes.remote")
+      : city;
 
   const isAuthor = user?._id === jobOffer.authorId;
+  const isAcceptingApplications =
+    jobOffer.status === undefined || jobOffer.status === "active";
 
   return (
     <div className="min-h-screen bg-muted/50">
@@ -179,7 +189,7 @@ export default function JobDetailsPage() {
                 {/* Location */}
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-primary/60" />
-                  <span className="font-medium">{city}</span>
+                  <span className="font-medium">{locationLabel}</span>
                 </div>
               </div>
 
@@ -189,28 +199,73 @@ export default function JobDetailsPage() {
                   <Skeleton className="w-[250px] h-[42px] rounded-full border border-muted select-none pointer-events-none" />
                 ) : isAuthor ? (
                   <ButtonGroup>
-                    <DeleteJobDialog jobId={jobOffer._id} />
+                    <JobLifecycleActions
+                      jobId={jobOffer._id}
+                      status={jobOffer.status}
+                    />
                     <ShareButton text={jobOffer.title} jobPage={true} />
                     <EditJobDialog jobOffer={jobOffer} />
                   </ButtonGroup>
                 ) : (
                   <ButtonGroup>
                     {isAuthenticated ? (
-                      <ApplyJobDialog jobOffer={jobOffer}>
-                        <Button variant="default" size="sm" className="gap-2">
+                      isAcceptingApplications ? (
+                        applicationEmailStatus === "failed" ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2"
+                            disabled
+                          >
+                            <Mail className="w-4 h-4" />
+                            {t("details.applicationDeliveryFailed")}
+                          </Button>
+                        ) : applicationEmailStatus !== "none" ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2"
+                            disabled
+                          >
+                            <Mail className="w-4 h-4" />
+                            {t("details.alreadyApplied")}
+                          </Button>
+                        ) : (
+                          <ApplyJobDialog jobOffer={jobOffer}>
+                            <Button
+                              variant="default"
+                              size="sm"
+                              className="gap-2"
+                              disabled={applicationEmailStatus === undefined}
+                            >
+                              <Mail className="w-4 h-4" />
+                              {t("details.apply")}
+                            </Button>
+                          </ApplyJobDialog>
+                        )
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-2"
+                          disabled
+                        >
                           <Mail className="w-4 h-4" />
-                          {t("details.apply")}
+                          {t("details.closed")}
                         </Button>
-                      </ApplyJobDialog>
+                      )
                     ) : (
                       <Button
                         variant="default"
                         size="sm"
                         className="gap-2"
+                        disabled={!isAcceptingApplications}
                         onClick={requireAuthentication}
                       >
                         <Mail className="w-4 h-4" />
-                        {t("details.apply")}
+                        {isAcceptingApplications
+                          ? t("details.apply")
+                          : t("details.closed")}
                       </Button>
                     )}
 
@@ -266,35 +321,28 @@ export default function JobDetailsPage() {
                     </Badge>
                   </div>
 
-                  <div className="space-y-1">
+                  {jobOffer.salary !== undefined && <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
                       {t("details.salary")}
                     </p>
                     <div className="flex items-baseline gap-0.5">
                       <SalaryDisplay salary={jobOffer.salary} />
-                      <span className="text-primary text-xs font-normal">
-                        /
-                        {t(
-                          `labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<
-                            typeof t
-                          >[0],
-                        )}
-                      </span>
+                      {jobOffer.salaryPeriod && <span className="text-primary text-xs font-normal">/{t(`labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<typeof t>[0])}</span>}
                     </div>
-                  </div>
+                  </div>}
 
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
                       {t("details.duration")}
                     </p>
-                    <p className="font-semibold">{jobOffer.duration}</p>
+                    <p className="font-semibold">{jobOffer.duration ?? "—"}</p>
                   </div>
 
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
                       {t("details.location")}
                     </p>
-                    <p className="font-semibold"> {city}</p>
+                    <p className="font-semibold"> {locationLabel}</p>
                   </div>
 
                   <div className="space-y-1">
@@ -314,7 +362,7 @@ export default function JobDetailsPage() {
                     <p className="text-sm text-muted-foreground">
                       {t("details.startDate")}
                     </p>
-                    <p className="font-semibold">{jobOffer.startDate}</p>
+                    <p className="font-semibold">{jobOffer.startDate ?? "—"}</p>
                   </div>
                 </div>
               </div>
@@ -389,7 +437,7 @@ export default function JobDetailsPage() {
                     <p className="font-semibold text-lg">
                       {jobOffer.company || t("details.companyName")}
                     </p>
-                    <p className="text-sm text-muted-foreground">{city}</p>
+                    <p className="text-sm text-muted-foreground">{locationLabel}</p>
                   </div>
                 </div>
               </div>
@@ -423,7 +471,7 @@ export default function JobDetailsPage() {
                   </div>
                   <div className="flex items-center text-muted-foreground bg-muted px-2.5 py-0.5 rounded-md">
                     <MapPin className="w-4 h-4 mr-1.5" />
-                    <span className="font-semibold text-sm">{city}</span>
+                    <span className="font-semibold text-sm">{locationLabel}</span>
                   </div>
                 </div>
 
@@ -432,26 +480,19 @@ export default function JobDetailsPage() {
                     {t("details.duration")}
                   </span>
                   <span className="font-semibold text-sm">
-                    {jobOffer.duration}
+                    {jobOffer.duration ?? "—"}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between py-3 border-b">
+                {jobOffer.salary !== undefined && <div className="flex items-center justify-between py-3 border-b">
                   <span className="text-sm text-muted-foreground">
                     {t("details.salary")}
                   </span>
                   <div className="flex items-baseline gap-0.5">
                     <SalaryDisplay salary={jobOffer.salary} />
-                    <span className="text-primary text-xs font-normal">
-                      /
-                      {t(
-                        `labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<
-                          typeof t
-                        >[0],
-                      )}
-                    </span>
+                    {jobOffer.salaryPeriod && <span className="text-primary text-xs font-normal">/{t(`labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<typeof t>[0])}</span>}
                   </div>
-                </div>
+                </div>}
 
                 <div className="flex items-center justify-between py-3">
                   <span className="text-sm text-muted-foreground">
@@ -475,11 +516,39 @@ export default function JobDetailsPage() {
                   <p className="text-sm text-primary-foreground/90 mb-4">
                     {t("details.dontMiss")}
                   </p>
-                  <ApplyJobDialog jobOffer={jobOffer}>
-                    <Button variant="secondary" className="w-full" size="lg">
+                  {!isAcceptingApplications ? (
+                    <Button variant="secondary" className="w-full" size="lg" disabled>
+                      {t("details.closed")}
+                    </Button>
+                  ) : !isAuthenticated ? (
+                    <Button
+                      variant="secondary"
+                      className="w-full"
+                      size="lg"
+                      onClick={requireAuthentication}
+                    >
                       {t("details.applyNow")}
                     </Button>
-                  </ApplyJobDialog>
+                  ) : applicationEmailStatus === "failed" ? (
+                    <Button variant="secondary" className="w-full" size="lg" disabled>
+                      {t("details.applicationDeliveryFailed")}
+                    </Button>
+                  ) : applicationEmailStatus !== "none" ? (
+                    <Button variant="secondary" className="w-full" size="lg" disabled>
+                      {t("details.alreadyApplied")}
+                    </Button>
+                  ) : (
+                    <ApplyJobDialog jobOffer={jobOffer}>
+                      <Button
+                        variant="secondary"
+                        className="w-full"
+                        size="lg"
+                        disabled={applicationEmailStatus === undefined}
+                      >
+                        {t("details.applyNow")}
+                      </Button>
+                    </ApplyJobDialog>
+                  )}
                 </div>
               </div>
             )}

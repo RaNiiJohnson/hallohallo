@@ -3,7 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { Controller, FieldPath, useFieldArray, useForm } from "react-hook-form";
+import {
+  Controller,
+  FieldPath,
+  useFieldArray,
+  useForm,
+  useWatch,
+} from "react-hook-form";
 import * as z from "zod";
 
 import { MarkdownHint } from "@/components/markdown-hint";
@@ -44,31 +50,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { LocationPicker } from "@/lib/LocationPicker";
+import {
+  contractTypesForJobType,
+  contractTypeValues,
+  jobTypeValues,
+  requiresDurationOrStartDate,
+  requiresWeeklyHours,
+  workModeValues,
+  type JobType,
+} from "@/lib/job-offer-options";
 import { api } from "@convex/_generated/api";
 import { useMutation } from "convex/react";
 import { CalendarIcon, ChevronLeft, ChevronRight, XIcon } from "lucide-react";
 import { toast } from "sonner";
 
-export const jobTypeValues = [
-  "auPair",
-  "training",
-  "voluntary",
-  "internship",
-  "miniJob",
-  "job",
-  "freelance",
-  "scholarship",
-] as const;
-
-export const contractTypeValues = [
-  "CDI",
-  "CDD",
-  "FSJ/FOJ/BFD",
-  "fullTime",
-  "partTime",
-  "freelance",
-  "apprenticeship",
-] as const;
+export { contractTypesForJobType, contractTypeValues, jobTypeValues } from "@/lib/job-offer-options";
 
 export const salaryPeriodValues = ["hour", "month", "year"] as const;
 
@@ -92,9 +88,12 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
       })
       .optional(),
     contractType: z.enum(contractTypeValues),
-    city: z.string().min(1, t("form.validation.cityReq")),
-    duration: z.string().min(1, t("form.validation.durationReq")),
-    startDate: z.string().min(1, t("form.validation.startDateReq")),
+    city: z.string(),
+    workMode: z.enum(workModeValues),
+    remoteLocation: z.string().optional(),
+    duration: z.string().optional(),
+    startDate: z.string().optional(),
+    applicationDeadline: z.string().optional(),
     company: z.string().min(1, t("form.validation.companyReq")),
     description: z.string().min(10, t("form.validation.descMin")),
     certificates: z
@@ -103,10 +102,24 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
           certificate: z.string(),
         }),
       )
-      .min(1, t("form.validation.certMin"))
+      .min(0)
       .max(5, t("form.validation.certMax")),
-    salary: z.string().min(1, t("form.validation.salaryReq")),
-    salaryPeriod: z.enum(salaryPeriodValues),
+    salary: z.string().optional(),
+    salaryPeriod: z.enum(salaryPeriodValues).optional(),
+    sector: z.string().optional(),
+    benefits: z.string().optional(),
+    externalApplicationUrl: z.string().url().optional().or(z.literal("")),
+    weeklyHours: z.string().optional(),
+    trainingRequirements: z.string().optional(),
+    contactEmail: z.string().email(t("form.validation.contactEmailReq")),
+  }).superRefine((data, ctx) => {
+    if (data.workMode !== "remote" && !data.city.trim()) {
+      ctx.addIssue({ code: "custom", path: ["city"], message: t("form.validation.cityReq") });
+    }
+    if (requiresDurationOrStartDate(data.type, data.contractType)) {
+      if (!data.duration?.trim()) ctx.addIssue({ code: "custom", path: ["duration"], message: t("form.validation.durationReq") });
+      if (!data.startDate?.trim()) ctx.addIssue({ code: "custom", path: ["startDate"], message: t("form.validation.startDateReq") });
+    }
   });
 
   type FormSchema = z.infer<typeof formSchema>;
@@ -116,8 +129,10 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
     defaultValues: {
       title: "",
       type: "auPair",
-      contractType: "CDI",
+      contractType: "CDD",
       city: "",
+      workMode: "onSite",
+      remoteLocation: "",
       duration: "",
       startDate: "",
       company: "",
@@ -125,6 +140,12 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
       certificates: [],
       salary: "",
       salaryPeriod: "month",
+      sector: "",
+      benefits: "",
+      externalApplicationUrl: "",
+      weeklyHours: "",
+      trainingRequirements: "",
+      contactEmail: "",
     },
   });
 
@@ -132,6 +153,13 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
     control: form.control,
     name: "certificates",
   });
+  const selectedJobType = useWatch({ control: form.control, name: "type" });
+  const selectedContractType = useWatch({ control: form.control, name: "contractType" });
+  const selectedWorkMode = useWatch({ control: form.control, name: "workMode" });
+  const availableContractTypes = contractTypesForJobType(selectedJobType);
+  const contractIsFixed = availableContractTypes.length === 1;
+  const showDurationAndStart = requiresDurationOrStartDate(selectedJobType, selectedContractType);
+  const showWeeklyHours = requiresWeeklyHours(selectedJobType, selectedContractType);
 
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
@@ -153,18 +181,14 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
       case 2:
         fieldsToValidate = [
           "contractType",
-          "city",
-          "startDate",
-          "salary",
-          "salaryPeriod",
-          "duration",
+          "city", "workMode",
         ];
         break;
       case 3:
         fieldsToValidate = ["description"];
         break;
       case 4:
-        fieldsToValidate = ["certificates"];
+        fieldsToValidate = ["contactEmail"];
         break;
     }
 
@@ -188,16 +212,25 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
         location: data.location,
         contractType: data.contractType,
         city: data.city,
-        duration: data.duration,
-        startDate: data.startDate,
+        workMode: data.workMode,
+        remoteLocation: data.remoteLocation || undefined,
+        duration: data.duration || undefined,
+        startDate: data.startDate || undefined,
+        applicationDeadline: data.applicationDeadline || undefined,
         company: data.company,
         description: data.description,
         certificates:
           data.certificates
             ?.map((cert: { certificate: string }) => cert.certificate)
             .filter((cert: string) => cert.trim() !== "") || [],
-        salary: Number(data.salary),
+        salary: data.salary ? Number(data.salary) : undefined,
         salaryPeriod: data.salaryPeriod,
+        sector: data.sector || undefined,
+        benefits: data.benefits || undefined,
+        externalApplicationUrl: data.externalApplicationUrl || undefined,
+        weeklyHours: data.weeklyHours ? Number(data.weeklyHours) : undefined,
+        trainingRequirements: data.trainingRequirements || undefined,
+        contactEmail: data.contactEmail,
       });
       toast.success(t("form.messages.success"));
       form.reset();
@@ -291,7 +324,19 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
                 <FieldLabel htmlFor="job-type">
                   {t("form.labels.jobType")}
                 </FieldLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    const jobType = value as JobType;
+                    field.onChange(jobType);
+                    const contractTypes = contractTypesForJobType(jobType);
+                    if (!contractTypes.includes(form.getValues("contractType"))) {
+                      form.setValue("contractType", contractTypes[0], {
+                        shouldValidate: true,
+                      });
+                    }
+                  }}
+                >
                   <SelectTrigger
                     id="job-type"
                     aria-invalid={fieldState.invalid}
@@ -330,30 +375,46 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
                 <FieldLabel htmlFor="job-contract">
                   {t("form.labels.contractType")}
                 </FieldLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger
-                    id="job-contract"
-                    aria-invalid={fieldState.invalid}
-                  >
-                    <SelectValue
-                      placeholder={t("form.placeholders.selectContract")}
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {contractTypeValues.map((contract) => (
-                      <SelectItem key={contract} value={contract}>
-                        {t(
-                          `labels.contracts.${contract}` as Parameters<
-                            typeof t
-                          >[0],
-                        )}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {contractIsFixed ? (
+                  <div className="rounded-md border bg-muted px-3 py-2 text-sm">
+                    {t(`labels.contracts.${field.value}` as Parameters<typeof t>[0])}
+                  </div>
+                ) : (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger id="job-contract" aria-invalid={fieldState.invalid}>
+                      <SelectValue placeholder={t("form.placeholders.selectContract")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableContractTypes.map((contract) => (
+                        <SelectItem key={contract} value={contract}>
+                          {t(`labels.contracts.${contract}` as Parameters<typeof t>[0])}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
+              </Field>
+            )}
+          />
+
+          <Controller
+            name="workMode"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="job-work-mode">{t("form.labels.workMode")}</FieldLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger id="job-work-mode"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {workModeValues.map((mode) => (
+                      <SelectItem key={mode} value={mode}>{t(`labels.workModes.${mode}` as Parameters<typeof t>[0])}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
           />
@@ -364,7 +425,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="job-city">
-                  {t("form.labels.city")}
+                  {t(selectedWorkMode === "remote" ? "form.labels.cityOptional" : "form.labels.city")}
                 </FieldLabel>
                 <Input
                   {...field}
@@ -379,6 +440,19 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
               </Field>
             )}
           />
+
+          {selectedWorkMode === "remote" && (
+            <Controller
+              name="remoteLocation"
+              control={form.control}
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel htmlFor="job-remote-location">{t("form.labels.remoteLocation")}</FieldLabel>
+                  <Input {...field} id="job-remote-location" placeholder={t("form.placeholders.remoteLocation")} />
+                </Field>
+              )}
+            />
+          )}
 
           {/* Location Map Picker */}
           <Controller
@@ -396,7 +470,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
               </Field>
             )}
           />
-          <Controller
+          {showDurationAndStart && <Controller
             name="startDate"
             control={form.control}
             render={({ field, fieldState }) => {
@@ -452,7 +526,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
                 </Field>
               );
             }}
-          />
+          />}
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_180px]">
             <Controller
@@ -523,7 +597,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             />
           </div>
 
-          <Controller
+          {showDurationAndStart && <Controller
             name="duration"
             control={form.control}
             render={({ field, fieldState }) => (
@@ -543,7 +617,7 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
                 )}
               </Field>
             )}
-          />
+          />}
         </FieldGroup>
 
         {/* Step 3 */}
@@ -583,8 +657,48 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
           />
         </FieldGroup>
 
+        {/* Extra details remain optional so an employer can publish quickly. */}
+        <FieldGroup className={`space-y-4 ${currentStep !== 3 ? "hidden" : ""}`}>
+          <Controller name="sector" control={form.control} render={({ field }) => (
+            <Field><FieldLabel htmlFor="job-sector">{t("form.labels.sector")}</FieldLabel><Input {...field} id="job-sector" /></Field>
+          )} />
+          {selectedJobType === "internship" || selectedJobType === "training" ? (
+            <Controller name="trainingRequirements" control={form.control} render={({ field }) => (
+              <Field><FieldLabel htmlFor="job-training-requirements">{t("form.labels.trainingRequirements")}</FieldLabel><Input {...field} id="job-training-requirements" /></Field>
+            )} />
+          ) : null}
+          {showWeeklyHours ? (
+            <Controller name="weeklyHours" control={form.control} render={({ field }) => (
+              <Field><FieldLabel htmlFor="job-weekly-hours">{t("form.labels.weeklyHours")}</FieldLabel><Input {...field} id="job-weekly-hours" type="number" min="0" /></Field>
+            )} />
+          ) : null}
+          <Controller name="applicationDeadline" control={form.control} render={({ field }) => (
+            <Field><FieldLabel htmlFor="job-deadline">{t("form.labels.applicationDeadline")}</FieldLabel><Input {...field} id="job-deadline" type="date" /></Field>
+          )} />
+          <Controller name="benefits" control={form.control} render={({ field }) => (
+            <Field>
+              <FieldLabel htmlFor="job-benefits">{t("form.labels.benefits")}</FieldLabel>
+              <InputGroup><InputGroupTextarea {...field} id="job-benefits" rows={3} className="min-h-24 resize-y" /></InputGroup>
+            </Field>
+          )} />
+          <Controller name="externalApplicationUrl" control={form.control} render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}><FieldLabel htmlFor="job-external-application">{t("form.labels.externalApplicationUrl")}</FieldLabel><Input {...field} id="job-external-application" type="url" />{fieldState.invalid && <FieldError errors={[fieldState.error]} />}</Field>
+          )} />
+        </FieldGroup>
+
         {/* Step 4 */}
         <FieldSet className={`gap-4 ${currentStep !== 4 ? "hidden" : ""}`}>
+          <Controller
+            name="contactEmail"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="job-contact-email">{t("form.labels.contactEmail")}</FieldLabel>
+                <Input {...field} id="job-contact-email" type="email" placeholder={t("form.placeholders.contactEmail")} />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
           <FieldLegend variant="label">
             {t("form.labels.certificates")}
           </FieldLegend>

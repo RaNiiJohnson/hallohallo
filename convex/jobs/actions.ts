@@ -1,15 +1,16 @@
 import { v } from "convex/values";
 import { render } from "react-email";
-import { api, internal } from "../_generated/api";
+import { internal } from "../_generated/api";
 import { authAction } from "../functions";
 import { r2 } from "../integrations/r2";
 import { resend } from "../sendEmails";
-import { throwForbidden, throwNotFound } from "../utils/errors";
+import { throwNotFound } from "../utils/errors";
 import NewApplicationEmail from "./CvTemplate";
 
 export const applyToJob = authAction({
   args: {
     jobId: v.id("JobOffer"),
+    applicationCvKey: v.optional(v.string()),
     coverLetter: v.optional(v.string()),
   },
   returns: v.null(),
@@ -19,50 +20,53 @@ export const applyToJob = authAction({
     // const distinctId = posthogDistinctId(user._id);
 
     try {
-      const job = await ctx.runQuery(api.jobs.queries.getJobWithContactById, {
-        id: args.jobId,
-      });
-      if (!job) {
-        throwNotFound("Job not found");
-      }
-
-      if (!user.cv) throwNotFound("CV not found");
-      const cvUrl = await r2.getUrl(user.cv);
-      if (!cvUrl) {
-        throwNotFound("CV not found");
-      }
-
-      let contactEmail = job.contact?.email;
-      if (!contactEmail) {
-        contactEmail =
-          (await ctx.runQuery(internal.auth.users.getContactEmailById, {
-            id: job.authorId,
-          })) ?? undefined;
-      }
-      if (!contactEmail) {
-        throwNotFound("No contact email found for this job.");
-      }
-
-      if (user.email === contactEmail) {
-        throwForbidden("You cannot apply to your own job.");
-      }
-
-      const html = await render(
-        NewApplicationEmail({
-          candidateName: user.name,
-          candidateEmail: user.email,
-          jobTitle: job.title,
-          coverLetter: args.coverLetter,
-          cvUrl,
-        }),
+      const application = await ctx.runMutation(
+        internal.jobs.mutations.submitApplication,
+        args,
       );
 
-      await resend.sendEmail(ctx, {
-        from: "HalloHallo <noreply@hallomada.de>",
-        to: contactEmail,
-        subject: `Nouvelle candidature pour: ${job.title}`,
-        html,
-      });
+      try {
+        let contactEmail = application.contactEmail;
+        if (!contactEmail) {
+          contactEmail =
+            (await ctx.runQuery(internal.auth.users.getContactEmailById, {
+              id: application.authorId,
+            })) ?? undefined;
+        }
+        if (!contactEmail) {
+          throwNotFound("No contact email found for this job.");
+        }
+
+        const cvUrl = await r2.getUrl(application.cvKey);
+        if (!cvUrl) throwNotFound("CV not found");
+
+        const html = await render(
+          NewApplicationEmail({
+            candidateName: user.name,
+            candidateEmail: user.email,
+            jobTitle: application.jobTitle,
+            coverLetter: args.coverLetter,
+            cvUrl,
+          }),
+        );
+
+        await resend.sendEmail(ctx, {
+          from: "HalloHallo <noreply@hallomada.de>",
+          to: contactEmail,
+          subject: `Nouvelle candidature pour: ${application.jobTitle}`,
+          html,
+        });
+        await ctx.runMutation(internal.jobs.mutations.updateApplicationEmailStatus, {
+          id: application.applicationId,
+          emailStatus: "sent",
+        });
+      } catch (error) {
+        await ctx.runMutation(internal.jobs.mutations.updateApplicationEmailStatus, {
+          id: application.applicationId,
+          emailStatus: "failed",
+        });
+        throw error;
+      }
 
       return null;
 

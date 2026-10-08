@@ -1,8 +1,16 @@
-import { paginationOptsValidator } from "convex/server";
+import { FilterBuilder, paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
-import { Id } from "../_generated/dataModel";
+import { DataModel, Id } from "../_generated/dataModel";
 import { authComponent } from "../auth/auth";
 import { query } from "../functions";
+
+function isVisibleJob(job: { status?: "active" | "closed" | "archived" }) {
+  return job.status === undefined || job.status === "active";
+}
+
+function visibleJobFilter(q: FilterBuilder<DataModel["JobOffer"]>) {
+  return q.or(q.eq(q.field("status"), "active"), q.eq(q.field("status"), undefined));
+}
 
 export const getJobWithContact = query({
   args: { slug: v.string() },
@@ -14,13 +22,15 @@ export const getJobWithContact = query({
 
     if (!job) return null;
 
-    // Récupération rapide via l'index
-    const contact = await ctx.db
-      .query("JobContactInfo")
-      .withIndex("by_jobId", (q) => q.eq("jobId", job._id))
-      .unique();
-
     const user = await authComponent.safeGetAuthUser(ctx);
+    if (
+      job.status === "archived" &&
+      user?._id !== job.authorId &&
+      user?.role !== "admin"
+    ) {
+      return null;
+    }
+
     let isBookmarked = false;
     if (user) {
       const existingBookmark = await ctx.db
@@ -35,23 +45,48 @@ export const getJobWithContact = query({
       if (existingBookmark) isBookmarked = true;
     }
 
-    return { ...job, contact, isBookmarked };
+    return { ...job, isBookmarked };
   },
 });
 
-export const getJobWithContactById = query({
+export const getJobContactForEdit = query({
   args: { id: v.id("JobOffer") },
   handler: async (ctx, { id }) => {
-    const job = await ctx.db.get(id);
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) return null;
 
-    if (!job) return null;
+    const job = await ctx.db.get(id);
+    if (!job || (job.authorId !== user._id && user.role !== "admin")) {
+      return null;
+    }
 
     const contact = await ctx.db
       .query("JobContactInfo")
       .withIndex("by_jobId", (q) => q.eq("jobId", job._id))
       .unique();
+    return { email: contact?.email ?? "" };
+  },
+});
 
-    return { ...job, contact };
+export const hasCurrentUserAppliedToJob = query({
+  args: { jobId: v.id("JobOffer") },
+  returns: v.union(
+    v.literal("none"),
+    v.literal("pending"),
+    v.literal("sent"),
+    v.literal("failed"),
+  ),
+  handler: async (ctx, { jobId }) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) return "none";
+
+    const application = await ctx.db
+      .query("jobApplications")
+      .withIndex("by_jobId_and_candidateId", (q) =>
+        q.eq("jobId", jobId).eq("candidateId", user._id),
+      )
+      .unique();
+    return application?.emailStatus ?? "none";
   },
 });
 
@@ -62,6 +97,17 @@ export const getJobMetadata = query({
       .query("JobOffer")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .unique();
+    if (!job) return null;
+
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (
+      job.status === "archived" &&
+      user?._id !== job.authorId &&
+      user?.role !== "admin"
+    ) {
+      return null;
+    }
+
     return job;
   },
 });
@@ -122,7 +168,7 @@ export const getJobs = query({
       );
 
       const filteredPage = enrichedPage.filter(
-        (j): j is NonNullable<typeof j> => j !== null,
+        (j): j is NonNullable<typeof j> => j !== null && isVisibleJob(j),
       );
       return { ...bookmarksPage, page: filteredPage };
     }
@@ -139,7 +185,9 @@ export const getJobs = query({
         });
 
       // avant: return await searchResult.collect();
-      const results = await searchResult.paginate(args.paginationOpts);
+      const results = await searchResult
+        .filter(visibleJobFilter)
+        .paginate(args.paginationOpts);
 
       const enrichedPage = await Promise.all(
         results.page.map(async (job) => {
@@ -160,7 +208,10 @@ export const getJobs = query({
         }),
       );
 
-      return { ...results, page: enrichedPage };
+      return {
+        ...results,
+        page: enrichedPage,
+      };
     }
 
     // CAS 2 : Pas de recherche textuelle -> Utilisation des index de filtrage
@@ -172,17 +223,20 @@ export const getJobs = query({
         .query("JobOffer")
         .withIndex("by_type", (q) => q.eq("type", type))
         .order("desc")
+        .filter(visibleJobFilter)
         .paginate(args.paginationOpts);
     } else if (contractType) {
       results = await ctx.db
         .query("JobOffer")
         .withIndex("by_contract", (q) => q.eq("contractType", contractType))
         .order("desc")
+        .filter(visibleJobFilter)
         .paginate(args.paginationOpts);
     } else {
       results = await ctx.db
         .query("JobOffer")
         .order("desc")
+        .filter(visibleJobFilter)
         .paginate(args.paginationOpts);
     }
 
@@ -225,6 +279,18 @@ export const getTranslation = query({
   },
 
   handler: async (ctx, args) => {
+    const job = await ctx.db.get(args.jobId);
+    if (!job) return null;
+
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (
+      job.status === "archived" &&
+      user?._id !== job.authorId &&
+      user?.role !== "admin"
+    ) {
+      return null;
+    }
+
     return await ctx.db
       .query("jobTranslations")
       .withIndex("by_job_language", (q) =>

@@ -17,7 +17,7 @@ import { useTypedR2Upload } from "@/hooks/use-r2-typed-upload";
 import { JobOfferDetails } from "@/lib/convexTypes";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
-import { useAction, useMutation } from "convex/react";
+import { useAction } from "convex/react";
 import {
   AlertCircleIcon,
   EyeIcon,
@@ -41,13 +41,9 @@ export function ApplyJobDialog({
   const applyToJob = useAction(api.jobs.actions.applyToJob);
 
   const { upload: uploadCv } = useTypedR2Upload(
-    api.integrations.r2.generateCvUploadUrl,
+    api.integrations.r2.generateApplicationCvUploadUrl,
     api.integrations.r2.syncMetadata,
     { accept: "application/pdf" },
-  );
-
-  const uploadCvAndDeleteOld = useMutation(
-    api.integrations.r2.uploadCvAndDeleteOld,
   );
   const cvUrl = useQuery(api.integrations.r2.getCvUrl);
   const t = useTranslations("jobs.dialogs.apply");
@@ -87,7 +83,7 @@ export function ApplyJobDialog({
 
     startTransition(async () => {
       try {
-        let cvStorageId = user?.cv;
+        let applicationCvKey: string | undefined;
 
         // If user uploaded a new file, we upload it
         if (file && file.file instanceof File) {
@@ -95,20 +91,16 @@ export function ApplyJobDialog({
           if (!uploadedStorageId) {
             throw new Error(t("errors.uploadError"));
           }
-          cvStorageId = uploadedStorageId;
-
-          // Save the new key and delete old one from R2
-          if (user) {
-            await uploadCvAndDeleteOld({ newCvKey: cvStorageId });
-          }
+          applicationCvKey = uploadedStorageId;
         }
 
-        if (!cvStorageId) {
+        if (!applicationCvKey && !user?.cv) {
           throw new Error(t("errors.cvNotFound"));
         }
 
         await applyToJob({
           jobId: jobOffer._id,
+          applicationCvKey,
           coverLetter: coverLetter.trim() || undefined,
         });
 
@@ -200,34 +192,39 @@ export function ApplyJobDialog({
             ) : null}
 
             {file && (
-              <div className="flex items-center gap-2 rounded-xl border px-4 py-3 bg-card">
-                <div className="flex items-center gap-3 min-w-0 flex-1 overflow-hidden">
-                  <PaperclipIcon className="w-4 h-4 text-muted-foreground shrink-0" />
-                  <div className="min-w-0 flex-1">
-                    <p
-                      className="text-sm font-medium truncate"
-                      title={file.file.name}
-                    >
-                      {file.file.name.length > 30
-                        ? `${file.file.name.slice(0, 20)}...${file.file.name.slice(-8)}`
-                        : file.file.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {formatBytes(file.file.size)}
-                    </p>
+              <div className="rounded-xl border px-4 py-3 bg-card space-y-2">
+                <p className="text-xs text-muted-foreground">
+                  {t("applicationCvUsed")}
+                </p>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3 min-w-0 flex-1 overflow-hidden">
+                    <PaperclipIcon className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <p
+                        className="text-sm font-medium truncate"
+                        title={file.file.name}
+                      >
+                        {file.file.name.length > 30
+                          ? `${file.file.name.slice(0, 20)}...${file.file.name.slice(-8)}`
+                          : file.file.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatBytes(file.file.size)}
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                <Button
-                  type="button"
-                  aria-label="Remove file"
-                  variant="ghost"
-                  size="icon"
-                  className="text-muted-foreground hover:text-foreground shrink-0"
-                  onClick={() => removeFile(file.id)}
-                >
-                  <XIcon className="w-4 h-4" />
-                </Button>
+                  <Button
+                    type="button"
+                    aria-label="Remove file"
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground hover:text-foreground shrink-0"
+                    onClick={() => removeFile(file.id)}
+                  >
+                    <XIcon className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
             )}
 

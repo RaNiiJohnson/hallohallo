@@ -28,9 +28,10 @@ const uploadKindValidator = v.union(
   v.literal("listing"),
   v.literal("profile"),
   v.literal("cover"),
+  v.literal("applicationCv"),
 );
 
-type UploadKind = "cv" | "listing" | "profile" | "cover";
+type UploadKind = "cv" | "listing" | "profile" | "cover" | "applicationCv";
 
 const PDF_CONTENT_TYPE = "application/pdf" as const;
 const imageContentTypeValidator = v.union(
@@ -101,6 +102,19 @@ export const generateCvUploadUrl = authMutation({
     return await issueUploadUrl(ctx, {
       userId: ctx.user._id,
       kind: "cv",
+      contentType,
+      maxSize: MAX_CV_SIZE,
+    });
+  },
+});
+
+export const generateApplicationCvUploadUrl = authMutation({
+  args: { contentType: v.literal(PDF_CONTENT_TYPE) },
+  returns: uploadUrlResultValidator,
+  handler: async (ctx, { contentType }) => {
+    return await issueUploadUrl(ctx, {
+      userId: ctx.user._id,
+      kind: "applicationCv",
       contentType,
       maxSize: MAX_CV_SIZE,
     });
@@ -249,15 +263,23 @@ export const uploadCvAndDeleteOld = authMutation({
       kind: "cv",
     });
 
-    if (user.cv && user.cv !== newCvKey) {
-      await r2.deleteObject(ctx, user.cv);
-    }
+    const previousCv = user.cv;
 
     await ctx.runMutation(components.betterAuth.users.updateUser, {
       id: user._id,
       patch: { cv: newCvKey },
     });
     await consumeUploadGrant(ctx, newCvKey);
+
+    if (previousCv && previousCv !== newCvKey) {
+      const applicationsUsingPreviousCv = await ctx.db
+        .query("jobApplications")
+        .withIndex("by_cvKey", (q) => q.eq("cvKey", previousCv))
+        .first();
+      if (!applicationsUsingPreviousCv) {
+        await r2.deleteObject(ctx, previousCv);
+      }
+    }
     return null;
   },
 });
@@ -308,7 +330,13 @@ export const deleteCv = authMutation({
     const user = ctx.user;
     if (!user.cv) throwNotFound("No CV to delete");
 
-    await r2.deleteObject(ctx, user.cv);
+    const applicationsUsingCv = await ctx.db
+      .query("jobApplications")
+      .withIndex("by_cvKey", (q) => q.eq("cvKey", user.cv!))
+      .first();
+    if (!applicationsUsingCv) {
+      await r2.deleteObject(ctx, user.cv);
+    }
     await ctx.runMutation(components.betterAuth.users.updateUser, {
       id: user._id,
       patch: { cv: null },

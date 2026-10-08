@@ -99,26 +99,22 @@ export function JobList() {
                 </h3>
 
                 {/* Company */}
-                <div className="flex items-center gap-1 mb-2">
-                  <SalaryDisplay
-                    salary={job.salary}
-                    className="text-foreground"
-                  />
-                  <span className="text-primary text-xs font-normal">
-                    /
-                    {t(
-                      `labels.salaryPeriods.${job.salaryPeriod}` as Parameters<
-                        typeof t
-                      >[0],
+                {job.salary !== undefined && (
+                  <div className="flex items-center gap-1 mb-2">
+                    <SalaryDisplay salary={job.salary} className="text-foreground" />
+                    {job.salaryPeriod && (
+                      <span className="text-primary text-xs font-normal">
+                        /{t(`labels.salaryPeriods.${job.salaryPeriod}` as Parameters<typeof t>[0])}
+                      </span>
                     )}
-                  </span>
-                </div>
+                  </div>
+                )}
 
                 {/* Location & Type */}
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground mb-3">
                   <div className="flex items-center gap-1">
                     <MapPin className="h-4 w-4" />
-                    <span>{job.city}</span>
+                    <span>{job.workMode === "remote" ? job.remoteLocation || t("labels.workModes.remote") : job.city}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Briefcase className="h-4 w-4" />

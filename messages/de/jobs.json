@@ -47,11 +47,21 @@
       "jobType": "Art des Angebots *",
       "contractType": "Vertragsart *",
       "city": "Stadt / Ort *",
+      "cityOptional": "Stadt / Ort (optional)",
+      "workMode": "Arbeitsmodell *",
+      "remoteLocation": "Wohngebiet oder Einschränkungen (optional)",
+      "contactEmail": "E-Mail für Bewerbungen *",
+      "sector": "Branche / Kategorie (optional)",
+      "trainingRequirements": "Gewünschte Schule oder Ausbildung (optional)",
+      "weeklyHours": "Wöchentliche Arbeitszeit (optional)",
+      "applicationDeadline": "Bewerbungsfrist (optional)",
+      "benefits": "Vorteile (optional)",
+      "externalApplicationUrl": "Externer Bewerbungslink (optional)",
       "mapPosition": "Kartenposition (optional)",
       "mapDesc": "Klicken Sie auf die Karte, um die genaue Position der Stelle anzugeben. Die Stadt wird automatisch aktualisiert.",
       "startDate": "Startdatum *",
-      "salary": "Gehalt *",
-      "period": "Zeitraum *",
+      "salary": "Gehalt (optional)",
+      "period": "Zeitraum (optional)",
       "duration": "Dauer *",
       "description": "Beschreibung *",
       "descHint": "Beschreiben Sie die Position, die Aufgaben und die erforderlichen Fähigkeiten",
@@ -70,7 +80,9 @@
       "duration": "Z.B.: 6 Monate, 2 Jahre, Unbefristet",
       "description": "Beschreiben Sie die Position, die Aufgaben, die erforderlichen Fähigkeiten...",
       "cert": "Z.B.: Führerschein B, Deutsch B2...",
-      "period": "Zeitraum"
+      "period": "Zeitraum",
+      "remoteLocation": "Z. B. Deutschland, EU oder Zeitzone",
+      "contactEmail": "bewerbung@organisation.de"
     },
     "actions": {
       "addCert": "Zertifikat hinzufügen",
@@ -97,7 +109,8 @@
       "descMin": "Die Beschreibung muss mindestens 10 Zeichen enthalten",
       "certMin": "Fügen Sie mindestens ein Zertifikat hinzu.",
       "certMax": "Sie können bis zu 5 Zertifikate hinzufügen.",
-      "salaryReq": "Das Gehalt ist erforderlich"
+      "salaryReq": "Das Gehalt ist erforderlich",
+      "contactEmailReq": "Eine gültige E-Mail für Bewerbungen ist erforderlich"
     }
   },
   "details": {
@@ -128,7 +141,10 @@
     "backToList": "Zurück zu den Angeboten",
     "breadcrumb": "Stellenangebote",
     "you": "Sie",
-    "have": "haben"
+    "have": "haben",
+    "closed": "Bewerbungen geschlossen",
+    "alreadyApplied": "Bewerbung bereits gesendet",
+    "applicationDeliveryFailed": "Bewerbung gespeichert — Versand nicht bestätigt"
   },
   "dialogs": {
     "publish": {
@@ -149,12 +165,21 @@
       "successToast": "Angebot erfolgreich gelöscht",
       "errorToast": "Fehler beim Löschen des Angebots"
     },
+    "lifecycle": {
+      "close": "Angebot schließen",
+      "reopen": "Wieder öffnen",
+      "archive": "Archivieren",
+      "restore": "Wiederherstellen",
+      "success": "Angebotsstatus aktualisiert.",
+      "error": "Angebotsstatus konnte nicht aktualisiert werden."
+    },
     "apply": {
       "application": "BEWERBUNG",
       "cvLabel": "LEBENSLAUF *",
       "cvHint": "(PDF, max 5 MB)",
-      "noProfileCv": "Sie haben noch keinen Lebenslauf in Ihrem Profil. Bitte laden Sie einen hoch, um sich zu bewerben.",
+      "noProfileCv": "Sie haben noch keinen Profil-Lebenslauf. Fügen Sie einen Lebenslauf nur für diese Bewerbung hinzu.",
       "profileCvUsed": "Ihr Profil-Lebenslauf wird standardmäßig verwendet.",
+      "applicationCvUsed": "Dieser Lebenslauf wird nur für diese Bewerbung verwendet. Ihr Profil-Lebenslauf wird nicht geändert.",
       "dropHere": "Legen Sie Ihre PDF hier ab oder",
       "browse": "durchsuchen",
       "maxSize": "Nur PDF • max 5 MB",
@@ -194,6 +219,11 @@
       "partTime": "Teilzeit",
       "freelance": "Freiberuflich",
       "apprenticeship": "Lehre"
+    },
+    "workModes": {
+      "onSite": "Vor Ort",
+      "hybrid": "Hybrid",
+      "remote": "Remote"
     },
     "salaryPeriods": {
       "hour": "Stunde",
