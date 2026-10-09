@@ -6,7 +6,6 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { Link, useRouter } from "@/i18n/navigation";
-import { getAuthHref } from "@/lib/auth-return-to";
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
 import { usePaginatedQuery, useQuery } from "convex-helpers/react/cache";
@@ -23,7 +22,6 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
 
 const validTabs = [
   "favorites",
@@ -36,8 +34,23 @@ const validTabs = [
 
 type Tab = (typeof validTabs)[number];
 
+const tabs = [
+  ["favorites", Heart],
+  ["publications", FileText],
+  ["communities", UsersRound],
+  ["applications", BriefcaseBusiness],
+  ["notifications", Bell],
+  ["profile", UserRound],
+] as const;
+
+const layoutClassName =
+  "lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:items-start lg:gap-8";
+
 const tabTriggerClassName =
-  "h-14 min-w-0 flex-col gap-1 overflow-hidden rounded-xl border-0 bg-transparent px-1.5 py-2 text-[11px] leading-tight whitespace-normal shadow-none after:hidden data-[state=active]:!bg-primary/10 data-[state=active]:!shadow-none data-[state=active]:text-primary sm:h-12 sm:flex-row sm:gap-1.5 sm:px-2 sm:text-xs lg:border lg:bg-card lg:px-3 lg:text-sm lg:data-[state=active]:border-primary/50";
+  "justify-start h-14 min-w-0 flex-col gap-1 overflow-hidden rounded-lg border-0 bg-transparent px-1.5 py-2 text-[11px] leading-tight whitespace-normal shadow-none after:hidden " +
+  "data-[state=active]:!bg-primary/10 data-[state=active]:!shadow-none data-[state=active]:text-primary " +
+  "sm:h-12 sm:flex-row sm:gap-1.5 sm:px-2 sm:text-xs " +
+  "lg:h-12 lg:w-full lg:flex-none lg:rounded-full lg:px-4 lg:text-sm";
 
 function isTab(value: string | null): value is Tab {
   return validTabs.some((tab) => tab === value);
@@ -102,16 +115,18 @@ function CompactListSkeleton() {
 export function PersonalSpaceSkeleton() {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-      <div className="mb-8 space-y-3">
+      <div className="mb-6 space-y-3 sm:mb-8">
         <Skeleton className="h-9 w-48" />
         <Skeleton className="h-4 w-full max-w-md" />
       </div>
-      <div className="mb-6 grid grid-cols-3 gap-1 rounded-2xl border bg-card p-1 sm:grid-cols-3 lg:grid-cols-6 lg:gap-2 lg:border-0 lg:bg-transparent lg:p-0">
-        {Array.from({ length: 6 }, (_, index) => (
-          <Skeleton key={index} className="h-14 rounded-xl sm:h-12" />
-        ))}
+      <div className={layoutClassName}>
+        <div className="mb-6 grid grid-cols-3 gap-1 lg:mb-0 lg:flex lg:flex-col lg:gap-4">
+          {Array.from({ length: 6 }, (_, index) => (
+            <Skeleton key={index} className="h-14 rounded-xl sm:h-12" />
+          ))}
+        </div>
+        <ListSkeleton />
       </div>
-      <ListSkeleton />
     </div>
   );
 }
@@ -140,8 +155,14 @@ function FavoritesPanel() {
               <Bookmark className="size-4" />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate font-medium">{bookmark.snapshot.title}</span>
-              {bookmark.snapshot.subtitle && <span className="block truncate text-sm text-muted-foreground">{bookmark.snapshot.subtitle}</span>}
+              <span className="block truncate font-medium">
+                {bookmark.snapshot.title}
+              </span>
+              {bookmark.snapshot.subtitle && (
+                <span className="block truncate text-sm text-muted-foreground">
+                  {bookmark.snapshot.subtitle}
+                </span>
+              )}
             </span>
           </Link>
         ) : (
@@ -157,31 +178,97 @@ function FavoritesPanel() {
           </Link>
         ),
       )}
-      <LoadMore canLoad={status === "CanLoadMore"} loadMore={() => loadMore(12)} label={t("loadMore")} />
+      <LoadMore
+        canLoad={status === "CanLoadMore"}
+        loadMore={() => loadMore(12)}
+        label={t("loadMore")}
+      />
     </div>
   );
 }
 
 function PublicationsPanel() {
   const t = useTranslations("me.publications");
-  const jobs = usePaginatedQuery(api.me.queries.getMyJobOffers, {}, { initialNumItems: 6 });
-  const listings = usePaginatedQuery(api.me.queries.getMyListings, {}, { initialNumItems: 6 });
-  const posts = usePaginatedQuery(api.me.queries.getMyPosts, {}, { initialNumItems: 6 });
+  const jobs = usePaginatedQuery(
+    api.me.queries.getMyJobOffers,
+    {},
+    { initialNumItems: 6 },
+  );
+  const listings = usePaginatedQuery(
+    api.me.queries.getMyListings,
+    {},
+    { initialNumItems: 6 },
+  );
+  const posts = usePaginatedQuery(
+    api.me.queries.getMyPosts,
+    {},
+    { initialNumItems: 6 },
+  );
   const groups = [
-    { title: t("jobs"), icon: BriefcaseBusiness, items: jobs.results, status: jobs.status, loadMore: jobs.loadMore, href: (item: (typeof jobs.results)[number]) => `/jobs/${item.slug}` },
-    { title: t("listings"), icon: Building2, items: listings.results, status: listings.status, loadMore: listings.loadMore, href: (item: (typeof listings.results)[number]) => `/listing/${item.slug}` },
-    { title: t("posts"), icon: FileText, items: posts.results, status: posts.status, loadMore: posts.loadMore, href: (item: (typeof posts.results)[number]) => item.communitySlug ? `/communities/${item.communitySlug}/${item.slug}` : `/posts/${item.slug}` },
+    {
+      title: t("jobs"),
+      icon: BriefcaseBusiness,
+      items: jobs.results,
+      status: jobs.status,
+      loadMore: jobs.loadMore,
+      href: (item: (typeof jobs.results)[number]) => `/jobs/${item.slug}`,
+    },
+    {
+      title: t("listings"),
+      icon: Building2,
+      items: listings.results,
+      status: listings.status,
+      loadMore: listings.loadMore,
+      href: (item: (typeof listings.results)[number]) =>
+        `/listing/${item.slug}`,
+    },
+    {
+      title: t("posts"),
+      icon: FileText,
+      items: posts.results,
+      status: posts.status,
+      loadMore: posts.loadMore,
+      href: (item: (typeof posts.results)[number]) =>
+        item.communitySlug
+          ? `/communities/${item.communitySlug}/${item.slug}`
+          : `/posts/${item.slug}`,
+    },
   ];
 
   return (
-    <div className="grid gap-5 lg:grid-cols-3">
+    <div className="grid gap-5 xl:grid-cols-3">
       {groups.map((group) => {
         const Icon = group.icon;
         return (
           <section key={group.title} className="rounded-xl border bg-card p-4">
-            <h2 className="mb-3 flex items-center gap-2 font-semibold"><Icon className="size-4 text-primary" />{group.title}</h2>
-            {group.status === "LoadingFirstPage" ? <CompactListSkeleton /> : group.items.length === 0 ? <p className="text-sm text-muted-foreground">{t("empty")}</p> : <div className="space-y-2">{group.items.map((item) => <Link key={item._id} href={group.href(item as never)} className="block rounded-lg px-2 py-1.5 text-sm hover:bg-muted"><span className="block truncate font-medium">{item.title}</span></Link>)}</div>}
-            <LoadMore canLoad={group.status === "CanLoadMore"} loadMore={() => group.loadMore(6)} label={t("loadMore")} />
+            <h2 className="mb-3 flex items-center gap-2 font-semibold">
+              <Icon className="size-4 text-primary" />
+              {group.title}
+            </h2>
+            {group.status === "LoadingFirstPage" ? (
+              <CompactListSkeleton />
+            ) : group.items.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t("empty")}</p>
+            ) : (
+              <div className="space-y-2">
+                {group.items.map((item) => (
+                  <Link
+                    key={item._id}
+                    href={group.href(item as never)}
+                    className="block rounded-lg px-2 py-1.5 text-sm hover:bg-muted"
+                  >
+                    <span className="block truncate font-medium">
+                      {item.title}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
+            <LoadMore
+              canLoad={group.status === "CanLoadMore"}
+              loadMore={() => group.loadMore(6)}
+              label={t("loadMore")}
+            />
           </section>
         );
       })}
@@ -191,36 +278,147 @@ function PublicationsPanel() {
 
 function CommunitiesPanel() {
   const t = useTranslations("me.communities");
-  const { results, status, loadMore } = usePaginatedQuery(api.me.queries.getMyCommunities, {}, { initialNumItems: 12 });
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.me.queries.getMyCommunities,
+    {},
+    { initialNumItems: 12 },
+  );
   if (status === "LoadingFirstPage") return <ListSkeleton />;
   if (results.length === 0) return <Empty>{t("empty")}</Empty>;
-  return <div className="space-y-3">{results.map((community) => <Link key={community._id} href={`/communities/${community.slug}`} className="flex min-h-14 min-w-0 items-center gap-3 rounded-2xl border bg-card p-4 transition-colors hover:border-primary/40 hover:bg-accent/30"><UsersRound className="size-4 shrink-0 text-primary" /><span className="min-w-0 flex-1 truncate font-medium">{community.name}</span><span className="shrink-0 text-xs text-muted-foreground sm:text-sm">{community.role}</span></Link>)}<LoadMore canLoad={status === "CanLoadMore"} loadMore={() => loadMore(12)} label={t("loadMore")} /></div>;
+  return (
+    <div className="space-y-3">
+      {results.map((community) => (
+        <Link
+          key={community._id}
+          href={`/communities/${community.slug}`}
+          className="flex min-h-14 min-w-0 items-center gap-3 rounded-2xl border bg-card p-4 transition-colors hover:border-primary/40 hover:bg-accent/30"
+        >
+          <UsersRound className="size-4 shrink-0 text-primary" />
+          <span className="min-w-0 flex-1 truncate font-medium">
+            {community.name}
+          </span>
+          <span className="shrink-0 text-xs text-muted-foreground sm:text-sm">
+            {community.role}
+          </span>
+        </Link>
+      ))}
+      <LoadMore
+        canLoad={status === "CanLoadMore"}
+        loadMore={() => loadMore(12)}
+        label={t("loadMore")}
+      />
+    </div>
+  );
 }
 
 function ApplicationsPanel() {
   const t = useTranslations("me.applications");
-  const { results, status, loadMore } = usePaginatedQuery(api.me.queries.getMyApplications, {}, { initialNumItems: 12 });
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.me.queries.getMyApplications,
+    {},
+    { initialNumItems: 12 },
+  );
   if (status === "LoadingFirstPage") return <ListSkeleton />;
   if (results.length === 0) return <Empty>{t("empty")}</Empty>;
-  return <div className="space-y-3">{results.map((application) => <div key={application._id} className="min-w-0 rounded-2xl border bg-card p-4"><p className="wrap-break-word font-medium">{application.job?.title ?? t("unavailable")}</p><p className="truncate text-sm text-muted-foreground">{application.job?.company}</p><p className="mt-2 text-xs text-muted-foreground">{t(application.emailStatus)}</p></div>)}<LoadMore canLoad={status === "CanLoadMore"} loadMore={() => loadMore(12)} label={t("loadMore")} /></div>;
+  return (
+    <div className="space-y-3">
+      {results.map((application) => (
+        <div
+          key={application._id}
+          className="min-w-0 rounded-2xl border bg-card p-4"
+        >
+          <p className="wrap-break-word font-medium">
+            {application.job?.title ?? t("unavailable")}
+          </p>
+          <p className="truncate text-sm text-muted-foreground">
+            {application.job?.company}
+          </p>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {t(application.emailStatus)}
+          </p>
+        </div>
+      ))}
+      <LoadMore
+        canLoad={status === "CanLoadMore"}
+        loadMore={() => loadMore(12)}
+        label={t("loadMore")}
+      />
+    </div>
+  );
 }
 
 function NotificationsPanel() {
   const t = useTranslations("me.notifications");
   const notificationT = useTranslations("notifications");
   const timeT = useTimeTranslations();
-  const notifications = usePaginatedQuery(api.notifications.queries.getMyNotificationsPage, {}, { initialNumItems: 20 });
+  const notifications = usePaginatedQuery(
+    api.notifications.queries.getMyNotificationsPage,
+    {},
+    { initialNumItems: 20 },
+  );
   const markAllRead = useMutation(api.notifications.mutations.markAllRead);
   const markOneRead = useMutation(api.notifications.mutations.markOneRead);
   if (notifications.status === "LoadingFirstPage") return <ListSkeleton />;
-  return <div className="space-y-3"><div className="flex justify-end"><Button variant="outline" className="min-h-11 rounded-full" onClick={() => markAllRead()}>{t("markAllRead")}</Button></div>{notifications.results.length === 0 ? <Empty>{t("empty")}</Empty> : notifications.results.map((notification) => {
-    const href = notification.communitySlug
-      ? notification.postSlug
-        ? `/communities/${notification.communitySlug}/${notification.postSlug}`
-        : `/communities/${notification.communitySlug}`
-      : "/communities";
-    return <Link key={notification._id} href={href} onClick={() => { if (!notification.read) markOneRead({ notificationId: notification._id }); }} className={`flex min-h-16 min-w-0 items-start gap-3 rounded-2xl border p-4 transition-colors hover:bg-accent/30 ${notification.read ? "bg-card" : "border-primary/50 bg-primary/5"}`}><span className={`mt-1.5 size-2 shrink-0 rounded-full ${notification.read ? "bg-muted-foreground/30" : "bg-primary"}`} /><span className="min-w-0 flex-1"><span className="block wrap-break-word text-sm">{notificationT(`messages.${notification.type}` as Parameters<typeof notificationT>[0], { name: notification.fromUserName ?? notificationT("someone") })}</span><span className="mt-1 block text-xs text-muted-foreground">{getRelativeTime(notification._creationTime, timeT)}</span></span></Link>;
-  })}<LoadMore canLoad={notifications.status === "CanLoadMore"} loadMore={() => notifications.loadMore(20)} label={t("loadMore")} /></div>;
+  return (
+    <div className="space-y-3">
+      <div className="flex justify-end">
+        <Button
+          variant="outline"
+          className="min-h-11 rounded-full"
+          onClick={() => markAllRead()}
+        >
+          {t("markAllRead")}
+        </Button>
+      </div>
+      {notifications.results.length === 0 ? (
+        <Empty>{t("empty")}</Empty>
+      ) : (
+        notifications.results.map((notification) => {
+          const href = notification.communitySlug
+            ? notification.postSlug
+              ? `/communities/${notification.communitySlug}/${notification.postSlug}`
+              : `/communities/${notification.communitySlug}`
+            : "/communities";
+          return (
+            <Link
+              key={notification._id}
+              href={href}
+              onClick={() => {
+                if (!notification.read)
+                  markOneRead({ notificationId: notification._id });
+              }}
+              className={`flex min-h-16 min-w-0 items-start gap-3 rounded-2xl border p-4 transition-colors hover:bg-accent/30 ${notification.read ? "bg-card" : "border-primary/50 bg-primary/5"}`}
+            >
+              <span
+                className={`mt-1.5 size-2 shrink-0 rounded-full ${notification.read ? "bg-muted-foreground/30" : "bg-primary"}`}
+              />
+              <span className="min-w-0 flex-1">
+                <span className="block wrap-break-word text-sm">
+                  {notificationT(
+                    `messages.${notification.type}` as Parameters<
+                      typeof notificationT
+                    >[0],
+                    {
+                      name:
+                        notification.fromUserName ?? notificationT("someone"),
+                    },
+                  )}
+                </span>
+                <span className="mt-1 block text-xs text-muted-foreground">
+                  {getRelativeTime(notification._creationTime, timeT)}
+                </span>
+              </span>
+            </Link>
+          );
+        })
+      )}
+      <LoadMore
+        canLoad={notifications.status === "CanLoadMore"}
+        loadMore={() => notifications.loadMore(20)}
+        label={t("loadMore")}
+      />
+    </div>
+  );
 }
 
 function ProfilePanel() {
@@ -229,7 +427,36 @@ function ProfilePanel() {
   const updateUser = useMutation(api.auth.users.updateUser);
   if (user === undefined) return <ListSkeleton rows={2} />;
   if (user === null) return null;
-  return <section className="rounded-2xl border bg-card p-5 sm:p-6"><div className="mb-5"><h2 className="text-lg font-semibold">{t("title")}</h2><p className="mt-1 text-sm text-muted-foreground">{t("privateCv")}</p></div><div className="flex items-center justify-between gap-4 border-y py-5"><div className="min-w-0"><p className="font-medium">{t("profileVisibility")}</p><p className="mt-1 text-sm text-muted-foreground">{t("profileVisibilityHint")}</p></div><Switch className="shrink-0" aria-label={t("profileVisibility")} checked={user.isPublic !== false} onCheckedChange={(isPublic) => updateUser({ patch: { isPublic } })} /></div><div className="mt-5 grid gap-3 sm:grid-cols-2"><Button className="min-h-11 rounded-full" asChild><Link href={`/hl/${user.slug}`}>{t("editProfile")}</Link></Button><Button className="min-h-11 rounded-full" variant="outline" asChild><Link href={`/hl/${user.slug}`}>{t("publicProfile")}</Link></Button></div></section>;
+  return (
+    <section className="rounded-2xl border bg-card p-5 sm:p-6">
+      <div className="mb-5">
+        <h2 className="text-lg font-semibold">{t("title")}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t("privateCv")}</p>
+      </div>
+      <div className="flex items-center justify-between gap-4 border-y py-5">
+        <div className="min-w-0">
+          <p className="font-medium">{t("profileVisibility")}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {t("profileVisibilityHint")}
+          </p>
+        </div>
+        <Switch
+          className="shrink-0"
+          aria-label={t("profileVisibility")}
+          checked={user.isPublic !== false}
+          onCheckedChange={(isPublic) => updateUser({ patch: { isPublic } })}
+        />
+      </div>
+      <div className="mt-5 grid gap-3 sm:grid-cols-2">
+        <Button className="min-h-11 rounded-full" asChild>
+          <Link href={`/hl/${user.slug}`}>{t("editProfile")}</Link>
+        </Button>
+        <Button className="min-h-11 rounded-full" variant="outline" asChild>
+          <Link href={`/hl/${user.slug}`}>{t("publicProfile")}</Link>
+        </Button>
+      </div>
+    </section>
+  );
 }
 
 export function PersonalSpace() {
@@ -240,12 +467,9 @@ export function PersonalSpace() {
   const tabFromUrl = searchParams.get("tab");
   const selected: Tab = isTab(tabFromUrl) ? tabFromUrl : "favorites";
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) router.replace(getAuthHref("/login", "/me"));
-  }, [isAuthenticated, isLoading, router]);
-
-  if (isLoading) return <PersonalSpaceSkeleton />;
-  if (!isAuthenticated) return <div className="mx-auto max-w-5xl p-8 text-muted-foreground">{t("signIn")}</div>;
+  // La redirection non connecté -> /login est gérée côté serveur dans page.tsx.
+  // Ici on attend seulement que le token Convex soit prêt avant de lancer les requêtes.
+  if (isLoading || !isAuthenticated) return <PersonalSpaceSkeleton />;
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
@@ -258,16 +482,18 @@ export function PersonalSpace() {
         </p>
       </header>
 
-      <Tabs defaultValue={selected} key={selected}>
-        <TabsList variant="line" className="grid w-full grid-cols-3 gap-1 rounded-2xl border border-border/60 bg-card p-1 data-[variant=line]:rounded-2xl group-data-[orientation=horizontal]/tabs:!h-auto sm:grid-cols-3 lg:grid-cols-6 lg:gap-2 lg:border-0 lg:bg-transparent lg:p-0">
-          {([
-            ["favorites", Heart],
-            ["publications", FileText],
-            ["communities", UsersRound],
-            ["applications", BriefcaseBusiness],
-            ["notifications", Bell],
-            ["profile", UserRound],
-          ] as const).map(([value, Icon]) => (
+      <Tabs
+        value={selected}
+        onValueChange={(tab) =>
+          router.replace(`/me?tab=${tab}`, { scroll: false })
+        }
+        className={layoutClassName}
+      >
+        <TabsList
+          variant="line"
+          className="grid w-full grid-cols-3 gap-1 rounded-none border-l-2 bg-transparent p-0 pl-2 group-data-[orientation=horizontal]/tabs:h-auto! data-[variant=line]:rounded-none lg:sticky lg:top-24 lg:flex lg:h-auto lg:flex-col lg:gap-4"
+        >
+          {tabs.map(([value, Icon]) => (
             <TabsTrigger
               key={value}
               className={tabTriggerClassName}
@@ -278,12 +504,27 @@ export function PersonalSpace() {
             </TabsTrigger>
           ))}
         </TabsList>
-        <TabsContent value="favorites" className="pt-6"><FavoritesPanel /></TabsContent>
-        <TabsContent value="publications" className="pt-6"><PublicationsPanel /></TabsContent>
-        <TabsContent value="communities" className="pt-6"><CommunitiesPanel /></TabsContent>
-        <TabsContent value="applications" className="pt-6"><ApplicationsPanel /></TabsContent>
-        <TabsContent value="notifications" className="pt-6"><NotificationsPanel /></TabsContent>
-        <TabsContent value="profile" className="pt-6"><ProfilePanel /></TabsContent>
+
+        <div className="mt-6 min-w-0 lg:mt-0">
+          <TabsContent value="favorites">
+            <FavoritesPanel />
+          </TabsContent>
+          <TabsContent value="publications">
+            <PublicationsPanel />
+          </TabsContent>
+          <TabsContent value="communities">
+            <CommunitiesPanel />
+          </TabsContent>
+          <TabsContent value="applications">
+            <ApplicationsPanel />
+          </TabsContent>
+          <TabsContent value="notifications">
+            <NotificationsPanel />
+          </TabsContent>
+          <TabsContent value="profile">
+            <ProfilePanel />
+          </TabsContent>
+        </div>
       </Tabs>
     </div>
   );
