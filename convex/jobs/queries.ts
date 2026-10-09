@@ -18,6 +18,14 @@ function withoutJobLocation<T extends { location?: unknown }>(job: T) {
   return publicJob;
 }
 
+function approximateLocation(location: { lat: number; lng: number } | undefined) {
+  if (!location) return undefined;
+  return {
+    lat: Math.round(location.lat * 100) / 100,
+    lng: Math.round(location.lng * 100) / 100,
+  };
+}
+
 export const getJobWithContact = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
@@ -51,7 +59,39 @@ export const getJobWithContact = query({
       if (existingBookmark) isBookmarked = true;
     }
 
-    return { ...withoutJobLocation(job), isBookmarked };
+    return {
+      ...withoutJobLocation(job),
+      // A detail view can render a map, but it must never receive the
+      // author-selected precision stored in the database.
+      ...(job.workMode !== "remote" && job.location
+        ? { location: approximateLocation(job.location) }
+        : {}),
+      isBookmarked,
+    };
+  },
+});
+
+export const getJobLocationForEdit = query({
+  args: { id: v.id("JobOffer") },
+  returns: v.union(
+    v.object({
+      location: v.union(
+        v.object({ lat: v.number(), lng: v.number() }),
+        v.null(),
+      ),
+    }),
+    v.null(),
+  ),
+  handler: async (ctx, { id }) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) return null;
+
+    const job = await ctx.db.get(id);
+    if (!job || job.authorId !== user._id) {
+      return null;
+    }
+
+    return { location: job.location ?? null };
   },
 });
 

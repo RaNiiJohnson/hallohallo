@@ -54,7 +54,7 @@ describe("Jobs", () => {
       title: "Job Title",
       description: "Job Description",
       company: "Job Company",
-      location: { lat: 0, lng: 0 },
+      location: { lat: 52.5294, lng: 13.4073 },
       salary: 0,
       salaryPeriod: "hour",
       type: "job",
@@ -86,9 +86,35 @@ describe("Jobs", () => {
     });
     expect(result?.title).toBe("Job Title");
     expect(result).not.toHaveProperty("contact");
+    expect(result?.location).toEqual({ lat: 52.53, lng: 13.41 });
     await expect(
       t.query(api.jobs.queries.getJobContactForEdit, { id: jobId }),
     ).resolves.toEqual({ email: "employer@example.com" });
+    await expect(
+      t.query(api.jobs.queries.getJobLocationForEdit, { id: jobId }),
+    ).resolves.toEqual({ location: { lat: 52.5294, lng: 13.4073 } });
+
+    const metadata = await t.query(api.jobs.queries.getJobMetadata, {
+      slug: jobSlug,
+    });
+    expect(metadata).not.toHaveProperty("location");
+    const listed = await t.query(api.jobs.queries.getJobs, {
+      paginationOpts: { cursor: null, numItems: 10 },
+    });
+    expect(listed.page[0]).not.toHaveProperty("location");
+
+    authState.user._id = "anotherUserId";
+    authState.user.id = "anotherUserId";
+    await expect(
+      t.query(api.jobs.queries.getJobLocationForEdit, { id: jobId }),
+    ).resolves.toBeNull();
+
+    authState.user._id = "adminUserId";
+    authState.user.id = "adminUserId";
+    authState.user.role = "admin";
+    await expect(
+      t.query(api.jobs.queries.getJobLocationForEdit, { id: jobId }),
+    ).resolves.toBeNull();
   });
 
   it("rejects a contract that is incompatible with the job type", async () => {
@@ -107,18 +133,21 @@ describe("Jobs", () => {
   });
 
   it("allows a remote job without a city", async () => {
-    await expect(
-      t.mutation(api.jobs.mutations.createJob, {
+    const remoteJobId = await t.mutation(api.jobs.mutations.createJob, {
         title: "Remote Job",
         description: "A remote job without a city.",
         company: "Job Company",
+        location: { lat: 48.8566, lng: 2.3522 },
         type: "job",
         contractType: "CDI",
         workMode: "remote",
         city: "",
         contactEmail: "employer@example.com",
-      }),
-    ).resolves.toBeTruthy();
+      });
+
+    await t.run(async (ctx) => {
+      expect((await ctx.db.get(remoteJobId))?.location).toBeUndefined();
+    });
   });
 
   it("enforces required and conditional fields on the server", async () => {
@@ -200,6 +229,62 @@ describe("Jobs", () => {
       slug: jobSlug,
     });
     expect(result?.title).toBe("Updated Job Title");
+  });
+
+  it("clears a saved map when a job becomes remote", async () => {
+    await t.mutation(api.jobs.mutations.updateJob, {
+      id: jobId,
+      title: "Remote Job Title",
+      description: "Job Description",
+      company: "Job Company",
+      location: { lat: 48.8566, lng: 2.3522 },
+      salary: 0,
+      salaryPeriod: "hour",
+      type: "job",
+      contractType: "fullTime",
+      workMode: "remote",
+      city: "",
+      duration: "Duration",
+      startDate: "2022-01-01",
+      certificates: [],
+      contactEmail: "employer@example.com",
+    });
+
+    await t.run(async (ctx) => {
+      expect((await ctx.db.get(jobId))?.location).toBeUndefined();
+    });
+    const result = await t.query(api.jobs.queries.getJobWithContact, {
+      slug: jobSlug,
+    });
+    expect(result).not.toHaveProperty("location");
+  });
+
+  it("clears a saved map when its author turns the map off", async () => {
+    await t.mutation(api.jobs.mutations.updateJob, {
+      id: jobId,
+      title: "Map disabled",
+      description: "Job Description",
+      company: "Job Company",
+      location: null,
+      salary: 0,
+      salaryPeriod: "hour",
+      type: "job",
+      contractType: "fullTime",
+      workMode: "onSite",
+      city: "City",
+      duration: "Duration",
+      startDate: "2022-01-01",
+      certificates: [],
+      contactEmail: "employer@example.com",
+    });
+
+    await expect(
+      t.query(api.jobs.queries.getJobLocationForEdit, { id: jobId }),
+    ).resolves.toEqual({ location: null });
+    const result = await t.query(api.jobs.queries.getJobWithContact, {
+      slug: jobSlug,
+    });
+    expect(result).not.toHaveProperty("location");
   });
 
   it("should delete a job", async () => {

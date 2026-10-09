@@ -120,6 +120,11 @@ describe("Listings", () => {
     expect(result?.contactAccessRequired).toBe(true);
     expect(result?.contactVerificationRequired).toBe(true);
     expect(result?.location).toEqual({ lat: 52.52, lng: 13.41 });
+    await expect(
+      t.query(api.listings.queries.getListingLocationForEdit, {
+        id: contactListingId,
+      }),
+    ).resolves.toEqual({ location: { lat: 52.52, lng: 13.405 } });
 
     vi.mocked(authComponent.safeGetAuthUser).mockResolvedValue(null as never);
     const anonymousResult = await t.query(
@@ -130,6 +135,21 @@ describe("Listings", () => {
     expect(anonymousResult?.location).toEqual({ lat: 52.52, lng: 13.41 });
     expect(anonymousResult?.contactAccessRequired).toBe(true);
     expect(anonymousResult?.contactVerificationRequired).toBe(false);
+    await expect(
+      t.query(api.listings.queries.getListingLocationForEdit, {
+        id: contactListingId,
+      }),
+    ).resolves.toBeNull();
+
+    vi.mocked(authComponent.safeGetAuthUser).mockResolvedValue({
+      _id: "adminUserId",
+      role: "admin",
+    } as never);
+    await expect(
+      t.query(api.listings.queries.getListingLocationForEdit, {
+        id: contactListingId,
+      }),
+    ).resolves.toBeNull();
 
     const cityResults = await t.query(
       api.listings.queries.listListingsByCity,
@@ -244,6 +264,64 @@ describe("Listings", () => {
     ).rejects.toThrow("Public listing text must not include contact details");
   });
 
+  it("enforces a non-blank city on the server", async () => {
+    await expect(
+      t.mutation(api.listings.mutations.createListing, {
+        title: "No city listing",
+        propertyType: "studio",
+        listingMode: "rent",
+        city: " ",
+        price: 900,
+        availableFrom: 1_800_000_000_000,
+        area: 30,
+        bedrooms: 1,
+        bathrooms: 1,
+        floor: 2,
+        pets: false,
+        images: [],
+        description: "A listing without a city.",
+        extras: [],
+        contact: { email: "owner@example.com" },
+      }),
+    ).rejects.toThrow("City is required");
+
+    await expect(
+      t.mutation(api.listings.mutations.updateListing, {
+        listingId,
+        patch: { city: " " },
+      }),
+    ).rejects.toThrow("City is required");
+  });
+
+  it("redacts sensitive text in legacy listings returned publicly", async () => {
+    await t.run(async (ctx) => {
+      await ctx.db.patch(listingId, {
+        title: "Hauptstraße 42 apartment",
+        neighborhood: "Rue Victor Hugo 4",
+        description: "Contact owner@example.com or +49 151 23456789 at 52.5200, 13.4050.",
+        extras: ["Meet at Hauptstr. 12"],
+        searchAll: "owner@example.com +49 151 23456789 52.5200, 13.4050",
+      });
+    });
+
+    const publicListing = await t.query(
+      api.listings.queries.getListingWithContact,
+      { slug: listingSlug },
+    );
+    const publicText = JSON.stringify(publicListing);
+    expect(publicText).not.toContain("owner@example.com");
+    expect(publicText).not.toContain("+49 151 23456789");
+    expect(publicText).not.toContain("52.5200, 13.4050");
+    expect(publicText).not.toContain("Hauptstraße 42");
+    expect(publicListing).not.toHaveProperty("searchAll");
+
+    const results = await t.query(api.listings.queries.getListing, {
+      paginationOpts: { cursor: null, numItems: 10 },
+    });
+    expect(JSON.stringify(results.page)).not.toContain("owner@example.com");
+    expect(JSON.stringify(results.page)).not.toContain("Hauptstraße 42");
+  });
+
   it("upserts contact details and prevents removing the last contact method", async () => {
     await t.mutation(api.listings.mutations.updateListing, {
       listingId,
@@ -287,6 +365,12 @@ describe("Listings", () => {
     expect(listing?.deposit).toBeUndefined();
     expect(listing?.availableFrom).toBeUndefined();
     expect(listing?.searchAll).toContain("Updated Listing");
+
+    const publicListing = await t.query(
+      api.listings.queries.getListingWithContact,
+      { slug: listing!.slug },
+    );
+    expect(publicListing).not.toHaveProperty("location");
   });
 
   it("keeps rental deposits out of listings for sale", async () => {

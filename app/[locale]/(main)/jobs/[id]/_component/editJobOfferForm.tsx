@@ -30,6 +30,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -38,6 +39,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { JobOfferDetails } from "@/lib/convexTypes";
+import { LocationPicker } from "@/lib/LocationPicker";
 import { api } from "@convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 import { ChevronLeft, ChevronRight, XIcon } from "lucide-react";
@@ -69,11 +71,18 @@ export function EditJobOfferForm({
   const contact = useQuery(api.jobs.queries.getJobContactForEdit, {
     id: jobOffer._id,
   });
+  const privateLocation = useQuery(api.jobs.queries.getJobLocationForEdit, {
+    id: jobOffer._id,
+  });
   const [currentStep, setCurrentStep] = useState(1);
 
   const formSchema = z.object({
     title: z.string().min(1, t("form.validation.titleReq")),
     type: z.enum(jobTypeValues),
+    location: z
+      .object({ lat: z.number(), lng: z.number() })
+      .optional(),
+    showMap: z.boolean(),
     contractType: z.enum(contractTypeValues),
     city: z.string(),
     workMode: z.enum(workModeValues),
@@ -114,6 +123,8 @@ export function EditJobOfferForm({
     defaultValues: {
       title: jobOffer?.title,
       type: jobOffer?.type as (typeof jobTypeValues)[number],
+      location: undefined,
+      showMap: false,
       contractType:
         jobOffer?.contractType as (typeof contractTypeValues)[number],
       city: jobOffer?.city,
@@ -146,6 +157,7 @@ export function EditJobOfferForm({
   const selectedJobType = useWatch({ control: form.control, name: "type" });
   const selectedContractType = useWatch({ control: form.control, name: "contractType" });
   const selectedWorkMode = useWatch({ control: form.control, name: "workMode" });
+  const showMap = useWatch({ control: form.control, name: "showMap" });
   const availableContractTypes = contractTypesForJobType(selectedJobType);
   const contractIsFixed = availableContractTypes.length === 1;
   const showDurationAndStart = requiresDurationOrStartDate(selectedJobType, selectedContractType);
@@ -154,6 +166,20 @@ export function EditJobOfferForm({
   useEffect(() => {
     if (contact) form.setValue("contactEmail", contact.email);
   }, [contact, form]);
+
+  useEffect(() => {
+    if (!privateLocation) return;
+    const location = privateLocation.location ?? undefined;
+    form.setValue("location", location);
+    form.setValue("showMap", Boolean(location));
+  }, [form, privateLocation]);
+
+  useEffect(() => {
+    if (selectedWorkMode === "remote") {
+      form.setValue("showMap", false);
+      form.setValue("location", undefined, { shouldDirty: true });
+    }
+  }, [form, selectedWorkMode]);
 
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
@@ -204,6 +230,10 @@ export function EditJobOfferForm({
           id: jobOffer._id,
           title: data.title,
           type: data.type,
+          location:
+            data.workMode === "remote" || !showMap
+              ? null
+              : data.location,
           contractType: data.contractType,
           city: data.city,
           workMode: data.workMode,
@@ -451,6 +481,45 @@ export function EditJobOfferForm({
                 <Field>
                   <FieldLabel htmlFor="job-remote-location">{t("form.labels.remoteLocation")}</FieldLabel>
                   <Input {...field} id="job-remote-location" placeholder={t("form.placeholders.remoteLocation")} autoComplete="off" />
+                </Field>
+              )}
+            />
+          )}
+
+          {selectedWorkMode !== "remote" && (
+            <Field orientation="horizontal">
+              <FieldContent>
+                <FieldLabel htmlFor="job-show-map">
+                  {t("form.labels.showMap")}
+                </FieldLabel>
+                <FieldDescription>{t("form.labels.mapDesc")}</FieldDescription>
+              </FieldContent>
+              <Switch
+                id="job-show-map"
+                checked={showMap}
+                onCheckedChange={(checked) => {
+                  form.setValue("showMap", checked, { shouldDirty: true });
+                  if (!checked) {
+                    form.setValue("location", undefined, { shouldDirty: true });
+                  }
+                }}
+              />
+            </Field>
+          )}
+
+          {selectedWorkMode !== "remote" && showMap && (
+            <Controller
+              name="location"
+              control={form.control}
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel>{t("form.labels.mapPosition")}</FieldLabel>
+                  <LocationPicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    onCityChange={(city) => form.setValue("city", city)}
+                    privacyMode
+                  />
                 </Field>
               )}
             />

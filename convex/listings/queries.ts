@@ -11,6 +11,7 @@ import { authComponent } from "../auth/auth";
 import { query } from "../functions";
 import { r2 } from "../integrations/r2";
 import { resolveListingImages } from "./imageUrls";
+import { redactSensitivePublicListingText } from "./privacy";
 
 // Resolve R2 storageId keys to signed URLs.
 // Falls back to the old Cloudinary secureUrl for existing records.
@@ -30,10 +31,38 @@ async function resolveImages(
  * public listing response so adding a new list or metadata query cannot expose
  * them by accident.
  */
-function withoutPreciseLocation<T extends { location?: unknown }>(listing: T) {
-  const { location, ...publicListing } = listing;
+function withoutSensitivePublicFields<
+  T extends {
+    location?: unknown;
+    searchAll?: unknown;
+    title: string;
+    city: string;
+    neighborhood?: string;
+    description: string;
+    extras?: string[];
+  },
+>(listing: T) {
+  const { location, searchAll, ...publicListing } = listing;
   void location;
-  return publicListing;
+  void searchAll;
+  return {
+    ...publicListing,
+    title: redactSensitivePublicListingText(publicListing.title),
+    city: redactSensitivePublicListingText(publicListing.city),
+    ...(publicListing.neighborhood !== undefined
+      ? {
+          neighborhood: redactSensitivePublicListingText(
+            publicListing.neighborhood,
+          ),
+        }
+      : {}),
+    description: redactSensitivePublicListingText(publicListing.description),
+    ...(publicListing.extras !== undefined
+      ? {
+          extras: publicListing.extras.map(redactSensitivePublicListingText),
+        }
+      : {}),
+  };
 }
 
 function approximateLocation(location: { lat: number; lng: number } | undefined) {
@@ -99,16 +128,40 @@ export const getListingWithContact = query({
     const canSeeContact = user?.emailVerified === true;
 
     return {
-      ...withoutPreciseLocation(listing),
+      ...withoutSensitivePublicFields(listing),
       images,
       isBookmarked,
       // The detail page can show an optional map for everyone, but only with a
       // deliberately rounded position. Contact information remains verified-only.
-      location: approximateLocation(listing.location),
+      ...(listing.location
+        ? { location: approximateLocation(listing.location) }
+        : {}),
       contact: canSeeContact && contact ? { email: contact.email, phone: contact.phone } : null,
       contactAccessRequired: !canSeeContact && Boolean(contact?.email || contact?.phone),
       contactVerificationRequired: Boolean(user && !user.emailVerified && (contact?.email || contact?.phone)),
     };
+  },
+});
+
+export const getListingLocationForEdit = query({
+  args: { id: v.id("RealestateListing") },
+  returns: v.union(
+    v.object({
+      location: v.union(
+        v.object({ lat: v.number(), lng: v.number() }),
+        v.null(),
+      ),
+    }),
+    v.null(),
+  ),
+  handler: async (ctx, { id }) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) return null;
+
+    const listing = await ctx.db.get(id);
+    if (!listing || listing.authorId !== user._id) return null;
+
+    return { location: listing.location ?? null };
   },
 });
 
@@ -126,7 +179,7 @@ export const getListingMetadata = query({
       return null;
     }
     return {
-      ...withoutPreciseLocation(listing),
+      ...withoutSensitivePublicFields(listing),
       images: await resolveImages(listing.images ?? []),
     };
   },
@@ -178,7 +231,7 @@ export const getListing = query({
           );
           if (!listing) return null;
           return {
-            ...withoutPreciseLocation(listing),
+            ...withoutSensitivePublicFields(listing),
             isBookmarked: true,
           } as Omit<typeof listing, "location"> & {
             isBookmarked: boolean;
@@ -256,7 +309,7 @@ export const getListing = query({
         }
         const images = await resolveImages(listing.images ?? []);
         return {
-          ...withoutPreciseLocation(listing),
+          ...withoutSensitivePublicFields(listing),
           images,
           isBookmarked,
         };
@@ -280,7 +333,7 @@ export const listListingsByCity = query({
     return Promise.all(
       listings.map(async (listing) => {
         const images = await resolveImages(listing.images ?? []);
-        return { ...withoutPreciseLocation(listing), images };
+        return { ...withoutSensitivePublicFields(listing), images };
       }),
     );
   },
@@ -316,7 +369,7 @@ export const getSimilarRealEstateListings = query({
       return Promise.all(
         byCity.map(async (listing) => {
           const images = await resolveImages(listing.images ?? []);
-          return { ...withoutPreciseLocation(listing), images };
+          return { ...withoutSensitivePublicFields(listing), images };
         }),
       );
     }
@@ -342,7 +395,7 @@ export const getSimilarRealEstateListings = query({
     return Promise.all(
       combined.map(async (listing) => {
         const images = await resolveImages(listing.images ?? []);
-        return { ...withoutPreciseLocation(listing), images };
+        return { ...withoutSensitivePublicFields(listing), images };
       }),
     );
   },

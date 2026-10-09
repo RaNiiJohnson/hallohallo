@@ -3,12 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import * as z from "zod";
 
 import {
   Field,
+  FieldContent,
   FieldDescription,
   FieldError,
   FieldGroup,
@@ -34,6 +35,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -42,7 +44,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import {
   AlertCircleIcon,
   CalendarIcon,
@@ -107,6 +109,10 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
   const createListing = useMutation(api.listings.mutations.createListing);
   const updateListing = useMutation(api.listings.mutations.updateListing);
   const isEditing = listing !== undefined;
+  const privateLocation = useQuery(
+    api.listings.queries.getListingLocationForEdit,
+    listing ? { id: listing._id } : "skip",
+  );
 
   const formSchema = z
     .object({
@@ -119,6 +125,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
         lng: z.number(),
       })
       .optional(),
+    showMap: z.boolean(),
     city: z.string().min(1, t("form.validation.cityReq")),
     neighborhood: z.string().trim().max(80).optional(),
     price: z.string().min(1, t("form.validation.priceReq")),
@@ -226,7 +233,8 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
       title: listing?.title ?? "",
       propertyType: listing?.propertyType ?? "apartment",
       listingMode: listing?.listingMode ?? "rent",
-      location: listing?.location,
+      location: undefined,
+      showMap: false,
       city: listing?.city ?? "",
       neighborhood: listing?.neighborhood ?? "",
       price: listing ? String(listing.price) : "",
@@ -249,8 +257,16 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
   });
 
   const listingMode = useWatch({ control: form.control, name: "listingMode" });
+  const showMap = useWatch({ control: form.control, name: "showMap" });
   const extras = useWatch({ control: form.control, name: "extras" }) ?? [];
   const preview = useWatch({ control: form.control });
+
+  useEffect(() => {
+    if (!privateLocation) return;
+    const location = privateLocation.location ?? undefined;
+    form.setValue("location", location);
+    form.setValue("showMap", Boolean(location));
+  }, [form, privateLocation]);
 
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
@@ -385,7 +401,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
           contact,
           patch: {
             ...values,
-            location: data.location ?? null,
+            location: showMap ? data.location ?? null : null,
             charges: isRental && data.charges ? Number(data.charges) : null,
             deposit: isRental && data.deposit ? Number(data.deposit) : null,
             availableFrom: data.availableFrom
@@ -397,7 +413,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
         await createListing({
           ...values,
           contact,
-          location: data.location,
+          location: showMap ? data.location : undefined,
           charges: isRental && data.charges ? Number(data.charges) : undefined,
           deposit: isRental && data.deposit ? Number(data.deposit) : undefined,
           availableFrom: data.availableFrom
@@ -583,22 +599,41 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
               </Field>
             )}
           />
-          <Controller
-            name="location"
-            control={form.control}
-            render={({ field }) => (
-              <Field>
-                <FieldLabel>{t("form.labels.mapPosition")}</FieldLabel>
-                <FieldDescription>{t("form.labels.mapDesc")}</FieldDescription>
-                <LocationPicker
-                  value={field.value}
-                  onChange={field.onChange}
-                  onCityChange={(city) => form.setValue("city", city)}
-                  privacyMode
-                />
-              </Field>
-            )}
-          />
+          <Field orientation="horizontal">
+            <FieldContent>
+              <FieldLabel htmlFor="listing-show-map">
+                {t("form.labels.showMap")}
+              </FieldLabel>
+              <FieldDescription>{t("form.labels.mapDesc")}</FieldDescription>
+            </FieldContent>
+            <Switch
+              id="listing-show-map"
+              checked={showMap}
+              onCheckedChange={(checked) => {
+                form.setValue("showMap", checked, { shouldDirty: true });
+                if (!checked) {
+                  form.setValue("location", undefined, { shouldDirty: true });
+                }
+              }}
+            />
+          </Field>
+          {showMap && (
+            <Controller
+              name="location"
+              control={form.control}
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel>{t("form.labels.mapPosition")}</FieldLabel>
+                  <LocationPicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    onCityChange={(city) => form.setValue("city", city)}
+                    privacyMode
+                  />
+                </Field>
+              )}
+            />
+          )}
         </FieldGroup>
 
         {/* ─── Step 2: Informations sur le bien ─── */}

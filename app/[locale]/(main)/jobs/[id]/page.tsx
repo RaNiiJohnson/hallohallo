@@ -12,6 +12,7 @@ import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { Link } from "@/i18n/navigation";
 import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
 import { formatDateLong, getRelativeTime } from "@/lib/date";
+import { LocationMap } from "@/lib/LocationMap";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
 import { useAction, useConvexAuth } from "convex/react";
@@ -386,6 +387,14 @@ export default function JobDetailsPage() {
                 />
               </div>
             </div>
+
+            {jobOffer.location && jobOffer.workMode !== "remote" && (
+              <LocationMap
+                location={jobOffer.location}
+                city={city}
+                approximate
+              />
+            )}
 
             {/* Certificates */}
             {jobOffer.certificates && jobOffer.certificates.length > 0 && (

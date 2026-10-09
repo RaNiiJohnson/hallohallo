@@ -91,23 +91,24 @@ export function LocationMap({ location, city, listing, approximate }: LocationMa
         </Map>
       </div>
 
-      {/* Coordinates & Actions */}
-      <div className="p-4 bg-muted/30 border-t">
-        <div className="flex items-center justify-between gap-4">
-          <p className="text-xs text-muted-foreground">
-            {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
-          </p>
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2"
-            onClick={openInGoogleMaps}
-          >
-            <ExternalLink className="w-3 h-3" />
-            Google Maps
-          </Button>
+      {!approximate && (
+        <div className="p-4 bg-muted/30 border-t">
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-xs text-muted-foreground">
+              {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={openInGoogleMaps}
+            >
+              <ExternalLink className="w-3 h-3" />
+              Google Maps
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

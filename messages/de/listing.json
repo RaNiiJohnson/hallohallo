@@ -104,6 +104,7 @@
       "listingMode": "Angebotsart *",
       "city": "Stadt / Ort *",
       "neighborhood": "Ungefähres Viertel oder Postleitzahl (optional)",
+      "showMap": "Ungefähren Standort auf der Karte anzeigen",
       "mapPosition": "Kartenbereich (optional)",
       "mapDesc": "Wähle einen für die Suche nützlichen Bereich; die öffentliche Karte bleibt bewusst ungenau.",
       "priceRent": "Monatsmiete *",

@@ -11,6 +11,7 @@ import {
   throwNotFound,
   throwValidationError,
 } from "../utils/errors";
+import { containsSensitivePublicListingText } from "./privacy";
 
 const imageValidator = v.object({
   storageId: v.optional(v.string()),
@@ -90,11 +91,6 @@ function normalizeContact(contact: ListingContactInput | undefined) {
   return { phone, email };
 }
 
-const emailPattern = /[^\s@]+@[^\s@]+\.[^\s@]+/i;
-const phonePattern = /\+?\d(?:[\s().-]*\d){5,}/;
-const coordinatePattern = /[-+]?\d{1,2}\.\d{3,}\s*,\s*[-+]?\d{1,3}\.\d{3,}/;
-const addressPattern = /\b(?:\d{1,4}[a-z]?\s+(?:[a-zà-ÿ'-]+\s+){0,4}(?:straße|strasse|str\.?|street|rue|avenue|avenida|weg|allee|platz)|[a-zà-ÿ'-]*?(?:straße|strasse|str\.?|street|rue|avenue|avenida|weg|allee|platz)\s+\d{1,4}[a-z]?)\b/i;
-
 function assertPublicTextIsSafe(values: {
   title: string;
   city: string;
@@ -102,25 +98,22 @@ function assertPublicTextIsSafe(values: {
   description: string;
   extras?: string[];
 }) {
-  const text = [
+  if (containsSensitivePublicListingText([
     values.title,
     values.city,
     values.neighborhood,
     values.description,
     ...(values.extras ?? []),
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  if (
-    emailPattern.test(text) ||
-    phonePattern.test(text) ||
-    coordinatePattern.test(text) ||
-    addressPattern.test(text)
-  ) {
+  ])) {
     throwValidationError(
       "Public listing text must not include contact details, GPS coordinates, or an exact address",
     );
+  }
+}
+
+function assertListingCity(city: string) {
+  if (!city.trim()) {
+    throwValidationError("City is required");
   }
 }
 
@@ -176,6 +169,7 @@ export const createListing = authMutation({
     if (!normalizedContact.email && !normalizedContact.phone) {
       throwValidationError("An email address or WhatsApp phone number is required");
     }
+    assertListingCity(args.city);
     assertPublicTextIsSafe(listingArgs);
 
     if (user.userType !== "provider" && user.role !== "admin") {
@@ -377,6 +371,7 @@ export const updateListing = authMutation({
     }
 
     const updatedListing = { ...listing, ...normalizedPatch };
+    assertListingCity(updatedListing.city);
     assertPublicTextIsSafe(updatedListing);
     const searchAllContent = `${updatedListing.title} ${updatedListing.propertyType} ${updatedListing.city} ${updatedListing.listingMode} ${updatedListing.description}`;
 
