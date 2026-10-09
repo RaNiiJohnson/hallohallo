@@ -20,7 +20,7 @@ export default function NotFound() {
           </div>
 
           <div className="space-y-3">
-            <Link href="listing" className="block">
+            <Link href="/listing" className="block">
               <Button className="w-full">
                 <Home className="h-4 w-4 mr-2" />
                 Retour aux annonces

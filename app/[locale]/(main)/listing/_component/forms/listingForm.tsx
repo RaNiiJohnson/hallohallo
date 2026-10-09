@@ -3,12 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import * as z from "zod";
 
 import {
   Field,
+  FieldContent,
   FieldDescription,
   FieldError,
   FieldGroup,
@@ -34,6 +35,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -42,7 +44,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import {
   AlertCircleIcon,
   CalendarIcon,
@@ -58,8 +60,8 @@ import { toast } from "sonner";
 import { MarkdownHint } from "@/components/markdown-hint";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import { useTypedR2Upload } from "@/hooks/use-r2-typed-upload";
-import { LocationPicker } from "@/lib/LocationPicker";
 import type { ListingListDetails } from "@/lib/convexTypes";
+import { LocationPicker } from "@/lib/LocationPicker";
 import { api } from "@convex/_generated/api";
 import imageCompression from "browser-image-compression";
 
@@ -107,8 +109,13 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
   const createListing = useMutation(api.listings.mutations.createListing);
   const updateListing = useMutation(api.listings.mutations.updateListing);
   const isEditing = listing !== undefined;
+  const privateLocation = useQuery(
+    api.listings.queries.getListingLocationForEdit,
+    listing ? { id: listing._id } : "skip",
+  );
 
-  const formSchema = z.object({
+  const formSchema = z
+    .object({
     title: z.string().min(1, t("form.validation.titleReq")),
     propertyType: z.enum(listingTypeValues),
     listingMode: z.enum(listingModeValues),
@@ -118,7 +125,9 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
         lng: z.number(),
       })
       .optional(),
+    showMap: z.boolean(),
     city: z.string().min(1, t("form.validation.cityReq")),
+    neighborhood: z.string().trim().max(80).optional(),
     price: z.string().min(1, t("form.validation.priceReq")),
     charges: z.string().optional(),
     deposit: z.string().optional(),
@@ -137,7 +146,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
     ),
     description: z.string().min(10, t("form.validation.descMin")),
     extras: z.array(z.string()).optional(),
-    availableFrom: z.string().optional(),
+    availableFrom: z.string().min(1, t("form.validation.availableFromReq")),
     contactEmail: z
       .string()
       .trim()
@@ -148,7 +157,21 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
       .trim()
       .regex(/^\+?[0-9 ()-]{6,30}$/, t("form.validation.phoneInvalid"))
       .or(z.literal("")),
-  });
+    })
+    .superRefine((values, ctx) => {
+      if (!values.contactEmail && !values.contactPhone) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t("form.validation.contactReq"),
+          path: ["contactEmail"],
+        });
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t("form.validation.contactReq"),
+          path: ["contactPhone"],
+        });
+      }
+    });
 
   const [currentStep, setCurrentStep] = useState(1);
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -210,8 +233,10 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
       title: listing?.title ?? "",
       propertyType: listing?.propertyType ?? "apartment",
       listingMode: listing?.listingMode ?? "rent",
-      location: listing?.location,
+      location: undefined,
+      showMap: false,
       city: listing?.city ?? "",
+      neighborhood: listing?.neighborhood ?? "",
       price: listing ? String(listing.price) : "",
       charges: listing?.charges !== undefined ? String(listing.charges) : "",
       deposit: listing?.deposit !== undefined ? String(listing.deposit) : "",
@@ -231,14 +256,25 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
     },
   });
 
-  const totalSteps = 5;
+  const listingMode = useWatch({ control: form.control, name: "listingMode" });
+  const showMap = useWatch({ control: form.control, name: "showMap" });
+  const extras = useWatch({ control: form.control, name: "extras" }) ?? [];
+  const preview = useWatch({ control: form.control });
+
+  useEffect(() => {
+    if (!privateLocation) return;
+    const location = privateLocation.location ?? undefined;
+    form.setValue("location", location);
+    form.setValue("showMap", Boolean(location));
+  }, [form, privateLocation]);
+
+  const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
 
   const stepTitles = [
-    t("form.steps.type"),
-    t("form.steps.location"),
+    t("form.steps.typeAndLocation"),
     t("form.steps.mainInfo"),
-    t("form.steps.conditionsOptional"),
+    t("form.steps.priceAndAvailability"),
     t("form.steps.media"),
   ];
 
@@ -247,18 +283,20 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
 
     switch (currentStep) {
       case 1:
-        fieldsToValidate = ["title", "propertyType", "listingMode"];
+        fieldsToValidate = ["title", "propertyType", "listingMode", "city"];
         break;
       case 2:
-        fieldsToValidate = ["city"];
+        fieldsToValidate = ["area", "bedrooms", "bathrooms", "floor"];
         break;
       case 3:
-        fieldsToValidate = ["price", "area", "bedrooms", "bathrooms", "floor"];
+        fieldsToValidate = [
+          "price",
+          "availableFrom",
+          "contactEmail",
+          "contactPhone",
+        ];
         break;
       case 4:
-        // deposit, charges, pets, availableFrom are all optional — no strict validation needed
-        break;
-      case 5:
         fieldsToValidate = ["description", "images"];
         break;
     }
@@ -341,6 +379,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
         propertyType: data.propertyType,
         listingMode: data.listingMode,
         city: data.city,
+        neighborhood: data.neighborhood || undefined,
         price: Number(data.price),
         area: Number(data.area),
         bedrooms: Number(data.bedrooms),
@@ -362,7 +401,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
           contact,
           patch: {
             ...values,
-            location: data.location ?? null,
+            location: showMap ? data.location ?? null : null,
             charges: isRental && data.charges ? Number(data.charges) : null,
             deposit: isRental && data.deposit ? Number(data.deposit) : null,
             availableFrom: data.availableFrom
@@ -374,7 +413,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
         await createListing({
           ...values,
           contact,
-          location: data.location,
+          location: showMap ? data.location : undefined,
           charges: isRental && data.charges ? Number(data.charges) : undefined,
           deposit: isRental && data.deposit ? Number(data.deposit) : undefined,
           availableFrom: data.availableFrom
@@ -396,9 +435,6 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
       );
     }
   }
-
-  const listingMode = useWatch({ control: form.control, name: "listingMode" });
-  const extras = useWatch({ control: form.control, name: "extras" }) ?? [];
 
   return (
     <div className="space-y-6">
@@ -498,7 +534,16 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
                 <FieldLabel htmlFor="listingMode">
                   {t("form.labels.listingMode")}
                 </FieldLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    const nextMode = value as (typeof listingModeValues)[number];
+                    field.onChange(nextMode);
+                    if (nextMode === "sale") {
+                      form.setValue("deposit", "", { shouldDirty: true });
+                    }
+                  }}
+                >
                   <SelectTrigger
                     id="listingMode"
                     aria-invalid={fieldState.invalid}
@@ -525,12 +570,6 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
               </Field>
             )}
           />
-        </FieldGroup>
-
-        {/* ─── Step 2: Localisation ─── */}
-        <FieldGroup
-          className={`space-y-4 ${currentStep !== 2 ? "hidden" : ""}`}
-        >
           <Controller
             name="city"
             control={form.control}
@@ -550,61 +589,57 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
               </Field>
             )}
           />
-
-          {/* Location Map Picker */}
           <Controller
-            name="location"
+            name="neighborhood"
             control={form.control}
             render={({ field }) => (
               <Field>
-                <FieldLabel>{t("form.labels.mapPosition")}</FieldLabel>
-                <FieldDescription>{t("form.labels.mapDesc")}</FieldDescription>
-                <LocationPicker
-                  value={field.value}
-                  onChange={field.onChange}
-                  onCityChange={(city) => form.setValue("city", city)}
-                />
+                <FieldLabel htmlFor="neighborhood">{t("form.labels.neighborhood")}</FieldLabel>
+                <Input {...field} id="neighborhood" placeholder={t("form.placeholders.neighborhood")} autoComplete="off" />
               </Field>
             )}
           />
+          <Field orientation="horizontal">
+            <FieldContent>
+              <FieldLabel htmlFor="listing-show-map">
+                {t("form.labels.showMap")}
+              </FieldLabel>
+              <FieldDescription>{t("form.labels.mapDesc")}</FieldDescription>
+            </FieldContent>
+            <Switch
+              id="listing-show-map"
+              checked={showMap}
+              onCheckedChange={(checked) => {
+                form.setValue("showMap", checked, { shouldDirty: true });
+                if (!checked) {
+                  form.setValue("location", undefined, { shouldDirty: true });
+                }
+              }}
+            />
+          </Field>
+          {showMap && (
+            <Controller
+              name="location"
+              control={form.control}
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel>{t("form.labels.mapPosition")}</FieldLabel>
+                  <LocationPicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    onCityChange={(city) => form.setValue("city", city)}
+                    privacyMode
+                  />
+                </Field>
+              )}
+            />
+          )}
         </FieldGroup>
 
-        {/* ─── Step 3: Informations principales ─── */}
+        {/* ─── Step 2: Informations sur le bien ─── */}
         <FieldGroup
-          className={`space-y-4 ${currentStep !== 3 ? "hidden" : ""}`}
+          className={`space-y-4 ${currentStep !== 2 ? "hidden" : ""}`}
         >
-          <Controller
-            name="price"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="price">
-                  {listingMode === "sale"
-                    ? t("form.labels.priceSale")
-                    : t("form.labels.priceRent")}
-                </FieldLabel>
-                <InputGroup>
-                  <InputGroupInput
-                    {...field}
-                    id="price"
-                    type="number"
-                    inputMode="decimal"
-                    min="0"
-                    step="0.01"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="off"
-                  />
-                  <InputGroupAddon align="inline-end" variant="boxed">
-                    <InputGroupText>€</InputGroupText>
-                  </InputGroupAddon>
-                </InputGroup>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-
           <Controller
             name="area"
             control={form.control}
@@ -711,8 +746,37 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
           </div>
         </FieldGroup>
 
-        {/* ─── Step 4: Conditions ─── */}
-        <FieldSet className={`space-y-4 ${currentStep !== 4 ? "hidden" : ""}`}>
+        {/* ─── Step 3: Prix, disponibilité et contact ─── */}
+        <FieldSet className={`space-y-4 ${currentStep !== 3 ? "hidden" : ""}`}>
+          <Controller
+            name="price"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="price">
+                  {listingMode === "sale"
+                    ? t("form.labels.priceSale")
+                    : t("form.labels.priceRent")}
+                </FieldLabel>
+                <InputGroup>
+                  <InputGroupInput
+                    {...field}
+                    id="price"
+                    type="number"
+                    inputMode="decimal"
+                    min="0"
+                    step="0.01"
+                    aria-invalid={fieldState.invalid}
+                    autoComplete="off"
+                  />
+                  <InputGroupAddon align="inline-end" variant="boxed">
+                    <InputGroupText>€</InputGroupText>
+                  </InputGroupAddon>
+                </InputGroup>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
           {listingMode === "rent" && (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Controller
@@ -800,101 +864,90 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
             name="availableFrom"
             control={form.control}
             render={({ field, fieldState }) => {
-              const selectedDate = field.value
-                ? parseLocalCalendarDate(field.value)
-                : undefined;
+                const selectedDate = field.value
+                  ? parseLocalCalendarDate(field.value)
+                  : undefined;
 
-              return (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="availableFrom">
-                    {t("form.labels.availableFrom")}
-                  </FieldLabel>
-                  <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        id="availableFrom"
-                        className="w-full justify-between font-normal"
-                        aria-invalid={fieldState.invalid}
+                return (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="availableFrom">
+                      {t("form.labels.availableFrom")}
+                    </FieldLabel>
+                    <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          id="availableFrom"
+                          className="w-full justify-between font-normal"
+                          aria-invalid={fieldState.invalid}
+                        >
+                          {selectedDate
+                            ? selectedDate.toLocaleDateString("fr-FR", {
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                              })
+                            : t("form.placeholders.selectDate")}
+                          <CalendarIcon className="h-4 w-4 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className="w-auto overflow-hidden p-0"
+                        align="start"
                       >
-                        {selectedDate
-                          ? selectedDate.toLocaleDateString("fr-FR", {
-                              day: "numeric",
-                              month: "long",
-                              year: "numeric",
-                            })
-                          : t("form.placeholders.selectDate")}
-                        <CalendarIcon className="h-4 w-4 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      className="w-auto overflow-hidden p-0"
-                      align="start"
-                    >
-                      <Calendar
-                        mode="single"
-                        selected={selectedDate}
-                        captionLayout="dropdown"
-                        onSelect={(date) => {
-                          if (date) {
-                            field.onChange(
-                              formatLocalCalendarDate(date.getTime()),
-                            );
-                          }
-                          setCalendarOpen(false);
-                        }}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  {selectedDate && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="mt-1 h-auto px-0 text-muted-foreground hover:text-foreground"
-                      onClick={() => field.onChange("")}
-                    >
-                      <XIcon className="size-3.5" />
-                      {t("form.actions.clearDate")}
-                    </Button>
-                  )}
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              );
+                        <Calendar
+                          mode="single"
+                          selected={selectedDate}
+                          captionLayout="dropdown"
+                          onSelect={(date) => {
+                            if (date) {
+                              field.onChange(
+                                formatLocalCalendarDate(date.getTime()),
+                              );
+                            }
+                            setCalendarOpen(false);
+                          }}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                );
             }}
           />
 
+          <Field>
+            <FieldLabel>{t("form.labels.contactMethods")}</FieldLabel>
+            <FieldDescription>{t("form.labels.contactMethodsHint")}</FieldDescription>
+          </Field>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Controller
               name="contactPhone"
               control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="contactPhone">
-                    {t("form.labels.contactPhone")}
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="contactPhone"
-                    type="tel"
-                    autoComplete="tel"
-                    placeholder={t("form.placeholders.contactPhone")}
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
+              render={({ field, fieldState }) => {
+                const isChoiceError =
+                  fieldState.error?.message === t("form.validation.contactReq");
 
+                return (
+                <Field data-invalid={fieldState.invalid && !isChoiceError}>
+                  <FieldLabel htmlFor="contactPhone">{t("form.labels.contactPhone")}</FieldLabel>
+                  <Input {...field} id="contactPhone" type="tel" autoComplete="tel" placeholder={t("form.placeholders.contactPhone")} aria-invalid={fieldState.invalid && !isChoiceError} />
+                  {fieldState.invalid && !isChoiceError && <FieldError errors={[fieldState.error]} />}
+                </Field>
+                );
+              }}
+            />
             <Controller
               name="contactEmail"
               control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
+              render={({ field, fieldState }) => {
+                const isChoiceError =
+                  fieldState.error?.message === t("form.validation.contactReq");
+
+                return (
+                <Field data-invalid={fieldState.invalid && !isChoiceError}>
                   <FieldLabel htmlFor="contactEmail">
                     {t("form.labels.contactEmail")}
                   </FieldLabel>
@@ -904,20 +957,27 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
                     type="email"
                     autoComplete="email"
                     placeholder={t("form.placeholders.contactEmail")}
-                    aria-invalid={fieldState.invalid}
+                    aria-invalid={fieldState.invalid && !isChoiceError}
                   />
-                  {fieldState.invalid && (
+                  {fieldState.invalid && !isChoiceError && (
                     <FieldError errors={[fieldState.error]} />
                   )}
                 </Field>
-              )}
+                );
+              }}
             />
           </div>
+          <FieldError
+            errors={[
+              form.formState.errors.contactPhone,
+              form.formState.errors.contactEmail,
+            ].filter((error) => error?.message === t("form.validation.contactReq"))}
+          />
         </FieldSet>
 
-        {/* ─── Step 5: Contenu & médias ─── */}
+        {/* ─── Step 4: Contenu & médias ─── */}
         <FieldGroup
-          className={`space-y-4 ${currentStep !== 5 ? "hidden" : ""}`}
+          className={`space-y-4 ${currentStep !== 4 ? "hidden" : ""}`}
         >
           {/* Description */}
           <Controller
@@ -1117,6 +1177,25 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
               </div>
             )}
           </Field>
+          <div className="rounded-lg border bg-muted/30 p-4 space-y-2">
+            <h4 className="font-semibold">{t("form.preview.title")}</h4>
+            <p className="text-sm text-muted-foreground">
+              {t("form.preview.hint")}
+            </p>
+            <div className="space-y-1 text-sm">
+              <p className="font-medium">{preview.title || t("form.preview.untitled")}</p>
+              <p>{[preview.city, preview.neighborhood].filter(Boolean).join(" · ")}</p>
+              <p>
+                {preview.price || "—"} € · {preview.area || "—"} m² · {preview.bedrooms || "—"} {t("form.preview.rooms")}
+              </p>
+              <p className="line-clamp-3">{preview.description || t("form.preview.noDescription")}</p>
+              <p className="text-muted-foreground">
+                {preview.contactEmail && t("form.preview.email")}
+                {preview.contactEmail && preview.contactPhone && " · "}
+                {preview.contactPhone && t("form.preview.whatsapp")}
+              </p>
+            </div>
+          </div>
         </FieldGroup>
       </form>
 

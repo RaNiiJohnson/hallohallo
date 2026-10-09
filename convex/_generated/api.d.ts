@@ -39,6 +39,7 @@ import type * as jobs_queries from "../jobs/queries.js";
 import type * as jobs_translate from "../jobs/translate.js";
 import type * as listings_imageUrls from "../listings/imageUrls.js";
 import type * as listings_mutations from "../listings/mutations.js";
+import type * as listings_privacy from "../listings/privacy.js";
 import type * as listings_queries from "../listings/queries.js";
 import type * as listings_translate from "../listings/translate.js";
 import type * as notifications_mutations from "../notifications/mutations.js";
@@ -94,6 +95,7 @@ declare const fullApi: ApiFromModules<{
   "jobs/translate": typeof jobs_translate;
   "listings/imageUrls": typeof listings_imageUrls;
   "listings/mutations": typeof listings_mutations;
+  "listings/privacy": typeof listings_privacy;
   "listings/queries": typeof listings_queries;
   "listings/translate": typeof listings_translate;
   "notifications/mutations": typeof notifications_mutations;

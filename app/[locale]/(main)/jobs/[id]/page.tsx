@@ -388,9 +388,12 @@ export default function JobDetailsPage() {
               </div>
             </div>
 
-            {/* Location Map - Only show if coordinates exist */}
-            {jobOffer.location && (
-              <LocationMap location={jobOffer.location} city={jobOffer.city} />
+            {jobOffer.location && jobOffer.workMode !== "remote" && (
+              <LocationMap
+                location={jobOffer.location}
+                city={city}
+                approximate
+              />
             )}
 
             {/* Certificates */}

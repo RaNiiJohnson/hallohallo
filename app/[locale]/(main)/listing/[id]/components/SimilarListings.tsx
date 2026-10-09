@@ -41,7 +41,7 @@ export function SimilarListings({
     <section className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">{t("similar.title")}</h2>
-        <Link href="listing">
+        <Link href="/listing">
           <Button variant="outline">{t("similar.seeAll")}</Button>
         </Link>
       </div>

@@ -66,6 +66,15 @@ function assertValidJobInput(args: {
   }
 }
 
+function locationForWorkMode(
+  workMode: "onSite" | "hybrid" | "remote",
+  location: { lat: number; lng: number } | null | undefined,
+) {
+  // Remote offers never retain a map location, including when the mutation is
+  // called directly instead of through the form.
+  return workMode === "remote" || location === null ? undefined : location;
+}
+
 function isJobActive(status: "active" | "closed" | "archived" | undefined) {
   return status === undefined || status === "active";
 }
@@ -110,12 +119,15 @@ export const createJob = authMutation({
       throwForbidden("Only providers or admins can publish jobs");
     }
     assertValidJobInput(args, { requireContactEmail: true });
-    const { contactEmail, ...jobArgs } = args;
+    const { contactEmail, location, ...jobArgs } = args;
 
     const searchAllContent = `${args.title} ${args.type} ${args.city} ${args.contractType} ${args.description}`;
 
     const job = await ctx.db.insert("JobOffer", {
       ...jobArgs,
+      ...(locationForWorkMode(args.workMode, location)
+        ? { location: locationForWorkMode(args.workMode, location) }
+        : {}),
       certificates: args.certificates ?? [],
       slug: generatedSlug(args.title),
       authorId: user._id,
@@ -150,10 +162,13 @@ export const updateJob = authMutation({
     title: v.string(),
     type: jobTypeValidator,
     location: v.optional(
-      v.object({
-        lat: v.number(),
-        lng: v.number(),
-      }),
+      v.union(
+        v.object({
+          lat: v.number(),
+          lng: v.number(),
+        }),
+        v.null(),
+      ),
     ),
     contractType: contractTypeValidator,
     city: v.string(),
@@ -189,13 +204,19 @@ export const updateJob = authMutation({
     }
 
     // Remove id from args before updating because it's not a field of the document
-    const { id, contactEmail, ...updateData } = args;
+    const { id, contactEmail, location, ...updateData } = args;
     assertValidJobInput(args, { requireContactEmail: false });
 
     const searchAllContent = `${args.title} ${args.type} ${args.city} ${args.contractType} ${args.description}`;
 
+    const nextLocation = locationForWorkMode(args.workMode, location);
     await ctx.db.patch(id, {
       ...updateData,
+      // Omitted locations preserve a previously selected map. `null` (the
+      // off switch) and `remote` both remove it explicitly.
+      ...(args.workMode === "remote" || location !== undefined
+        ? { location: nextLocation }
+        : {}),
       searchAll: searchAllContent,
       updatedAt: Date.now(),
     });

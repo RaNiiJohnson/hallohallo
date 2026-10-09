@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Item, ItemContent, ItemSeparator } from "@/components/ui/item";
 import { Separator } from "@/components/ui/separator";
 import { useManualTranslate } from "@/hooks/use-manual-translate";
+import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
+import { useRouter } from "@/i18n/navigation";
+import { getAuthHref, getCurrentReturnTo } from "@/lib/auth-return-to";
 import { ListingListDetails } from "@/lib/convexTypes";
 import { formatDateWithFallback } from "@/lib/date";
 import { LocationMap } from "@/lib/LocationMap";
@@ -19,8 +22,8 @@ import {
   Calendar,
   Mail,
   MapPin,
+  MessageCircle,
   PawPrint,
-  Phone,
   Square,
   User,
 } from "lucide-react";
@@ -41,6 +44,13 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
   const te = useTranslations("common");
 
   const translateListing = useAction(api.listings.translate.translateListing);
+  const requireAuthentication = useAuthRequiredAction();
+  const router = useRouter();
+  const requireEmailVerification = () => {
+    router.push(
+      getAuthHref("/verify-email", getCurrentReturnTo(window.location)),
+    );
+  };
 
   const { data, activeLang, pendingLang, translate, reset } =
     useManualTranslate(
@@ -58,6 +68,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
 
   const title = data?.title ?? property.title;
   const city = data?.city ?? property.city;
+  const isActive = property.status === undefined || property.status === "active";
   const formatNumber = (value: number) =>
     new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(value);
   const contactLinks = getListingContactLinks(property.contact);
@@ -95,6 +106,9 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                   >[0],
                 )}
               </Badge>
+              {property.status === "closed" && (
+                <Badge variant="secondary">{tListing("details.closed")}</Badge>
+              )}
             </div>
 
             <div className="mt-2">
@@ -204,19 +218,21 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
 
               {/* Disponibilité et animaux */}
               <div className="mt-6 space-y-3">
-                <div className="flex items-center gap-3">
-                  <Calendar className="h-5 w-5 text-primary" />
-                  <span className="font-medium">
-                    {tListing("details.available")}
-                  </span>
-                  <span>
-                    {formatDateWithFallback(
-                      property.availableFrom,
-                      locale,
-                      t("availableNow"),
-                    )}
-                  </span>
-                </div>
+                {isActive && (
+                  <div className="flex items-center gap-3">
+                    <Calendar className="h-5 w-5 text-primary" />
+                    <span className="font-medium">
+                      {tListing("details.available")}
+                    </span>
+                    <span>
+                      {formatDateWithFallback(
+                        property.availableFrom,
+                        locale,
+                        t("availableNow"),
+                      )}
+                    </span>
+                  </div>
+                )}
 
                 <div className="flex items-center gap-3">
                   <PawPrint className="h-5 w-5 text-primary" />
@@ -256,7 +272,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
           </div>
 
           <ItemSeparator />
-          {/* Location Map - Only show if coordinates exist */}
+          {/* The optional map always uses a deliberately rounded position. */}
           <div>
             <div className="py-6">
               <h2 className="text-xl font-semibold mb-4">
@@ -265,11 +281,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
               <p className="text-sm text-muted-foreground mt-1">{city}</p>
             </div>
             {property.location && (
-              <LocationMap
-                location={property.location}
-                city={property.city}
-                listing={true}
-              />
+              <LocationMap location={property.location} city={property.city} listing approximate />
             )}
           </div>
 
@@ -322,18 +334,14 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
 
               {/* Boutons de contact */}
               <div className="space-y-3">
-                {contactLinks.phoneHref && (
+                {contactLinks.whatsappHref && (
                   <Button asChild className="w-full" size="lg">
-                    <a
-                      href={contactLinks.phoneHref}
-                      className="flex items-center gap-2"
-                    >
-                      <Phone className="h-4 w-4" />
-                      {tListing("details.call")}
+                    <a href={contactLinks.whatsappHref} target="_blank" rel="noreferrer" className="flex items-center gap-2">
+                      <MessageCircle className="h-4 w-4" />
+                      {tListing("details.whatsapp")}
                     </a>
                   </Button>
                 )}
-
                 {contactLinks.emailHref && (
                   <Button
                     asChild
@@ -346,12 +354,33 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                       className="flex items-center gap-2"
                     >
                       <Mail className="h-4 w-4" />
-                      {tListing("details.sendMessage")}
+                      {tListing("details.sendEmail")}
                     </a>
                   </Button>
                 )}
 
-                {!contactLinks.phoneHref && !contactLinks.emailHref && (
+                {property.contactAccessRequired && (
+                  <Button
+                    variant="outline"
+                    className="w-full flex items-center gap-2"
+                    size="lg"
+                    onClick={
+                      property.contactVerificationRequired
+                        ? requireEmailVerification
+                        : requireAuthentication
+                    }
+                  >
+                    <Mail className="h-4 w-4" />
+                    {tListing(
+                      property.contactVerificationRequired
+                        ? "details.verifyEmailToContact"
+                        : "details.signInToContact",
+                    )}
+                  </Button>
+                )}
+
+                {!contactLinks.whatsappHref && !contactLinks.emailHref &&
+                  !property.contactAccessRequired && (
                   <Button
                     variant="outline"
                     className="w-full flex items-center gap-2"
@@ -361,20 +390,13 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                     <Mail className="h-4 w-4" />
                     {tListing("details.contactUnavailable")}
                   </Button>
-                )}
+                  )}
               </div>
 
               {/* Informations de contact */}
               {(property.contact?.phone || property.contact?.email) && (
                 <div className="mt-4 pt-4 border-t space-y-2">
-                  {property.contact.phone && (
-                    <div className="text-sm text-muted-foreground">
-                      <span className="font-medium">
-                        {tListing("details.phone")}
-                      </span>{" "}
-                      {property.contact.phone}
-                    </div>
-                  )}
+                  {property.contact.phone && <div className="text-sm text-muted-foreground"><span className="font-medium">{tListing("details.phone")}</span> {property.contact.phone}</div>}
                   {property.contact.email && (
                     <div className="text-sm text-muted-foreground">
                       <span className="font-medium">

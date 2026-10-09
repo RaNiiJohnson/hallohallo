@@ -52,6 +52,24 @@
       "title": "Edit listing",
       "description": "Update your listing information and photos."
     },
+    "lifecycle": {
+      "close": "Close listing",
+      "reopen": "Reopen",
+      "archive": "Archive",
+      "restore": "Restore",
+      "success": "Listing status updated.",
+      "error": "Unable to update the listing status."
+    },
+    "archive": {
+      "trigger": "Archive",
+      "title": "Archive listing?",
+      "desc": "The listing will be removed from public lists but can be restored.",
+      "cancel": "Cancel",
+      "confirm": "Archive listing",
+      "submitting": "Archiving...",
+      "successToast": "Listing archived successfully",
+      "errorToast": "Unable to archive the listing"
+    },
     "delete": {
       "trigger": "Delete",
       "title": "Delete listing?",
@@ -74,6 +92,10 @@
       "mainInfo": "Main information",
       "conditions": "Conditions",
       "conditionsOptional": "Conditions (optional)",
+      "typeAndLocation": "Type and location",
+      "rentalDetails": "Rental terms and contact",
+      "saleContact": "Contact and additional details",
+      "priceAndAvailability": "Price and availability",
       "media": "Content & media"
     },
     "labels": {
@@ -81,19 +103,23 @@
       "propertyType": "Property type *",
       "listingMode": "Listing mode *",
       "city": "City / Location *",
-      "mapPosition": "Map position (optional)",
-      "mapDesc": "Click on the map to pinpoint the exact position of the property. The city will update automatically.",
+      "neighborhood": "Approximate area or postal code (optional)",
+      "showMap": "Show an approximate location on the map",
+      "mapPosition": "Map area (optional)",
+      "mapDesc": "Choose a useful search area; the public map will be deliberately approximate.",
       "priceRent": "Monthly rent *",
       "priceSale": "Sale price *",
       "area": "Area *",
       "bedrooms": "Bedrooms *",
       "bathrooms": "Bathrooms *",
       "floor": "Floor *",
-      "deposit": "Deposit",
-      "charges": "Charges",
-      "pets": "Pets allowed",
-      "availableFrom": "Available from",
-      "contactPhone": "Contact phone (optional)",
+      "deposit": "Deposit (optional)",
+      "charges": "Charges (optional)",
+      "pets": "Pets allowed (optional)",
+      "availableFrom": "Available from *",
+      "contactMethods": "Contact method *",
+      "contactMethodsHint": "Provide WhatsApp, email, or both.",
+      "contactPhone": "WhatsApp number (optional)",
       "contactEmail": "Contact email (optional)",
       "description": "Description *",
       "descHint": "A good description increases your chances of finding a tenant quickly.",
@@ -108,6 +134,7 @@
       "selectType": "Select property type",
       "selectMode": "Rent or sale",
       "city": "E.g. Königstein im Taunus, Hesse",
+      "neighborhood": "E.g. Downtown or 37574",
       "price": "E.g. 850",
       "area": "E.g. 65",
       "bedrooms": "E.g. 3",
@@ -130,6 +157,8 @@
       "bedroomsReq": "Number of bedrooms is required",
       "bathroomsReq": "Number of bathrooms is required",
       "floorReq": "Floor is required",
+      "availableFromReq": "Availability date is required",
+      "contactReq": "Provide an email address or WhatsApp number",
       "descMin": "Description must be at least 10 characters long",
       "emailInvalid": "Enter a valid email address",
       "phoneInvalid": "Enter a valid phone number"
@@ -142,6 +171,15 @@
       "imagesRequired": "Add at least one photo to the listing",
       "imageUploadError": "Error uploading image",
       "chars": "characters"
+    },
+    "preview": {
+      "title": "Preview before publishing",
+      "hint": "Review the public information; contact details remain for verified members only.",
+      "untitled": "Untitled listing",
+      "rooms": "rooms",
+      "noDescription": "No description provided.",
+      "email": "Contact email",
+      "whatsapp": "WhatsApp"
     },
     "actions": {
       "addPhoto": "Add",
@@ -159,7 +197,7 @@
       "removeImage": "Remove image: {name}"
     },
     "labels_extra": {
-      "extras": "Extras / Amenities",
+      "extras": "Extras / Amenities (optional)",
       "extrasDesc": "Add property amenities and perks (e.g. Parking, Balcony, Cellar, Elevator...)"
     }
   },
@@ -202,6 +240,7 @@
     "featuresTitle": "Features",
     "level": "Level",
     "available": "Available:",
+    "closed": "Listing closed",
     "pets": "Pets:",
     "petsDenied": "Not allowed",
     "descTitle": "Description",
@@ -212,8 +251,10 @@
     "contactTitle": "Contact",
     "anonymous": "Anonymous",
     "ownerRole": "Owner",
-    "call": "Call",
-    "sendMessage": "Send message",
+    "whatsapp": "Contact on WhatsApp",
+    "sendEmail": "Send email",
+    "signInToContact": "Sign in to contact",
+    "verifyEmailToContact": "Verify my email to contact",
     "contactOwner": "Contact owner",
     "contactUnavailable": "Contact details unavailable",
     "phone": "Phone:",

@@ -52,6 +52,24 @@
       "title": "Modifier l'annonce",
       "description": "Mettez à jour les informations et les photos de votre annonce."
     },
+    "lifecycle": {
+      "close": "Clôturer l'annonce",
+      "reopen": "Rouvrir",
+      "archive": "Archiver",
+      "restore": "Restaurer",
+      "success": "Statut de l'annonce mis à jour.",
+      "error": "Impossible de mettre à jour le statut de l'annonce."
+    },
+    "archive": {
+      "trigger": "Archiver",
+      "title": "Archiver l'annonce ?",
+      "desc": "L'annonce sera retirée des listes publiques, mais pourra être restaurée.",
+      "cancel": "Annuler",
+      "confirm": "Archiver l'annonce",
+      "submitting": "Archivage...",
+      "successToast": "Annonce archivée avec succès",
+      "errorToast": "Erreur lors de l'archivage de l'annonce"
+    },
     "delete": {
       "trigger": "Supprimer",
       "title": "Supprimer l'annonce ?",
@@ -74,6 +92,10 @@
       "mainInfo": "Informations principales",
       "conditions": "Conditions",
       "conditionsOptional": "Conditions (optionnel)",
+      "typeAndLocation": "Type et localisation",
+      "rentalDetails": "Conditions de location et contact",
+      "saleContact": "Contact et informations complémentaires",
+      "priceAndAvailability": "Prix et disponibilité",
       "media": "Contenu & médias"
     },
     "labels": {
@@ -81,20 +103,24 @@
       "propertyType": "Type de bien *",
       "listingMode": "Mode d'annonce *",
       "city": "Ville / Localité *",
-      "mapPosition": "Position sur la carte (optionnel)",
-      "mapDesc": "Cliquez sur la carte pour indiquer la position exacte du bien. La ville sera mise à jour automatiquement.",
+      "neighborhood": "Quartier ou code postal approximatif (optionnel)",
+      "showMap": "Afficher un emplacement approximatif sur la carte",
+      "mapPosition": "Zone sur la carte (optionnel)",
+      "mapDesc": "La carte montre une zone approximative, pas l’adresse exacte.",
       "priceRent": "Loyer mensuel *",
       "priceSale": "Prix de vente *",
       "area": "Surface *",
       "bedrooms": "Chambres *",
       "bathrooms": "Salles de bain *",
       "floor": "Étage *",
-      "deposit": "Caution",
-      "charges": "Charges",
-      "pets": "Animaux de compagnie autorisés",
-      "availableFrom": "Disponible à partir du",
-      "contactPhone": "Téléphone de contact (optionnel)",
-      "contactEmail": "Email de contact (optionnel)",
+      "deposit": "Caution (optionnel)",
+      "charges": "Charges (optionnel)",
+      "pets": "Animaux de compagnie autorisés (optionnel)",
+      "availableFrom": "Disponible à partir du *",
+      "contactMethods": "Moyen de contact *",
+      "contactMethodsHint": "Indiquez WhatsApp, e-mail, ou les deux.",
+      "contactPhone": "Numéro WhatsApp (optionnel)",
+      "contactEmail": "E-mail de contact (optionnel)",
       "description": "Description *",
       "descHint": "Une bonne description augmente vos chances de trouver un locataire rapidement.",
       "markdownHint": "Mise en forme Markdown prise en charge",
@@ -108,6 +134,7 @@
       "selectType": "Sélectionnez le type de bien",
       "selectMode": "Location ou vente",
       "city": "Ex: Königstein im Taunus, Hesse",
+      "neighborhood": "Ex: Centre-ville ou 37574",
       "price": "Ex: 850",
       "area": "Ex: 65",
       "bedrooms": "Ex: 3",
@@ -130,6 +157,8 @@
       "bedroomsReq": "Le nombre de chambres est requis",
       "bathroomsReq": "Le nombre de salles de bain est requis",
       "floorReq": "L'étage est requis",
+      "availableFromReq": "La date de disponibilité est requise",
+      "contactReq": "Indiquez un e-mail ou un numéro WhatsApp",
       "descMin": "La description doit contenir au moins 10 caractères",
       "emailInvalid": "Saisissez une adresse email valide",
       "phoneInvalid": "Saisissez un numéro de téléphone valide"
@@ -142,6 +171,15 @@
       "imagesRequired": "Ajoutez au moins une photo à l'annonce",
       "imageUploadError": "Erreur lors de l'upload de l'image",
       "chars": "caractères"
+    },
+    "preview": {
+      "title": "Aperçu avant publication",
+      "hint": "Vérifiez les informations publiques ; les coordonnées restent réservées aux membres vérifiés.",
+      "untitled": "Annonce sans titre",
+      "rooms": "pièces",
+      "noDescription": "Aucune description renseignée.",
+      "email": "E-mail de contact",
+      "whatsapp": "WhatsApp"
     },
     "actions": {
       "addPhoto": "Ajouter",
@@ -159,7 +197,7 @@
       "removeImage": "Supprimer l'image : {name}"
     },
     "labels_extra": {
-      "extras": "Extras / Équipements",
+      "extras": "Extras / Équipements (optionnel)",
       "extrasDesc": "Ajoutez les équipements et atouts du bien (ex: Parking, Balcon, Cave, Ascenseur...)"
     }
   },
@@ -202,6 +240,7 @@
     "featuresTitle": "Caractéristiques",
     "level": "Niveau",
     "available": "Disponible :",
+    "closed": "Annonce clôturée",
     "pets": "Animaux :",
     "petsDenied": "Non acceptés",
     "descTitle": "Description",
@@ -212,8 +251,10 @@
     "contactTitle": "Contact",
     "anonymous": "Anonyme",
     "ownerRole": "Propriétaire",
-    "call": "Appeler",
-    "sendMessage": "Envoyer un message",
+    "whatsapp": "Contacter sur WhatsApp",
+    "sendEmail": "Envoyer un e-mail",
+    "signInToContact": "Se connecter pour contacter",
+    "verifyEmailToContact": "Vérifier mon e-mail pour contacter",
     "contactOwner": "Contacter le propriétaire",
     "contactUnavailable": "Coordonnées indisponibles",
     "phone": "Téléphone :",

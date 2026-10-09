@@ -1,4 +1,5 @@
 import {
+  FilterBuilder,
   OrderedQuery,
   paginationOptsValidator,
   Query,
@@ -10,6 +11,7 @@ import { authComponent } from "../auth/auth";
 import { query } from "../functions";
 import { r2 } from "../integrations/r2";
 import { resolveListingImages } from "./imageUrls";
+import { redactSensitivePublicListingText } from "./privacy";
 
 // Resolve R2 storageId keys to signed URLs.
 // Falls back to the old Cloudinary secureUrl for existing records.
@@ -24,6 +26,70 @@ async function resolveImages(
   return await resolveListingImages(images, (key) => r2.getUrl(key));
 }
 
+/**
+ * Precise map coordinates are sensitive listing data. Keep them out of every
+ * public listing response so adding a new list or metadata query cannot expose
+ * them by accident.
+ */
+function withoutSensitivePublicFields<
+  T extends {
+    location?: unknown;
+    searchAll?: unknown;
+    title: string;
+    city: string;
+    neighborhood?: string;
+    description: string;
+    extras?: string[];
+  },
+>(listing: T) {
+  const { location, searchAll, ...publicListing } = listing;
+  void location;
+  void searchAll;
+  return {
+    ...publicListing,
+    title: redactSensitivePublicListingText(publicListing.title),
+    city: redactSensitivePublicListingText(publicListing.city),
+    ...(publicListing.neighborhood !== undefined
+      ? {
+          neighborhood: redactSensitivePublicListingText(
+            publicListing.neighborhood,
+          ),
+        }
+      : {}),
+    description: redactSensitivePublicListingText(publicListing.description),
+    ...(publicListing.extras !== undefined
+      ? {
+          extras: publicListing.extras.map(redactSensitivePublicListingText),
+        }
+      : {}),
+  };
+}
+
+function approximateLocation(location: { lat: number; lng: number } | undefined) {
+  if (!location) return undefined;
+  return {
+    lat: Math.round(location.lat * 100) / 100,
+    lng: Math.round(location.lng * 100) / 100,
+  };
+}
+
+type ListingStatus = "active" | "closed" | "archived";
+
+function isVisibleListing(listing: { status?: ListingStatus }) {
+  return listing.status === undefined || listing.status === "active";
+}
+
+function visibleListingFilter(q: FilterBuilder<DataModel["RealestateListing"]>) {
+  return q.or(q.eq(q.field("status"), "active"), q.eq(q.field("status"), undefined));
+}
+
+function canManageListing(
+  listing: { authorId: string },
+  user: { _id: string; role?: string | null } | null | undefined,
+) {
+  return user?._id === listing.authorId || user?.role === "admin";
+}
+
 export const getListingWithContact = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
@@ -34,6 +100,9 @@ export const getListingWithContact = query({
     if (!listing) return null;
 
     const user = await authComponent.safeGetAuthUser(ctx);
+    if (listing.status === "archived" && !canManageListing(listing, user)) {
+      return null;
+    }
     let isBookmarked = false;
     if (user) {
       const existingBookmark = await ctx.db
@@ -56,12 +125,43 @@ export const getListingWithContact = query({
 
     const images = await resolveImages(listing.images ?? []);
 
+    const canSeeContact = user?.emailVerified === true;
+
     return {
-      ...listing,
+      ...withoutSensitivePublicFields(listing),
       images,
-      contact,
       isBookmarked,
+      // The detail page can show an optional map for everyone, but only with a
+      // deliberately rounded position. Contact information remains verified-only.
+      ...(listing.location
+        ? { location: approximateLocation(listing.location) }
+        : {}),
+      contact: canSeeContact && contact ? { email: contact.email, phone: contact.phone } : null,
+      contactAccessRequired: !canSeeContact && Boolean(contact?.email || contact?.phone),
+      contactVerificationRequired: Boolean(user && !user.emailVerified && (contact?.email || contact?.phone)),
     };
+  },
+});
+
+export const getListingLocationForEdit = query({
+  args: { id: v.id("RealestateListing") },
+  returns: v.union(
+    v.object({
+      location: v.union(
+        v.object({ lat: v.number(), lng: v.number() }),
+        v.null(),
+      ),
+    }),
+    v.null(),
+  ),
+  handler: async (ctx, { id }) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) return null;
+
+    const listing = await ctx.db.get(id);
+    if (!listing || listing.authorId !== user._id) return null;
+
+    return { location: listing.location ?? null };
   },
 });
 
@@ -74,8 +174,12 @@ export const getListingMetadata = query({
       .unique();
 
     if (!listing) return null;
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (listing.status === "archived" && !canManageListing(listing, user)) {
+      return null;
+    }
     return {
-      ...listing,
+      ...withoutSensitivePublicFields(listing),
       images: await resolveImages(listing.images ?? []),
     };
   },
@@ -126,14 +230,17 @@ export const getListing = query({
             b.resourceId as Id<"RealestateListing">,
           );
           if (!listing) return null;
-          return { ...listing, isBookmarked: true } as typeof listing & {
+          return {
+            ...withoutSensitivePublicFields(listing),
+            isBookmarked: true,
+          } as Omit<typeof listing, "location"> & {
             isBookmarked: boolean;
           };
         }),
       );
 
       const filteredPage = enrichedPage.filter(
-        (j): j is NonNullable<typeof j> => j !== null,
+        (j): j is NonNullable<typeof j> => j !== null && isVisibleListing(j),
       );
       return { ...bookmarksPage, page: filteredPage };
     }
@@ -167,7 +274,7 @@ export const getListing = query({
 
     // Step 4: Additional filters
     const filtered = orderedQuery.filter((q) => {
-      let expr = q.eq(q.field("_id"), q.field("_id")); // toujours vrai
+      let expr = visibleListingFilter(q);
 
       if (minPrice !== undefined) {
         expr = q.and(expr, q.gte(q.field("price"), minPrice));
@@ -201,7 +308,11 @@ export const getListing = query({
           if (existingBookmark) isBookmarked = true;
         }
         const images = await resolveImages(listing.images ?? []);
-        return { ...listing, images, isBookmarked };
+        return {
+          ...withoutSensitivePublicFields(listing),
+          images,
+          isBookmarked,
+        };
       }),
     );
 
@@ -216,12 +327,13 @@ export const listListingsByCity = query({
       .query("RealestateListing")
       .withIndex("by_city", (q) => q.eq("city", args.city))
       .order("desc")
+      .filter(visibleListingFilter)
       .take(50);
 
     return Promise.all(
       listings.map(async (listing) => {
         const images = await resolveImages(listing.images ?? []);
-        return { ...listing, images };
+        return { ...withoutSensitivePublicFields(listing), images };
       }),
     );
   },
@@ -244,11 +356,23 @@ export const getSimilarRealEstateListings = query({
     const byCity = await ctx.db
       .query("RealestateListing")
       .withIndex("by_city", (q) => q.eq("city", args.city))
-      .filter((q) => q.neq(q.field("slug"), args.excludeSlug))
+      .filter((q) =>
+        q.and(
+          q.neq(q.field("slug"), args.excludeSlug),
+          visibleListingFilter(q),
+        ),
+      )
       .order("desc")
       .take(args.limit);
 
-    if (byCity.length >= args.limit) return byCity;
+    if (byCity.length >= args.limit) {
+      return Promise.all(
+        byCity.map(async (listing) => {
+          const images = await resolveImages(listing.images ?? []);
+          return { ...withoutSensitivePublicFields(listing), images };
+        }),
+      );
+    }
 
     const remaining = args.limit - byCity.length;
 
@@ -261,6 +385,7 @@ export const getSimilarRealEstateListings = query({
         q.and(
           q.neq(q.field("slug"), args.excludeSlug),
           q.neq(q.field("city"), args.city), // Avoid duplicates; city already taken.
+          visibleListingFilter(q),
         ),
       )
       .order("desc")
@@ -270,7 +395,7 @@ export const getSimilarRealEstateListings = query({
     return Promise.all(
       combined.map(async (listing) => {
         const images = await resolveImages(listing.images ?? []);
-        return { ...listing, images };
+        return { ...withoutSensitivePublicFields(listing), images };
       }),
     );
   },

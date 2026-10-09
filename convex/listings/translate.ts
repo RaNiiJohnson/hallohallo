@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { api, internal } from "../_generated/api";
+import { authComponent } from "../auth/auth";
 import { authAction, internalMutation, query } from "../functions";
 import { languageValidator } from "../translations/shared";
 import { enforceTranslationLimits } from "../translations/security";
@@ -16,6 +17,14 @@ export const getSource = query({
   handler: async (ctx, { id }) => {
     const listing = await ctx.db.get(id);
     if (!listing) return null;
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (
+      listing.status === "archived" &&
+      user?._id !== listing.authorId &&
+      user?.role !== "admin"
+    ) {
+      return null;
+    }
     return {
       title: listing.title,
       description: listing.description,
@@ -28,6 +37,16 @@ export const getSource = query({
 export const getTranslation = query({
   args: { listingId: v.id("RealestateListing"), language: languageValidator },
   handler: async (ctx, args) => {
+    const listing = await ctx.db.get(args.listingId);
+    if (!listing) return null;
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (
+      listing.status === "archived" &&
+      user?._id !== listing.authorId &&
+      user?.role !== "admin"
+    ) {
+      return null;
+    }
     return await ctx.db
       .query("listingTranslations")
       .withIndex("by_listing_language", (q) =>

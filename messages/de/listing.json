@@ -52,6 +52,24 @@
       "title": "Anzeige bearbeiten",
       "description": "Aktualisiere die Informationen und Fotos deiner Anzeige."
     },
+    "lifecycle": {
+      "close": "Anzeige schließen",
+      "reopen": "Wieder öffnen",
+      "archive": "Archivieren",
+      "restore": "Wiederherstellen",
+      "success": "Anzeigenstatus aktualisiert.",
+      "error": "Anzeigenstatus konnte nicht aktualisiert werden."
+    },
+    "archive": {
+      "trigger": "Archivieren",
+      "title": "Anzeige archivieren?",
+      "desc": "Die Anzeige wird aus öffentlichen Listen entfernt, kann aber wiederhergestellt werden.",
+      "cancel": "Abbrechen",
+      "confirm": "Anzeige archivieren",
+      "submitting": "Wird archiviert...",
+      "successToast": "Anzeige erfolgreich archiviert",
+      "errorToast": "Anzeige konnte nicht archiviert werden"
+    },
     "delete": {
       "trigger": "Löschen",
       "title": "Anzeige löschen?",
@@ -74,6 +92,10 @@
       "mainInfo": "Hauptinformationen",
       "conditions": "Bedingungen",
       "conditionsOptional": "Bedingungen (optional)",
+      "typeAndLocation": "Art und Standort",
+      "rentalDetails": "Mietbedingungen und Kontakt",
+      "saleContact": "Kontakt und weitere Angaben",
+      "priceAndAvailability": "Preis und Verfügbarkeit",
       "media": "Inhalt & Medien"
     },
     "labels": {
@@ -81,19 +103,23 @@
       "propertyType": "Immobilientyp *",
       "listingMode": "Angebotsart *",
       "city": "Stadt / Ort *",
-      "mapPosition": "Kartenposition (optional)",
-      "mapDesc": "Klicke auf die Karte, um den genauen Standort der Immobilie anzugeben. Die Stadt wird automatisch aktualisiert.",
+      "neighborhood": "Ungefähres Viertel oder Postleitzahl (optional)",
+      "showMap": "Ungefähren Standort auf der Karte anzeigen",
+      "mapPosition": "Kartenbereich (optional)",
+      "mapDesc": "Wähle einen für die Suche nützlichen Bereich; die öffentliche Karte bleibt bewusst ungenau.",
       "priceRent": "Monatsmiete *",
       "priceSale": "Verkaufspreis *",
       "area": "Wohnfläche *",
       "bedrooms": "Schlafzimmer *",
       "bathrooms": "Badezimmer *",
       "floor": "Etage *",
-      "deposit": "Kaution",
-      "charges": "Nebenkosten",
-      "pets": "Haustiere erlaubt",
-      "availableFrom": "Verfügbar ab",
-      "contactPhone": "Kontakttelefon (optional)",
+      "deposit": "Kaution (optional)",
+      "charges": "Nebenkosten (optional)",
+      "pets": "Haustiere erlaubt (optional)",
+      "availableFrom": "Verfügbar ab *",
+      "contactMethods": "Kontaktmethode *",
+      "contactMethodsHint": "Gib WhatsApp, E-Mail oder beides an.",
+      "contactPhone": "WhatsApp-Nummer (optional)",
       "contactEmail": "Kontakt-E-Mail (optional)",
       "description": "Beschreibung *",
       "descHint": "Eine gute Beschreibung erhöht deine Chancen, schnell einen Mieter zu finden.",
@@ -108,6 +134,7 @@
       "selectType": "Immobilientyp auswählen",
       "selectMode": "Miete oder Kauf",
       "city": "Z.B. Königstein im Taunus, Hessen",
+      "neighborhood": "Z.B. Innenstadt oder 37574",
       "price": "Z.B. 850",
       "area": "Z.B. 65",
       "bedrooms": "Z.B. 3",
@@ -130,6 +157,8 @@
       "bedroomsReq": "Die Anzahl der Schlafzimmer ist erforderlich",
       "bathroomsReq": "Die Anzahl der Badezimmer ist erforderlich",
       "floorReq": "Die Etage ist erforderlich",
+      "availableFromReq": "Das Verfügbarkeitsdatum ist erforderlich",
+      "contactReq": "Gib eine E-Mail-Adresse oder WhatsApp-Nummer an",
       "descMin": "Die Beschreibung muss mindestens 10 Zeichen lang sein",
       "emailInvalid": "Gib eine gültige E-Mail-Adresse ein",
       "phoneInvalid": "Gib eine gültige Telefonnummer ein"
@@ -142,6 +171,15 @@
       "imagesRequired": "Füge der Anzeige mindestens ein Foto hinzu",
       "imageUploadError": "Fehler beim Hochladen des Bildes",
       "chars": "Zeichen"
+    },
+    "preview": {
+      "title": "Vorschau vor der Veröffentlichung",
+      "hint": "Prüfe die öffentlichen Informationen; Kontaktdaten bleiben nur für verifizierte Mitglieder sichtbar.",
+      "untitled": "Anzeige ohne Titel",
+      "rooms": "Zimmer",
+      "noDescription": "Keine Beschreibung angegeben.",
+      "email": "Kontakt-E-Mail",
+      "whatsapp": "WhatsApp"
     },
     "actions": {
       "addPhoto": "Hinzufügen",
@@ -159,7 +197,7 @@
       "removeImage": "Bild entfernen: {name}"
     },
     "labels_extra": {
-      "extras": "Extras / Ausstattung",
+      "extras": "Extras / Ausstattung (optional)",
       "extrasDesc": "Füge Ausstattungsmerkmale und Vorteile der Immobilie hinzu (z. B. Parkplatz, Balkon, Keller, Aufzug...)"
     }
   },
@@ -202,6 +240,7 @@
     "featuresTitle": "Eigenschaften",
     "level": "Ebene",
     "available": "Verfügbar:",
+    "closed": "Anzeige geschlossen",
     "pets": "Haustiere:",
     "petsDenied": "Nicht erlaubt",
     "descTitle": "Beschreibung",
@@ -212,8 +251,10 @@
     "contactTitle": "Kontakt",
     "anonymous": "Anonym",
     "ownerRole": "Eigentümer",
-    "call": "Anrufen",
-    "sendMessage": "Nachricht senden",
+    "whatsapp": "Über WhatsApp kontaktieren",
+    "sendEmail": "E-Mail senden",
+    "signInToContact": "Anmelden, um zu kontaktieren",
+    "verifyEmailToContact": "E-Mail bestätigen, um zu kontaktieren",
     "contactOwner": "Eigentümer kontaktieren",
     "contactUnavailable": "Kontaktdaten nicht verfügbar",
     "phone": "Telefon:",

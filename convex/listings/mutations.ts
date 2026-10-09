@@ -11,6 +11,7 @@ import {
   throwNotFound,
   throwValidationError,
 } from "../utils/errors";
+import { containsSensitivePublicListingText } from "./privacy";
 
 const imageValidator = v.object({
   storageId: v.optional(v.string()),
@@ -23,6 +24,54 @@ const contactValidator = v.object({
   phone: v.optional(v.string()),
   email: v.optional(v.string()),
 });
+
+const listingStatusValidator = v.union(
+  v.literal("active"),
+  v.literal("closed"),
+  v.literal("archived"),
+);
+
+type ListingStatus = "active" | "closed" | "archived";
+type ListingMode = "rent" | "sale";
+type RentalTermsInput = {
+  charges?: number | null;
+  deposit?: number | null;
+  availableFrom?: number | null;
+};
+
+function isAllowedListingTransition(
+  currentStatus: ListingStatus | undefined,
+  nextStatus: ListingStatus,
+) {
+  const current = currentStatus ?? "active";
+  return (
+    (current === "active" && nextStatus === "closed") ||
+    (current === "closed" && nextStatus === "archived")
+  );
+}
+
+function normalizeRentalTerms(
+  listingMode: ListingMode,
+  { charges, deposit, availableFrom }: RentalTermsInput,
+) {
+  if (listingMode === "sale") {
+    return {
+      deposit: undefined,
+      ...(charges !== undefined ? { charges: charges ?? undefined } : {}),
+      ...(availableFrom !== undefined
+        ? { availableFrom: availableFrom ?? undefined }
+        : {}),
+    };
+  }
+
+  return {
+    ...(charges !== undefined ? { charges: charges ?? undefined } : {}),
+    ...(deposit !== undefined ? { deposit: deposit ?? undefined } : {}),
+    ...(availableFrom !== undefined
+      ? { availableFrom: availableFrom ?? undefined }
+      : {}),
+  };
+}
 
 type ListingContactInput = {
   phone?: string;
@@ -39,8 +88,33 @@ function normalizeContact(contact: ListingContactInput | undefined) {
   if (phone && !/^\+?[0-9 ()-]{6,30}$/.test(phone)) {
     throwValidationError("Invalid contact phone number");
   }
-
   return { phone, email };
+}
+
+function assertPublicTextIsSafe(values: {
+  title: string;
+  city: string;
+  neighborhood?: string;
+  description: string;
+  extras?: string[];
+}) {
+  if (containsSensitivePublicListingText([
+    values.title,
+    values.city,
+    values.neighborhood,
+    values.description,
+    ...(values.extras ?? []),
+  ])) {
+    throwValidationError(
+      "Public listing text must not include contact details, GPS coordinates, or an exact address",
+    );
+  }
+}
+
+function assertListingCity(city: string) {
+  if (!city.trim()) {
+    throwValidationError("City is required");
+  }
 }
 
 export const createListing = authMutation({
@@ -61,6 +135,7 @@ export const createListing = authMutation({
       }),
     ),
     city: v.string(),
+    neighborhood: v.optional(v.string()),
     price: v.number(),
 
     charges: v.optional(v.number()),
@@ -86,8 +161,16 @@ export const createListing = authMutation({
   returns: v.id("RealestateListing"),
   handler: async (ctx, args) => {
     const user = ctx.user;
-    const { contact, ...listingArgs } = args;
+    const { contact, charges, deposit, availableFrom, ...listingArgs } = args;
     const normalizedContact = normalizeContact(contact);
+    if (availableFrom === undefined) {
+      throwValidationError("Availability date is required");
+    }
+    if (!normalizedContact.email && !normalizedContact.phone) {
+      throwValidationError("An email address or WhatsApp phone number is required");
+    }
+    assertListingCity(args.city);
+    assertPublicTextIsSafe(listingArgs);
 
     if (user.userType !== "provider" && user.role !== "admin") {
       throwForbidden("Only providers or admins can publish listings");
@@ -111,9 +194,15 @@ export const createListing = authMutation({
       slug: generatedSlug(args.title),
       authorId: user._id,
       authorName: user.name,
+      status: "active",
       updatedAt: Date.now(),
       searchAll: searchAllContent,
       currency: "EUR",
+      ...normalizeRentalTerms(args.listingMode, {
+        charges,
+        deposit,
+        availableFrom,
+      }),
     });
 
     for (const key of new Set(uploadedKeys)) {
@@ -144,7 +233,7 @@ export const createListing = authMutation({
   },
 });
 
-export const deleteListing = authMutation({
+export const archiveListing = authMutation({
   args: { listingId: v.id("RealestateListing") },
   returns: v.null(),
   handler: async (ctx, { listingId }) => {
@@ -154,47 +243,32 @@ export const deleteListing = authMutation({
     const isOwner = listing.authorId === ctx.user._id;
     const isAdmin = ctx.user.role === "admin";
     if (!isOwner && !isAdmin) {
-      throwForbidden("Not allowed to delete this listing");
+      throwForbidden("Not allowed to archive this listing");
+    }
+    if (!isAllowedListingTransition(listing.status, "archived")) {
+      throwValidationError("Listing must be closed before it can be archived");
     }
 
-    // 1. Deletes R2 images (ignores legacy Cloudinary entries without a storageId)
-    const results = await Promise.allSettled(
-      (listing.images ?? [])
-        .filter((img) => img.storageId)
-        .map((img) => r2.deleteObject(ctx, img.storageId!)),
-    );
-    const failed = results.filter((r) => r.status === "rejected");
-    if (failed.length > 0) {
-      console.error(
-        `deleteListing ${listingId}: ${failed.length} image(s) R2 non supprimée(s)`,
-        failed,
-      );
-      // We'll proceed anyway: better an orphaned listing without an image
-      // than an orphaned image without a listing—which would be impossible to find.
+    // Listings are retained by default: contacts, translations, bookmarks and
+    // images remain intact so the owner can restore the record if needed.
+    await ctx.db.patch(listingId, { status: "archived", updatedAt: Date.now() });
+    return null;
+  },
+});
+
+export const setListingStatus = authMutation({
+  args: { listingId: v.id("RealestateListing"), status: listingStatusValidator },
+  returns: v.null(),
+  handler: async (ctx, { listingId, status }) => {
+    const listing = await ctx.db.get(listingId);
+    if (!listing) throwNotFound("Listing not found");
+    if (listing.authorId !== ctx.user._id && ctx.user.role !== "admin") {
+      throwForbidden("Not allowed to change this listing status");
     }
-
-    // 2. Deletes the linked contact
-    const contact = await ctx.db
-      .query("RealestateContactInfo")
-      .withIndex("by_listingId", (q) => q.eq("listingId", listingId))
-      .unique();
-    if (contact) await ctx.db.delete(contact._id);
-
-    const translations = await ctx.db
-      .query("listingTranslations")
-      .withIndex("by_listing", (q) => q.eq("listingId", listingId))
-      .collect();
-    await Promise.all(translations.map((t) => ctx.db.delete(t._id)));
-
-    // 3. Deletes the bookmarks pointing to this listing.
-    const bookmarks = await ctx.db
-      .query("bookmarks")
-      .withIndex("by_resourceId", (q) => q.eq("resourceId", listingId))
-      .collect();
-    await Promise.all(bookmarks.map((b) => ctx.db.delete(b._id)));
-
-    // 4. Deletes the ad itself
-    await ctx.db.delete(listingId);
+    if (!isAllowedListingTransition(listing.status, status)) {
+      throwValidationError("Invalid listing status transition");
+    }
+    await ctx.db.patch(listingId, { status, updatedAt: Date.now() });
     return null;
   },
 });
@@ -219,6 +293,7 @@ export const updateListing = authMutation({
         v.union(v.object({ lat: v.number(), lng: v.number() }), v.null()),
       ),
       city: v.optional(v.string()),
+      neighborhood: v.optional(v.string()),
       price: v.optional(v.number()),
       charges: v.optional(v.union(v.number(), v.null())),
       deposit: v.optional(v.union(v.number(), v.null())),
@@ -246,14 +321,15 @@ export const updateListing = authMutation({
     }
 
     const { location, charges, deposit, availableFrom, ...otherFields } = patch;
+    const nextListingMode = otherFields.listingMode ?? listing.listingMode;
     const normalizedPatch = {
       ...otherFields,
       ...(location !== undefined ? { location: location ?? undefined } : {}),
-      ...(charges !== undefined ? { charges: charges ?? undefined } : {}),
-      ...(deposit !== undefined ? { deposit: deposit ?? undefined } : {}),
-      ...(availableFrom !== undefined
-        ? { availableFrom: availableFrom ?? undefined }
-        : {}),
+      ...normalizeRentalTerms(nextListingMode, {
+        charges,
+        deposit,
+        availableFrom,
+      }),
     };
 
     if (normalizedPatch.images) {
@@ -295,6 +371,8 @@ export const updateListing = authMutation({
     }
 
     const updatedListing = { ...listing, ...normalizedPatch };
+    assertListingCity(updatedListing.city);
+    assertPublicTextIsSafe(updatedListing);
     const searchAllContent = `${updatedListing.title} ${updatedListing.propertyType} ${updatedListing.city} ${updatedListing.listingMode} ${updatedListing.description}`;
 
     await ctx.db.patch(listingId, {
@@ -311,7 +389,7 @@ export const updateListing = authMutation({
     if (contact !== undefined) {
       const normalizedContact = normalizeContact(contact);
       if (!normalizedContact.phone && !normalizedContact.email) {
-        if (existingContact) await ctx.db.delete(existingContact._id);
+        throwValidationError("An email address or WhatsApp phone number is required");
       } else if (existingContact) {
         await ctx.db.patch(existingContact._id, {
           ...normalizedContact,
