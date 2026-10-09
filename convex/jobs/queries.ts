@@ -12,6 +12,12 @@ function visibleJobFilter(q: FilterBuilder<DataModel["JobOffer"]>) {
   return q.or(q.eq(q.field("status"), "active"), q.eq(q.field("status"), undefined));
 }
 
+function withoutJobLocation<T extends { location?: unknown }>(job: T) {
+  const { location, ...publicJob } = job;
+  void location;
+  return publicJob;
+}
+
 export const getJobWithContact = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
@@ -45,7 +51,7 @@ export const getJobWithContact = query({
       if (existingBookmark) isBookmarked = true;
     }
 
-    return { ...job, isBookmarked };
+    return { ...withoutJobLocation(job), isBookmarked };
   },
 });
 
@@ -108,7 +114,7 @@ export const getJobMetadata = query({
       return null;
     }
 
-    return job;
+    return withoutJobLocation(job);
   },
 });
 
@@ -161,7 +167,7 @@ export const getJobs = query({
         bookmarksPage.page.map(async (b) => {
           const job = await ctx.db.get(b.resourceId as Id<"JobOffer">);
           if (!job) return null;
-          return { ...job, isBookmarked: true } as typeof job & {
+          return { ...withoutJobLocation(job), isBookmarked: true } as Omit<typeof job, "location"> & {
             isBookmarked: boolean;
           };
         }),
@@ -204,7 +210,7 @@ export const getJobs = query({
               .unique();
             if (existingBookmark) isBookmarked = true;
           }
-          return { ...job, isBookmarked };
+          return { ...withoutJobLocation(job), isBookmarked };
         }),
       );
 
@@ -264,7 +270,7 @@ export const getJobs = query({
             .unique();
           if (existingBookmark) isBookmarked = true;
         }
-        return { ...job, isBookmarked };
+        return { ...withoutJobLocation(job), isBookmarked };
       }),
     );
 

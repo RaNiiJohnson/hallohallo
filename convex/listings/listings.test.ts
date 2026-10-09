@@ -237,7 +237,7 @@ describe("Listings", () => {
     ).rejects.toThrow("Public listing text must not include contact details");
   });
 
-  it("upserts and removes contact details while keeping legacy listings valid", async () => {
+  it("upserts contact details and prevents removing the last contact method", async () => {
     await t.mutation(api.listings.mutations.updateListing, {
       listingId,
       patch: {},
@@ -251,18 +251,13 @@ describe("Listings", () => {
       )?.contact?.email,
     ).toBeUndefined();
 
-    await t.mutation(api.listings.mutations.updateListing, {
-      listingId,
-      patch: {},
-      contact: {},
-    });
-    expect(
-      (
-        await t.query(api.listings.queries.getListingWithContact, {
-          slug: listingSlug,
-        })
-      )?.contact,
-    ).toBeNull();
+    await expect(
+      t.mutation(api.listings.mutations.updateListing, {
+        listingId,
+        patch: {},
+        contact: {},
+      }),
+    ).rejects.toThrow("An email address or WhatsApp phone number is required");
   });
 
   it("updates a listing and clears optional fields", async () => {

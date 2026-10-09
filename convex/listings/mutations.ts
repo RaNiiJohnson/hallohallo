@@ -394,7 +394,7 @@ export const updateListing = authMutation({
     if (contact !== undefined) {
       const normalizedContact = normalizeContact(contact);
       if (!normalizedContact.phone && !normalizedContact.email) {
-        if (existingContact) await ctx.db.delete(existingContact._id);
+        throwValidationError("An email address or WhatsApp phone number is required");
       } else if (existingContact) {
         await ctx.db.patch(existingContact._id, {
           ...normalizedContact,

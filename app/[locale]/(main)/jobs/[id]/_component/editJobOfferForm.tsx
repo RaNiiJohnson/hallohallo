@@ -43,7 +43,6 @@ import { useMutation, useQuery } from "convex/react";
 import { ChevronLeft, ChevronRight, XIcon } from "lucide-react";
 import { toast } from "sonner";
 
-import { LocationPicker } from "@/lib/LocationPicker";
 import { runMutationWorkflow } from "@/lib/mutation-workflow";
 import {
   contractTypesForJobType,
@@ -75,12 +74,6 @@ export function EditJobOfferForm({
   const formSchema = z.object({
     title: z.string().min(1, t("form.validation.titleReq")),
     type: z.enum(jobTypeValues),
-    location: z
-      .object({
-        lat: z.number(),
-        lng: z.number(),
-      })
-      .optional(),
     contractType: z.enum(contractTypeValues),
     city: z.string(),
     workMode: z.enum(workModeValues),
@@ -121,7 +114,6 @@ export function EditJobOfferForm({
     defaultValues: {
       title: jobOffer?.title,
       type: jobOffer?.type as (typeof jobTypeValues)[number],
-      location: jobOffer?.location,
       contractType:
         jobOffer?.contractType as (typeof contractTypeValues)[number],
       city: jobOffer?.city,
@@ -212,7 +204,6 @@ export function EditJobOfferForm({
           id: jobOffer._id,
           title: data.title,
           type: data.type,
-          location: data.location,
           contractType: data.contractType,
           city: data.city,
           workMode: data.workMode,
@@ -465,22 +456,6 @@ export function EditJobOfferForm({
             />
           )}
 
-          {/* Location Map Picker */}
-          <Controller
-            name="location"
-            control={form.control}
-            render={({ field }) => (
-              <Field>
-                <FieldLabel>{t("form.labels.mapPosition")}</FieldLabel>
-                <FieldDescription>{t("form.labels.mapDesc")}</FieldDescription>
-                <LocationPicker
-                  value={field.value}
-                  onChange={field.onChange}
-                  onCityChange={(city) => form.setValue("city", city)}
-                />
-              </Field>
-            )}
-          />
 
           {showDurationAndStart && <Controller
             name="startDate"

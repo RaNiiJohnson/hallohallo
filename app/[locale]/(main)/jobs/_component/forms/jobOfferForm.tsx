@@ -49,7 +49,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { LocationPicker } from "@/lib/LocationPicker";
 import {
   contractTypesForJobType,
   contractTypeValues,
@@ -81,12 +80,6 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
   const formSchema = z.object({
     title: z.string().min(1, t("form.validation.titleReq")),
     type: z.enum(jobTypeValues),
-    location: z
-      .object({
-        lat: z.number(),
-        lng: z.number(),
-      })
-      .optional(),
     contractType: z.enum(contractTypeValues),
     city: z.string(),
     workMode: z.enum(workModeValues),
@@ -209,7 +202,6 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
       await createJob({
         title: data.title,
         type: data.type,
-        location: data.location,
         contractType: data.contractType,
         city: data.city,
         workMode: data.workMode,
@@ -454,22 +446,6 @@ export function JobOfferForm({ onSuccess }: JobOfferFormProps) {
             />
           )}
 
-          {/* Location Map Picker */}
-          <Controller
-            name="location"
-            control={form.control}
-            render={({ field }) => (
-              <Field>
-                <FieldLabel>{t("form.labels.mapPosition")}</FieldLabel>
-                <FieldDescription>{t("form.labels.mapDesc")}</FieldDescription>
-                <LocationPicker
-                  value={field.value}
-                  onChange={field.onChange}
-                  onCityChange={(city) => form.setValue("city", city)}
-                />
-              </Field>
-            )}
-          />
           {showDurationAndStart && <Controller
             name="startDate"
             control={form.control}
