@@ -93,7 +93,7 @@ function normalizeContact(contact: ListingContactInput | undefined) {
 const emailPattern = /[^\s@]+@[^\s@]+\.[^\s@]+/i;
 const phonePattern = /\+?\d(?:[\s().-]*\d){5,}/;
 const coordinatePattern = /[-+]?\d{1,2}\.\d{3,}\s*,\s*[-+]?\d{1,3}\.\d{3,}/;
-const addressPattern = /\b(?:\d{1,4}[a-z]?\s+(?:[a-zà-ÿ'-]+\s+){0,4}(?:straße|strasse|street|rue|avenue|avenida|weg|allee|platz)|[a-zà-ÿ'-]*?(?:straße|strasse|street|rue|avenue|avenida|weg|allee|platz)\s+\d{1,4}[a-z]?)\b/i;
+const addressPattern = /\b(?:\d{1,4}[a-z]?\s+(?:[a-zà-ÿ'-]+\s+){0,4}(?:straße|strasse|str\.?|street|rue|avenue|avenida|weg|allee|platz)|[a-zà-ÿ'-]*?(?:straße|strasse|str\.?|street|rue|avenue|avenida|weg|allee|platz)\s+\d{1,4}[a-z]?)\b/i;
 
 function assertPublicTextIsSafe(values: {
   title: string;

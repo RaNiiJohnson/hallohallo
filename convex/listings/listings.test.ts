@@ -235,6 +235,13 @@ describe("Listings", () => {
         patch: { neighborhood: "Hauptstraße 42" },
       }),
     ).rejects.toThrow("Public listing text must not include contact details");
+
+    await expect(
+      t.mutation(api.listings.mutations.updateListing, {
+        listingId,
+        patch: { neighborhood: "Hauptstr. 12" },
+      }),
+    ).rejects.toThrow("Public listing text must not include contact details");
   });
 
   it("upserts contact details and prevents removing the last contact method", async () => {
