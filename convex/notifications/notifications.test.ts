@@ -75,4 +75,24 @@ describe("Notifications", () => {
     const notif = await t.run(async (ctx) => await ctx.db.get(notificationId));
     expect(notif?.read).toBe(false);
   });
+
+  it("only returns the signed-in member's paginated notification history", async () => {
+    await t.run(async (ctx) => {
+      await ctx.db.insert("notifications", {
+        userId: "anotherUserId",
+        type: "new_like",
+        read: false,
+        fromUserName: "Someone else",
+        message: "Private to another member",
+      });
+    });
+
+    const result = await t.query(api.notifications.queries.getMyNotificationsPage, {
+      paginationOpts: { cursor: null, numItems: 10 },
+    });
+
+    expect(result.page).toHaveLength(1);
+    expect(result.page[0]._id).toBe(notificationId);
+    expect(JSON.stringify(result)).not.toContain("anotherUserId");
+  });
 });

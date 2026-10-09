@@ -13,6 +13,7 @@
   "at": "chez {company}",
   "skills": "Compétences",
   "journey": "Parcours",
+  "activeContent": "Contenus actifs",
   "contactInfo": "Informations de contact",
   "email": "Email",
   "visibleOnProfile": "Visible sur le profil",
@@ -20,6 +21,7 @@
   "profileVisibility": "Visibilité du profil",
   "publicProfile": "Profil public",
   "privateProfile": "Profil privé",
+  "privateProfileDescription": "Ce membre a choisi de garder son profil privé.",
   "edit": "Modifier",
   "viewProfile": "Voir le profil",
   "status": {
@@ -86,7 +88,7 @@
   "saveError": "Une erreur est survenue lors de la mise à jour du profil",
   "editForm": {
     "title": "Informations du profil",
-    "description": "Personnalisez votre profil public et vos informations de contact",
+    "description": "Personnalisez votre profil public. Votre e-mail et votre CV restent privés.",
     "name": "Nom",
     "slug": "Nom d'utilisateur public",
     "slugHint": "Utilisé pour votre URL de profil",

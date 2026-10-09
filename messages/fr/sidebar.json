@@ -16,6 +16,7 @@
   "auth": {
     "register": "S'inscrire",
     "login": "Se connecter",
+    "account": "Mon espace",
     "profile": "Mon Profil",
     "settings": "Paramètres",
     "logout": "Se déconnecter"

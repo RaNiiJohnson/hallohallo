@@ -16,6 +16,7 @@
   "auth": {
     "register": "Sign up",
     "login": "Log in",
+    "account": "My space",
     "profile": "My Profile",
     "settings": "Settings",
     "logout": "Log out"

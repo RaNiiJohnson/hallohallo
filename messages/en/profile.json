@@ -13,6 +13,7 @@
   "at": "at {company}",
   "skills": "Skills",
   "journey": "Journey",
+  "activeContent": "Active content",
   "contactInfo": "Contact information",
   "email": "Email",
   "visibleOnProfile": "Visible on profile",
@@ -20,6 +21,7 @@
   "profileVisibility": "Profile visibility",
   "publicProfile": "Public profile",
   "privateProfile": "Private profile",
+  "privateProfileDescription": "This member chose to keep their profile private.",
   "edit": "Edit",
   "viewProfile": "View profile",
   "status": {
@@ -86,7 +88,7 @@
   "saveError": "Something went wrong while updating your profile",
   "editForm": {
     "title": "Profile information",
-    "description": "Customize your public profile and contact information",
+    "description": "Customize your public profile. Your email and CV stay private.",
     "name": "Name",
     "slug": "Public username",
     "slugHint": "Used for your profile URL",

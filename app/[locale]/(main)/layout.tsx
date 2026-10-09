@@ -1,6 +1,5 @@
 import Footer from "@/components/footer";
 import { MainNavbar } from "@/components/main-navbar";
-import { NotificationWidget } from "@/components/notificationBell";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WidgetProvider } from "@/components/WidgetContext";
 import { Locale } from "@/i18n/routing";
@@ -17,15 +16,14 @@ export default async function RootLayout({
   setRequestLocale(locale as Locale);
 
   return (
-    <div className="flex min-h-svh flex-col bg-background">
-      <MainNavbar />
-      <main className="mx-auto w-full min-h-screen">
-        <TooltipProvider>{children}</TooltipProvider>
-      </main>
-      <Footer />
-      <WidgetProvider>
-        <NotificationWidget />
-      </WidgetProvider>
-    </div>
+    <WidgetProvider>
+      <div className="flex min-h-svh flex-col bg-background">
+        <MainNavbar />
+        <main className="mx-auto min-h-screen w-full">
+          <TooltipProvider>{children}</TooltipProvider>
+        </main>
+        <Footer />
+      </div>
+    </WidgetProvider>
   );
 }

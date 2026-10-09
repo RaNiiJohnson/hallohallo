@@ -42,6 +42,7 @@ import type * as listings_mutations from "../listings/mutations.js";
 import type * as listings_privacy from "../listings/privacy.js";
 import type * as listings_queries from "../listings/queries.js";
 import type * as listings_translate from "../listings/translate.js";
+import type * as me_queries from "../me/queries.js";
 import type * as notifications_mutations from "../notifications/mutations.js";
 import type * as notifications_queries from "../notifications/queries.js";
 import type * as posts_actions from "../posts/actions.js";
@@ -98,6 +99,7 @@ declare const fullApi: ApiFromModules<{
   "listings/privacy": typeof listings_privacy;
   "listings/queries": typeof listings_queries;
   "listings/translate": typeof listings_translate;
+  "me/queries": typeof me_queries;
   "notifications/mutations": typeof notifications_mutations;
   "notifications/queries": typeof notifications_queries;
   "posts/actions": typeof posts_actions;

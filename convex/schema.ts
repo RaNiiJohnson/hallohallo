@@ -195,9 +195,18 @@ export default defineSchema({
       v.literal("realEstate"),
       v.literal("post"),
     ),
+    // A small, public-safe projection lets the private favorites page render
+    // a page of saved resources without issuing one document read per item.
+    // It is optional while bookmarks created before PR 4 remain in place.
+    snapshot: v.optional(
+      v.object({
+        title: v.string(),
+        href: v.string(),
+        subtitle: v.optional(v.string()),
+      }),
+    ),
   })
     .index("by_userId", ["userId"])
-    .index("by_userId_and_resourceType", ["userId", "resourceType"])
     .index("by_userId_and_resourceType_and_resourceId", [
       "userId",
       "resourceType",

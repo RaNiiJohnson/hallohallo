@@ -108,9 +108,9 @@ describe("Bookmarks", () => {
 
     const afterRemoval = await t.query(
       api.bookmarks.queries.getMyBookmarks,
-      {},
+      { paginationOpts: { cursor: null, numItems: 10 } },
     );
-    expect(afterRemoval).toHaveLength(0);
+    expect(afterRemoval.page).toHaveLength(0);
 
     await t.mutation(api.bookmarks.mutations.toggleBookmark, {
       resourceId: postId,
@@ -118,12 +118,16 @@ describe("Bookmarks", () => {
     });
     const afterInsert = await t.query(
       api.bookmarks.queries.getMyBookmarks,
-      {},
+      { paginationOpts: { cursor: null, numItems: 10 } },
     );
-    expect(afterInsert).toHaveLength(1);
+    expect(afterInsert.page).toHaveLength(1);
+    expect(afterInsert.page[0]?.snapshot).toMatchObject({
+      title: "Test Post",
+      href: expect.stringContaining("/communities/"),
+    });
   });
 
-  it("bounds the public bookmark list", async () => {
+  it("paginates private bookmarks without resolving every resource", async () => {
     await t.run(async (ctx) => {
       for (let index = 0; index < 105; index += 1) {
         await ctx.db.insert("bookmarks", {
@@ -134,7 +138,32 @@ describe("Bookmarks", () => {
       }
     });
 
-    const bookmarks = await t.query(api.bookmarks.queries.getMyBookmarks, {});
-    expect(bookmarks).toHaveLength(100);
+    const bookmarks = await t.query(api.bookmarks.queries.getMyBookmarks, {
+      paginationOpts: { cursor: null, numItems: 20 },
+    });
+    expect(bookmarks.page).toHaveLength(20);
+    expect(bookmarks.isDone).toBe(false);
+  });
+
+  it("repairs and opens an existing legacy bookmark for its owner", async () => {
+    const bookmarkId = await t.run(async (ctx) =>
+      ctx.db.insert("bookmarks", {
+        userId: "testUserId",
+        resourceId: postId,
+        resourceType: "post",
+      }),
+    );
+
+    const snapshot = await t.mutation(
+      api.bookmarks.mutations.resolveLegacyBookmark,
+      { bookmarkId },
+    );
+
+    expect(snapshot).toMatchObject({
+      title: "Test Post",
+      href: expect.stringContaining("/communities/"),
+    });
+    const repaired = await t.run((ctx) => ctx.db.get(bookmarkId));
+    expect(repaired?.snapshot).toEqual(snapshot);
   });
 });

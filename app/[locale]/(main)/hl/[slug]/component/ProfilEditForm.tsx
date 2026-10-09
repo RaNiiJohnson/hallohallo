@@ -65,7 +65,6 @@ function buildDefaultValues(user: UserType) {
     status: (user.status ?? "active") as (typeof profileStatusValues)[number],
     isServiceProvider: !!user.isServiceProvider,
     isPublic: user.isPublic ?? true,
-    showEmail: !!user.showEmail,
   };
 }
 
@@ -94,7 +93,6 @@ export function ProfileEditForm({ user, onSaved }: ProfileEditFormProps) {
     status: z.enum(profileStatusValues),
     isServiceProvider: z.boolean(),
     isPublic: z.boolean(),
-    showEmail: z.boolean(),
   });
 
   type FormSchema = z.infer<typeof formSchema>;
@@ -127,7 +125,6 @@ export function ProfileEditForm({ user, onSaved }: ProfileEditFormProps) {
           status: data.status,
           isServiceProvider: data.isServiceProvider,
           isPublic: data.isPublic,
-          showEmail: data.showEmail,
         },
       });
       toast.success(t("saveSuccess"));
@@ -520,22 +517,6 @@ export function ProfileEditForm({ user, onSaved }: ProfileEditFormProps) {
                       {t("editForm.isPublicHint")}
                     </FieldDescription>
                   </div>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </Field>
-              )}
-            />
-
-            <Controller
-              name="showEmail"
-              control={form.control}
-              render={({ field }) => (
-                <Field orientation="horizontal" className="py-2">
-                  <p className="font-medium text-sm">
-                    {t("editForm.showEmail")}
-                  </p>
                   <Switch
                     checked={field.value}
                     onCheckedChange={field.onChange}

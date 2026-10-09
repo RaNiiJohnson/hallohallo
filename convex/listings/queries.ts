@@ -218,7 +218,7 @@ export const getListing = query({
       if (!user) return { page: [], isDone: true, continueCursor: "" };
       const bookmarksPage = await ctx.db
         .query("bookmarks")
-        .withIndex("by_userId_and_resourceType", (q) =>
+        .withIndex("by_userId_and_resourceType_and_resourceId", (q) =>
           q.eq("userId", user._id).eq("resourceType", "realEstate"),
         )
         .order("desc")

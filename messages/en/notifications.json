@@ -3,6 +3,7 @@
   "description": "Your recent notifications",
   "empty": "No notifications",
   "markAllRead": "Mark all as read",
+  "history": "View all notifications",
   "open": "Open notifications",
   "close": "Close notifications",
   "someone": "Someone",

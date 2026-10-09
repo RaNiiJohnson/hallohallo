@@ -1,5 +1,10 @@
 export function getAccountNavigation(slug: string | null | undefined) {
-  return slug ? [{ key: "profile" as const, href: `/hl/${slug}` }] : [];
+  return slug
+    ? [
+        { key: "account" as const, href: "/me" },
+        { key: "profile" as const, href: `/hl/${slug}` },
+      ]
+    : [{ key: "account" as const, href: "/me" }];
 }
 
 export const sitemapRoutes = ["", "/jobs", "/listing", "/communities"] as const;

@@ -40,22 +40,24 @@ export function projectPublicUser(
 ): PublicUser {
   const isOwner = options.viewerId === user._id;
   const isPublic = user.isPublic !== false;
-  const canSeeDetails = isOwner || isPublic;
-  const canSeeEmail = isOwner || (isPublic && user.showEmail === true);
+  // A public profile is intentionally a small identity card. Full biography,
+  // professional details, email and CV state belong only to its owner.
+  const canSeePrivateDetails = isOwner;
 
   return {
     _id: user._id,
     name: user.name,
     slug: user.slug,
     isPublic,
-    showEmail: canSeeDetails && user.showEmail === true,
-    ...(canSeeDetails
+    showEmail: isOwner && user.showEmail === true,
+    ...(isPublic || isOwner
+      ? { image: user.image, city: user.city }
+      : {}),
+    ...(canSeePrivateDetails
       ? {
-          image: user.image,
           coverImage: user.coverImage,
           headline: user.headline,
           bio: user.bio,
-          city: user.city,
           country: user.country,
           industry: user.industry,
           roles: user.roles,
@@ -70,7 +72,7 @@ export function projectPublicUser(
           userType: user.userType,
         }
       : {}),
-    ...(canSeeEmail ? { email: user.email } : {}),
+    ...(isOwner ? { email: user.email } : {}),
     ...(isOwner ? { hasCv: Boolean(user.cv) } : {}),
   };
 }

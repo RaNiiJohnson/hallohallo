@@ -16,6 +16,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { Link } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
+import { cn } from "@/lib/utils";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
 import { useConvexAuth, useMutation } from "convex/react";
@@ -33,7 +34,11 @@ const notificationIcon: Record<string, string> = {
   leave_community: "❌",
 };
 
-export function NotificationWidget() {
+export function NotificationWidget({
+  placement = "floating",
+}: {
+  placement?: "floating" | "navbar";
+}) {
   const { isAuthenticated } = useConvexAuth();
   const { activeWidget, openWidget, closeWidget } = useWidget();
   const timeT = useTimeTranslations();
@@ -128,15 +133,32 @@ export function NotificationWidget() {
     </div>
   );
 
+  const historyLink = (
+    <Link
+      href="/me?tab=notifications"
+      onClick={() => closeWidget("notifications")}
+      className="block border-t border-border px-4 py-3 text-center text-sm font-medium text-primary hover:bg-muted"
+    >
+      {t("history")}
+    </Link>
+  );
+
   return (
-    <div className="fixed bottom-5 right-5 z-50">
+    <div
+      className={cn(
+        placement === "floating" ? "fixed bottom-5 right-5 z-50" : "relative",
+      )}
+    >
       {isMobile ? (
         <>
           {!isOpen && (
             <button
               onClick={() => openWidget("notifications")}
               aria-label={t("open")}
-              className="relative w-12 h-12 rounded-full bg-card border border-border text-foreground flex items-center justify-center shadow-lg hover:bg-muted transition-colors"
+              className={cn(
+                "relative flex items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted",
+                placement === "navbar" ? "size-11" : "size-12 shadow-lg",
+              )}
             >
               <Bell size={18} />
               {unreadCount != null && unreadCount > 0 && (
@@ -192,6 +214,7 @@ export function NotificationWidget() {
                 </div>
               </div>
               {notificationListContent}
+              {historyLink}
             </SheetContent>
           </Sheet>
         </>
@@ -200,7 +223,10 @@ export function NotificationWidget() {
           <PopoverTrigger asChild>
             <button
               aria-label={t("open")}
-              className="relative w-12 h-12 rounded-full bg-card border border-border text-foreground flex items-center justify-center shadow-lg hover:bg-muted transition-colors"
+                className={cn(
+                  "relative flex items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted",
+                  placement === "navbar" ? "size-11" : "size-12 shadow-lg",
+                )}
             >
               <Bell size={18} />
               {!isOpen && unreadCount != null && unreadCount > 0 && (
@@ -240,6 +266,7 @@ export function NotificationWidget() {
               )}
             </div>
             {notificationListContent}
+            {historyLink}
           </PopoverContent>
         </Popover>
       )}

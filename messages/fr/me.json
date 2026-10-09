@@ -1,0 +1,64 @@
+{
+  "title": "Mon espace",
+  "description": "Vos éléments personnels restent visibles uniquement par vous.",
+  "signIn": "Connectez-vous pour accéder à votre espace personnel.",
+  "tabs": {
+    "favorites": "Favoris",
+    "publications": "Publications",
+    "communities": "Communautés",
+    "applications": "Candidatures",
+    "notifications": "Alertes",
+    "profile": "Réglages"
+  },
+  "favorites": {
+    "empty": "Vous n’avez pas encore de favori.",
+    "legacy": "{type} sauvegardé (ouvrir)",
+    "types": {
+      "job": "Offre d’emploi",
+      "realEstate": "Annonce logement",
+      "post": "Publication"
+    },
+    "opening": "Ouverture du favori…",
+    "unavailable": "Ce favori n’est plus disponible.",
+    "backToFavorites": "Retour aux favoris",
+    "loadMore": "Afficher plus de favoris"
+  },
+  "publications": {
+    "jobs": "Offres d’emploi",
+    "listings": "Annonces logement",
+    "posts": "Publications",
+    "empty": "Aucune publication pour le moment.",
+    "loadMore": "Afficher plus"
+  },
+  "communities": {
+    "empty": "Vous n’avez rejoint aucune communauté.",
+    "loadMore": "Afficher plus de communautés"
+  },
+  "applications": {
+    "empty": "Vous n’avez envoyé aucune candidature.",
+    "pending": "Envoi en cours",
+    "sent": "Envoyée",
+    "failed": "Échec d’envoi",
+    "unavailable": "Offre indisponible",
+    "loadMore": "Afficher plus de candidatures"
+  },
+  "notifications": {
+    "empty": "Aucune notification.",
+    "loadMore": "Afficher plus de notifications",
+    "markAllRead": "Tout marquer comme lu",
+    "fallback": "Notification"
+  },
+  "profile": {
+    "title": "Profil et confidentialité",
+    "publicProfile": "Voir mon profil public",
+    "privateCv": "Votre CV est privé et n’est jamais visible sur votre profil public.",
+    "editProfile": "Modifier mon profil",
+    "profileVisibility": "Profil public",
+    "profileVisibilityHint": "Rendre mon profil visible avec mes contenus actifs."
+  },
+  "status": {
+    "active": "Active",
+    "closed": "Clôturée",
+    "archived": "Archivée"
+  }
+}

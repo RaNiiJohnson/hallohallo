@@ -82,7 +82,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
                 ...user,
                 slug: generatedSlug(user.name),
                 isPublic: true,
-                showEmail: true,
+                showEmail: false,
                 showPhone: false,
               },
             };

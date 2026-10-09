@@ -35,6 +35,16 @@ describe("public user projection", () => {
     expect(result).not.toHaveProperty("showPhone");
   });
 
+  it("keeps a public profile minimal even when the owner enabled email visibility", () => {
+    const result = projectPublicUser({ ...user, showEmail: true, city: "Berlin" });
+
+    expect(result).toMatchObject({ name: "Ada", city: "Berlin" });
+    expect(result.email).toBeUndefined();
+    expect(result.headline).toBeUndefined();
+    expect(result.bio).toBeUndefined();
+    expect(result.skills).toBeUndefined();
+  });
+
   it("hides detailed fields for a private profile visitor", () => {
     const result = projectPublicUser({ ...user, isPublic: false });
 
