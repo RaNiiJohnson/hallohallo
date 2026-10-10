@@ -74,6 +74,9 @@ describe("public user projection", () => {
       name: "Ada",
       slug: "ada",
       isPublic: false,
+      headline: "Engineer",
+      bio: "Private biography",
+      email: "ada@example.com",
     });
   });
 });
