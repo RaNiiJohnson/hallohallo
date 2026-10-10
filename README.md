@@ -24,6 +24,23 @@ Hallomada est une application web dédiée au réseautage et à l'entraide entre
 - Réseau de confiance au sein de la communauté
 - Annonces vérifiées par les membres
 
+## Stack Technique & Outils
+
+- **Framework**: Next.js
+- **Base de données**: Convex (Backend-as-a-Service)
+- **Authentification**: Better Auth (via Convex)
+- **UI**: shadCn UI + Tailwind CSS
+- **Validation**: Zod + React Hook Form
+- **Gestion d'état URL**: nuqs
+- **Internationalisation**: next-intl
+- **Médias & Stockage**: Cloudflare R2
+- **Emails**: Resend
+- **Paiements**: Stripe
+- **Cartographie**: Maplibre GL
+- **Animations**: Motion (Framer Motion)
+- **Utilitaires**: date-fns
+- **Tests**: Vitest + convex-test
+
 ```text
 Hallo Hallo - Ensemble, construisons une communauté forte !
 ```
