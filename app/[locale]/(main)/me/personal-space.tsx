@@ -260,7 +260,7 @@ function PublicationsPanel() {
                     href={group.href(item as never)}
                     className="block rounded-lg px-2 py-1.5 text-sm hover:bg-muted"
                   >
-                    <span className="block truncate font-medium">
+                    <span className="inline-block max-w-full truncate border-b-2 align-top font-medium ">
                       {item.title}
                     </span>
                   </Link>
