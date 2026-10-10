@@ -236,11 +236,14 @@ function PublicationsPanel() {
   ];
 
   return (
-    <div className="grid gap-5 xl:grid-cols-3">
+    <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
       {groups.map((group) => {
         const Icon = group.icon;
         return (
-          <section key={group.title} className="rounded-xl border bg-card p-4">
+          <section
+            key={group.title}
+            className="min-w-0 rounded-xl border bg-card p-4"
+          >
             <h2 className="mb-3 flex items-center gap-2 font-semibold">
               <Icon className="size-4 text-primary" />
               {group.title}
