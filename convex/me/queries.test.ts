@@ -22,15 +22,27 @@ vi.mock("../auth/auth", async (importOriginal) => {
 
 describe("personal space queries", () => {
   it("never exposes a private or secret community post on a public profile", () => {
-    const post = { scope: "community" } as Pick<
+    const post = { scope: "community", communityId: "community_1" } as Pick<
       import("../_generated/dataModel").Doc<"posts">,
-      "scope"
+      "scope" | "communityId"
     >;
 
     expect(isPublicProfilePost(post, { privacy: "public" })).toBe(true);
     expect(isPublicProfilePost(post, { privacy: "private" })).toBe(false);
     expect(isPublicProfilePost(post, { privacy: "secret" })).toBe(false);
     expect(isPublicProfilePost(post, null)).toBe(false);
+  });
+
+  it("treats legacy posts linked to a community as community content", () => {
+    const legacyPost = { communityId: "community_1" } as Pick<
+      import("../_generated/dataModel").Doc<"posts">,
+      "scope" | "communityId"
+    >;
+
+    expect(isPublicProfilePost(legacyPost, { privacy: "public" })).toBe(true);
+    expect(isPublicProfilePost(legacyPost, { privacy: "private" })).toBe(false);
+    expect(isPublicProfilePost(legacyPost, { privacy: "secret" })).toBe(false);
+    expect(isPublicProfilePost(legacyPost, null)).toBe(false);
   });
 
   it("only returns the signed-in member's applications and never exposes their CV key", async () => {

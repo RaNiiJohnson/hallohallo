@@ -1,6 +1,6 @@
 import { redirect } from "@/i18n/navigation";
 import { getAuthHref } from "@/lib/auth-return-to";
-import { isAuthenticated } from "@/lib/auth-server"; // adapte à ton setup Better Auth / Convex
+import { isAuthenticated } from "@/lib/auth-server";
 import { getLocale } from "next-intl/server";
 import { Suspense } from "react";
 import { PersonalSpace, PersonalSpaceSkeleton } from "./personal-space";

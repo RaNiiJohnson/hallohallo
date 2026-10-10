@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const validTabs = [
   "favorites",
@@ -467,8 +468,17 @@ export function PersonalSpace() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isDesktop, setIsDesktop] = useState(false);
   const tabFromUrl = searchParams.get("tab");
   const selected: Tab = isTab(tabFromUrl) ? tabFromUrl : "favorites";
+
+  useEffect(() => {
+    const query = window.matchMedia("(min-width: 1024px)");
+    const updateOrientation = () => setIsDesktop(query.matches);
+    updateOrientation();
+    query.addEventListener("change", updateOrientation);
+    return () => query.removeEventListener("change", updateOrientation);
+  }, []);
 
   // La redirection non connecté -> /login est gérée côté serveur dans page.tsx.
   // Ici on attend seulement que le token Convex soit prêt avant de lancer les requêtes.
@@ -487,6 +497,7 @@ export function PersonalSpace() {
 
       <Tabs
         value={selected}
+        orientation={isDesktop ? "vertical" : "horizontal"}
         onValueChange={(tab) =>
           router.replace(`/me?tab=${tab}`, { scroll: false })
         }
@@ -494,7 +505,7 @@ export function PersonalSpace() {
       >
         <TabsList
           variant="line"
-          className="grid w-full grid-cols-3 gap-1 rounded-none border-l-2 bg-transparent p-0 pl-2 group-data-[orientation=horizontal]/tabs:h-auto! data-[variant=line]:rounded-none lg:sticky lg:top-24 lg:flex lg:h-auto lg:flex-col lg:gap-4"
+          className="grid w-full grid-cols-3 gap-1 rounded-2xl border border-border/60 bg-card p-1 group-data-[orientation=horizontal]/tabs:h-auto! data-[variant=line]:rounded-2xl lg:sticky lg:top-24 lg:flex lg:h-auto lg:flex-col lg:gap-4 lg:rounded-none lg:border-0 lg:border-l-2 lg:bg-transparent lg:p-0 lg:pl-2 lg:data-[variant=line]:rounded-none"
         >
           {tabs.map(([value, Icon]) => (
             <TabsTrigger

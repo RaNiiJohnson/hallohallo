@@ -12,10 +12,11 @@ const emptyPage = () => ({
 });
 
 export function isPublicProfilePost(
-  post: Pick<Doc<"posts">, "scope">,
+  post: Pick<Doc<"posts">, "scope" | "communityId">,
   community: Pick<Doc<"communities">, "privacy"> | null,
 ) {
-  return post.scope !== "community" || community?.privacy === "public";
+  if (post.communityId) return community?.privacy === "public";
+  return post.scope !== "community";
 }
 
 /** Personal publications are never selected by a caller-supplied user id. */
@@ -152,9 +153,9 @@ export const getPublicActivity = query({
 
     const publicPosts = await Promise.all(
       posts.map(async (post) => {
-        if (post.scope !== "community") return post;
-        if (!post.communityId) return null;
-        const community = await ctx.db.get(post.communityId);
+        const community = post.communityId
+          ? await ctx.db.get(post.communityId)
+          : null;
         return isPublicProfilePost(post, community) ? post : null;
       }),
     );

@@ -37,9 +37,11 @@ export type PublicUser = Infer<typeof publicUserValidator>;
 export function projectPublicUser(
   user: Doc<"user">,
   options: { viewerId?: string | null } = {},
-): PublicUser {
+): PublicUser | null {
   const isOwner = options.viewerId === user._id;
   const isPublic = user.isPublic !== false;
+  if (!isPublic && !isOwner) return null;
+
   // A public profile is intentionally a small identity card. Full biography,
   // professional details, email and CV state belong only to its owner.
   const canSeePrivateDetails = isOwner;
@@ -50,9 +52,8 @@ export function projectPublicUser(
     slug: user.slug,
     isPublic,
     showEmail: isOwner && user.showEmail === true,
-    ...(isPublic || isOwner
-      ? { image: user.image, city: user.city }
-      : {}),
+    image: user.image,
+    city: user.city,
     ...(canSeePrivateDetails
       ? {
           coverImage: user.coverImage,
