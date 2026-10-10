@@ -426,7 +426,7 @@ export const getBookmarkedPosts = query({
     const safeNumItems = Math.max(1, Math.min(numItems, 50));
     const bookmarks = await ctx.db
       .query("bookmarks")
-      .withIndex("by_userId_and_resourceType", (q) =>
+      .withIndex("by_userId_and_resourceType_and_resourceId", (q) =>
         q.eq("userId", user._id).eq("resourceType", "post"),
       )
       .order("desc")

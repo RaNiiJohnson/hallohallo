@@ -25,6 +25,8 @@ const user = {
 describe("public user projection", () => {
   it("never exposes Better Auth, moderation, phone or CV internals", () => {
     const result = projectPublicUser(user);
+    expect(result).not.toBeNull();
+    if (!result) throw new Error("Expected public profile projection");
 
     expect(result.email).toBeUndefined();
     expect(result).not.toHaveProperty("cv");
@@ -35,26 +37,46 @@ describe("public user projection", () => {
     expect(result).not.toHaveProperty("showPhone");
   });
 
+  it("keeps a public profile minimal even when the owner enabled email visibility", () => {
+    const result = projectPublicUser({ ...user, showEmail: true, city: "Berlin" });
+    expect(result).not.toBeNull();
+    if (!result) throw new Error("Expected public profile projection");
+
+    expect(result).toMatchObject({ name: "Ada", city: "Berlin" });
+    expect(result.email).toBeUndefined();
+    expect(result.headline).toBeUndefined();
+    expect(result.bio).toBeUndefined();
+    expect(result.skills).toBeUndefined();
+  });
+
   it("hides detailed fields for a private profile visitor", () => {
     const result = projectPublicUser({ ...user, isPublic: false });
+
+    expect(result).toBeNull();
+  });
+
+  it("returns editable profile data to the owner without revealing the CV key", () => {
+    const result = projectPublicUser(user, { viewerId: "user_1" });
+
+    expect(result?.email).toBe("ada@example.com");
+    expect(result?.hasCv).toBe(true);
+    expect(result).not.toHaveProperty("cv");
+  });
+
+  it("returns a private profile only to its owner", () => {
+    const result = projectPublicUser(
+      { ...user, isPublic: false },
+      { viewerId: "user_1" },
+    );
 
     expect(result).toMatchObject({
       _id: "user_1",
       name: "Ada",
       slug: "ada",
       isPublic: false,
+      headline: "Engineer",
+      bio: "Private biography",
+      email: "ada@example.com",
     });
-    expect(result.headline).toBeUndefined();
-    expect(result.bio).toBeUndefined();
-    expect(result.image).toBeUndefined();
-    expect(result.email).toBeUndefined();
-  });
-
-  it("returns editable profile data to the owner without revealing the CV key", () => {
-    const result = projectPublicUser(user, { viewerId: "user_1" });
-
-    expect(result.email).toBe("ada@example.com");
-    expect(result.hasCv).toBe(true);
-    expect(result).not.toHaveProperty("cv");
   });
 });

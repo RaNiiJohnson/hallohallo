@@ -12,6 +12,7 @@ import { CvUploadSection } from "./component/CvUploadSection";
 import { ImageUploadModal } from "./component/ImageUploadModal";
 import { ProfileEditForm } from "./component/ProfilEditForm";
 import { ProfileView } from "./component/ProfilView";
+import { PublicActivity } from "./component/PublicActivity";
 
 export default function UserClient({
   preloadedUser,
@@ -31,6 +32,26 @@ export default function UserClient({
   }
 
   const isOwnProfile = currentUser?._id === user._id;
+  const ownerProfile = currentUser
+    ? {
+        ...currentUser,
+        isPublic: currentUser.isPublic !== false,
+        showEmail: currentUser.showEmail === true,
+        hasCv: Boolean(currentUser.cv),
+      }
+    : null;
+  const profile = isOwnProfile && ownerProfile ? ownerProfile : user;
+
+  if (currentUser !== undefined && !isOwnProfile && !user.isPublic) {
+    return (
+      <div className="mx-auto my-12 max-w-lg rounded-xl border bg-card p-8 text-center">
+        <h1 className="text-xl font-semibold">{t("privateProfile")}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {t("privateProfileDescription")}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="lg:max-w-4xl mx-auto my-4 lg:space-y-4 sm:space-y-2 space-y-1.5 sm:px-0">
@@ -38,7 +59,7 @@ export default function UserClient({
       <section className="bg-card lg:rounded-lg overflow-hidden">
         <div className="relative">
           <Image
-            src={user.coverImage || "/default-cover.jpg"}
+            src={profile.coverImage || "/default-cover.jpg"}
             alt={t("coverAlt")}
             height={200}
             width={800}
@@ -61,8 +82,8 @@ export default function UserClient({
           <div className="relative -mt-16 sm:-mt-20 mb-4">
             <div className="relative inline-block">
               <Image
-                src={user.image || "/random-user.png"}
-                alt={user.name || t("profileAlt")}
+                src={profile.image || "/random-user.png"}
+                alt={profile.name || t("profileAlt")}
                 height={140}
                 width={140}
                 className="size-28 sm:size-36 object-cover rounded-full border-4 border-card"
@@ -83,15 +104,15 @@ export default function UserClient({
           {/* Name / headline + toggle vue/édition */}
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex-1">
-              <h1 className="text-2xl sm:text-3xl font-bold">{user.name}</h1>
-              {!isEditing && user.headline && (
+              <h1 className="text-2xl sm:text-3xl font-bold">{profile.name}</h1>
+              {!isEditing && profile.headline && (
                 <p className="text-muted-foreground mt-1 text-base sm:text-lg">
-                  {user.headline}
+                  {profile.headline}
                 </p>
               )}
               {isEditing && (
                 <p className="text-sm text-muted-foreground mt-1">
-                  @{user.slug || "—"}
+                  @{profile.slug || "—"}
                 </p>
               )}
             </div>
@@ -111,34 +132,34 @@ export default function UserClient({
           {!isEditing && (
             <>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-sm text-muted-foreground">
-                {(user.city || user.country) && (
+                {(profile.city || profile.country) && (
                   <span className="flex items-center gap-1.5">
                     <MapPin className="size-4" />
-                    {[user.city, user.country].filter(Boolean).join(", ")}
+                    {[profile.city, profile.country].filter(Boolean).join(", ")}
                   </span>
                 )}
-                {user.industry && (
+                {profile.industry && (
                   <span className="flex items-center gap-1.5">
                     <Building2 className="size-4" />
-                    {user.industry}
+                    {profile.industry}
                   </span>
                 )}
               </div>
 
-              {user.isServiceProvider && (
+              {profile.isServiceProvider && (
                 <span className="inline-flex items-center gap-1.5 mt-3 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
                   <Sparkles className="size-4" />
                   {t("serviceProvider")}
                 </span>
               )}
 
-              {user.company && (
+              {profile.company && (
                 <div className="mt-4 flex items-center gap-2 text-sm">
                   <Briefcase className="size-4 text-muted-foreground" />
-                  <span className="font-medium">{user.company}</span>
-                  {user.field && (
+                  <span className="font-medium">{profile.company}</span>
+                  {profile.field && (
                     <span className="text-muted-foreground">
-                      • {user.field}
+                      • {profile.field}
                     </span>
                   )}
                 </div>
@@ -151,13 +172,14 @@ export default function UserClient({
       {/* === CONTENU : vue en lecture seule OU formulaire d'édition === */}
       {isOwnProfile && isEditing ? (
         <>
-          <ProfileEditForm user={user} onSaved={() => setIsEditing(false)} />
-          <CvUploadSection user={user} />
+          <ProfileEditForm user={profile} onSaved={() => setIsEditing(false)} />
+          <CvUploadSection user={profile} />
         </>
       ) : (
         <>
-          {isOwnProfile && <CvUploadSection user={user} />}
-          <ProfileView user={user} />
+          {isOwnProfile && <CvUploadSection user={profile} />}
+          <ProfileView user={profile} />
+          <PublicActivity userId={user._id} />
         </>
       )}
 
@@ -166,13 +188,13 @@ export default function UserClient({
         imageType="profile"
         open={profileImageModalOpen}
         onOpenChange={setProfileImageModalOpen}
-        currentImageUrl={user.image}
+        currentImageUrl={profile.image}
       />
       <ImageUploadModal
         imageType="cover"
         open={coverImageModalOpen}
         onOpenChange={setCoverImageModalOpen}
-        currentImageUrl={user.coverImage}
+        currentImageUrl={profile.coverImage}
       />
     </div>
   );

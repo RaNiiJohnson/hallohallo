@@ -1,0 +1,64 @@
+{
+  "title": "Mein Bereich",
+  "description": "Ihre persönlichen Elemente sind nur für Sie sichtbar.",
+  "signIn": "Melden Sie sich an, um Ihren persönlichen Bereich zu öffnen.",
+  "tabs": {
+    "favorites": "Favoriten",
+    "publications": "Beiträge",
+    "communities": "Gruppen",
+    "applications": "Bewerbungen",
+    "notifications": "Hinweise",
+    "profile": "Einstellungen"
+  },
+  "favorites": {
+    "empty": "Sie haben noch keine Favoriten.",
+    "legacy": "Gespeicherte {type} (öffnen)",
+    "types": {
+      "job": "Stellenangebot",
+      "realEstate": "Wohnungsanzeige",
+      "post": "Beitrag"
+    },
+    "opening": "Favorit wird geöffnet…",
+    "unavailable": "Dieser Favorit ist nicht mehr verfügbar.",
+    "backToFavorites": "Zurück zu Favoriten",
+    "loadMore": "Mehr Favoriten anzeigen"
+  },
+  "publications": {
+    "jobs": "Stellenangebote",
+    "listings": "Wohnungsanzeigen",
+    "posts": "Beiträge",
+    "empty": "Noch keine Veröffentlichungen.",
+    "loadMore": "Mehr anzeigen"
+  },
+  "communities": {
+    "empty": "Sie sind noch keiner Gemeinschaft beigetreten.",
+    "loadMore": "Mehr Gemeinschaften anzeigen"
+  },
+  "applications": {
+    "empty": "Sie haben noch keine Bewerbung gesendet.",
+    "pending": "Wird gesendet",
+    "sent": "Gesendet",
+    "failed": "Versand fehlgeschlagen",
+    "unavailable": "Stellenangebot nicht verfügbar",
+    "loadMore": "Mehr Bewerbungen anzeigen"
+  },
+  "notifications": {
+    "empty": "Keine Benachrichtigungen.",
+    "loadMore": "Mehr Benachrichtigungen anzeigen",
+    "markAllRead": "Alle als gelesen markieren",
+    "fallback": "Benachrichtigung"
+  },
+  "profile": {
+    "title": "Profil und Datenschutz",
+    "publicProfile": "Mein öffentliches Profil ansehen",
+    "privateCv": "Ihr Lebenslauf ist privat und erscheint nie in Ihrem öffentlichen Profil.",
+    "editProfile": "Mein Profil bearbeiten",
+    "profileVisibility": "Öffentliches Profil",
+    "profileVisibilityHint": "Mein Profil mit aktiven Inhalten sichtbar machen."
+  },
+  "status": {
+    "active": "Aktiv",
+    "closed": "Geschlossen",
+    "archived": "Archiviert"
+  }
+}

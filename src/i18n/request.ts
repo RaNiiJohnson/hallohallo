@@ -2,7 +2,7 @@ import { getRequestConfig } from "next-intl/server";
 import { routing } from "./routing";
 import type { Locale } from "./routing";
 
-const namespaces = ['home', 'pricing', 'footer', 'localeSwitcher', 'sidebar', 'faq', 'communities', 'sortMode', 'time', 'common', 'jobs', 'listing', 'auth', 'profile', 'notFound', 'notifications', 'admin'];
+const namespaces = ['home', 'pricing', 'footer', 'localeSwitcher', 'sidebar', 'faq', 'communities', 'sortMode', 'time', 'common', 'jobs', 'listing', 'auth', 'profile', 'me', 'notFound', 'notifications', 'admin'];
 
 export default getRequestConfig(async ({ requestLocale }) => {
   let locale = await requestLocale;

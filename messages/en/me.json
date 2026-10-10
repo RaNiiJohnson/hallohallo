@@ -1,0 +1,64 @@
+{
+  "title": "My space",
+  "description": "Your personal items are visible only to you.",
+  "signIn": "Sign in to access your personal space.",
+  "tabs": {
+    "favorites": "Saved",
+    "publications": "Posts",
+    "communities": "Groups",
+    "applications": "Applications",
+    "notifications": "Alerts",
+    "profile": "Settings"
+  },
+  "favorites": {
+    "empty": "You have not saved anything yet.",
+    "legacy": "Saved {type} (open)",
+    "types": {
+      "job": "job offer",
+      "realEstate": "housing listing",
+      "post": "post"
+    },
+    "opening": "Opening saved item…",
+    "unavailable": "This saved item is no longer available.",
+    "backToFavorites": "Back to saved items",
+    "loadMore": "Show more saved items"
+  },
+  "publications": {
+    "jobs": "Job offers",
+    "listings": "Housing listings",
+    "posts": "Posts",
+    "empty": "No publications yet.",
+    "loadMore": "Show more"
+  },
+  "communities": {
+    "empty": "You have not joined a community yet.",
+    "loadMore": "Show more communities"
+  },
+  "applications": {
+    "empty": "You have not sent an application yet.",
+    "pending": "Sending",
+    "sent": "Sent",
+    "failed": "Delivery failed",
+    "unavailable": "Offer unavailable",
+    "loadMore": "Show more applications"
+  },
+  "notifications": {
+    "empty": "No notifications.",
+    "loadMore": "Show more notifications",
+    "markAllRead": "Mark all as read",
+    "fallback": "Notification"
+  },
+  "profile": {
+    "title": "Profile and privacy",
+    "publicProfile": "View my public profile",
+    "privateCv": "Your CV is private and is never shown on your public profile.",
+    "editProfile": "Edit my profile",
+    "profileVisibility": "Public profile",
+    "profileVisibilityHint": "Show my profile with my active content."
+  },
+  "status": {
+    "active": "Active",
+    "closed": "Closed",
+    "archived": "Archived"
+  }
+}

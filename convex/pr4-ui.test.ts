@@ -25,8 +25,9 @@ describe("PR 4 public navigation and pagination", () => {
     ).toBe(true);
   });
 
-  it("does not expose the nonexistent settings route", () => {
+  it("links authenticated members to their private space, not a nonexistent settings route", () => {
     expect(getAccountNavigation("alice")).toEqual([
+      { key: "account", href: "/me" },
       { key: "profile", href: "/hl/alice" },
     ]);
     expect(getAccountNavigation("alice")).not.toContainEqual(

@@ -13,6 +13,7 @@
   "at": "bei {company}",
   "skills": "Fähigkeiten",
   "journey": "Werdegang",
+  "activeContent": "Aktive Inhalte",
   "contactInfo": "Kontaktinformationen",
   "email": "E-Mail",
   "visibleOnProfile": "Auf dem Profil sichtbar",
@@ -20,6 +21,7 @@
   "profileVisibility": "Profilsichtbarkeit",
   "publicProfile": "Öffentliches Profil",
   "privateProfile": "Privates Profil",
+  "privateProfileDescription": "Dieses Mitglied hat sein Profil privat gehalten.",
   "edit": "Bearbeiten",
   "viewProfile": "Profil ansehen",
   "status": {
@@ -86,7 +88,7 @@
   "saveError": "Beim Aktualisieren des Profils ist ein Fehler aufgetreten",
   "editForm": {
     "title": "Profilinformationen",
-    "description": "Passen Sie Ihr öffentliches Profil und Ihre Kontaktdaten an",
+    "description": "Passen Sie Ihr öffentliches Profil an. Ihre E-Mail und Ihr Lebenslauf bleiben privat.",
     "name": "Name",
     "slug": "Öffentlicher Benutzername",
     "slugHint": "Wird für Ihre Profil-URL verwendet",

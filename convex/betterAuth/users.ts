@@ -15,7 +15,8 @@ export const getAllUsers = query({
     const users = await ctx.db.query("user").take(100);
     return users
       .filter((user) => user.isPublic !== false)
-      .map((user) => projectPublicUser(user));
+      .map((user) => projectPublicUser(user))
+      .filter((user): user is PublicUser => user !== null);
   },
 });
 

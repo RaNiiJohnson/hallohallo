@@ -16,6 +16,7 @@
   "auth": {
     "register": "Registrieren",
     "login": "Anmelden",
+    "account": "Mein Bereich",
     "profile": "Mein Profil",
     "settings": "Einstellungen",
     "logout": "Abmelden"

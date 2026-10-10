@@ -1,6 +1,7 @@
 "use client";
 
 import LocaleSwitcher from "@/components/locale-switcher";
+import { NotificationWidget } from "@/components/notificationBell";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ import {
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
@@ -42,6 +44,7 @@ import {
   Home,
   LogOut,
   Menu,
+  PanelsTopLeft,
   Shield,
   User,
   Users,
@@ -171,6 +174,7 @@ export function MainNavbar() {
                 {t("admin.dashboard")}
               </Link>
             )}
+            <NotificationWidget placement="navbar" />
           </Authenticated>
 
           <div className="hidden lg:block">
@@ -207,28 +211,49 @@ export function MainNavbar() {
                 Hallo
               </span>
             </SheetTitle>
+            <SheetDescription className="sr-only">
+              {navItems.map((item) => t(`nav.${item.key}`)).join(", ")}
+            </SheetDescription>
           </SheetHeader>
 
           <div className="flex flex-1 flex-col overflow-y-auto px-3 py-4">
             <nav className="flex flex-col gap-1">
-              {navItems.map((item) => {
+              {navItems.map((item, index) => {
                 const Icon = item.icon;
                 const active = isActivePath(pathname, item.url);
                 return (
-                  <Link
-                    key={item.url}
-                    href={item.url}
-                    onClick={() => setMobileOpen(false)}
-                    className={cn(
-                      "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
-                      active
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  <React.Fragment key={item.url}>
+                    <Link
+                      href={item.url}
+                      onClick={() => setMobileOpen(false)}
+                      className={cn(
+                        "flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+                        active
+                          ? "bg-primary/10 text-primary"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      )}
+                    >
+                      <Icon className="size-4" />
+                      {t(`nav.${item.key}`)}
+                    </Link>
+                    {index === 0 && (
+                      <Authenticated>
+                        <Link
+                          href="/me"
+                          onClick={() => setMobileOpen(false)}
+                          className={cn(
+                            "flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+                            isActivePath(pathname, "/me")
+                              ? "bg-primary/10 text-primary"
+                              : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                          )}
+                        >
+                          <PanelsTopLeft className="size-4" />
+                          {t("auth.account")}
+                        </Link>
+                      </Authenticated>
                     )}
-                  >
-                    <Icon className="size-4" />
-                    {t(`nav.${item.key}`)}
-                  </Link>
+                  </React.Fragment>
                 );
               })}
             </nav>
