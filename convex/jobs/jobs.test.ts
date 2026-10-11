@@ -288,6 +288,13 @@ describe("Jobs", () => {
   });
 
   it("should delete a job", async () => {
+    await expect(
+      t.mutation(api.jobs.mutations.deleteJob, { id: jobId }),
+    ).rejects.toThrow("Job must be closed before it can be archived");
+    await t.mutation(api.jobs.mutations.setJobStatus, {
+      id: jobId,
+      status: "closed",
+    });
     await t.mutation(api.jobs.mutations.deleteJob, {
       id: jobId,
     });
@@ -320,6 +327,10 @@ describe("Jobs", () => {
       return { translationId, contactId, bookmarkId };
     });
 
+    await t.mutation(api.jobs.mutations.setJobStatus, {
+      id: jobId,
+      status: "closed",
+    });
     await t.mutation(api.jobs.mutations.deleteJob, { id: jobId });
 
     await t.run(async (ctx) => {
@@ -385,6 +396,10 @@ describe("Jobs", () => {
         description: "Description",
         sourceUpdatedAt: Date.now(),
       });
+    });
+    await t.mutation(api.jobs.mutations.setJobStatus, {
+      id: jobId,
+      status: "closed",
     });
     await t.mutation(api.jobs.mutations.deleteJob, { id: jobId });
     authState.user._id = "anotherUserId";

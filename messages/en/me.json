@@ -27,6 +27,11 @@
     "jobs": "Job offers",
     "listings": "Housing listings",
     "posts": "Posts",
+    "statuses": {
+      "active": "Active",
+      "closed": "Closed",
+      "archived": "Archived"
+    },
     "empty": "No publications yet.",
     "loadMore": "Show more"
   },

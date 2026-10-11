@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -209,30 +210,40 @@ function PublicationsPanel() {
     {
       title: t("jobs"),
       icon: BriefcaseBusiness,
-      items: jobs.results,
+      items: jobs.results.map((item) => ({
+        _id: item._id,
+        title: item.title,
+        href: `/jobs/${item.slug}`,
+        status: item.status ?? "active",
+      })),
       status: jobs.status,
       loadMore: jobs.loadMore,
-      href: (item: (typeof jobs.results)[number]) => `/jobs/${item.slug}`,
     },
     {
       title: t("listings"),
       icon: Building2,
-      items: listings.results,
+      items: listings.results.map((item) => ({
+        _id: item._id,
+        title: item.title,
+        href: `/listing/${item.slug}`,
+        status: item.status ?? "active",
+      })),
       status: listings.status,
       loadMore: listings.loadMore,
-      href: (item: (typeof listings.results)[number]) =>
-        `/listing/${item.slug}`,
     },
     {
       title: t("posts"),
       icon: FileText,
-      items: posts.results,
-      status: posts.status,
-      loadMore: posts.loadMore,
-      href: (item: (typeof posts.results)[number]) =>
-        item.communitySlug
+      items: posts.results.map((item) => ({
+        _id: item._id,
+        title: item.title,
+        href: item.communitySlug
           ? `/communities/${item.communitySlug}/${item.slug}`
           : `/posts/${item.slug}`,
+        status: null,
+      })),
+      status: posts.status,
+      loadMore: posts.loadMore,
     },
   ];
 
@@ -258,12 +269,26 @@ function PublicationsPanel() {
                 {group.items.map((item) => (
                   <Link
                     key={item._id}
-                    href={group.href(item as never)}
-                    className="block rounded-lg px-2 py-1.5 text-sm hover:bg-muted"
+                    href={item.href}
+                    className="flex min-w-0 items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-muted"
                   >
-                    <span className="inline-block max-w-full truncate border-b-2 align-top font-medium ">
+                    <span className="min-w-0 flex-1 truncate border-b-2 font-medium">
                       {item.title}
                     </span>
+                    {item.status ? (
+                      <Badge
+                        variant={
+                          item.status === "active"
+                            ? "default"
+                            : item.status === "closed"
+                              ? "secondary"
+                              : "outline"
+                        }
+                        className="shrink-0"
+                      >
+                        {t(`statuses.${item.status}`)}
+                      </Badge>
+                    ) : null}
                   </Link>
                 ))}
               </div>

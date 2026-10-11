@@ -27,6 +27,11 @@
     "jobs": "Offres d’emploi",
     "listings": "Annonces logement",
     "posts": "Publications",
+    "statuses": {
+      "active": "Active",
+      "closed": "Clôturée",
+      "archived": "Archivée"
+    },
     "empty": "Aucune publication pour le moment.",
     "loadMore": "Afficher plus"
   },

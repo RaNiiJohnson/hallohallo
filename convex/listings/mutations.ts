@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
+import { isAllowedPublicationTransition } from "../../src/lib/publication-lifecycle";
 import { authMutation } from "../functions";
 import {
   assertVerifiedUpload,
@@ -31,26 +32,12 @@ const listingStatusValidator = v.union(
   v.literal("archived"),
 );
 
-type ListingStatus = "active" | "closed" | "archived";
 type ListingMode = "rent" | "sale";
 type RentalTermsInput = {
   charges?: number | null;
   deposit?: number | null;
   availableFrom?: number | null;
 };
-
-function isAllowedListingTransition(
-  currentStatus: ListingStatus | undefined,
-  nextStatus: ListingStatus,
-) {
-  const current = currentStatus ?? "active";
-  return (
-    (current === "active" && nextStatus === "closed") ||
-    (current === "closed" &&
-      (nextStatus === "active" || nextStatus === "archived")) ||
-    (current === "archived" && nextStatus === "active")
-  );
-}
 
 function normalizeRentalTerms(
   listingMode: ListingMode,
@@ -245,7 +232,7 @@ export const archiveListing = authMutation({
     if (listing.authorId !== ctx.user._id) {
       throwForbidden("Not allowed to archive this listing");
     }
-    if (!isAllowedListingTransition(listing.status, "archived")) {
+    if (!isAllowedPublicationTransition(listing.status, "archived")) {
       throwValidationError("Listing must be closed before it can be archived");
     }
 
@@ -265,7 +252,7 @@ export const setListingStatus = authMutation({
     if (listing.authorId !== ctx.user._id) {
       throwForbidden("Not allowed to change this listing status");
     }
-    if (!isAllowedListingTransition(listing.status, status)) {
+    if (!isAllowedPublicationTransition(listing.status, status)) {
       throwValidationError("Invalid listing status transition");
     }
     await ctx.db.patch(listingId, { status, updatedAt: Date.now() });

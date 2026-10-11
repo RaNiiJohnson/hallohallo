@@ -1,11 +1,12 @@
 "use client";
 
 import { ShareButton } from "@/components/ShareButton";
+import { MobileActionsMenu } from "@/components/mobile-actions-menu";
 import { ReportDialog } from "@/components/report-dialog";
 import { TranslateMenu } from "@/components/translate-menu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/button-group";
+import { InputGroup } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useManualTranslate } from "@/hooks/use-manual-translate";
@@ -89,6 +90,96 @@ export default function JobDetailsPage() {
   const isAuthor = user?._id === jobOffer.authorId;
   const isAcceptingApplications =
     jobOffer.status === undefined || jobOffer.status === "active";
+
+  const renderOwnerActions = () => (
+    <>
+      <JobLifecycleActions
+        jobId={jobOffer._id}
+        status={jobOffer.status}
+      />
+      <ShareButton text={jobOffer.title} showLabel />
+      <EditJobDialog jobOffer={jobOffer} />
+    </>
+  );
+
+  const renderApplicationAction = () => {
+    if (!isAuthenticated) {
+      return (
+        <Button
+          variant="default"
+          size="sm"
+          className="gap-2"
+          disabled={!isAcceptingApplications}
+          onClick={requireAuthentication}
+        >
+          <Mail className="w-4 h-4" />
+          {isAcceptingApplications ? t("details.apply") : t("details.closed")}
+        </Button>
+      );
+    }
+
+    if (!isAcceptingApplications) {
+      return (
+        <Button variant="outline" size="sm" className="gap-2" disabled>
+          <Mail className="w-4 h-4" />
+          {t("details.closed")}
+        </Button>
+      );
+    }
+
+    if (applicationEmailStatus === "failed") {
+      return (
+        <Button variant="outline" size="sm" className="gap-2" disabled>
+          <Mail className="w-4 h-4" />
+          {t("details.applicationDeliveryFailed")}
+        </Button>
+      );
+    }
+
+    if (applicationEmailStatus !== "none") {
+      return (
+        <Button variant="outline" size="sm" className="gap-2" disabled>
+          <Mail className="w-4 h-4" />
+          {t("details.alreadyApplied")}
+        </Button>
+      );
+    }
+
+    return (
+      <ApplyJobDialog jobOffer={jobOffer}>
+        <Button
+          variant="default"
+          size="sm"
+          className="gap-2"
+          disabled={applicationEmailStatus === undefined}
+        >
+          <Mail className="w-4 h-4" />
+          {t("details.apply")}
+        </Button>
+      </ApplyJobDialog>
+    );
+  };
+
+  const renderVisitorActions = () => (
+    <>
+      {renderApplicationAction()}
+      <ShareButton text={jobOffer.title} showLabel />
+      {user !== undefined && !isAuthor ? (
+        <ReportDialog
+          target={{ type: "job", id: jobOffer._id }}
+          showLabel
+          size="sm"
+          variant="outline"
+        />
+      ) : null}
+      <JobBookmarkButton
+        jobId={jobOffer._id}
+        initialBookmark={jobOffer.isBookmarked}
+        className="mt-0 h-8"
+        showLabel
+      />
+    </>
+  );
 
   return (
     <div className="min-h-screen bg-muted/50">
@@ -199,95 +290,23 @@ export default function JobDetailsPage() {
                 {isLoading ? (
                   <Skeleton className="w-[250px] h-[42px] rounded-full border border-muted select-none pointer-events-none" />
                 ) : isAuthor ? (
-                  <ButtonGroup className="max-w-full flex-wrap justify-center gap-2 [&>*]:rounded-md! [&>*]:border! max-sm:grid max-sm:w-full max-sm:grid-cols-2">
-                    <JobLifecycleActions
-                      jobId={jobOffer._id}
-                      status={jobOffer.status}
-                    />
-                    <ShareButton text={jobOffer.title} showLabel />
-                    <EditJobDialog jobOffer={jobOffer} />
-                  </ButtonGroup>
+                  <>
+                    <InputGroup className="hidden h-auto w-fit max-w-full flex-wrap justify-center overflow-hidden sm:flex [&>*]:shrink-0 [&>*]:rounded-none! [&>*]:border-0! [&>*:not(:last-child)]:border-r!">
+                      {renderOwnerActions()}
+                    </InputGroup>
+                    <MobileActionsMenu>
+                      {renderOwnerActions()}
+                    </MobileActionsMenu>
+                  </>
                 ) : (
-                  <ButtonGroup className="max-w-full flex-wrap justify-center gap-2 [&>*]:rounded-md! [&>*]:border! max-sm:grid max-sm:w-full max-sm:grid-cols-2">
-                    {isAuthenticated ? (
-                      isAcceptingApplications ? (
-                        applicationEmailStatus === "failed" ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="gap-2"
-                            disabled
-                          >
-                            <Mail className="w-4 h-4" />
-                            {t("details.applicationDeliveryFailed")}
-                          </Button>
-                        ) : applicationEmailStatus !== "none" ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="gap-2"
-                            disabled
-                          >
-                            <Mail className="w-4 h-4" />
-                            {t("details.alreadyApplied")}
-                          </Button>
-                        ) : (
-                          <ApplyJobDialog jobOffer={jobOffer}>
-                            <Button
-                              variant="default"
-                              size="sm"
-                              className="gap-2"
-                              disabled={applicationEmailStatus === undefined}
-                            >
-                              <Mail className="w-4 h-4" />
-                              {t("details.apply")}
-                            </Button>
-                          </ApplyJobDialog>
-                        )
-                      ) : (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="gap-2"
-                          disabled
-                        >
-                          <Mail className="w-4 h-4" />
-                          {t("details.closed")}
-                        </Button>
-                      )
-                    ) : (
-                      <Button
-                        variant="default"
-                        size="sm"
-                        className="gap-2"
-                        disabled={!isAcceptingApplications}
-                        onClick={requireAuthentication}
-                      >
-                        <Mail className="w-4 h-4" />
-                        {isAcceptingApplications
-                          ? t("details.apply")
-                          : t("details.closed")}
-                      </Button>
-                    )}
-
-                    <ShareButton text={jobOffer.title} showLabel />
-
-                    {user !== undefined && !isAuthor ? (
-                      <ReportDialog
-                        target={{ type: "job", id: jobOffer._id }}
-                        showLabel
-                        size="sm"
-                        variant="outline"
-                      />
-                    ) : null}
-
-                    <JobBookmarkButton
-                      jobId={jobOffer._id}
-                      initialBookmark={jobOffer.isBookmarked}
-                      className="mt-0 h-8"
-                      showLabel
-                    />
-                  </ButtonGroup>
+                  <>
+                    <InputGroup className="hidden h-auto w-fit max-w-full flex-wrap justify-center overflow-hidden sm:flex [&>*]:shrink-0 [&>*]:rounded-none! [&>*]:border-0! [&>*:not(:last-child)]:border-r!">
+                      {renderVisitorActions()}
+                    </InputGroup>
+                    <MobileActionsMenu>
+                      {renderVisitorActions()}
+                    </MobileActionsMenu>
+                  </>
                 )}
               </div>
             </div>

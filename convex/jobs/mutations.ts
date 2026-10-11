@@ -6,6 +6,7 @@ import {
   type ContractType,
   type JobType,
 } from "../../src/lib/job-offer-options";
+import { isAllowedPublicationTransition } from "../../src/lib/publication-lifecycle";
 import { authComponent } from "../auth/auth";
 import { authMutation, internalMutation } from "../functions";
 import { assertVerifiedUpload, consumeUploadGrant } from "../integrations/r2";
@@ -32,21 +33,6 @@ const contractTypeValidator = v.union(
   v.literal("apprenticeship"),
 );
 const jobContactEmailValidator = v.string();
-
-type JobStatus = "active" | "closed" | "archived";
-
-function isAllowedJobTransition(
-  currentStatus: JobStatus | undefined,
-  nextStatus: JobStatus,
-) {
-  const current = currentStatus ?? "active";
-  return (
-    (current === "active" && nextStatus === "closed") ||
-    (current === "closed" &&
-      (nextStatus === "active" || nextStatus === "archived")) ||
-    (current === "archived" && nextStatus === "active")
-  );
-}
 
 function assertValidJobInput(args: {
   title: string;
@@ -255,6 +241,9 @@ export const deleteJob = authMutation({
     if (existing.authorId !== ctx.user._id) {
       throwForbidden("Not allowed to delete this job");
     }
+    if (!isAllowedPublicationTransition(existing.status, "archived")) {
+      throwValidationError("Job must be closed before it can be archived");
+    }
 
     await ctx.db.patch(args.id, { status: "archived", updatedAt: Date.now() });
 
@@ -276,7 +265,7 @@ export const setJobStatus = authMutation({
     if (job.authorId !== ctx.user._id) {
       throwForbidden("Not allowed to change this job status");
     }
-    if (!isAllowedJobTransition(job.status, status)) {
+    if (!isAllowedPublicationTransition(job.status, status)) {
       throwValidationError("Invalid job status transition");
     }
     await ctx.db.patch(id, { status, updatedAt: Date.now() });

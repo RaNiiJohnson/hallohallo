@@ -28,7 +28,7 @@ export function EditListingDialog({ listing }: EditListingDialogProps) {
       <DialogTrigger asChild>
         <Button size="sm" variant="outline" className="gap-2">
           <Pencil className="size-4" />
-          <span className="max-sm:hidden">{t("trigger")}</span>
+          <span>{t("trigger")}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
