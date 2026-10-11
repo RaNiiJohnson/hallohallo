@@ -1,4 +1,4 @@
-import { MINUTE, RateLimiter } from "@convex-dev/rate-limiter";
+import { DAY, MINUTE, RateLimiter } from "@convex-dev/rate-limiter";
 import { components } from "./_generated/api";
 
 export const limiter = new RateLimiter(components.rateLimiter, {
@@ -25,5 +25,11 @@ export const limiter = new RateLimiter(components.rateLimiter, {
     rate: 12,
     period: MINUTE,
     capacity: 6,
+  },
+  reportPerUser: {
+    kind: "token bucket",
+    rate: 10,
+    period: DAY,
+    capacity: 10,
   },
 });

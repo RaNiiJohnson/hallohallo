@@ -1,6 +1,7 @@
 "use client";
 
 import { ShareButton } from "@/components/ShareButton";
+import { ReportDialog } from "@/components/report-dialog";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
@@ -62,6 +63,14 @@ export default function PropertyPage() {
               />
             )}
             <ShareButton text={property.title} />
+            {user !== undefined && user?._id !== property.authorId ? (
+              <ReportDialog
+                target={{ type: "listing", id: property._id }}
+                showLabel={false}
+                size="icon-sm"
+                variant="outline"
+              />
+            ) : null}
             {canManage ? (
               <EditListingDialog listing={property} />
             ) : (

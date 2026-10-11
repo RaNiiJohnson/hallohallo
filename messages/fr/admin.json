@@ -4,6 +4,7 @@
     "navigation": "Navigation",
     "dashboard": "Dashboard",
     "users": "Utilisateurs",
+    "moderation": "Modération",
     "audit": "Journal administratif",
     "analytics": "Analytics PostHog",
     "returnSite": "Retour au site",

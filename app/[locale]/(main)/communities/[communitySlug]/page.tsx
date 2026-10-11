@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ReportDialog } from "@/components/report-dialog";
 import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
 import {
   Dialog,
@@ -46,6 +47,7 @@ export default function CommunityClient() {
     slug: communitySlug as string,
   });
   const { isAuthenticated } = useConvexAuth();
+  const currentUser = useQuery(api.auth.auth.getCurrentUser);
   const requireAuthentication = useAuthRequiredAction();
 
   const isMember = useQuery(
@@ -230,6 +232,16 @@ export default function CommunityClient() {
               <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
                 {community.description}
               </p>
+
+              {currentUser !== undefined &&
+              currentUser?._id !== community.authorId ? (
+                <div className="mt-3">
+                  <ReportDialog
+                    target={{ type: "community", id: community._id }}
+                    variant="outline"
+                  />
+                </div>
+              ) : null}
 
               {/* Actions — mobile only (below description) */}
               {!isAuthenticated ? (

@@ -1,6 +1,7 @@
 "use client";
 
 import { ShareButton } from "@/components/ShareButton";
+import { ReportDialog } from "@/components/report-dialog";
 import { TranslateMenu } from "@/components/translate-menu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -270,6 +271,15 @@ export default function JobDetailsPage() {
                     )}
 
                     <ShareButton text={jobOffer.title} jobPage={true} />
+
+                    {user !== undefined && !isAuthor ? (
+                      <ReportDialog
+                        target={{ type: "job", id: jobOffer._id }}
+                        showLabel={false}
+                        size="icon-sm"
+                        variant="outline"
+                      />
+                    ) : null}
 
                     <JobBookmarkButton
                       jobId={jobOffer._id}

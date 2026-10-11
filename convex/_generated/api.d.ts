@@ -53,6 +53,8 @@ import type * as posts_publicAuthor from "../posts/publicAuthor.js";
 import type * as posts_queries from "../posts/queries.js";
 import type * as posts_translate from "../posts/translate.js";
 import type * as rateLimits from "../rateLimits.js";
+import type * as reportValues from "../reportValues.js";
+import type * as reports from "../reports.js";
 import type * as sendEmails from "../sendEmails.js";
 import type * as translations_security from "../translations/security.js";
 import type * as translations_shared from "../translations/shared.js";
@@ -110,6 +112,8 @@ declare const fullApi: ApiFromModules<{
   "posts/queries": typeof posts_queries;
   "posts/translate": typeof posts_translate;
   rateLimits: typeof rateLimits;
+  reportValues: typeof reportValues;
+  reports: typeof reports;
   sendEmails: typeof sendEmails;
   "translations/security": typeof translations_security;
   "translations/shared": typeof translations_shared;
