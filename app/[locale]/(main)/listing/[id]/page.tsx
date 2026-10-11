@@ -104,15 +104,19 @@ export default function PropertyPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header avec navigation */}
-      <div className="flex flex-col gap-2 border-b max-w-full mx-auto px-4 py-2 sm:flex-row sm:items-center sm:justify-between sm:py-4">
+      <div className="mx-auto flex max-w-full items-center justify-between gap-2 border-b px-4 py-3 sm:py-4">
         <Link href="/listing">
-          <Button variant="ghost" className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="-ml-2 flex items-center gap-2 px-2"
+          >
             <ArrowLeft className="h-4 w-4" />
             {t("details.backBtn")}
           </Button>
         </Link>
 
-        <div className="flex w-full items-center gap-2 sm:w-auto">
+        <div className="ml-auto flex items-center gap-2">
           <InputGroup className="hidden h-auto w-fit max-w-full flex-wrap justify-center overflow-hidden sm:flex [&>*]:shrink-0 [&>*]:rounded-none! [&>*]:border-0! [&>*:not(:last-child)]:border-r!">
             {renderActions()}
           </InputGroup>
