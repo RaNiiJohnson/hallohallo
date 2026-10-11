@@ -33,6 +33,21 @@ const contractTypeValidator = v.union(
 );
 const jobContactEmailValidator = v.string();
 
+type JobStatus = "active" | "closed" | "archived";
+
+function isAllowedJobTransition(
+  currentStatus: JobStatus | undefined,
+  nextStatus: JobStatus,
+) {
+  const current = currentStatus ?? "active";
+  return (
+    (current === "active" && nextStatus === "closed") ||
+    (current === "closed" &&
+      (nextStatus === "active" || nextStatus === "archived")) ||
+    (current === "archived" && nextStatus === "active")
+  );
+}
+
 function assertValidJobInput(args: {
   title: string;
   company: string;
@@ -237,9 +252,7 @@ export const deleteJob = authMutation({
     const existing = await ctx.db.get("JobOffer", args.id);
     if (!existing) throwNotFound("Job not found");
 
-    const isOwner = existing.authorId === ctx.user._id;
-    const isAdmin = ctx.user.role === "admin";
-    if (!isOwner && !isAdmin) {
+    if (existing.authorId !== ctx.user._id) {
       throwForbidden("Not allowed to delete this job");
     }
 
@@ -260,8 +273,11 @@ export const setJobStatus = authMutation({
   handler: async (ctx, { id, status }) => {
     const job = await ctx.db.get(id);
     if (!job) throwNotFound("Job not found");
-    if (job.authorId !== ctx.user._id && ctx.user.role !== "admin") {
+    if (job.authorId !== ctx.user._id) {
       throwForbidden("Not allowed to change this job status");
+    }
+    if (!isAllowedJobTransition(job.status, status)) {
+      throwValidationError("Invalid job status transition");
     }
     await ctx.db.patch(id, { status, updatedAt: Date.now() });
     return null;

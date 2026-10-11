@@ -31,8 +31,8 @@
     "added": "Job saved",
     "removed": "Job removed from favorites",
     "error": "Unable to update favorite",
-    "addLabel": "Add to favorites",
-    "removeLabel": "Remove from favorites"
+    "addLabel": "Save",
+    "removeLabel": "Remove"
   },
   "form": {
     "steps": {

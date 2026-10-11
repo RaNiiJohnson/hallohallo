@@ -40,13 +40,12 @@ export default function PropertyPage() {
     notFound();
   }
 
-  const canManage =
-    !isLoading && (user?._id === property.authorId || user?.role === "admin");
+  const canManage = !isLoading && user?._id === property.authorId;
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header avec navigation */}
-      <div className="flex items-center justify-between border-b max-w-full mx-auto px-4 py-2 sm:py-4">
+      <div className="flex flex-col gap-2 border-b max-w-full mx-auto px-4 py-2 sm:flex-row sm:items-center sm:justify-between sm:py-4">
         <Link href="/listing">
           <Button variant="ghost" className="flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
@@ -54,20 +53,20 @@ export default function PropertyPage() {
           </Button>
         </Link>
 
-        <div className="flex items-center gap-2">
-          <ButtonGroup>
+        <div className="flex w-full items-center gap-2 sm:w-auto">
+          <ButtonGroup className="max-w-full flex-wrap justify-center gap-2 [&>*]:rounded-md! [&>*]:border! max-sm:grid max-sm:w-full max-sm:grid-cols-2">
             {canManage && (
               <ListingLifecycleActions
                 listingId={property._id}
                 status={property.status}
               />
             )}
-            <ShareButton text={property.title} />
+            <ShareButton text={property.title} showLabel />
             {user !== undefined && user?._id !== property.authorId ? (
               <ReportDialog
                 target={{ type: "listing", id: property._id }}
-                showLabel={false}
-                size="icon-sm"
+                showLabel
+                size="sm"
                 variant="outline"
               />
             ) : null}
@@ -102,8 +101,10 @@ export default function PropertyPage() {
                   <Heart
                     className={`h-4 w-4 ${property.isBookmarked ? "fill-current" : ""}`}
                   />
-                  <span className="max-sm:hidden">
-                    {t("details.bookmarkBtn")}
+                  <span>
+                    {property.isBookmarked
+                      ? t("details.bookmarkRemoveLabel")
+                      : t("details.bookmarkAddLabel")}
                   </span>
                 </Button>
             )}

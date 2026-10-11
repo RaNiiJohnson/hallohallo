@@ -330,6 +330,51 @@ describe("Jobs", () => {
     });
   });
 
+  it("reserves lifecycle changes to the job owner", async () => {
+    authState.user._id = "adminUserId";
+    authState.user.id = "adminUserId";
+    authState.user.role = "admin";
+
+    await expect(
+      t.mutation(api.jobs.mutations.setJobStatus, {
+        id: jobId,
+        status: "closed",
+      }),
+    ).rejects.toThrow("Not allowed to change this job status");
+  });
+
+  it("enforces close, reopen, archive, and restore transitions", async () => {
+    await expect(
+      t.mutation(api.jobs.mutations.setJobStatus, {
+        id: jobId,
+        status: "archived",
+      }),
+    ).rejects.toThrow("Invalid job status transition");
+
+    await t.mutation(api.jobs.mutations.setJobStatus, {
+      id: jobId,
+      status: "closed",
+    });
+    await t.mutation(api.jobs.mutations.setJobStatus, {
+      id: jobId,
+      status: "active",
+    });
+    await t.mutation(api.jobs.mutations.setJobStatus, {
+      id: jobId,
+      status: "closed",
+    });
+    await t.mutation(api.jobs.mutations.setJobStatus, {
+      id: jobId,
+      status: "archived",
+    });
+    await t.mutation(api.jobs.mutations.setJobStatus, {
+      id: jobId,
+      status: "active",
+    });
+
+    expect((await t.run((ctx) => ctx.db.get(jobId)))?.status).toBe("active");
+  });
+
   it("hides archived jobs from other members", async () => {
     await t.run(async (ctx) => {
       await ctx.db.insert("jobTranslations", {

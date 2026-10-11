@@ -46,7 +46,9 @@ function isAllowedListingTransition(
   const current = currentStatus ?? "active";
   return (
     (current === "active" && nextStatus === "closed") ||
-    (current === "closed" && nextStatus === "archived")
+    (current === "closed" &&
+      (nextStatus === "active" || nextStatus === "archived")) ||
+    (current === "archived" && nextStatus === "active")
   );
 }
 
@@ -240,9 +242,7 @@ export const archiveListing = authMutation({
     const listing = await ctx.db.get(listingId);
     if (!listing) throwNotFound("Listing not found");
 
-    const isOwner = listing.authorId === ctx.user._id;
-    const isAdmin = ctx.user.role === "admin";
-    if (!isOwner && !isAdmin) {
+    if (listing.authorId !== ctx.user._id) {
       throwForbidden("Not allowed to archive this listing");
     }
     if (!isAllowedListingTransition(listing.status, "archived")) {
@@ -262,7 +262,7 @@ export const setListingStatus = authMutation({
   handler: async (ctx, { listingId, status }) => {
     const listing = await ctx.db.get(listingId);
     if (!listing) throwNotFound("Listing not found");
-    if (listing.authorId !== ctx.user._id && ctx.user.role !== "admin") {
+    if (listing.authorId !== ctx.user._id) {
       throwForbidden("Not allowed to change this listing status");
     }
     if (!isAllowedListingTransition(listing.status, status)) {

@@ -518,19 +518,30 @@ describe("Listings", () => {
       listingId,
       status: "archived",
     });
-    await expect(
-      t.mutation(api.listings.mutations.setListingStatus, {
-        listingId,
-        status: "active",
-      }),
-    ).rejects.toThrow("Invalid listing status transition");
+    await t.mutation(api.listings.mutations.setListingStatus, {
+      listingId,
+      status: "active",
+    });
 
-    expect((await t.run((ctx) => ctx.db.get(listingId)))?.status).toBe("archived");
+    expect((await t.run((ctx) => ctx.db.get(listingId)))?.status).toBe("active");
   });
 
   it("refuses lifecycle changes by another member", async () => {
     vi.mocked(requireAuth).mockResolvedValue({
       user: { _id: "anotherUserId", role: "user" },
+    } as never);
+
+    await expect(
+      t.mutation(api.listings.mutations.setListingStatus, {
+        listingId,
+        status: "closed",
+      }),
+    ).rejects.toThrow("Not allowed to change this listing status");
+  });
+
+  it("refuses lifecycle changes by an administrator who is not the owner", async () => {
+    vi.mocked(requireAuth).mockResolvedValue({
+      user: { _id: "adminUserId", role: "admin" },
     } as never);
 
     await expect(

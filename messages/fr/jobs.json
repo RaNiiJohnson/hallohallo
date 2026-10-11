@@ -31,8 +31,8 @@
     "added": "Offre enregistrée",
     "removed": "Offre retirée des favoris",
     "error": "Impossible de mettre à jour le favori",
-    "addLabel": "Ajouter aux favoris",
-    "removeLabel": "Retirer des favoris"
+    "addLabel": "Sauvegarder",
+    "removeLabel": "Retirer"
   },
   "form": {
     "steps": {

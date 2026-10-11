@@ -25,7 +25,7 @@ interface ShareButtonProps {
     "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
   size?: "default" | "sm" | "lg" | "icon";
   className?: string;
-  jobPage?: boolean;
+  showLabel?: boolean;
 }
 
 const SHARE_LINKS = (url: string, text: string) => ({
@@ -50,7 +50,7 @@ export function ShareButton({
   variant = "outline",
   size = "sm",
   className = "gap-2",
-  jobPage,
+  showLabel = false,
 }: ShareButtonProps) {
   const t = useTranslations("common");
   const currentUrl =
@@ -59,7 +59,7 @@ export function ShareButton({
   const trigger = (
     <Button variant={variant} size={size} className={className}>
       <Share2 className="w-4 h-4" />
-      {jobPage && <span>{t("share")}</span>}
+      {showLabel && <span>{t("share")}</span>}
     </Button>
   );
 
@@ -73,7 +73,7 @@ export function ShareButton({
         onClick={() => navigator.share({ title: text, text, url: currentUrl })}
       >
         <Share2 className="w-4 h-4" />
-        {jobPage && <span>{t("share")}</span>}
+        {showLabel && <span>{t("share")}</span>}
       </Button>
     );
   }

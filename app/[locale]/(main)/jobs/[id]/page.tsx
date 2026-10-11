@@ -195,20 +195,20 @@ export default function JobDetailsPage() {
               </div>
 
               {/* Company Links / Edit Button */}
-              <div className="flex flex-wrap items-center justify-center gap-3">
+              <div className="flex min-w-0 max-w-full flex-wrap items-center justify-center gap-3">
                 {isLoading ? (
                   <Skeleton className="w-[250px] h-[42px] rounded-full border border-muted select-none pointer-events-none" />
                 ) : isAuthor ? (
-                  <ButtonGroup>
+                  <ButtonGroup className="max-w-full flex-wrap justify-center gap-2 [&>*]:rounded-md! [&>*]:border! max-sm:grid max-sm:w-full max-sm:grid-cols-2">
                     <JobLifecycleActions
                       jobId={jobOffer._id}
                       status={jobOffer.status}
                     />
-                    <ShareButton text={jobOffer.title} jobPage={true} />
+                    <ShareButton text={jobOffer.title} showLabel />
                     <EditJobDialog jobOffer={jobOffer} />
                   </ButtonGroup>
                 ) : (
-                  <ButtonGroup>
+                  <ButtonGroup className="max-w-full flex-wrap justify-center gap-2 [&>*]:rounded-md! [&>*]:border! max-sm:grid max-sm:w-full max-sm:grid-cols-2">
                     {isAuthenticated ? (
                       isAcceptingApplications ? (
                         applicationEmailStatus === "failed" ? (
@@ -270,13 +270,13 @@ export default function JobDetailsPage() {
                       </Button>
                     )}
 
-                    <ShareButton text={jobOffer.title} jobPage={true} />
+                    <ShareButton text={jobOffer.title} showLabel />
 
                     {user !== undefined && !isAuthor ? (
                       <ReportDialog
                         target={{ type: "job", id: jobOffer._id }}
-                        showLabel={false}
-                        size="icon-sm"
+                        showLabel
+                        size="sm"
                         variant="outline"
                       />
                     ) : null}
@@ -284,7 +284,8 @@ export default function JobDetailsPage() {
                     <JobBookmarkButton
                       jobId={jobOffer._id}
                       initialBookmark={jobOffer.isBookmarked}
-                      className="mt-0 h-8 w-8"
+                      className="mt-0 h-8"
+                      showLabel
                     />
                   </ButtonGroup>
                 )}
