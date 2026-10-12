@@ -183,23 +183,44 @@ export default function JobDetailsPage() {
 
   return (
     <div className="min-h-screen bg-muted/50">
+      <div className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b bg-background/90 px-4 py-3 text-sm text-muted-foreground backdrop-blur sm:hidden">
+        <Link href="/jobs">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="-ml-2 flex items-center gap-2 px-2"
+          >
+            <ArrowLeft className="size-4" />
+            {t("details.backToList")}
+          </Button>
+        </Link>
+
+        {!isLoading ? (
+          <div className="shrink-0">
+            <MobileActionsMenu>
+              {isAuthor ? renderOwnerActions() : renderVisitorActions()}
+            </MobileActionsMenu>
+          </div>
+        ) : null}
+      </div>
+
       {/* Hero Section without image */}
       <div className="relative w-full">
         <div className="max-w-full mx-auto px-4 pt-2 sm:pt-8">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2 sm:mb-4">
-            <Link
-              href="/jobs"
-              className="hover:text-foreground transition-colors"
-            >
-              {t("details.breadcrumb")}
-            </Link>
-            <span>
-              <ChevronRight className="w-4 h-4" />
-            </span>
-            <span className="text-foreground font-medium line-clamp-1">
-              {title}
-            </span>
+          <div className="mb-4 hidden min-w-0 items-center gap-2 text-sm text-muted-foreground sm:flex">
+            <div className="flex min-w-0 flex-1 items-center gap-2">
+              <Link
+                href="/jobs"
+                className="shrink-0 transition-colors hover:text-foreground"
+              >
+                {t("details.breadcrumb")}
+              </Link>
+              <ChevronRight className="size-4 shrink-0" />
+              <span className="truncate font-medium text-foreground">
+                {title}
+              </span>
+            </div>
           </div>
 
           {/* Job Header */}
@@ -286,27 +307,17 @@ export default function JobDetailsPage() {
               </div>
 
               {/* Company Links / Edit Button */}
-              <div className="flex min-w-0 max-w-full flex-wrap items-center justify-center gap-3">
+              <div className="hidden min-w-0 max-w-full flex-wrap items-center justify-center gap-3 sm:flex">
                 {isLoading ? (
                   <Skeleton className="w-[250px] h-[42px] rounded-full border border-muted select-none pointer-events-none" />
                 ) : isAuthor ? (
-                  <>
-                    <InputGroup className="hidden h-auto w-fit max-w-full flex-wrap justify-center overflow-hidden sm:flex [&>*]:shrink-0 [&>*]:rounded-none! [&>*]:border-0! [&>*:not(:last-child)]:border-r!">
-                      {renderOwnerActions()}
-                    </InputGroup>
-                    <MobileActionsMenu>
-                      {renderOwnerActions()}
-                    </MobileActionsMenu>
-                  </>
+                  <InputGroup className="h-auto w-fit max-w-full flex-wrap justify-center overflow-hidden border-0 bg-transparent shadow-none dark:bg-transparent [&>*]:shrink-0 [&>*]:rounded-none! [&>*]:border-0! [&>*:not(:last-child)]:border-r!">
+                    {renderOwnerActions()}
+                  </InputGroup>
                 ) : (
-                  <>
-                    <InputGroup className="hidden h-auto w-fit max-w-full flex-wrap justify-center overflow-hidden sm:flex [&>*]:shrink-0 [&>*]:rounded-none! [&>*]:border-0! [&>*:not(:last-child)]:border-r!">
-                      {renderVisitorActions()}
-                    </InputGroup>
-                    <MobileActionsMenu>
-                      {renderVisitorActions()}
-                    </MobileActionsMenu>
-                  </>
+                  <InputGroup className="h-auto w-fit max-w-full flex-wrap justify-center overflow-hidden border-0 bg-transparent shadow-none dark:bg-transparent [&>*]:shrink-0 [&>*]:rounded-none! [&>*]:border-0! [&>*:not(:last-child)]:border-r!">
+                    {renderVisitorActions()}
+                  </InputGroup>
                 )}
               </div>
             </div>
