@@ -257,7 +257,22 @@
     "contactOwner": "Eigentümer kontaktieren",
     "contactUnavailable": "Kontaktdaten nicht verfügbar",
     "phone": "Telefon:",
-    "email": "E-Mail:"
+    "email": "E-Mail:",
+    "gallery": {
+      "title": "Fotogalerie — {title}",
+      "description": "Durchsuchen Sie die Fotos der Anzeige. Navigieren Sie mit den Pfeiltasten oder durch horizontales Wischen.",
+      "allPhotosTitle": "Alle Fotos",
+      "photoCount": "{count, plural, one {# Foto} other {# Fotos}}",
+      "backToGallery": "Alle Fotos",
+      "viewAll": "Alle Fotos ansehen",
+      "counter": "{current} / {total}",
+      "imageAlt": "{title} — Foto {current} von {total}",
+      "openImage": "Foto {current} von {total} öffnen",
+      "slide": "Foto {current} von {total}",
+      "close": "Galerie schließen",
+      "previous": "Vorheriges Foto",
+      "next": "Nächstes Foto"
+    }
   },
   "similar": {
     "title": "Ähnliche Anzeigen",

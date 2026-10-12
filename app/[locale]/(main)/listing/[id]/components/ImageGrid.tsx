@@ -1,18 +1,29 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import type { CarouselApi } from "@/components/ui/carousel";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ArrowLeft, ChevronLeft, ChevronRight, Images, X } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import {
+  type MouseEvent as ReactMouseEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 interface ListingImage {
   storageId?: string;
@@ -26,238 +37,434 @@ interface ImageGridProps {
   title: string;
 }
 
-export function ImageGrid({ images, title }: ImageGridProps) {
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [fullscreenIndex, setFullscreenIndex] = useState(0);
-  const [api, setApi] = useState<CarouselApi>();
+interface ResolvedImage {
+  key: string;
+  src: string;
+}
 
-  const allImages = images && images.length > 0 ? images : [];
-  const visibleImages = allImages.slice(0, 3);
-  const remainingCount = Math.max(0, allImages.length - 3);
+type GalleryView = "overview" | "viewer";
 
-  const openFullscreen = (index: number) => {
-    setFullscreenIndex(index);
-    setIsFullscreen(true);
-    // Ajoute une entrée dans l'historique pour intercepter le bouton retour mobile
-    window.history.pushState({ modal: "image-gallery" }, "");
-  };
+const HERO_IMAGE_SIZES =
+  "(max-width: 640px) calc(100vw - 3rem), (max-width: 1024px) 66vw, 640px";
 
-  const closeFullscreen = () => {
-    setIsFullscreen(false);
-  };
+function useCarouselIndex(api: CarouselApi | undefined, initialIndex = 0) {
+  const [index, setIndex] = useState(initialIndex);
 
-  // Intercepte le bouton retour du navigateur (mobile)
-  useEffect(() => {
-    const handlePopState = () => {
-      if (isFullscreen) {
-        setIsFullscreen(false);
-      }
-    };
-
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, [isFullscreen]);
-
-  // Quand le dialog est fermé via onOpenChange (croix, overlay),
-  // on retire l'entrée history qu'on avait poussée
-  const handleOpenChange = (open: boolean) => {
-    if (!open && isFullscreen) {
-      // L'utilisateur a fermé via la croix ou l'overlay (pas via popstate)
-      // On revient en arrière dans l'historique pour ne pas laisser une entrée orpheline
-      window.history.back();
-      closeFullscreen();
-    }
-  };
-
-  // Synchroniser l'index avec le carousel
   useEffect(() => {
     if (!api) return;
 
-    api.on("select", () => {
-      setFullscreenIndex(api.selectedScrollSnap());
-    });
+    const updateIndex = () => setIndex(api.selectedScrollSnap());
+    updateIndex();
+    api.on("select", updateIndex);
+    api.on("reInit", updateIndex);
+
+    return () => {
+      api.off("select", updateIndex);
+      api.off("reInit", updateIndex);
+    };
   }, [api]);
 
-  // Aller à l'index spécifique quand on ouvre le fullscreen
-  useEffect(() => {
-    if (api && isFullscreen) {
-      setTimeout(() => {
-        api.scrollTo(fullscreenIndex, false);
-      }, 50);
+  return [index, setIndex] as const;
+}
+
+export function ImageGrid({ images, title }: ImageGridProps) {
+  const t = useTranslations("listing.details.gallery");
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [galleryView, setGalleryView] = useState<GalleryView>("viewer");
+  const [canReturnToOverview, setCanReturnToOverview] = useState(false);
+  const [fullscreenIndex, setFullscreenIndex] = useState(0);
+  const [mobileApi, setMobileApi] = useState<CarouselApi>();
+  const [lightboxApi, setLightboxApi] = useState<CarouselApi>();
+  const [mobileIndex] = useCarouselIndex(mobileApi);
+  const [lightboxIndex, setLightboxIndex] = useCarouselIndex(
+    lightboxApi,
+    fullscreenIndex,
+  );
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+
+  const allImages = useMemo<ResolvedImage[]>(
+    () =>
+      (images ?? []).flatMap((image, index) => {
+        const src = image.url || image.secureUrl;
+        if (!src) return [];
+
+        return [
+          {
+            key: image.storageId || image.publicId || `${src}-${index}`,
+            src,
+          },
+        ];
+      }),
+    [images],
+  );
+
+  const rememberReturnFocus = () => {
+    returnFocusRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+  };
+
+  const openViewer = (index: number) => {
+    rememberReturnFocus();
+    setFullscreenIndex(index);
+    setLightboxIndex(index);
+    setGalleryView("viewer");
+    setCanReturnToOverview(false);
+    setIsFullscreen(true);
+  };
+
+  const openGallery = () => {
+    rememberReturnFocus();
+    setGalleryView("overview");
+    setCanReturnToOverview(false);
+    setIsFullscreen(true);
+  };
+
+  const openViewerFromGallery = (index: number) => {
+    setFullscreenIndex(index);
+    setLightboxIndex(index);
+    setLightboxApi(undefined);
+    setCanReturnToOverview(true);
+    setGalleryView("viewer");
+  };
+
+  const returnToGallery = () => {
+    setLightboxApi(undefined);
+    setGalleryView("overview");
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    setIsFullscreen(open);
+    if (!open) {
+      setLightboxApi(undefined);
+      setCanReturnToOverview(false);
     }
-  }, [api, isFullscreen, fullscreenIndex]);
+  };
 
-  // Navigation au clavier
-  // useEffect(() => {
-  //   if (!isFullscreen || !api) return;
+  const handleViewerBackdropClick = (
+    event: ReactMouseEvent<HTMLDivElement>,
+  ) => {
+    const image = event.currentTarget.querySelector("img");
+    if (!image || image.naturalWidth === 0 || image.naturalHeight === 0) {
+      handleOpenChange(false);
+      return;
+    }
 
-  //   const handleKeyDown = (e: KeyboardEvent) => {
-  //     if (e.key === "ArrowLeft") api.scrollPrev();
-  //     if (e.key === "ArrowRight") api.scrollNext();
-  //     if (e.key === "Escape") closeFullscreen();
-  //   };
+    const bounds = image.getBoundingClientRect();
+    const scale = Math.min(
+      bounds.width / image.naturalWidth,
+      bounds.height / image.naturalHeight,
+    );
+    const renderedWidth = image.naturalWidth * scale;
+    const renderedHeight = image.naturalHeight * scale;
+    const renderedLeft = bounds.left + (bounds.width - renderedWidth) / 2;
+    const renderedTop = bounds.top + (bounds.height - renderedHeight) / 2;
+    const clickedImage =
+      event.clientX >= renderedLeft &&
+      event.clientX <= renderedLeft + renderedWidth &&
+      event.clientY >= renderedTop &&
+      event.clientY <= renderedTop + renderedHeight;
 
-  //   window.addEventListener("keydown", handleKeyDown);
-  //   return () => window.removeEventListener("keydown", handleKeyDown);
-  // }, [isFullscreen, api]);
+    if (!clickedImage) handleOpenChange(false);
+  };
+
+  const imageAlt = (index: number) =>
+    t("imageAlt", { title, current: index + 1, total: allImages.length });
 
   if (allImages.length === 0) {
     return (
-      <div className="relative h-96 w-full rounded-xl overflow-hidden bg-muted">
+      <div className="relative h-72 w-full overflow-hidden rounded-2xl bg-muted sm:h-96">
         <Image
           src="/default-cover.jpg"
           alt={title}
           fill
-          sizes="(max-width: 768px) 100vw, 50vw"
+          sizes="(max-width: 768px) 100vw, 80vw"
           className="object-cover"
         />
       </div>
     );
   }
 
+  const desktopImages = allImages.slice(0, 3);
+
   return (
     <>
-      {/* Grille d'images */}
-      <div className="grid grid-cols-3 gap-2 h-96 rounded-xl overflow-hidden">
-        {/* Image principale (2x2) */}
-        <div
-          className="col-span-2 row-span-2 relative cursor-pointer group"
-          onClick={() => openFullscreen(0)}
+      <div className="relative md:hidden">
+        <Carousel
+          setApi={setMobileApi}
+          opts={{ align: "start", loop: false, skipSnaps: false }}
+          className="w-full"
         >
-          <Image
-            src={allImages[0].url || allImages[0].secureUrl || ""}
-            alt={`${title} - Image principale`}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 50vw, 25vw"
-          />
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+          <CarouselContent className="ml-0">
+            {allImages.map((image, index) => (
+              <CarouselItem key={image.key} className="pl-0">
+                <button
+                  type="button"
+                  className="relative block h-72 w-full cursor-zoom-in overflow-hidden rounded-2xl bg-muted text-left sm:h-80"
+                  onClick={() => openViewer(index)}
+                  aria-label={t("openImage", {
+                    current: index + 1,
+                    total: allImages.length,
+                  })}
+                >
+                  <Image
+                    src={image.src}
+                    alt={imageAlt(index)}
+                    fill
+                    className="object-cover"
+                    sizes={HERO_IMAGE_SIZES}
+                    loading={index === 0 ? "eager" : "lazy"}
+                  />
+                </button>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          className="absolute bottom-3 left-3 z-10 gap-2 border border-border/70 bg-background/85 shadow-sm backdrop-blur-md hover:bg-background"
+          onClick={openGallery}
+        >
+          <Images className="size-4" />
+          {t("viewAll")}
+        </Button>
+
+        <div className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/65 px-2.5 py-1 text-xs font-medium tabular-nums text-white backdrop-blur-sm">
+          {t("counter", {
+            current: mobileIndex + 1,
+            total: allImages.length,
+          })}
         </div>
-
-        {/* Images secondaires */}
-        {visibleImages.slice(1, 3).map((image, index) => (
-          <div
-            key={image.storageId || image.publicId || index}
-            className="relative cursor-pointer group"
-            onClick={() => openFullscreen(index + 1)}
-          >
-            <Image
-              src={image.url || image.secureUrl || ""}
-              alt={`${title} - Image ${index + 2}`}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 25vw, 12.5vw"
-            />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-
-            {/* Overlay pour les images supplémentaires */}
-            {index === 1 && remainingCount > 0 && (
-              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                <span className="text-white font-semibold text-lg">
-                  +{remainingCount}
-                </span>
-              </div>
-            )}
-          </div>
-        ))}
-
-        {/* Si moins de 3 images, remplir avec des placeholders */}
-        {visibleImages.length < 3 &&
-          Array.from({ length: 3 - visibleImages.length }).map((_, index) => (
-            <div
-              key={`placeholder-${index}`}
-              className="bg-muted flex items-center justify-center"
-            >
-              <div className="text-muted-foreground text-sm">
-                Pas d&apos;image
-              </div>
-            </div>
-          ))}
       </div>
 
-      {/* Modal plein écran avec Carousel */}
-      <Dialog open={isFullscreen} onOpenChange={handleOpenChange}>
-        <DialogContent className="max-w-[95vw] md:max-w-[97vw] max-h-[95vh] p-0 border-0 rounded-none">
-          <DialogTitle className="sr-only">
-            Galerie d&apos;images - {title}
-          </DialogTitle>
+      <div className="relative hidden h-96 grid-cols-3 grid-rows-2 gap-2 overflow-hidden rounded-2xl bg-muted md:grid">
+        {desktopImages.map((image, index) => {
+          const isOnlyImage = allImages.length === 1;
+          const isSecondOfTwo = allImages.length === 2 && index === 1;
 
-          <Carousel
-            className="w-full h-[90vh]"
-            setApi={setApi}
-            opts={{
-              loop: false,
-              startIndex: fullscreenIndex,
-              align: "center",
-              skipSnaps: false,
-              dragFree: false,
-              duration: 30,
-              containScroll: "trimSnaps",
-              inViewThreshold: 0.7,
-            }}
-          >
-            <CarouselContent
-              className="h-full ml-0"
-              style={{
-                transition:
-                  "transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-              }}
+          return (
+            <button
+              key={image.key}
+              type="button"
+              className={
+                index === 0
+                  ? `group relative row-span-2 cursor-zoom-in overflow-hidden ${isOnlyImage ? "col-span-3" : "col-span-2"}`
+                  : `group relative cursor-zoom-in overflow-hidden ${isSecondOfTwo ? "row-span-2" : ""}`
+              }
+              onClick={() => openViewer(index)}
+              aria-label={t("openImage", {
+                current: index + 1,
+                total: allImages.length,
+              })}
             >
-              {allImages.map((image, index) => (
-                <CarouselItem
-                  key={image.storageId || image.publicId || index}
-                  className="flex items-center justify-center pl-0"
-                >
-                  <div className="relative w-full h-[90vh]">
-                    <Image
-                      src={image.url || image.secureUrl || ""}
-                      alt={`${title} - Image ${index + 1}`}
-                      fill
-                      className="object-contain"
-                      sizes="95vw"
-                      priority={index === fullscreenIndex}
-                    />
+              <Image
+                src={image.src}
+                alt={imageAlt(index)}
+                fill
+                className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+                sizes={
+                  index === 0
+                    ? HERO_IMAGE_SIZES
+                    : "(max-width: 1024px) 33vw, 320px"
+                }
+                loading={index === 0 ? "eager" : "lazy"}
+              />
+              <span className="absolute inset-0 bg-black/0 transition-colors duration-200 group-hover:bg-black/10" />
+            </button>
+          );
+        })}
+
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          className="absolute bottom-4 right-4 z-10 gap-2 border border-white/25 bg-background/90 shadow-sm backdrop-blur-sm hover:bg-background"
+          onClick={openGallery}
+        >
+          <Images className="size-4" />
+          {t("viewAll")}
+        </Button>
+      </div>
+
+      <Dialog open={isFullscreen} onOpenChange={handleOpenChange}>
+        <DialogContent
+          showCloseButton={false}
+          className="inset-0 left-0 top-0 z-[60] flex h-dvh max-h-none w-screen max-w-none translate-x-0 translate-y-0 items-stretch gap-0 rounded-none border-0 bg-background p-0 shadow-none duration-200 sm:max-w-none"
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            returnFocusRef.current?.focus();
+          }}
+          onKeyDown={(event) => {
+            if (galleryView !== "viewer" || event.defaultPrevented) return;
+
+            if (event.key === "ArrowLeft") {
+              event.preventDefault();
+              lightboxApi?.scrollPrev();
+            }
+            if (event.key === "ArrowRight") {
+              event.preventDefault();
+              lightboxApi?.scrollNext();
+            }
+          }}
+        >
+          <DialogTitle className="sr-only">
+            {t("title", { title })}
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            {t("description")}
+          </DialogDescription>
+
+          <DialogClose asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="absolute right-3 top-3 z-20 size-10 rounded-full border border-border/70 bg-background/85 text-foreground shadow-sm backdrop-blur-md hover:bg-accent hover:text-accent-foreground sm:right-5 sm:top-5"
+              aria-label={t("close")}
+            >
+              <X className="size-5" />
+            </Button>
+          </DialogClose>
+
+          {galleryView === "overview" ? (
+            <div className="h-dvh w-full overflow-y-auto overscroll-contain bg-background">
+              <header className="sticky top-0 z-10 border-b border-border/70 bg-background/90 backdrop-blur-md">
+                <div className="mx-auto flex h-16 max-w-6xl items-center px-4 pr-16 sm:px-6 sm:pr-20">
+                  <div>
+                    <h2 className="font-semibold text-foreground sm:text-lg">
+                      {t("allPhotosTitle")}
+                    </h2>
+                    <p className="text-xs text-muted-foreground sm:text-sm">
+                      {t("photoCount", { count: allImages.length })}
+                    </p>
                   </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
+                </div>
+              </header>
 
-            {/* Boutons de navigation personnalisés */}
-            {fullscreenIndex > 0 && (
-              <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 bg-black/50 border-0 h-12 w-12">
-                <ChevronLeft className="h-8 w-8" />
-              </CarouselPrevious>
-            )}
-
-            {fullscreenIndex < allImages.length - 1 && (
-              <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 bg-black/50 border-0 h-12 w-12">
-                <ChevronRight className="h-8 w-8" />
-              </CarouselNext>
-            )}
-
-            {/* Compteur */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-lg z-10">
-              {fullscreenIndex + 1} / {allImages.length}
-            </div>
-
-            {/* Indicateurs */}
-            {allImages.length > 1 && (
-              <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+              <div className="mx-auto grid max-w-6xl grid-cols-1 gap-3 p-4 sm:grid-cols-2 sm:gap-4 sm:p-6 lg:py-8">
                 {allImages.map((image, index) => (
                   <button
-                    key={image.storageId || image.publicId || index}
-                    className={cn(
-                      "w-3 h-3 rounded-full transition-all duration-200",
-                      index === fullscreenIndex
-                        ? "bg-white scale-125"
-                        : "bg-white/50 hover:bg-white/75",
-                    )}
-                    onClick={() => api?.scrollTo(index)}
-                  />
+                    key={image.key}
+                    type="button"
+                    className={`group relative aspect-[4/3] cursor-zoom-in overflow-hidden rounded-xl bg-muted text-left ${index === 0 ? "sm:col-span-2 sm:aspect-[2/1]" : ""}`}
+                    onClick={() => openViewerFromGallery(index)}
+                    aria-label={t("openImage", {
+                      current: index + 1,
+                      total: allImages.length,
+                    })}
+                  >
+                    <Image
+                      src={image.src}
+                      alt={imageAlt(index)}
+                      fill
+                      className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.015]"
+                      sizes={
+                        index === 0
+                          ? "(max-width: 640px) calc(100vw - 2rem), min(100vw - 3rem, 1152px)"
+                          : "(max-width: 640px) calc(100vw - 2rem), min(50vw - 2rem, 568px)"
+                      }
+                    />
+                    <span className="absolute inset-0 bg-black/0 transition-colors duration-200 group-hover:bg-black/10" />
+                  </button>
                 ))}
               </div>
-            )}
-          </Carousel>
+            </div>
+          ) : (
+            <>
+              {canReturnToOverview && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="absolute left-3 top-3 z-20 gap-2 rounded-full border border-border/70 bg-background/85 px-3 text-foreground shadow-sm backdrop-blur-md hover:bg-accent hover:text-accent-foreground sm:left-5 sm:top-5"
+                  onClick={returnToGallery}
+                >
+                  <ArrowLeft className="size-4" />
+                  <span className="hidden sm:inline">{t("backToGallery")}</span>
+                  <span className="sr-only sm:hidden">{t("backToGallery")}</span>
+                </Button>
+              )}
+
+              <div className="pointer-events-none absolute left-1/2 top-3 z-20 -translate-x-1/2 rounded-full border border-border/70 bg-background/85 px-3 py-2 text-xs font-medium tabular-nums text-foreground shadow-sm backdrop-blur-md sm:top-5 sm:text-sm">
+                {t("counter", {
+                  current: lightboxIndex + 1,
+                  total: allImages.length,
+                })}
+              </div>
+
+              <Carousel
+                className="h-full w-full"
+                setApi={setLightboxApi}
+                opts={{
+                  align: "center",
+                  containScroll: "trimSnaps",
+                  duration: 28,
+                  loop: false,
+                  skipSnaps: false,
+                  startIndex: fullscreenIndex,
+                }}
+              >
+                <CarouselContent className="ml-0 h-full">
+                  {allImages.map((image, index) => (
+                    <CarouselItem
+                      key={image.key}
+                      className="h-full pl-0"
+                      aria-label={t("slide", {
+                        current: index + 1,
+                        total: allImages.length,
+                      })}
+                    >
+                      <div
+                        className="flex h-dvh w-full items-center justify-center px-3 py-16 sm:px-16 sm:py-12"
+                        onClick={handleViewerBackdropClick}
+                      >
+                        <div className="relative h-full w-full max-w-7xl">
+                          <Image
+                            src={image.src}
+                            alt={imageAlt(index)}
+                            fill
+                            className="select-none object-contain"
+                            sizes="(max-width: 640px) calc(100vw - 1.5rem), calc(100vw - 8rem)"
+                            draggable={false}
+                          />
+                        </div>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+
+                {allImages.length > 1 && lightboxIndex > 0 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute left-2 top-1/2 z-20 size-10 -translate-y-1/2 rounded-full border border-border/70 bg-background/85 text-foreground shadow-sm backdrop-blur-md hover:bg-accent hover:text-accent-foreground sm:left-5 sm:size-12"
+                    onClick={() => lightboxApi?.scrollPrev()}
+                    aria-label={t("previous")}
+                  >
+                    <ChevronLeft className="size-6" />
+                  </Button>
+                )}
+
+                {allImages.length > 1 &&
+                  lightboxIndex < allImages.length - 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 z-20 size-10 -translate-y-1/2 rounded-full border border-border/70 bg-background/85 text-foreground shadow-sm backdrop-blur-md hover:bg-accent hover:text-accent-foreground sm:right-5 sm:size-12"
+                      onClick={() => lightboxApi?.scrollNext()}
+                      aria-label={t("next")}
+                    >
+                      <ChevronRight className="size-6" />
+                    </Button>
+                  )}
+              </Carousel>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </>
