@@ -105,16 +105,12 @@ export default function PropertyPage() {
     <div className="min-h-screen bg-background relative">
       {/* Header avec navigation */}
       <div className="mx-auto flex max-w-full items-center justify-between gap-2 border-b px-4 py-3 sm:py-4 sticky top-0 z-10 bg-background/90 backdrop-blur">
-        <Link href="/listing">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="-ml-2 flex items-center gap-2 px-2"
-          >
+        <Button variant="ghost" size="sm" className="-ml-2 px-2" asChild>
+          <Link href="/listing">
             <ArrowLeft className="h-4 w-4" />
             {t("details.backBtn")}
-          </Button>
-        </Link>
+          </Link>
+        </Button>
 
         <div className="ml-auto flex items-center gap-2">
           <InputGroup className="hidden h-auto w-fit max-w-full flex-wrap justify-center overflow-x-clip border-0 bg-transparent shadow-none sm:flex dark:bg-transparent *:shrink-0 *:rounded-none! *:border-0! [&>*:not(:last-child)]:border-r!">

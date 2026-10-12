@@ -184,16 +184,12 @@ export default function JobDetailsPage() {
   return (
     <div className="min-h-screen bg-muted/50">
       <div className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b bg-background/90 px-4 py-3 text-sm text-muted-foreground backdrop-blur sm:hidden">
-        <Link href="/jobs">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="-ml-2 flex items-center gap-2 px-2"
-          >
+        <Button variant="ghost" size="sm" className="-ml-2 px-2" asChild>
+          <Link href="/jobs">
             <ArrowLeft className="size-4" />
             {t("details.backToList")}
-          </Button>
-        </Link>
+          </Link>
+        </Button>
 
         {!isLoading ? (
           <div className="shrink-0">
