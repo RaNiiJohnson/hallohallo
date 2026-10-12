@@ -413,7 +413,7 @@ export default function JobDetailsPage() {
                 </h2>
               </div>
               <div className="p-4">
-                <div className="prose prose-invert prose-sm max-w-none mb-4">
+                <div className="prose prose-sm mb-4 max-w-none dark:prose-invert">
                   <ReactMarkdown>{description}</ReactMarkdown>
                 </div>
                 <TranslateMenu

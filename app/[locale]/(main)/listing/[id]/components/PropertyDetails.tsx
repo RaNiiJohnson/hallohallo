@@ -256,8 +256,8 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                 {tListing("details.descTitle")}
               </h2>
               <div className="prose prose-sm max-w-none">
-                <div className="text-muted-foreground leading-relaxed">
-                  <div className="prose prose-invert prose-sm max-w-none">
+                <div className="leading-relaxed">
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
                     <ReactMarkdown>{description}</ReactMarkdown>
                   </div>
                 </div>
