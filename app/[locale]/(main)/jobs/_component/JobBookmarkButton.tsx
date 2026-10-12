@@ -15,12 +15,14 @@ interface JobBookmarkButtonProps {
   jobId: string;
   initialBookmark?: boolean;
   className?: string;
+  showLabel?: boolean;
 }
 
 export const JobBookmarkButton = ({
   jobId,
   initialBookmark = false,
   className,
+  showLabel = false,
 }: JobBookmarkButtonProps) => {
   const { isAuthenticated } = useConvexAuth();
   const requireAuthentication = useAuthRequiredAction();
@@ -57,9 +59,9 @@ export const JobBookmarkButton = ({
   return (
     <Button
       variant="ghost"
-      size="icon"
+      size={showLabel ? "sm" : "icon"}
       className={cn(
-        "h-8 w-8 mt-2",
+        showLabel ? "mt-0 h-8 w-auto" : "mt-2 h-8 w-8",
         optimisticIsBookmarked
           ? "text-blue-500 hover:bg-blue-500/20"
           : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -70,7 +72,7 @@ export const JobBookmarkButton = ({
       <Bookmark
         className={cn("w-4 h-4", optimisticIsBookmarked && "fill-current")}
       />
-      <span className="sr-only">
+      <span className={showLabel ? undefined : "sr-only"}>
         {optimisticIsBookmarked ? t("removeLabel") : t("addLabel")}
       </span>
     </Button>

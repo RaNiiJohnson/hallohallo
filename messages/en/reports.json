@@ -1,0 +1,64 @@
+{
+  "dialog": {
+    "trigger": "Report",
+    "reported": "Reported",
+    "title": "Report this content",
+    "description": "Help the moderation team understand the issue. Your report remains confidential.",
+    "reasonLabel": "Reason",
+    "reasonPlaceholder": "Choose a reason",
+    "detailsLabel": "Details (optional)",
+    "detailsPlaceholder": "Only add information that is useful for moderation.",
+    "cancel": "Cancel",
+    "submit": "Send report",
+    "success": "Report sent to moderation.",
+    "error": "The report could not be sent. It may already have been submitted.",
+    "reasons": {
+      "spam": "Spam",
+      "fraud": "Fraud or fake content",
+      "harassment": "Harassment",
+      "hate": "Hateful content",
+      "dangerous": "Dangerous or illegal content",
+      "misinformation": "Misleading information",
+      "other": "Other"
+    }
+  },
+  "queue": {
+    "title": "Moderation",
+    "description": "Daily queue of content reported by members.",
+    "loading": "Loading reports",
+    "filters": {
+      "label": "Filter reports",
+      "new": "To review",
+      "handled": "Handled",
+      "all": "All"
+    },
+    "emptyTitle": "No reports in this view",
+    "emptyDescription": "New reports will appear here.",
+    "statuses": {
+      "new": "New",
+      "handled": "Handled"
+    },
+    "targetTypes": {
+      "post": "Post",
+      "job": "Job",
+      "listing": "Housing listing",
+      "community": "Community"
+    },
+    "reasons": {
+      "spam": "Spam",
+      "fraud": "Fraud or fake content",
+      "harassment": "Harassment",
+      "hate": "Hateful content",
+      "dangerous": "Dangerous or illegal",
+      "misinformation": "Misleading information",
+      "other": "Other"
+    },
+    "reportedBy": "Reported by {name}",
+    "handledBy": "Handled by {name} on {date}",
+    "markHandled": "Mark as handled",
+    "handledSuccess": "Report marked as handled.",
+    "handledError": "This report could not be handled.",
+    "loadMore": "Show more",
+    "loadingMore": "Loading..."
+  }
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { ShareButton } from "@/components/ShareButton";
+import { ReportDialog } from "@/components/report-dialog";
 import { TranslateMenu } from "@/components/translate-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -271,6 +272,14 @@ export default function PostClient() {
               postId={post._id}
               initialBookmark={post.isBookmarked}
             />
+
+            {me !== undefined && !isPostOwner ? (
+              <ReportDialog
+                target={{ type: "post", id: post._id }}
+                showLabel={false}
+                size="icon-sm"
+              />
+            ) : null}
 
             {/* Post edit/delete — only for author */}
             {isPostOwner && !isEditingPost && (

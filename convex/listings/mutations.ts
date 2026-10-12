@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { generatedSlug } from "../../src/lib/utils";
+import { isAllowedPublicationTransition } from "../../src/lib/publication-lifecycle";
 import { authMutation } from "../functions";
 import {
   assertVerifiedUpload,
@@ -31,24 +32,12 @@ const listingStatusValidator = v.union(
   v.literal("archived"),
 );
 
-type ListingStatus = "active" | "closed" | "archived";
 type ListingMode = "rent" | "sale";
 type RentalTermsInput = {
   charges?: number | null;
   deposit?: number | null;
   availableFrom?: number | null;
 };
-
-function isAllowedListingTransition(
-  currentStatus: ListingStatus | undefined,
-  nextStatus: ListingStatus,
-) {
-  const current = currentStatus ?? "active";
-  return (
-    (current === "active" && nextStatus === "closed") ||
-    (current === "closed" && nextStatus === "archived")
-  );
-}
 
 function normalizeRentalTerms(
   listingMode: ListingMode,
@@ -240,12 +229,10 @@ export const archiveListing = authMutation({
     const listing = await ctx.db.get(listingId);
     if (!listing) throwNotFound("Listing not found");
 
-    const isOwner = listing.authorId === ctx.user._id;
-    const isAdmin = ctx.user.role === "admin";
-    if (!isOwner && !isAdmin) {
+    if (listing.authorId !== ctx.user._id) {
       throwForbidden("Not allowed to archive this listing");
     }
-    if (!isAllowedListingTransition(listing.status, "archived")) {
+    if (!isAllowedPublicationTransition(listing.status, "archived")) {
       throwValidationError("Listing must be closed before it can be archived");
     }
 
@@ -262,10 +249,10 @@ export const setListingStatus = authMutation({
   handler: async (ctx, { listingId, status }) => {
     const listing = await ctx.db.get(listingId);
     if (!listing) throwNotFound("Listing not found");
-    if (listing.authorId !== ctx.user._id && ctx.user.role !== "admin") {
+    if (listing.authorId !== ctx.user._id) {
       throwForbidden("Not allowed to change this listing status");
     }
-    if (!isAllowedListingTransition(listing.status, status)) {
+    if (!isAllowedPublicationTransition(listing.status, status)) {
       throwValidationError("Invalid listing status transition");
     }
     await ctx.db.patch(listingId, { status, updatedAt: Date.now() });

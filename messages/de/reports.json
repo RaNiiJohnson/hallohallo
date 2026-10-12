@@ -1,0 +1,64 @@
+{
+  "dialog": {
+    "trigger": "Melden",
+    "reported": "Gemeldet",
+    "title": "Diesen Inhalt melden",
+    "description": "Helfen Sie dem Moderationsteam, das Problem zu verstehen. Ihre Meldung bleibt vertraulich.",
+    "reasonLabel": "Grund",
+    "reasonPlaceholder": "Grund auswählen",
+    "detailsLabel": "Details (optional)",
+    "detailsPlaceholder": "Fügen Sie nur Informationen hinzu, die für die Moderation hilfreich sind.",
+    "cancel": "Abbrechen",
+    "submit": "Meldung senden",
+    "success": "Meldung an die Moderation gesendet.",
+    "error": "Die Meldung konnte nicht gesendet werden. Möglicherweise wurde sie bereits übermittelt.",
+    "reasons": {
+      "spam": "Spam",
+      "fraud": "Betrug oder gefälschter Inhalt",
+      "harassment": "Belästigung",
+      "hate": "Hasserfüllter Inhalt",
+      "dangerous": "Gefährlicher oder illegaler Inhalt",
+      "misinformation": "Irreführende Information",
+      "other": "Sonstiges"
+    }
+  },
+  "queue": {
+    "title": "Moderation",
+    "description": "Tägliche Warteschlange der von Mitgliedern gemeldeten Inhalte.",
+    "loading": "Meldungen werden geladen",
+    "filters": {
+      "label": "Meldungen filtern",
+      "new": "Zu prüfen",
+      "handled": "Bearbeitet",
+      "all": "Alle"
+    },
+    "emptyTitle": "Keine Meldungen in dieser Ansicht",
+    "emptyDescription": "Neue Meldungen werden hier angezeigt.",
+    "statuses": {
+      "new": "Neu",
+      "handled": "Bearbeitet"
+    },
+    "targetTypes": {
+      "post": "Beitrag",
+      "job": "Stellenangebot",
+      "listing": "Wohnungsanzeige",
+      "community": "Community"
+    },
+    "reasons": {
+      "spam": "Spam",
+      "fraud": "Betrug oder Fälschung",
+      "harassment": "Belästigung",
+      "hate": "Hasserfüllter Inhalt",
+      "dangerous": "Gefährlich oder illegal",
+      "misinformation": "Irreführende Information",
+      "other": "Sonstiges"
+    },
+    "reportedBy": "Gemeldet von {name}",
+    "handledBy": "Bearbeitet von {name} am {date}",
+    "markHandled": "Als bearbeitet markieren",
+    "handledSuccess": "Meldung als bearbeitet markiert.",
+    "handledError": "Diese Meldung konnte nicht bearbeitet werden.",
+    "loadMore": "Mehr anzeigen",
+    "loadingMore": "Wird geladen..."
+  }
+}

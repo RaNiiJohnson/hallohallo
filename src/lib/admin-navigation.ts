@@ -1,6 +1,7 @@
 export type AdminNavigationKey =
   | "dashboard"
   | "users"
+  | "moderation"
   | "audit"
   | "analytics";
 
@@ -17,7 +18,6 @@ type AdminIdentityInput = {
 };
 
 export const RETIRED_ADMIN_ROUTES = [
-  "/admin/moderation",
   "/admin/jobs",
   "/admin/listing",
   "/admin/communities",
@@ -44,6 +44,7 @@ export function getAdminNavigation(
   const navigation: AdminNavigationItem[] = [
     { key: "dashboard", href: "/admin", external: false },
     { key: "users", href: "/admin/users", external: false },
+    { key: "moderation", href: "/admin/moderation", external: false },
     { key: "audit", href: "/admin/audit", external: false },
   ];
   const analyticsUrl = getPostHogDashboardUrl(postHogDashboardUrl);

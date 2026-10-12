@@ -4,6 +4,12 @@ import {
   adminAuditActionValidator,
   adminAuditMetadataValidator,
 } from "./adminAuditValues";
+import {
+  reportReasonValidator,
+  reportStatusValidator,
+  reportTargetIdValidator,
+  reportTargetTypeValidator,
+} from "./reportValues";
 
 export default defineSchema({
   service_provider: defineTable({
@@ -413,6 +419,29 @@ export default defineSchema({
     .index("by_jobId_and_candidateId", ["jobId", "candidateId"])
     .index("by_candidateId", ["candidateId"])
     .index("by_cvKey", ["cvKey"]),
+
+  reports: defineTable({
+    reporterId: v.string(),
+    reporterName: v.optional(v.string()),
+    targetType: reportTargetTypeValidator,
+    targetId: reportTargetIdValidator,
+    targetLabel: v.string(),
+    targetHref: v.string(),
+    reason: reportReasonValidator,
+    details: v.optional(v.string()),
+    status: reportStatusValidator,
+    reportedAt: v.number(),
+    handledAt: v.optional(v.number()),
+    handledById: v.optional(v.string()),
+    handledByName: v.optional(v.string()),
+  })
+    .index("by_reporterId_and_targetType_and_targetId", [
+      "reporterId",
+      "targetType",
+      "targetId",
+    ])
+    .index("by_status_and_reportedAt", ["status", "reportedAt"])
+    .index("by_reportedAt", ["reportedAt"]),
 
   adminAuditEvents: defineTable({
     administratorId: v.string(),

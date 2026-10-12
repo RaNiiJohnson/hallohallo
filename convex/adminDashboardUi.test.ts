@@ -13,6 +13,7 @@ describe("admin V1 navigation", () => {
     expect(navigation).toEqual([
       { key: "dashboard", href: "/admin", external: false },
       { key: "users", href: "/admin/users", external: false },
+      { key: "moderation", href: "/admin/moderation", external: false },
       { key: "audit", href: "/admin/audit", external: false },
     ]);
     expect(navigation.map((item) => item.href)).not.toEqual(

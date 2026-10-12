@@ -6,6 +6,7 @@ import {
   type ContractType,
   type JobType,
 } from "../../src/lib/job-offer-options";
+import { isAllowedPublicationTransition } from "../../src/lib/publication-lifecycle";
 import { authComponent } from "../auth/auth";
 import { authMutation, internalMutation } from "../functions";
 import { assertVerifiedUpload, consumeUploadGrant } from "../integrations/r2";
@@ -237,10 +238,11 @@ export const deleteJob = authMutation({
     const existing = await ctx.db.get("JobOffer", args.id);
     if (!existing) throwNotFound("Job not found");
 
-    const isOwner = existing.authorId === ctx.user._id;
-    const isAdmin = ctx.user.role === "admin";
-    if (!isOwner && !isAdmin) {
+    if (existing.authorId !== ctx.user._id) {
       throwForbidden("Not allowed to delete this job");
+    }
+    if (!isAllowedPublicationTransition(existing.status, "archived")) {
+      throwValidationError("Job must be closed before it can be archived");
     }
 
     await ctx.db.patch(args.id, { status: "archived", updatedAt: Date.now() });
@@ -260,8 +262,11 @@ export const setJobStatus = authMutation({
   handler: async (ctx, { id, status }) => {
     const job = await ctx.db.get(id);
     if (!job) throwNotFound("Job not found");
-    if (job.authorId !== ctx.user._id && ctx.user.role !== "admin") {
+    if (job.authorId !== ctx.user._id) {
       throwForbidden("Not allowed to change this job status");
+    }
+    if (!isAllowedPublicationTransition(job.status, status)) {
+      throwValidationError("Invalid job status transition");
     }
     await ctx.db.patch(id, { status, updatedAt: Date.now() });
     return null;

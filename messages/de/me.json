@@ -27,6 +27,11 @@
     "jobs": "Stellenangebote",
     "listings": "Wohnungsanzeigen",
     "posts": "Beiträge",
+    "statuses": {
+      "active": "Aktiv",
+      "closed": "Geschlossen",
+      "archived": "Archiviert"
+    },
     "empty": "Noch keine Veröffentlichungen.",
     "loadMore": "Mehr anzeigen"
   },

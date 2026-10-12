@@ -1,0 +1,64 @@
+{
+  "dialog": {
+    "trigger": "Signaler",
+    "reported": "Signalé",
+    "title": "Signaler ce contenu",
+    "description": "Aidez l'équipe de modération à comprendre le problème. Le signalement reste confidentiel.",
+    "reasonLabel": "Motif",
+    "reasonPlaceholder": "Choisir un motif",
+    "detailsLabel": "Précisions (facultatif)",
+    "detailsPlaceholder": "Ajoutez uniquement les éléments utiles à la modération.",
+    "cancel": "Annuler",
+    "submit": "Envoyer le signalement",
+    "success": "Signalement envoyé à la modération.",
+    "error": "Impossible d'envoyer le signalement. Il a peut-être déjà été transmis.",
+    "reasons": {
+      "spam": "Spam",
+      "fraud": "Fraude ou faux contenu",
+      "harassment": "Harcèlement",
+      "hate": "Contenu haineux",
+      "dangerous": "Contenu dangereux ou illégal",
+      "misinformation": "Information trompeuse",
+      "other": "Autre"
+    }
+  },
+  "queue": {
+    "title": "Modération",
+    "description": "File quotidienne des contenus signalés par les membres.",
+    "loading": "Chargement des signalements",
+    "filters": {
+      "label": "Filtrer les signalements",
+      "new": "À traiter",
+      "handled": "Traités",
+      "all": "Tous"
+    },
+    "emptyTitle": "Aucun signalement dans cette vue",
+    "emptyDescription": "Les nouveaux signalements apparaîtront ici.",
+    "statuses": {
+      "new": "Nouveau",
+      "handled": "Traité"
+    },
+    "targetTypes": {
+      "post": "Publication",
+      "job": "Offre d'emploi",
+      "listing": "Logement",
+      "community": "Communauté"
+    },
+    "reasons": {
+      "spam": "Spam",
+      "fraud": "Fraude ou faux contenu",
+      "harassment": "Harcèlement",
+      "hate": "Contenu haineux",
+      "dangerous": "Dangereux ou illégal",
+      "misinformation": "Information trompeuse",
+      "other": "Autre"
+    },
+    "reportedBy": "Signalé par {name}",
+    "handledBy": "Traité par {name}, le {date}",
+    "markHandled": "Marquer comme traité",
+    "handledSuccess": "Signalement marqué comme traité.",
+    "handledError": "Impossible de traiter ce signalement.",
+    "loadMore": "Afficher plus",
+    "loadingMore": "Chargement..."
+  }
+}
