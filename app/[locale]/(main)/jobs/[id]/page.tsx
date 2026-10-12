@@ -14,6 +14,7 @@ import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { Link } from "@/i18n/navigation";
 import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
 import { formatDateLong, getRelativeTime } from "@/lib/date";
+import { getSafeExternalUrl } from "@/lib/external-url";
 import { LocationMap } from "@/lib/LocationMap";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
@@ -86,6 +87,11 @@ export default function JobDetailsPage() {
     jobOffer.workMode === "remote"
       ? jobOffer.remoteLocation || t("labels.workModes.remote")
       : city;
+  const externalApplicationUrl = getSafeExternalUrl(
+    jobOffer.externalApplicationUrl,
+  );
+  const formatStoredDate = (value: string) =>
+    formatDateLong(`${value}T00:00:00`, locale);
 
   const isAuthor = user?._id === jobOffer.authorId;
   const isAcceptingApplications =
@@ -358,22 +364,41 @@ export default function JobDetailsPage() {
                     </Badge>
                   </div>
 
-                  {jobOffer.salary !== undefined && <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">
-                      {t("details.salary")}
-                    </p>
-                    <div className="flex items-baseline gap-0.5">
-                      <SalaryDisplay salary={jobOffer.salary} />
-                      {jobOffer.salaryPeriod && <span className="text-primary text-xs font-normal">/{t(`labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<typeof t>[0])}</span>}
+                  {jobOffer.salary !== undefined && (
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">
+                        {t("details.salary")}
+                      </p>
+                      <div className="flex items-baseline gap-0.5">
+                        <SalaryDisplay salary={jobOffer.salary} />
+                        {jobOffer.salaryPeriod && (
+                          <span className="text-primary text-xs font-normal">
+                            /
+                            {t(
+                              `labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<
+                                typeof t
+                              >[0],
+                            )}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>}
+                  )}
 
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">
-                      {t("details.duration")}
-                    </p>
-                    <p className="font-semibold">{jobOffer.duration ?? "—"}</p>
-                  </div>
+                  {jobOffer.workMode && (
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">
+                        {t("details.workMode")}
+                      </p>
+                      <p className="font-semibold">
+                        {t(
+                          `labels.workModes.${jobOffer.workMode}` as Parameters<
+                            typeof t
+                          >[0],
+                        )}
+                      </p>
+                    </div>
+                  )}
 
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
@@ -395,12 +420,69 @@ export default function JobDetailsPage() {
                     </Badge>
                   </div>
 
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">
-                      {t("details.startDate")}
-                    </p>
-                    <p className="font-semibold">{jobOffer.startDate ?? "—"}</p>
-                  </div>
+                  {jobOffer.sector && (
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">
+                        {t("details.sector")}
+                      </p>
+                      <p className="font-semibold">{jobOffer.sector}</p>
+                    </div>
+                  )}
+
+                  {jobOffer.duration && (
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">
+                        {t("details.duration")}
+                      </p>
+                      <p className="font-semibold">{jobOffer.duration}</p>
+                    </div>
+                  )}
+
+                  {jobOffer.startDate && (
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">
+                        {t("details.startDate")}
+                      </p>
+                      <p className="font-semibold">
+                        {formatStoredDate(jobOffer.startDate)}
+                      </p>
+                    </div>
+                  )}
+
+                  {jobOffer.weeklyHours !== undefined && (
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">
+                        {t("details.weeklyHours")}
+                      </p>
+                      <p className="font-semibold">
+                        {t("details.hoursPerWeek", {
+                          hours: jobOffer.weeklyHours,
+                        })}
+                      </p>
+                    </div>
+                  )}
+
+                  {jobOffer.applicationDeadline && (
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">
+                        {t("details.applicationDeadline")}
+                      </p>
+                      <p className="font-semibold">
+                        {formatStoredDate(jobOffer.applicationDeadline)}
+                      </p>
+                    </div>
+                  )}
+
+                  {jobOffer.trainingRequirements && (
+                    <div className="space-y-1 sm:col-span-2">
+                      <p className="text-sm text-muted-foreground">
+                        {t("details.trainingRequirements")}
+                      </p>
+                      <p className="font-semibold">
+                        {jobOffer.trainingRequirements}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -424,6 +506,19 @@ export default function JobDetailsPage() {
                 />
               </div>
             </div>
+
+            {jobOffer.benefits && (
+              <div className="bg-card dark:bg-card/35 border rounded-lg shadow-sm">
+                <div className="p-4 border-b">
+                  <h2 className="text-xl font-semibold">
+                    {t("details.benefits")}
+                  </h2>
+                </div>
+                <div className="p-4 whitespace-pre-wrap">
+                  {jobOffer.benefits}
+                </div>
+              </div>
+            )}
 
             {jobOffer.location && jobOffer.workMode !== "remote" && (
               <LocationMap
@@ -515,14 +610,16 @@ export default function JobDetailsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between py-3 border-b">
-                  <span className="text-sm text-muted-foreground">
-                    {t("details.duration")}
-                  </span>
-                  <span className="font-semibold text-sm">
-                    {jobOffer.duration ?? "—"}
-                  </span>
-                </div>
+                {jobOffer.duration && (
+                  <div className="flex items-center justify-between py-3 border-b">
+                    <span className="text-sm text-muted-foreground">
+                      {t("details.duration")}
+                    </span>
+                    <span className="font-semibold text-sm">
+                      {jobOffer.duration}
+                    </span>
+                  </div>
+                )}
 
                 {jobOffer.salary !== undefined && <div className="flex items-center justify-between py-3 border-b">
                   <span className="text-sm text-muted-foreground">
@@ -588,6 +685,22 @@ export default function JobDetailsPage() {
                         {t("details.applyNow")}
                       </Button>
                     </ApplyJobDialog>
+                  )}
+                  {isAcceptingApplications && externalApplicationUrl && (
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="mt-3 w-full bg-transparent"
+                      size="lg"
+                    >
+                      <a
+                        href={externalApplicationUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {t("details.applyExternally")}
+                      </a>
+                    </Button>
                   )}
                 </div>
               </div>

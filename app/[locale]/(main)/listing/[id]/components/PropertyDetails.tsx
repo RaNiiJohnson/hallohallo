@@ -20,6 +20,7 @@ import {
   Bath,
   Bed,
   Calendar,
+  Layers3,
   Mail,
   MapPin,
   MessageCircle,
@@ -68,6 +69,9 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
 
   const title = data?.title ?? property.title;
   const city = data?.city ?? property.city;
+  const locationLabel = [property.neighborhood, city]
+    .filter(Boolean)
+    .join(", ");
   const isActive = property.status === undefined || property.status === "active";
   const formatNumber = (value: number) =>
     new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(value);
@@ -85,7 +89,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
             <h1 className="text-2xl sm:text-3xl font-bold">{title}</h1>
             <div className="flex items-center gap-2 text-muted-foreground mt-2">
               <MapPin className="h-4 w-4 shrink-0" />
-              <span className="text-sm sm:text-base">{city}</span>
+              <span className="text-sm sm:text-base">{locationLabel}</span>
             </div>
             <div className="flex gap-2 mt-2">
               <Badge variant="secondary">
@@ -127,6 +131,13 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
           </div>
 
           <div className="sm:text-right">
+            <div className="text-sm text-muted-foreground">
+              {tListing(
+                property.listingMode === "sale"
+                  ? "details.salePrice"
+                  : "details.monthlyRentTotal",
+              )}
+            </div>
             <PriceDisplay
               price={property.price}
               listingMode={property.listingMode}
@@ -142,7 +153,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
             {property.listingMode === "rent" &&
               property.charges !== undefined && (
                 <div className="text-sm text-muted-foreground mt-1">
-                  {tListing("details.charges")} :{" "}
+                  {tListing("details.monthlyCharges")} :{" "}
                   <PriceDisplay price={property.charges} /> /mois
                 </div>
               )}
@@ -200,17 +211,13 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                 </div>
 
                 <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                  <div className="h-5 w-5 text-primary font-bold text-sm flex items-center justify-center">
-                    {formatNumber(property.floor)}
-                  </div>
+                  <Layers3 className="h-5 w-5 text-primary" />
                   <div>
                     <div className="font-medium">
-                      {tListing("details.floor", {
-                        floor: formatNumber(property.floor),
-                      })}
+                      {formatNumber(property.floor)}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {tListing("details.level")}
+                      {tListing("details.floorLabel")}
                     </div>
                   </div>
                 </div>
@@ -222,7 +229,11 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                   <div className="flex items-center gap-3">
                     <Calendar className="h-5 w-5 text-primary" />
                     <span className="font-medium">
-                      {tListing("details.available")}
+                      {tListing(
+                        property.listingMode === "sale"
+                          ? "details.keysAvailable"
+                          : "details.available",
+                      )}
                     </span>
                     <span>
                       {formatDateWithFallback(
@@ -278,7 +289,9 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
               <h2 className="text-xl font-semibold mb-4">
                 {tListing("details.locationTitle")}
               </h2>
-              <p className="text-sm text-muted-foreground mt-1">{city}</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {locationLabel}
+              </p>
             </div>
             {property.location && (
               <LocationMap location={property.location} city={property.city} listing approximate />
@@ -325,7 +338,11 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
                     {property.authorName || tListing("details.anonymous")}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {tListing("details.ownerRole")}
+                    {tListing(
+                      property.listingMode === "sale"
+                        ? "details.sellerRole"
+                        : "details.ownerRole",
+                    )}
                   </div>
                 </div>
               </div>
