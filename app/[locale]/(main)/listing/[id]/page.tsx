@@ -104,7 +104,7 @@ export default function PropertyPage() {
   return (
     <div className="min-h-screen bg-background relative">
       {/* Header avec navigation */}
-      <div className="mx-auto flex max-w-full items-center justify-between gap-2 border-b px-4 py-3 sm:py-4 sticky top-0 z-10 bg-background/90 backdrop-blur">
+      <div className="sticky top-0 z-10 mx-auto flex max-w-full items-center justify-between gap-2 border-b bg-background/70 px-4 py-3 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 sm:py-4">
         <Button variant="ghost" size="sm" className="-ml-2 px-2" asChild>
           <Link href="/listing">
             <ArrowLeft className="h-4 w-4" />
@@ -121,11 +121,19 @@ export default function PropertyPage() {
       </div>
 
       <div
-        className={`mx-auto max-w-5xl px-4 py-4 sm:py-8 ${!canManage ? "pb-24 lg:pb-8" : ""}`}
+        className={`mx-auto max-w-5xl px-4 pt-0 sm:pt-8 ${!canManage ? "pb-24 lg:pb-8" : "pb-4 sm:pb-8"}`}
       >
         <PropertyDetails property={property} showContactBar={!canManage} />
         {/* Section des annonces similaires */}
-        <div className="mt-8 sm:mt-12">
+        <div
+          aria-hidden="true"
+          className="mt-8 flex items-center gap-3 sm:mt-12"
+        >
+          <span className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-primary/50" />
+          <span className="size-1.5 rotate-45 rounded-[1px] bg-primary/70" />
+          <span className="h-px flex-1 bg-gradient-to-l from-transparent via-border to-primary/50" />
+        </div>
+        <div className="mt-6">
           <SimilarListings slug={params.id} property={property} />
         </div>
       </div>

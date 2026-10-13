@@ -58,13 +58,14 @@ export const JobBookmarkButton = ({
 
   return (
     <Button
-      variant="ghost"
+      variant="secondary"
       size={showLabel ? "sm" : "icon"}
+      aria-pressed={optimisticIsBookmarked}
       className={cn(
         showLabel ? "mt-0 h-8 w-auto" : "mt-2 h-8 w-8",
         optimisticIsBookmarked
-          ? "text-blue-500 hover:bg-blue-500/20"
-          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+          ? "bg-primary/15 text-primary hover:bg-primary/20"
+          : "text-foreground hover:bg-accent",
         className,
       )}
       onClick={isAuthenticated ? handleToggle : requireAuthentication}

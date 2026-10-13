@@ -214,37 +214,19 @@ export function PropertyDetails({
 
           <Separator />
 
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-4 gap-y-1 lg:hidden">
+          <div className="space-y-1 lg:hidden">
             <div className="text-xs text-muted-foreground">
               {tListing(
                 property.listingMode === "sale"
                   ? "details.salePrice"
                   : "details.monthlyRentTotal",
-              )}
-            </div>
-            {isActive && (
-              <div className="max-w-40 text-right text-xs font-medium text-primary">
-                {tListing(
-                  property.listingMode === "sale"
-                    ? "details.keysAvailable"
-                    : "details.available",
                 )}
-              </div>
-            )}
+            </div>
             <PriceDisplay
               price={property.price}
               listingMode={property.listingMode}
               className="text-3xl"
             />
-            {isActive && (
-              <div className="max-w-40 text-right text-xs text-muted-foreground">
-                {formatDateWithFallback(
-                  property.availableFrom,
-                  locale,
-                  t("availableNow"),
-                )}
-              </div>
-            )}
           </div>
 
           {property.listingMode === "rent" &&
@@ -369,7 +351,7 @@ export function PropertyDetails({
               {/* Disponibilité et animaux */}
               <div className="mt-6 space-y-3">
                 {isActive && (
-                  <div className="hidden items-center gap-3 lg:flex">
+                  <div className="flex items-center gap-3">
                     <Calendar className="h-5 w-5 text-primary" />
                     <span className="font-medium">
                       {tListing(

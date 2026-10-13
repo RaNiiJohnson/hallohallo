@@ -32,6 +32,7 @@ import {
 import { useLocale, useTranslations } from "next-intl";
 import { notFound, useParams } from "next/navigation";
 import ReactMarkdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
 import { toast } from "sonner";
 import { ApplyJobDialog } from "../_component/dialogs/applyJobDialog";
 import { JobLifecycleActions } from "../_component/jobLifecycleActions";
@@ -105,13 +106,13 @@ export default function JobDetailsPage() {
     </>
   );
 
-  const renderApplicationAction = () => {
+  const renderApplicationAction = (className?: string) => {
     if (!isAuthenticated) {
       return (
         <Button
           variant="default"
           size="sm"
-          className="gap-2"
+          className={`gap-2 ${className ?? ""}`}
           disabled={!isAcceptingApplications}
           onClick={requireAuthentication}
         >
@@ -123,7 +124,12 @@ export default function JobDetailsPage() {
 
     if (!isAcceptingApplications) {
       return (
-        <Button variant="outline" size="sm" className="gap-2" disabled>
+        <Button
+          variant="outline"
+          size="sm"
+          className={`gap-2 ${className ?? ""}`}
+          disabled
+        >
           <Mail className="w-4 h-4" />
           {t("details.closed")}
         </Button>
@@ -132,7 +138,12 @@ export default function JobDetailsPage() {
 
     if (applicationEmailStatus === "failed") {
       return (
-        <Button variant="outline" size="sm" className="gap-2" disabled>
+        <Button
+          variant="outline"
+          size="sm"
+          className={`gap-2 ${className ?? ""}`}
+          disabled
+        >
           <Mail className="w-4 h-4" />
           {t("details.applicationDeliveryFailed")}
         </Button>
@@ -141,7 +152,12 @@ export default function JobDetailsPage() {
 
     if (applicationEmailStatus !== "none") {
       return (
-        <Button variant="outline" size="sm" className="gap-2" disabled>
+        <Button
+          variant="outline"
+          size="sm"
+          className={`gap-2 ${className ?? ""}`}
+          disabled
+        >
           <Mail className="w-4 h-4" />
           {t("details.alreadyApplied")}
         </Button>
@@ -153,7 +169,7 @@ export default function JobDetailsPage() {
         <Button
           variant="default"
           size="sm"
-          className="gap-2"
+          className={`gap-2 ${className ?? ""}`}
           disabled={applicationEmailStatus === undefined}
         >
           <Mail className="w-4 h-4" />
@@ -185,7 +201,9 @@ export default function JobDetailsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-muted/50">
+    <div
+      className={`min-h-screen bg-muted/50 ${!isLoading && !isAuthor ? "pb-24 sm:pb-0" : ""}`}
+    >
       <div className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b bg-background/90 px-4 py-3 text-sm text-muted-foreground backdrop-blur sm:hidden">
         <Button variant="ghost" size="sm" className="-ml-2 px-2" asChild>
           <Link href="/jobs">
@@ -493,7 +511,9 @@ export default function JobDetailsPage() {
               </div>
               <div className="p-4">
                 <div className="prose prose-sm mb-4 max-w-none dark:prose-invert">
-                  <ReactMarkdown>{description}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkBreaks]}>
+                    {description}
+                  </ReactMarkdown>
                 </div>
                 <TranslateMenu
                   activeLang={activeLang}
@@ -745,6 +765,12 @@ export default function JobDetailsPage() {
           </Button>
         </div>
       </div>
+
+      {!isLoading && !isAuthor && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_-16px_rgba(0,0,0,0.45)] backdrop-blur-md sm:hidden">
+          {renderApplicationAction("mx-auto w-full max-w-xl")}
+        </div>
+      )}
     </div>
   );
 }
