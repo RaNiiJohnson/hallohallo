@@ -2,12 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import type { ListingListDetails } from "@/lib/convexTypes";
 import { Pencil } from "lucide-react";
@@ -26,7 +26,7 @@ export function EditListingDialog({ listing }: EditListingDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" className="gap-2">
+        <Button size="sm" variant="default" className="gap-2">
           <Pencil className="size-4" />
           <span>{t("trigger")}</span>
         </Button>

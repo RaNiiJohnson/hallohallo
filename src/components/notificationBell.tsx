@@ -21,8 +21,8 @@ import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
 import { useConvexAuth, useMutation } from "convex/react";
 import { Bell, X } from "lucide-react";
-import { useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { useEffect } from "react";
 
 const notificationIcon: Record<string, string> = {
   new_comment: "💬",
@@ -114,10 +114,9 @@ export function NotificationWidget({
               </span>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-foreground leading-snug wrap-break-word">
-                  {t(
-                    `messages.${notif.type}` as Parameters<typeof t>[0],
-                    { name: notif.fromUserName ?? t("someone") },
-                  )}
+                  {t(`messages.${notif.type}` as Parameters<typeof t>[0], {
+                    name: notif.fromUserName ?? t("someone"),
+                  })}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   {getRelativeTime(notif._creationTime, timeT)}
@@ -156,13 +155,15 @@ export function NotificationWidget({
               onClick={() => openWidget("notifications")}
               aria-label={t("open")}
               className={cn(
-                "relative flex items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted",
-                placement === "navbar" ? "size-11" : "size-12 shadow-lg",
+                "relative flex items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted",
+                placement === "navbar"
+                  ? "size-9 bg-transparent"
+                  : "size-12 border border-border bg-card shadow-lg",
               )}
             >
               <Bell size={18} />
               {unreadCount != null && unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-medium">
+                <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
@@ -223,14 +224,16 @@ export function NotificationWidget({
           <PopoverTrigger asChild>
             <button
               aria-label={t("open")}
-                className={cn(
-                  "relative flex items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted",
-                  placement === "navbar" ? "size-11" : "size-12 shadow-lg",
-                )}
+              className={cn(
+                "relative flex items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted",
+                placement === "navbar"
+                  ? "size-9 bg-transparent"
+                  : "size-12 border border-border bg-card shadow-lg",
+              )}
             >
               <Bell size={18} />
               {!isOpen && unreadCount != null && unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-medium">
+                <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}

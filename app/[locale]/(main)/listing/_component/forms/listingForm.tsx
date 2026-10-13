@@ -829,7 +829,7 @@ export function ListingForm({ listing, onSuccess }: ListingFormProps) {
                         autoComplete="off"
                       />
                       <InputGroupAddon align="inline-end" variant="boxed">
-                        <InputGroupText>€/mois</InputGroupText>
+                        <InputGroupText>{t("form.perMonth")}</InputGroupText>
                       </InputGroupAddon>
                     </InputGroup>
                     {fieldState.invalid && (

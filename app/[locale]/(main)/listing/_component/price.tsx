@@ -1,6 +1,6 @@
 "use client";
 
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 interface PriceDisplayProps {
   price: number | undefined;
@@ -14,6 +14,7 @@ export function PriceDisplay({
   className = "",
 }: PriceDisplayProps) {
   const locale = useLocale();
+  const t = useTranslations("listing.details");
 
   if (price === undefined || price === null) {
     return null;
@@ -30,7 +31,9 @@ export function PriceDisplay({
         {"\u00a0"}€
       </span>
       {listingMode === "rent" && (
-        <span className="text-muted-foreground text-xs font-normal">/mois</span>
+        <span className="ml-1 text-muted-foreground text-sm font-normal">
+          {t("perMonth")}
+        </span>
       )}
     </span>
   );

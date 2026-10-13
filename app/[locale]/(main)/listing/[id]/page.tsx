@@ -113,16 +113,15 @@ export default function PropertyPage() {
         </Button>
 
         <div className="ml-auto flex items-center gap-2">
-          <InputGroup className="hidden h-auto w-fit max-w-full flex-wrap justify-center overflow-x-clip border-0 bg-transparent shadow-none sm:flex dark:bg-transparent *:shrink-0 *:rounded-none! *:border-0! [&>*:not(:last-child)]:border-r!">
+          <InputGroup className="hidden h-auto w-fit max-w-full flex-wrap justify-center overflow-hidden rounded-lg bg-background sm:flex *:shrink-0 *:rounded-none! *:border-0! [&>*:not(:last-child)]:border-r!">
             {renderActions()}
           </InputGroup>
           <MobileActionsMenu>{renderActions()}</MobileActionsMenu>
         </div>
       </div>
 
-      {/* Contenu principal */}
-      <div className="max-w-5xl mx-auto py-8 px-4">
-        <PropertyDetails property={property} />
+      <div className="max-w-5xl mx-auto px-4 py-4 sm:py-8">
+        <PropertyDetails property={property} showContactBar={!canManage} />
         {/* Section des annonces similaires */}
         <div className="mt-16">
           <SimilarListings slug={params.id} property={property} />

@@ -82,6 +82,7 @@
     }
   },
   "form": {
+    "perMonth": "€/month",
     "progress": {
       "step": "Step {current} of {total}",
       "completed": "{progress}% completed"
@@ -226,6 +227,7 @@
     "monthlyRentTotal": "Total monthly rent",
     "salePrice": "Sale price",
     "monthlyCharges": "Monthly charges",
+    "perMonth": "/month",
     "petsAllowed": "Allowed",
     "petsNotAllowed": "Pets not allowed",
     "availableFrom": "Available from",
@@ -261,6 +263,7 @@
     "signInToContact": "Sign in to contact",
     "verifyEmailToContact": "Verify my email to contact",
     "contactOwner": "Contact owner",
+    "chooseContactMethod": "Choose WhatsApp or email, depending on the available contact details.",
     "contactUnavailable": "Contact details unavailable",
     "phone": "Phone:",
     "email": "Email:",
