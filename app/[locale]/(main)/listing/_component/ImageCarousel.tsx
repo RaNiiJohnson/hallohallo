@@ -26,6 +26,16 @@ interface ImageCarouselProps {
   showTitleOverlay?: boolean;
 }
 
+function TitleOverlay({ title }: { title: string }) {
+  return (
+    <div className="absolute inset-x-3 bottom-3">
+      <h2 className="inline-flex max-w-full rounded-md bg-black/55 px-2.5 py-1.5 text-base font-semibold text-white backdrop-blur-sm">
+        <span className="truncate">{title}</span>
+      </h2>
+    </div>
+  );
+}
+
 export function ImageCarousel({
   images,
   title,
@@ -74,13 +84,7 @@ export function ImageCarousel({
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover"
         />
-        {showTitleOverlay && (
-          <div className="absolute inset-x-3 bottom-3">
-            <span className="inline-flex max-w-full rounded-md bg-black/55 px-2.5 py-1.5 text-base font-semibold text-white backdrop-blur-sm">
-              <span className="truncate">{title}</span>
-            </span>
-          </div>
-        )}
+        {showTitleOverlay && <TitleOverlay title={title} />}
       </div>
     );
   }
@@ -114,13 +118,7 @@ export function ImageCarousel({
                     {index + 1} / {allImages.length}
                   </div>
 
-                  {showTitleOverlay && (
-                    <div className="absolute inset-x-3 bottom-3">
-                      <span className="inline-flex max-w-full rounded-md bg-black/55 px-2.5 py-1.5 text-base font-semibold text-white backdrop-blur-sm">
-                        <span className="truncate">{title}</span>
-                      </span>
-                    </div>
-                  )}
+                  {showTitleOverlay && <TitleOverlay title={title} />}
                 </div>
               </CarouselItem>
             ))}
