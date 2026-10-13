@@ -46,7 +46,7 @@ export function SimilarListings({
             <Link
               key={list.slug}
               href={`/listing/${list.slug}`}
-              className="relative group cursor-pointer transition-all duration-300 h-fit block"
+              className="group relative block h-fit cursor-pointer rounded-xl transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary active:scale-[0.99] active:ring-2 active:ring-primary active:shadow-primary motion-reduce:transform-none"
             >
               <div className="relative h-80 w-full rounded-xl overflow-hidden shadow-xl">
                 <Image

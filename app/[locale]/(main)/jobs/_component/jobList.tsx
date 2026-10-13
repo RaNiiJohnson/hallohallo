@@ -89,8 +89,12 @@ export function JobList() {
   return (
     <div className="space-y-3 mt-8">
       {jobs.map((job) => (
-        <Link key={job.slug} href={`/jobs/${job.slug}`} className="block group">
-          <div className="bg-card dark:bg-card/35 border border-border rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:border-primary/30">
+        <Link
+          key={job.slug}
+          href={`/jobs/${job.slug}`}
+          className="group block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        >
+          <div className="rounded-lg border border-border bg-card p-4 transition-all duration-150 hover:border-primary/30 hover:shadow-md active:scale-[0.99] active:border-primary active:ring-2 active:ring-primary dark:bg-card/35 motion-reduce:transform-none">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 {/* Title */}
@@ -101,10 +105,18 @@ export function JobList() {
                 {/* Company */}
                 {job.salary !== undefined && (
                   <div className="flex items-center gap-1 mb-2">
-                    <SalaryDisplay salary={job.salary} className="text-foreground" />
+                    <SalaryDisplay
+                      salary={job.salary}
+                      className="text-foreground"
+                    />
                     {job.salaryPeriod && (
                       <span className="text-primary text-xs font-normal">
-                        /{t(`labels.salaryPeriods.${job.salaryPeriod}` as Parameters<typeof t>[0])}
+                        /
+                        {t(
+                          `labels.salaryPeriods.${job.salaryPeriod}` as Parameters<
+                            typeof t
+                          >[0],
+                        )}
                       </span>
                     )}
                   </div>
@@ -114,7 +126,11 @@ export function JobList() {
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground mb-3">
                   <div className="flex items-center gap-1">
                     <MapPin className="h-4 w-4" />
-                    <span>{job.workMode === "remote" ? job.remoteLocation || t("labels.workModes.remote") : job.city}</span>
+                    <span>
+                      {job.workMode === "remote"
+                        ? job.remoteLocation || t("labels.workModes.remote")
+                        : job.city}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Briefcase className="h-4 w-4" />

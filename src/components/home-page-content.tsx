@@ -45,6 +45,9 @@ const reviews = [
   { icon: "Sparkles", key: "identity" },
 ] as const;
 
+const serviceCardLinkClasses =
+  "group cursor-pointer rounded-xl transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary active:scale-[0.99] active:ring-2 active:ring-primary motion-reduce:transform-none";
+
 export function HomePageContent() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const t = useTranslations("home");
@@ -118,9 +121,9 @@ export function HomePageContent() {
             {/* Communauté */}
             <Link
               href="/communities"
-              className="cursor-pointer transition group"
+              className={serviceCardLinkClasses}
             >
-              <Card className="flex flex-col dark:bg-card/35 h-full">
+              <Card className="flex h-full flex-col transition-colors group-active:border-primary dark:bg-card/35">
                 <CardHeader>
                   <CardTitle className="text-xl">{t("community")}</CardTitle>
                 </CardHeader>
@@ -145,8 +148,8 @@ export function HomePageContent() {
             </Link>
 
             {/* Opportunités */}
-            <Link href="/jobs" className="cursor-pointer transition group">
-              <Card className="flex flex-col dark:bg-card/35 h-full">
+            <Link href="/jobs" className={serviceCardLinkClasses}>
+              <Card className="flex h-full flex-col transition-colors group-active:border-primary dark:bg-card/35">
                 <CardHeader>
                   <CardTitle className="text-xl">
                     {t("opportunities")}
@@ -173,8 +176,8 @@ export function HomePageContent() {
             </Link>
 
             {/* Immobilier */}
-            <Link href="/listing" className="cursor-pointer transition group">
-              <Card className="flex flex-col dark:bg-card/35 h-full">
+            <Link href="/listing" className={serviceCardLinkClasses}>
+              <Card className="flex h-full flex-col transition-colors group-active:border-primary dark:bg-card/35">
                 <CardHeader>
                   <CardTitle className="text-xl">{t("housing")}</CardTitle>
                 </CardHeader>

@@ -150,7 +150,7 @@ export function ListingList() {
             key={list.slug}
             href={`/listing/${list.slug}`}
             className={cn(
-              "relative group cursor-pointer transition-all duration-300 h-fit block",
+              "group relative block h-fit cursor-pointer rounded-xl transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary active:scale-[0.99] active:ring-2 active:ring-primary active:shadow-primary motion-reduce:transform-none",
               selectedId === list._id &&
                 "ring-2 ring-primary rounded-xl shadow-primary",
             )}
