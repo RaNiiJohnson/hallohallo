@@ -22,9 +22,16 @@ interface ListingImage {
 interface ImageCarouselProps {
   images?: ListingImage[];
   title: string;
+  compact?: boolean;
+  showTitleOverlay?: boolean;
 }
 
-export function ImageCarousel({ images, title }: ImageCarouselProps) {
+export function ImageCarousel({
+  images,
+  title,
+  compact = false,
+  showTitleOverlay = false,
+}: ImageCarouselProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
 
@@ -54,7 +61,12 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
 
   if (!allImages) {
     return (
-      <div className="relative h-80 w-full rounded-xl overflow-hidden bg-muted mb-6 flex items-center justify-center">
+      <div
+        className={cn(
+          "relative w-full overflow-hidden rounded-xl bg-muted",
+          compact ? "h-64 mb-3 rounded-none" : "h-80 mb-6",
+        )}
+      >
         <Image
           src="/default-cover.jpg"
           alt={title}
@@ -62,6 +74,13 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover"
         />
+        {showTitleOverlay && (
+          <div className="absolute inset-x-3 bottom-3">
+            <span className="inline-flex max-w-full rounded-md bg-black/55 px-2.5 py-1.5 text-base font-semibold text-white backdrop-blur-sm">
+              <span className="truncate">{title}</span>
+            </span>
+          </div>
+        )}
       </div>
     );
   }
@@ -69,12 +88,17 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
   return (
     <>
       {/* Carrousel principal avec shadcn/ui */}
-      <div className="relative group mb-6">
+      <div className={cn("relative group", compact ? "mb-3" : "mb-6")}>
         <Carousel setApi={setApi} className="w-full">
           <CarouselContent>
             {allImages.map((image, index) => (
               <CarouselItem key={image.storageId || image.publicId || index}>
-                <div className="relative h-80 w-full rounded-xl overflow-hidden bg-muted">
+                <div
+                  className={cn(
+                    "relative w-full overflow-hidden rounded-xl bg-muted",
+                    compact ? "h-64 rounded-none" : "h-80",
+                  )}
+                >
                   <Image
                     src={image.url || image.secureUrl || ""}
                     alt={`${title} - Image ${index + 1}`}
@@ -89,6 +113,14 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
                   <div className="absolute top-3 left-3 bg-black/50 text-white text-xs px-2 py-1 rounded-md">
                     {index + 1} / {allImages.length}
                   </div>
+
+                  {showTitleOverlay && (
+                    <div className="absolute inset-x-3 bottom-3">
+                      <span className="inline-flex max-w-full rounded-md bg-black/55 px-2.5 py-1.5 text-base font-semibold text-white backdrop-blur-sm">
+                        <span className="truncate">{title}</span>
+                      </span>
+                    </div>
+                  )}
                 </div>
               </CarouselItem>
             ))}
@@ -101,12 +133,18 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
 
         {/* Miniatures */}
         {allImages.length > 1 && (
-          <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
+          <div
+            className={cn(
+              "flex gap-2 overflow-x-auto",
+              compact ? "mt-2 px-4 pb-1" : "mt-3 pb-2",
+            )}
+          >
             {allImages.map((image, index) => (
               <button
                 key={image.storageId || image.publicId || index}
                 className={cn(
-                  "relative shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 cursor-pointer",
+                  "relative shrink-0 rounded-lg overflow-hidden border-2 transition-all duration-200 cursor-pointer",
+                  compact ? "size-14" : "size-16",
                   index === current
                     ? "border-primary scale-105"
                     : "border-transparent hover:border-muted-foreground/50",

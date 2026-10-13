@@ -20,30 +20,32 @@ export function ListingDetails({
   const t = useTranslations("listing");
 
   return (
-    <div className="bg-card border rounded-xl p-6 shadow-lg">
+    <div className="relative overflow-hidden rounded-xl border bg-card shadow-lg">
       {showCloseButton && (
-        <div className="flex items-start justify-between mb-4">
-          <h2 className="text-2xl font-bold pr-4">{listing.title}</h2>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="shrink-0"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
-          >
-            <X className="size-4" />
-          </Button>
-        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute right-3 top-3 z-10 size-8 bg-black/50 text-white hover:bg-black/70 hover:text-white"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+        >
+          <X className="size-4" />
+        </Button>
       )}
 
       {/* Carrousel d'images */}
-      <ImageCarousel images={listing.images} title={listing.title} />
+      <ImageCarousel
+        images={listing.images}
+        title={listing.title}
+        compact
+        showTitleOverlay
+      />
 
-      <div className="space-y-4">
+      <div className="px-4 pb-4">
         {/* Bouton vers les détails complets */}
-        <Link href={`/listing/${listing.slug}`} className="block mt-4">
+        <Link href={`/listing/${listing.slug}`} className="block mt-3">
           <Button className="w-full flex items-center gap-2">
             <ExternalLink className="size-4" />
             {t("details.seeDetails")}
