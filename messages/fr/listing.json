@@ -257,7 +257,22 @@
     "contactOwner": "Contacter le propriétaire",
     "contactUnavailable": "Coordonnées indisponibles",
     "phone": "Téléphone :",
-    "email": "Email :"
+    "email": "Email :",
+    "gallery": {
+      "title": "Galerie de photos — {title}",
+      "description": "Parcourez les photos de l’annonce. Utilisez les flèches ou balayez horizontalement pour naviguer.",
+      "allPhotosTitle": "Toutes les photos",
+      "photoCount": "{count, plural, one {# photo} other {# photos}}",
+      "backToGallery": "Toutes les photos",
+      "viewAll": "Voir toutes les photos",
+      "counter": "{current} / {total}",
+      "imageAlt": "{title} — photo {current} sur {total}",
+      "openImage": "Ouvrir la photo {current} sur {total}",
+      "slide": "Photo {current} sur {total}",
+      "close": "Fermer la galerie",
+      "previous": "Photo précédente",
+      "next": "Photo suivante"
+    }
   },
   "similar": {
     "title": "Annonces similaires",

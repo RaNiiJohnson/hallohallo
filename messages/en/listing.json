@@ -257,7 +257,22 @@
     "contactOwner": "Contact owner",
     "contactUnavailable": "Contact details unavailable",
     "phone": "Phone:",
-    "email": "Email:"
+    "email": "Email:",
+    "gallery": {
+      "title": "Photo gallery — {title}",
+      "description": "Browse the listing photos. Use the arrow keys or swipe horizontally to navigate.",
+      "allPhotosTitle": "All photos",
+      "photoCount": "{count, plural, one {# photo} other {# photos}}",
+      "backToGallery": "All photos",
+      "viewAll": "View all photos",
+      "counter": "{current} / {total}",
+      "imageAlt": "{title} — photo {current} of {total}",
+      "openImage": "Open photo {current} of {total}",
+      "slide": "Photo {current} of {total}",
+      "close": "Close gallery",
+      "previous": "Previous photo",
+      "next": "Next photo"
+    }
   },
   "similar": {
     "title": "Similar listings",
