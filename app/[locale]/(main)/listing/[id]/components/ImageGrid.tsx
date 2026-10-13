@@ -228,7 +228,7 @@ export function ImageGrid({ images, title }: ImageGridProps) {
 
   if (allImages.length === 0) {
     return (
-      <div className="relative aspect-4/3 w-full overflow-hidden rounded-2xl bg-muted md:h-96 md:aspect-auto">
+      <div className="relative aspect-4/3 w-full overflow-hidden bg-muted md:h-96 md:aspect-auto md:rounded-2xl">
         <Image
           src="/default-cover.jpg"
           alt={title}
@@ -255,7 +255,7 @@ export function ImageGrid({ images, title }: ImageGridProps) {
               <CarouselItem key={image.key} className="pl-0">
                 <button
                   type="button"
-                  className="relative block aspect-4/3 w-full cursor-zoom-in overflow-hidden rounded-2xl bg-muted text-left"
+                  className="relative block aspect-4/3 w-full cursor-zoom-in overflow-hidden bg-muted text-left"
                   onClick={() => openViewer(index)}
                   aria-label={t("openImage", {
                     current: index + 1,

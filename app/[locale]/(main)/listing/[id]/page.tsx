@@ -120,10 +120,12 @@ export default function PropertyPage() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 py-4 sm:py-8">
+      <div
+        className={`mx-auto max-w-5xl px-4 py-4 sm:py-8 ${!canManage ? "pb-24 lg:pb-8" : ""}`}
+      >
         <PropertyDetails property={property} showContactBar={!canManage} />
         {/* Section des annonces similaires */}
-        <div className="mt-16">
+        <div className="mt-8 sm:mt-12">
           <SimilarListings slug={params.id} property={property} />
         </div>
       </div>

@@ -38,13 +38,8 @@ export function SimilarListings({
   }
 
   return (
-    <section className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">{t("similar.title")}</h2>
-        <Link href="/listing">
-          <Button variant="outline">{t("similar.seeAll")}</Button>
-        </Link>
-      </div>
+    <section className="space-y-4 sm:space-y-6">
+      <h2 className="text-2xl font-bold">{t("similar.title")}</h2>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {properties.map((list) => (
@@ -96,7 +91,7 @@ export function SimilarListings({
 
       {/* Message si peu d'annonces similaires */}
       {properties.length < 3 && (
-        <div className="text-center py-8">
+        <div className="py-4 text-center sm:py-6">
           <p className="text-muted-foreground mb-4">{t("similar.emptyMsg")}</p>
           <Link href="/listing">
             <Button variant="outline">{t("similar.emptyBtn")}</Button>

@@ -154,24 +154,22 @@ export function PropertyDetails({
 
   return (
     <>
-      <div
-        className={
-          showContactBar ? "space-y-8 pb-24 lg:pb-0" : "space-y-8"
-        }
-      >
+      <div className="space-y-8">
         {/* Galerie d'images */}
-        <div className="w-full">
+        <div className="-mx-4 w-[calc(100%+2rem)] md:mx-0 md:w-full">
           <ImageGrid images={property.images} title={title} />
         </div>
         <div className="space-y-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div className="min-w-0 flex-1 space-y-2">
-              <h1 className="text-2xl font-bold sm:text-3xl">{title}</h1>
-              <div className="flex items-start gap-2 text-muted-foreground">
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              <h1 className="order-2 text-2xl font-bold sm:text-3xl lg:order-1">
+                {title}
+              </h1>
+              <div className="order-3 flex items-start gap-2 text-muted-foreground lg:order-2">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
                 <span className="text-sm sm:text-base">{locationLabel}</span>
               </div>
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="order-1 flex flex-wrap items-center gap-2 lg:order-3">
                 <Badge variant="secondary">
                   {tListing(
                     `labels.listingTypes.${property.propertyType}` as Parameters<
@@ -216,8 +214,7 @@ export function PropertyDetails({
 
           <Separator />
 
-          <div className="flex items-end justify-between gap-4 lg:hidden">
-          <div>
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-4 gap-y-1 lg:hidden">
             <div className="text-xs text-muted-foreground">
               {tListing(
                 property.listingMode === "sale"
@@ -225,30 +222,29 @@ export function PropertyDetails({
                   : "details.monthlyRentTotal",
               )}
             </div>
-            <PriceDisplay
-              price={property.price}
-              listingMode={property.listingMode}
-              className="text-3xl"
-            />
-          </div>
-          {isActive && (
-            <div className="max-w-40 text-right text-xs">
-              <div className="font-medium text-primary">
+            {isActive && (
+              <div className="max-w-40 text-right text-xs font-medium text-primary">
                 {tListing(
                   property.listingMode === "sale"
                     ? "details.keysAvailable"
                     : "details.available",
                 )}
               </div>
-              <div className="mt-1 text-muted-foreground">
+            )}
+            <PriceDisplay
+              price={property.price}
+              listingMode={property.listingMode}
+              className="text-3xl"
+            />
+            {isActive && (
+              <div className="max-w-40 text-right text-xs text-muted-foreground">
                 {formatDateWithFallback(
                   property.availableFrom,
                   locale,
                   t("availableNow"),
                 )}
               </div>
-            </div>
-          )}
+            )}
           </div>
 
           {property.listingMode === "rent" &&
@@ -281,7 +277,7 @@ export function PropertyDetails({
                 )}
               </div>
 
-              <div className="hidden grid-cols-2 gap-8 border-t pt-5 text-sm lg:grid">
+              <div className="hidden grid-cols-2 gap-8 text-sm lg:grid">
                 {property.charges !== undefined && (
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground">
@@ -314,8 +310,6 @@ export function PropertyDetails({
         {/* Colonne principale */}
         <div className="lg:col-span-2 space-y-8">
           {/* Caractéristiques principales */}
-
-          <ItemSeparator />
           <div>
             <div className="py-6">
               <h2 className="text-xl font-semibold mb-4">
