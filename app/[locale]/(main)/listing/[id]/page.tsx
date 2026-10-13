@@ -106,7 +106,7 @@ export default function PropertyPage() {
   return (
     <div className="min-h-screen bg-background relative">
       {/* Header avec navigation */}
-      <div className="sticky top-0 z-10 mx-auto flex max-w-full items-center justify-between gap-2 border-b bg-background/70 px-4 py-3 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 sm:py-4">
+      <div className="sticky top-0 z-20 mx-auto flex max-w-full items-center justify-between gap-2 border-b bg-background/70 px-4 py-3 backdrop-blur-md supports-backdrop-filter:bg-background/60 sm:py-4">
         <Button variant="ghost" size="sm" className="-ml-2 px-2" asChild>
           <Link href="/listing">
             <ArrowLeft className="h-4 w-4" />
