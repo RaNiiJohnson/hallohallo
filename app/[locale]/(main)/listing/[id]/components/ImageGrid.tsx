@@ -15,8 +15,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ArrowLeft, ChevronLeft, ChevronRight, Images, X } from "lucide-react";
-import Image from "next/image";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 import {
   type MouseEvent as ReactMouseEvent,
   useCallback,
@@ -228,7 +228,7 @@ export function ImageGrid({ images, title }: ImageGridProps) {
 
   if (allImages.length === 0) {
     return (
-      <div className="relative h-72 w-full overflow-hidden rounded-2xl bg-muted sm:h-96">
+      <div className="relative aspect-4/3 w-full overflow-hidden bg-muted md:h-96 md:aspect-auto md:rounded-2xl">
         <Image
           src="/default-cover.jpg"
           alt={title}
@@ -255,7 +255,7 @@ export function ImageGrid({ images, title }: ImageGridProps) {
               <CarouselItem key={image.key} className="pl-0">
                 <button
                   type="button"
-                  className="relative block h-72 w-full cursor-zoom-in overflow-hidden rounded-2xl bg-muted text-left sm:h-80"
+                  className="relative block aspect-4/3 w-full cursor-zoom-in overflow-hidden bg-muted text-left"
                   onClick={() => openViewer(index)}
                   aria-label={t("openImage", {
                     current: index + 1,
@@ -287,7 +287,7 @@ export function ImageGrid({ images, title }: ImageGridProps) {
           {t("viewAll")}
         </Button>
 
-        <div className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/65 px-2.5 py-1 text-xs font-medium tabular-nums text-white backdrop-blur-sm">
+        <div className="pointer-events-none absolute right-3 top-3 rounded-full bg-black/65 px-2.5 py-1 text-xs font-medium tabular-nums text-white backdrop-blur-sm">
           {t("counter", {
             current: mobileIndex + 1,
             total: allImages.length,
@@ -347,7 +347,7 @@ export function ImageGrid({ images, title }: ImageGridProps) {
       <Dialog open={isFullscreen} onOpenChange={handleOpenChange}>
         <DialogContent
           showCloseButton={false}
-          className="inset-0 left-0 top-0 z-[60] flex h-dvh max-h-none w-screen max-w-none translate-x-0 translate-y-0 items-stretch gap-0 rounded-none border-0 bg-background p-0 shadow-none duration-200 sm:max-w-none"
+          className="inset-0 left-0 top-0 z-60 flex h-dvh max-h-none w-screen max-w-none translate-x-0 translate-y-0 items-stretch gap-0 rounded-none border-0 bg-background p-0 shadow-none duration-200 sm:max-w-none"
           onCloseAutoFocus={(event) => {
             event.preventDefault();
             returnFocusRef.current?.focus();
@@ -365,9 +365,7 @@ export function ImageGrid({ images, title }: ImageGridProps) {
             }
           }}
         >
-          <DialogTitle className="sr-only">
-            {t("title", { title })}
-          </DialogTitle>
+          <DialogTitle className="sr-only">{t("title", { title })}</DialogTitle>
           <DialogDescription className="sr-only">
             {t("description")}
           </DialogDescription>
@@ -404,7 +402,7 @@ export function ImageGrid({ images, title }: ImageGridProps) {
                   <button
                     key={image.key}
                     type="button"
-                    className={`group relative aspect-[4/3] cursor-zoom-in overflow-hidden rounded-xl bg-muted text-left ${index === 0 ? "sm:col-span-2 sm:aspect-[2/1]" : ""}`}
+                    className={`group relative aspect-4/3 cursor-zoom-in overflow-hidden rounded-xl bg-muted text-left ${index === 0 ? "sm:col-span-2 sm:aspect-2/1" : ""}`}
                     onClick={() => openViewerFromGallery(index)}
                     aria-label={t("openImage", {
                       current: index + 1,
@@ -438,7 +436,9 @@ export function ImageGrid({ images, title }: ImageGridProps) {
                 >
                   <ArrowLeft className="size-4" />
                   <span className="hidden sm:inline">{t("backToGallery")}</span>
-                  <span className="sr-only sm:hidden">{t("backToGallery")}</span>
+                  <span className="sr-only sm:hidden">
+                    {t("backToGallery")}
+                  </span>
                 </Button>
               )}
 

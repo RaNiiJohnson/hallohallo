@@ -32,6 +32,7 @@ import {
 import { useLocale, useTranslations } from "next-intl";
 import { notFound, useParams } from "next/navigation";
 import ReactMarkdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
 import { toast } from "sonner";
 import { ApplyJobDialog } from "../_component/dialogs/applyJobDialog";
 import { JobLifecycleActions } from "../_component/jobLifecycleActions";
@@ -96,25 +97,24 @@ export default function JobDetailsPage() {
   const isAuthor = user?._id === jobOffer.authorId;
   const isAcceptingApplications =
     jobOffer.status === undefined || jobOffer.status === "active";
+  const actionsReady = !isLoading && user !== undefined;
+  const showMobileApplicationBar = actionsReady && !isAuthor;
 
   const renderOwnerActions = () => (
     <>
-      <JobLifecycleActions
-        jobId={jobOffer._id}
-        status={jobOffer.status}
-      />
+      <JobLifecycleActions jobId={jobOffer._id} status={jobOffer.status} />
       <ShareButton text={jobOffer.title} showLabel />
       <EditJobDialog jobOffer={jobOffer} />
     </>
   );
 
-  const renderApplicationAction = () => {
+  const renderApplicationAction = (className?: string) => {
     if (!isAuthenticated) {
       return (
         <Button
           variant="default"
           size="sm"
-          className="gap-2"
+          className={`gap-2 ${className ?? ""}`}
           disabled={!isAcceptingApplications}
           onClick={requireAuthentication}
         >
@@ -126,16 +126,40 @@ export default function JobDetailsPage() {
 
     if (!isAcceptingApplications) {
       return (
-        <Button variant="outline" size="sm" className="gap-2" disabled>
+        <Button
+          variant="outline"
+          size="sm"
+          className={`gap-2 ${className ?? ""}`}
+          disabled
+        >
           <Mail className="w-4 h-4" />
           {t("details.closed")}
         </Button>
       );
     }
 
+    if (applicationEmailStatus === undefined) {
+      return (
+        <Button
+          variant="outline"
+          size="sm"
+          className={`gap-2 ${className ?? ""}`}
+          disabled
+        >
+          <Mail className="w-4 h-4" />
+          {t("details.apply")}
+        </Button>
+      );
+    }
+
     if (applicationEmailStatus === "failed") {
       return (
-        <Button variant="outline" size="sm" className="gap-2" disabled>
+        <Button
+          variant="outline"
+          size="sm"
+          className={`gap-2 ${className ?? ""}`}
+          disabled
+        >
           <Mail className="w-4 h-4" />
           {t("details.applicationDeliveryFailed")}
         </Button>
@@ -144,7 +168,12 @@ export default function JobDetailsPage() {
 
     if (applicationEmailStatus !== "none") {
       return (
-        <Button variant="outline" size="sm" className="gap-2" disabled>
+        <Button
+          variant="outline"
+          size="sm"
+          className={`gap-2 ${className ?? ""}`}
+          disabled
+        >
           <Mail className="w-4 h-4" />
           {t("details.alreadyApplied")}
         </Button>
@@ -156,7 +185,7 @@ export default function JobDetailsPage() {
         <Button
           variant="default"
           size="sm"
-          className="gap-2"
+          className={`gap-2 ${className ?? ""}`}
           disabled={applicationEmailStatus === undefined}
         >
           <Mail className="w-4 h-4" />
@@ -188,7 +217,9 @@ export default function JobDetailsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-muted/50">
+    <div
+      className={`min-h-screen bg-muted/50 ${showMobileApplicationBar ? "pb-24 sm:pb-0" : ""}`}
+    >
       <div className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b bg-background/90 px-4 py-3 text-sm text-muted-foreground backdrop-blur sm:hidden">
         <Button variant="ghost" size="sm" className="-ml-2 px-2" asChild>
           <Link href="/jobs">
@@ -197,7 +228,7 @@ export default function JobDetailsPage() {
           </Link>
         </Button>
 
-        {!isLoading ? (
+        {actionsReady ? (
           <div className="shrink-0">
             <MobileActionsMenu>
               {isAuthor ? renderOwnerActions() : renderVisitorActions()}
@@ -310,14 +341,14 @@ export default function JobDetailsPage() {
 
               {/* Company Links / Edit Button */}
               <div className="hidden min-w-0 max-w-full flex-wrap items-center justify-center gap-3 sm:flex">
-                {isLoading ? (
+                {!actionsReady ? (
                   <Skeleton className="w-[250px] h-[42px] rounded-full border border-muted select-none pointer-events-none" />
                 ) : isAuthor ? (
-                  <InputGroup className="h-auto w-fit max-w-full flex-wrap justify-center overflow-hidden border-0 bg-transparent shadow-none dark:bg-transparent [&>*]:shrink-0 [&>*]:rounded-none! [&>*]:border-0! [&>*:not(:last-child)]:border-r!">
+                  <InputGroup className="h-auto w-fit max-w-full flex-wrap justify-center overflow-hidden border-0 bg-transparent shadow-none dark:bg-transparent *:shrink-0 *:rounded-none! *:border-0! [&>*:not(:last-child)]:border-r!">
                     {renderOwnerActions()}
                   </InputGroup>
                 ) : (
-                  <InputGroup className="h-auto w-fit max-w-full flex-wrap justify-center overflow-hidden border-0 bg-transparent shadow-none dark:bg-transparent [&>*]:shrink-0 [&>*]:rounded-none! [&>*]:border-0! [&>*:not(:last-child)]:border-r!">
+                  <InputGroup className="h-auto w-fit max-w-full flex-wrap justify-center overflow-hidden border-0 bg-transparent shadow-none dark:bg-transparent *:shrink-0 *:rounded-none! *:border-0! [&>*:not(:last-child)]:border-r!">
                     {renderVisitorActions()}
                   </InputGroup>
                 )}
@@ -496,7 +527,9 @@ export default function JobDetailsPage() {
               </div>
               <div className="p-4">
                 <div className="prose prose-sm mb-4 max-w-none dark:prose-invert">
-                  <ReactMarkdown>{description}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkBreaks]}>
+                    {description}
+                  </ReactMarkdown>
                 </div>
                 <TranslateMenu
                   activeLang={activeLang}
@@ -572,7 +605,9 @@ export default function JobDetailsPage() {
                     <p className="font-semibold text-lg">
                       {jobOffer.company || t("details.companyName")}
                     </p>
-                    <p className="text-sm text-muted-foreground">{locationLabel}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {locationLabel}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -606,7 +641,9 @@ export default function JobDetailsPage() {
                   </div>
                   <div className="flex items-center text-muted-foreground bg-muted px-2.5 py-0.5 rounded-md">
                     <MapPin className="w-4 h-4 mr-1.5" />
-                    <span className="font-semibold text-sm">{locationLabel}</span>
+                    <span className="font-semibold text-sm">
+                      {locationLabel}
+                    </span>
                   </div>
                 </div>
 
@@ -621,15 +658,26 @@ export default function JobDetailsPage() {
                   </div>
                 )}
 
-                {jobOffer.salary !== undefined && <div className="flex items-center justify-between py-3 border-b">
-                  <span className="text-sm text-muted-foreground">
-                    {t("details.salary")}
-                  </span>
-                  <div className="flex items-baseline gap-0.5">
-                    <SalaryDisplay salary={jobOffer.salary} />
-                    {jobOffer.salaryPeriod && <span className="text-primary text-xs font-normal">/{t(`labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<typeof t>[0])}</span>}
+                {jobOffer.salary !== undefined && (
+                  <div className="flex items-center justify-between py-3 border-b">
+                    <span className="text-sm text-muted-foreground">
+                      {t("details.salary")}
+                    </span>
+                    <div className="flex items-baseline gap-0.5">
+                      <SalaryDisplay salary={jobOffer.salary} />
+                      {jobOffer.salaryPeriod && (
+                        <span className="text-primary text-xs font-normal">
+                          /
+                          {t(
+                            `labels.salaryPeriods.${jobOffer.salaryPeriod}` as Parameters<
+                              typeof t
+                            >[0],
+                          )}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>}
+                )}
 
                 <div className="flex items-center justify-between py-3">
                   <span className="text-sm text-muted-foreground">
@@ -644,8 +692,8 @@ export default function JobDetailsPage() {
 
             {/* Apply CTA */}
 
-            {user?._id !== jobOffer.authorId && (
-              <div className="bg-primary text-primary-foreground border rounded-lg shadow-sm">
+            {actionsReady && !isAuthor && (
+              <div className="hidden bg-primary text-primary-foreground border rounded-lg shadow-sm sm:block">
                 <div className="p-4">
                   <h3 className="font-bold text-lg mb-2">
                     {t("details.readyToApply")}
@@ -654,7 +702,12 @@ export default function JobDetailsPage() {
                     {t("details.dontMiss")}
                   </p>
                   {!isAcceptingApplications ? (
-                    <Button variant="secondary" className="w-full" size="lg" disabled>
+                    <Button
+                      variant="secondary"
+                      className="w-full"
+                      size="lg"
+                      disabled
+                    >
                       {t("details.closed")}
                     </Button>
                   ) : !isAuthenticated ? (
@@ -666,12 +719,31 @@ export default function JobDetailsPage() {
                     >
                       {t("details.applyNow")}
                     </Button>
+                  ) : applicationEmailStatus === undefined ? (
+                    <Button
+                      variant="secondary"
+                      className="w-full"
+                      size="lg"
+                      disabled
+                    >
+                      {t("details.applyNow")}
+                    </Button>
                   ) : applicationEmailStatus === "failed" ? (
-                    <Button variant="secondary" className="w-full" size="lg" disabled>
+                    <Button
+                      variant="secondary"
+                      className="w-full"
+                      size="lg"
+                      disabled
+                    >
                       {t("details.applicationDeliveryFailed")}
                     </Button>
                   ) : applicationEmailStatus !== "none" ? (
-                    <Button variant="secondary" className="w-full" size="lg" disabled>
+                    <Button
+                      variant="secondary"
+                      className="w-full"
+                      size="lg"
+                      disabled
+                    >
                       {t("details.alreadyApplied")}
                     </Button>
                   ) : (
@@ -718,6 +790,12 @@ export default function JobDetailsPage() {
           </Button>
         </div>
       </div>
+
+      {showMobileApplicationBar && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_-16px_rgba(0,0,0,0.45)] backdrop-blur-md sm:hidden">
+          {renderApplicationAction("mx-auto w-full max-w-xl")}
+        </div>
+      )}
     </div>
   );
 }

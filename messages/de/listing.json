@@ -82,6 +82,7 @@
     }
   },
   "form": {
+    "perMonth": "€/Monat",
     "progress": {
       "step": "Schritt {current} von {total}",
       "completed": "{progress}% abgeschlossen"
@@ -226,6 +227,7 @@
     "monthlyRentTotal": "Monatliche Gesamtmiete",
     "salePrice": "Verkaufspreis",
     "monthlyCharges": "Monatliche Nebenkosten",
+    "perMonth": "/Monat",
     "petsAllowed": "Erlaubt",
     "petsNotAllowed": "Keine Haustiere",
     "availableFrom": "Verfügbar ab",
@@ -261,6 +263,7 @@
     "signInToContact": "Anmelden, um zu kontaktieren",
     "verifyEmailToContact": "E-Mail bestätigen, um zu kontaktieren",
     "contactOwner": "Eigentümer kontaktieren",
+    "chooseContactMethod": "Wählen Sie je nach verfügbaren Kontaktdaten WhatsApp oder E-Mail.",
     "contactUnavailable": "Kontaktdaten nicht verfügbar",
     "phone": "Telefon:",
     "email": "E-Mail:",

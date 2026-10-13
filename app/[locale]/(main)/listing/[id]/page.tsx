@@ -41,7 +41,9 @@ export default function PropertyPage() {
     notFound();
   }
 
-  const canManage = !isLoading && user?._id === property.authorId;
+  const actionsReady = !isLoading && user !== undefined;
+  const canManage = actionsReady && user?._id === property.authorId;
+  const showVisitorActions = actionsReady && !canManage;
 
   const renderActions = () => (
     <>
@@ -104,7 +106,7 @@ export default function PropertyPage() {
   return (
     <div className="min-h-screen bg-background relative">
       {/* Header avec navigation */}
-      <div className="mx-auto flex max-w-full items-center justify-between gap-2 border-b px-4 py-3 sm:py-4 sticky top-0 z-10 bg-background/90 backdrop-blur">
+      <div className="sticky top-0 z-10 mx-auto flex max-w-full items-center justify-between gap-2 border-b bg-background/70 px-4 py-3 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 sm:py-4">
         <Button variant="ghost" size="sm" className="-ml-2 px-2" asChild>
           <Link href="/listing">
             <ArrowLeft className="h-4 w-4" />
@@ -112,19 +114,25 @@ export default function PropertyPage() {
           </Link>
         </Button>
 
-        <div className="ml-auto flex items-center gap-2">
-          <InputGroup className="hidden h-auto w-fit max-w-full flex-wrap justify-center overflow-x-clip border-0 bg-transparent shadow-none sm:flex dark:bg-transparent *:shrink-0 *:rounded-none! *:border-0! [&>*:not(:last-child)]:border-r!">
-            {renderActions()}
-          </InputGroup>
-          <MobileActionsMenu>{renderActions()}</MobileActionsMenu>
-        </div>
+        {actionsReady && (
+          <div className="ml-auto flex items-center gap-2">
+            <InputGroup className="hidden h-auto w-fit max-w-full flex-wrap justify-center overflow-hidden rounded-lg bg-background sm:flex *:shrink-0 *:rounded-none! *:border-0! [&>*:not(:last-child)]:border-r!">
+              {renderActions()}
+            </InputGroup>
+            <MobileActionsMenu>{renderActions()}</MobileActionsMenu>
+          </div>
+        )}
       </div>
 
-      {/* Contenu principal */}
-      <div className="max-w-5xl mx-auto py-8 px-4">
-        <PropertyDetails property={property} />
+      <div
+        className={`mx-auto max-w-5xl px-4 pt-0 sm:pt-8 ${showVisitorActions ? "pb-24 lg:pb-8" : "pb-4 sm:pb-8"}`}
+      >
+        <PropertyDetails
+          property={property}
+          showContactBar={showVisitorActions}
+        />
         {/* Section des annonces similaires */}
-        <div className="mt-16">
+        <div className="mt-6 sm:mt-8">
           <SimilarListings slug={params.id} property={property} />
         </div>
       </div>
