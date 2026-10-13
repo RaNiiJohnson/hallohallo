@@ -444,23 +444,25 @@ export function PropertyDetails({
             )}
           </div>
 
-          <ItemSeparator />
           {/* Équipements et services */}
           {property.extras.length > 0 && (
-            <div>
-              <div className="py-6">
-                <h2 className="text-xl font-semibold mb-4">
-                  {tListing("details.extrasTitle")}
-                </h2>
-                <div className="flex flex-wrap gap-2">
-                  {property.extras.map((extra, index) => (
-                    <Badge key={index} variant="outline">
-                      {extra}
-                    </Badge>
-                  ))}
+            <>
+              <ItemSeparator />
+              <div>
+                <div className="py-6">
+                  <h2 className="text-xl font-semibold mb-4">
+                    {tListing("details.extrasTitle")}
+                  </h2>
+                  <div className="flex flex-wrap gap-2">
+                    {property.extras.map((extra, index) => (
+                      <Badge key={index} variant="outline">
+                        {extra}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
+            </>
           )}
         </div>
 

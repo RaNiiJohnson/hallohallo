@@ -89,15 +89,14 @@ export function SimilarListings({
         ))}
       </div>
 
-      {/* Message si peu d'annonces similaires */}
-      {properties.length < 3 && (
-        <div className="py-4 text-center sm:py-6">
+      <div className="py-4 text-center sm:py-6">
+        {properties.length < 3 && (
           <p className="text-muted-foreground mb-4">{t("similar.emptyMsg")}</p>
-          <Link href="/listing">
-            <Button variant="outline">{t("similar.emptyBtn")}</Button>
-          </Link>
-        </div>
-      )}
+        )}
+        <Link href="/listing">
+          <Button variant="outline">{t("similar.emptyBtn")}</Button>
+        </Link>
+      </div>
     </section>
   );
 }
