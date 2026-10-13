@@ -46,7 +46,7 @@ const reviews = [
 ] as const;
 
 const serviceCardLinkClasses =
-  "group cursor-pointer rounded-xl transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary active:scale-[0.99] active:ring-2 active:ring-primary motion-reduce:transform-none";
+  "group cursor-pointer rounded-xl transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary active:scale-[0.99] active:ring-1 active:ring-primary motion-reduce:transform-none";
 
 export function HomePageContent() {
   const { isAuthenticated, isLoading } = useConvexAuth();
@@ -119,10 +119,7 @@ export function HomePageContent() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
             {/* Communauté */}
-            <Link
-              href="/communities"
-              className={serviceCardLinkClasses}
-            >
+            <Link href="/communities" className={serviceCardLinkClasses}>
               <Card className="flex h-full flex-col transition-colors group-active:border-primary dark:bg-card/35">
                 <CardHeader>
                   <CardTitle className="text-xl">{t("community")}</CardTitle>

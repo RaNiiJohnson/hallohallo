@@ -92,9 +92,9 @@ export function JobList() {
         <Link
           key={job.slug}
           href={`/jobs/${job.slug}`}
-          className="group block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="group block rounded-lg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
         >
-          <div className="rounded-lg border border-border bg-card p-4 transition-all duration-150 hover:border-primary/30 hover:shadow-md active:scale-[0.99] active:border-primary active:ring-2 active:ring-primary dark:bg-card/35 motion-reduce:transform-none">
+          <div className="rounded-lg border border-border bg-card p-4 transition-all duration-150 hover:border-primary/30 hover:shadow-md active:scale-[0.99] active:border-primary active:ring-1 active:ring-primary dark:bg-card/35 motion-reduce:transform-none">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 {/* Title */}
