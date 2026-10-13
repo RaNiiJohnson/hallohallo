@@ -19,7 +19,9 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import {
   type MouseEvent as ReactMouseEvent,
+  useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -43,6 +45,8 @@ interface ResolvedImage {
 }
 
 type GalleryView = "overview" | "viewer";
+
+const GALLERY_HISTORY_KEY = "hallomadaListingGallery";
 
 const HERO_IMAGE_SIZES =
   "(max-width: 640px) calc(100vw - 3rem), (max-width: 1024px) 66vw, 640px";
@@ -80,7 +84,9 @@ export function ImageGrid({ images, title }: ImageGridProps) {
     lightboxApi,
     fullscreenIndex,
   );
+  const galleryHistoryToken = useId();
   const returnFocusRef = useRef<HTMLElement | null>(null);
+  const galleryHistoryTokenRef = useRef<string | null>(null);
 
   const allImages = useMemo<ResolvedImage[]>(
     () =>
@@ -105,8 +111,48 @@ export function ImageGrid({ images, title }: ImageGridProps) {
         : null;
   };
 
+  const pushGalleryHistory = () => {
+    if (galleryHistoryTokenRef.current) return;
+
+    const token = galleryHistoryToken;
+    const currentState = window.history.state;
+    const nextState =
+      typeof currentState === "object" && currentState !== null
+        ? { ...currentState, [GALLERY_HISTORY_KEY]: token }
+        : { [GALLERY_HISTORY_KEY]: token };
+
+    window.history.pushState(nextState, "", window.location.href);
+    galleryHistoryTokenRef.current = token;
+  };
+
+  const resetFullscreenState = useCallback(() => {
+    setIsFullscreen(false);
+    setLightboxApi(undefined);
+    setCanReturnToOverview(false);
+  }, []);
+
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      const token = galleryHistoryTokenRef.current;
+      if (
+        !isFullscreen ||
+        !token ||
+        event.state?.[GALLERY_HISTORY_KEY] === token
+      ) {
+        return;
+      }
+
+      galleryHistoryTokenRef.current = null;
+      resetFullscreenState();
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [isFullscreen, resetFullscreenState]);
+
   const openViewer = (index: number) => {
     rememberReturnFocus();
+    pushGalleryHistory();
     setFullscreenIndex(index);
     setLightboxIndex(index);
     setGalleryView("viewer");
@@ -116,6 +162,7 @@ export function ImageGrid({ images, title }: ImageGridProps) {
 
   const openGallery = () => {
     rememberReturnFocus();
+    pushGalleryHistory();
     setGalleryView("overview");
     setCanReturnToOverview(false);
     setIsFullscreen(true);
@@ -135,10 +182,17 @@ export function ImageGrid({ images, title }: ImageGridProps) {
   };
 
   const handleOpenChange = (open: boolean) => {
-    setIsFullscreen(open);
-    if (!open) {
-      setLightboxApi(undefined);
-      setCanReturnToOverview(false);
+    if (open) {
+      setIsFullscreen(true);
+      return;
+    }
+
+    const token = galleryHistoryTokenRef.current;
+    galleryHistoryTokenRef.current = null;
+    resetFullscreenState();
+
+    if (token && window.history.state?.[GALLERY_HISTORY_KEY] === token) {
+      window.history.back();
     }
   };
 
