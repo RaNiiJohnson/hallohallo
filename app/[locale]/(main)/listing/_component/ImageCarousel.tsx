@@ -94,9 +94,12 @@ export function ImageCarousel({
       {/* Carrousel principal avec shadcn/ui */}
       <div className={cn("relative group", compact ? "mb-3" : "mb-6")}>
         <Carousel setApi={setApi} className="w-full">
-          <CarouselContent>
+          <CarouselContent className={cn(compact && "ml-0")}>
             {allImages.map((image, index) => (
-              <CarouselItem key={image.storageId || image.publicId || index}>
+              <CarouselItem
+                key={image.storageId || image.publicId || index}
+                className={cn(compact && "pl-0")}
+              >
                 <div
                   className={cn(
                     "relative w-full overflow-hidden rounded-xl bg-muted",
