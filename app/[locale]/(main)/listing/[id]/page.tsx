@@ -41,7 +41,9 @@ export default function PropertyPage() {
     notFound();
   }
 
-  const canManage = !isLoading && user?._id === property.authorId;
+  const actionsReady = !isLoading && user !== undefined;
+  const canManage = actionsReady && user?._id === property.authorId;
+  const showVisitorActions = actionsReady && !canManage;
 
   const renderActions = () => (
     <>
@@ -112,20 +114,25 @@ export default function PropertyPage() {
           </Link>
         </Button>
 
-        <div className="ml-auto flex items-center gap-2">
-          <InputGroup className="hidden h-auto w-fit max-w-full flex-wrap justify-center overflow-hidden rounded-lg bg-background sm:flex *:shrink-0 *:rounded-none! *:border-0! [&>*:not(:last-child)]:border-r!">
-            {renderActions()}
-          </InputGroup>
-          <MobileActionsMenu>{renderActions()}</MobileActionsMenu>
-        </div>
+        {actionsReady && (
+          <div className="ml-auto flex items-center gap-2">
+            <InputGroup className="hidden h-auto w-fit max-w-full flex-wrap justify-center overflow-hidden rounded-lg bg-background sm:flex *:shrink-0 *:rounded-none! *:border-0! [&>*:not(:last-child)]:border-r!">
+              {renderActions()}
+            </InputGroup>
+            <MobileActionsMenu>{renderActions()}</MobileActionsMenu>
+          </div>
+        )}
       </div>
 
       <div
-        className={`mx-auto max-w-5xl px-4 pt-0 sm:pt-8 ${!canManage ? "pb-24 lg:pb-8" : "pb-4 sm:pb-8"}`}
+        className={`mx-auto max-w-5xl px-4 pt-0 sm:pt-8 ${showVisitorActions ? "pb-24 lg:pb-8" : "pb-4 sm:pb-8"}`}
       >
-        <PropertyDetails property={property} showContactBar={!canManage} />
+        <PropertyDetails
+          property={property}
+          showContactBar={showVisitorActions}
+        />
         {/* Section des annonces similaires */}
-        <div className="mt-8 sm:mt-12">
+        <div className="mt-6 sm:mt-8">
           <SimilarListings slug={params.id} property={property} />
         </div>
       </div>

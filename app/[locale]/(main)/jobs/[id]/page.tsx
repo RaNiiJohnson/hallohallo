@@ -97,8 +97,8 @@ export default function JobDetailsPage() {
   const isAuthor = user?._id === jobOffer.authorId;
   const isAcceptingApplications =
     jobOffer.status === undefined || jobOffer.status === "active";
-  const showMobileApplicationBar =
-    !isLoading && user !== undefined && !isAuthor;
+  const actionsReady = !isLoading && user !== undefined;
+  const showMobileApplicationBar = actionsReady && !isAuthor;
 
   const renderOwnerActions = () => (
     <>
@@ -228,7 +228,7 @@ export default function JobDetailsPage() {
           </Link>
         </Button>
 
-        {!isLoading ? (
+        {actionsReady ? (
           <div className="shrink-0">
             <MobileActionsMenu>
               {isAuthor ? renderOwnerActions() : renderVisitorActions()}
@@ -341,7 +341,7 @@ export default function JobDetailsPage() {
 
               {/* Company Links / Edit Button */}
               <div className="hidden min-w-0 max-w-full flex-wrap items-center justify-center gap-3 sm:flex">
-                {isLoading ? (
+                {!actionsReady ? (
                   <Skeleton className="w-[250px] h-[42px] rounded-full border border-muted select-none pointer-events-none" />
                 ) : isAuthor ? (
                   <InputGroup className="h-auto w-fit max-w-full flex-wrap justify-center overflow-hidden border-0 bg-transparent shadow-none dark:bg-transparent *:shrink-0 *:rounded-none! *:border-0! [&>*:not(:last-child)]:border-r!">
@@ -692,7 +692,7 @@ export default function JobDetailsPage() {
 
             {/* Apply CTA */}
 
-            {user?._id !== jobOffer.authorId && (
+            {actionsReady && !isAuthor && (
               <div className="hidden bg-primary text-primary-foreground border rounded-lg shadow-sm sm:block">
                 <div className="p-4">
                   <h3 className="font-bold text-lg mb-2">

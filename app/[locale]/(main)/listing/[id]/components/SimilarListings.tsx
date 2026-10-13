@@ -38,13 +38,7 @@ export function SimilarListings({
   }
 
   return (
-    <>
-      <div aria-hidden="true" className="flex items-center gap-3">
-        <span className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-primary/50" />
-        <span className="size-1.5 rotate-45 rounded-[1px] bg-primary/70" />
-        <span className="h-px flex-1 bg-gradient-to-l from-transparent via-border to-primary/50" />
-      </div>
-      <section className="mt-6 space-y-4 sm:space-y-6">
+      <section className="space-y-4 sm:space-y-6">
         <h2 className="text-2xl font-bold">{t("similar.title")}</h2>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -112,6 +106,5 @@ export function SimilarListings({
           </Link>
         </div>
       </section>
-    </>
   );
 }
