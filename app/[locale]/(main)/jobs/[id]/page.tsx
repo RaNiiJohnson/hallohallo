@@ -97,6 +97,8 @@ export default function JobDetailsPage() {
   const isAuthor = user?._id === jobOffer.authorId;
   const isAcceptingApplications =
     jobOffer.status === undefined || jobOffer.status === "active";
+  const showMobileApplicationBar =
+    !isLoading && user !== undefined && !isAuthor;
 
   const renderOwnerActions = () => (
     <>
@@ -132,6 +134,20 @@ export default function JobDetailsPage() {
         >
           <Mail className="w-4 h-4" />
           {t("details.closed")}
+        </Button>
+      );
+    }
+
+    if (applicationEmailStatus === undefined) {
+      return (
+        <Button
+          variant="outline"
+          size="sm"
+          className={`gap-2 ${className ?? ""}`}
+          disabled
+        >
+          <Mail className="w-4 h-4" />
+          {t("details.apply")}
         </Button>
       );
     }
@@ -202,7 +218,7 @@ export default function JobDetailsPage() {
 
   return (
     <div
-      className={`min-h-screen bg-muted/50 ${!isLoading && !isAuthor ? "pb-24 sm:pb-0" : ""}`}
+      className={`min-h-screen bg-muted/50 ${showMobileApplicationBar ? "pb-24 sm:pb-0" : ""}`}
     >
       <div className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b bg-background/90 px-4 py-3 text-sm text-muted-foreground backdrop-blur sm:hidden">
         <Button variant="ghost" size="sm" className="-ml-2 px-2" asChild>
@@ -677,7 +693,7 @@ export default function JobDetailsPage() {
             {/* Apply CTA */}
 
             {user?._id !== jobOffer.authorId && (
-              <div className="bg-primary text-primary-foreground border rounded-lg shadow-sm">
+              <div className="hidden bg-primary text-primary-foreground border rounded-lg shadow-sm sm:block">
                 <div className="p-4">
                   <h3 className="font-bold text-lg mb-2">
                     {t("details.readyToApply")}
@@ -700,6 +716,15 @@ export default function JobDetailsPage() {
                       className="w-full"
                       size="lg"
                       onClick={requireAuthentication}
+                    >
+                      {t("details.applyNow")}
+                    </Button>
+                  ) : applicationEmailStatus === undefined ? (
+                    <Button
+                      variant="secondary"
+                      className="w-full"
+                      size="lg"
+                      disabled
                     >
                       {t("details.applyNow")}
                     </Button>
@@ -766,7 +791,7 @@ export default function JobDetailsPage() {
         </div>
       </div>
 
-      {!isLoading && !isAuthor && (
+      {showMobileApplicationBar && (
         <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_-16px_rgba(0,0,0,0.45)] backdrop-blur-md sm:hidden">
           {renderApplicationAction("mx-auto w-full max-w-xl")}
         </div>

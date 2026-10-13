@@ -125,15 +125,7 @@ export default function PropertyPage() {
       >
         <PropertyDetails property={property} showContactBar={!canManage} />
         {/* Section des annonces similaires */}
-        <div
-          aria-hidden="true"
-          className="mt-8 flex items-center gap-3 sm:mt-12"
-        >
-          <span className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-primary/50" />
-          <span className="size-1.5 rotate-45 rounded-[1px] bg-primary/70" />
-          <span className="h-px flex-1 bg-gradient-to-l from-transparent via-border to-primary/50" />
-        </div>
-        <div className="mt-6">
+        <div className="mt-8 sm:mt-12">
           <SimilarListings slug={params.id} property={property} />
         </div>
       </div>
