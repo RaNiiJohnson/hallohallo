@@ -1,4 +1,3 @@
-import { Link } from "@/i18n/navigation";
 import { getTranslations } from "next-intl/server";
 import { FAQAccordion } from "./faq-accordion";
 
@@ -14,13 +13,7 @@ export async function FAQSection() {
             <div className="sticky top-20">
               <h2 className="mt-4 text-3xl font-bold">{t("title")}</h2>
               <p className="text-muted-foreground mt-4">
-                {t("description")}{" "}
-                <Link
-                  href="#"
-                  className="text-primary font-medium hover:underline"
-                >
-                  {t("support")}
-                </Link>{" "}
+                {t("description")} {t("support")} {" "}
                 {t("descriptionEnd")}
               </p>
             </div>

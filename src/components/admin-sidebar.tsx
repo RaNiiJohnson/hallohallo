@@ -97,7 +97,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
                   <span
                     className={`${righteous.className} text-lg leading-none text-primary`}
                   >
-                    Hallo Hallo
+                    Hallomada
                   </span>
                   <span className="text-xs text-muted-foreground">
                     {t("panel")}

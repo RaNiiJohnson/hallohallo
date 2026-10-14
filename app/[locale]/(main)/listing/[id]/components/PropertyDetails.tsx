@@ -13,7 +13,11 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
-import { useManualTranslate } from "@/hooks/use-manual-translate";
+import {
+  getFreshTranslation,
+  getSupportedTranslationLanguage,
+  useManualTranslate,
+} from "@/hooks/use-manual-translate";
 import { useRouter } from "@/i18n/navigation";
 import { getAuthHref, getCurrentReturnTo } from "@/lib/auth-return-to";
 import { ListingListDetails } from "@/lib/convexTypes";
@@ -22,7 +26,8 @@ import { getListingContactLinks } from "@/lib/listing-contact";
 import { LocationMap } from "@/lib/LocationMap";
 import { truncateText } from "@/lib/utils";
 import { api } from "@convex/_generated/api";
-import { useAction } from "convex/react";
+import { useQuery } from "convex-helpers/react/cache";
+import { useAction, useConvexAuth } from "convex/react";
 import {
   Bath,
   Bed,
@@ -58,6 +63,14 @@ export function PropertyDetails({
   const te = useTranslations("common");
 
   const translateListing = useAction(api.listings.translate.translateListing);
+  const { isAuthenticated } = useConvexAuth();
+  const translationLanguage = getSupportedTranslationLanguage(locale);
+  const cachedTranslation = useQuery(
+    api.listings.translate.getTranslation,
+    translationLanguage
+      ? { listingId: property._id, language: translationLanguage }
+      : "skip",
+  );
   const requireAuthentication = useAuthRequiredAction();
   const router = useRouter();
   const requireEmailVerification = () => {
@@ -78,10 +91,19 @@ export function PropertyDetails({
       { onError: () => toast.error(te("translateError")) },
     );
 
-  const description = data?.description ?? property.description;
+  const cached = getFreshTranslation(cachedTranslation, property.updatedAt);
+  const translation = data ?? cached;
+  const description = translation?.description ?? property.description;
 
-  const title = data?.title ?? property.title;
-  const city = data?.city ?? property.city;
+  const title = translation?.title ?? property.title;
+  const city = translation?.city ?? property.city;
+  const handleTranslate = (language: Parameters<typeof translate>[0]) => {
+    if (!isAuthenticated) {
+      requireAuthentication();
+      return;
+    }
+    translate(language);
+  };
   const locationLabel = [property.neighborhood, city]
     .filter(Boolean)
     .join(", ");
@@ -400,7 +422,7 @@ export function PropertyDetails({
             <TranslateMenu
               activeLang={activeLang}
               pendingLang={pendingLang}
-              onTranslateAction={translate}
+              onTranslateAction={handleTranslate}
               onResetAction={reset}
             />
           </div>

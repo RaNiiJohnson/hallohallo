@@ -23,30 +23,30 @@ export const emailVerificationTranslations: Record<
   VerificationEmailStrings
 > = {
   fr: {
-    subject: "V\u00e9rifiez votre adresse e-mail \u2013 HalloHallo",
+    subject: "V\u00e9rifiez votre adresse e-mail \u2013 Hallomada",
     greeting: (name) => `Bonjour ${name}`,
     intro:
-      "Merci de vous \u00eatre inscrit sur HalloHallo. Cliquez sur le bouton ci-dessous pour v\u00e9rifier votre adresse e-mail et activer votre compte.",
+      "Merci de vous \u00eatre inscrit sur Hallomada. Cliquez sur le bouton ci-dessous pour v\u00e9rifier votre adresse e-mail et activer votre compte.",
     buttonLabel: "V\u00e9rifier mon e-mail",
     expiry: "Ce lien est valable 24\u00a0heures.",
     ignore:
       "Si vous n'\u00eates pas \u00e0 l'origine de cette demande, ignorez cet e-mail.",
   },
   en: {
-    subject: "Verify your email address \u2013 HalloHallo",
+    subject: "Verify your email address \u2013 Hallomada",
     greeting: (name) => `Hi ${name}`,
     intro:
-      "Thanks for signing up on HalloHallo. Click the button below to verify your email address and activate your account.",
+      "Thanks for signing up on Hallomada. Click the button below to verify your email address and activate your account.",
     buttonLabel: "Verify my email",
     expiry: "This link is valid for 24\u00a0hours.",
     ignore:
       "If you didn\u2019t create an account, you can safely ignore this email.",
   },
   de: {
-    subject: "Bitte best\u00e4tige deine E-Mail-Adresse \u2013 HalloHallo",
+    subject: "Bitte best\u00e4tige deine E-Mail-Adresse \u2013 Hallomada",
     greeting: (name) => `Hallo ${name}`,
     intro:
-      "Danke, dass du dich bei HalloHallo angemeldet hast. Klicke auf den Button unten, um deine E-Mail-Adresse zu best\u00e4tigen und dein Konto zu aktivieren.",
+      "Danke, dass du dich bei Hallomada angemeldet hast. Klicke auf den Button unten, um deine E-Mail-Adresse zu best\u00e4tigen und dein Konto zu aktivieren.",
     buttonLabel: "E-Mail best\u00e4tigen",
     expiry: "Dieser Link ist 24\u00a0Stunden g\u00fcltig.",
     ignore:
@@ -59,30 +59,30 @@ export const resetPasswordTranslations: Record<
   ResetPasswordEmailStrings
 > = {
   fr: {
-    subject: "Réinitialisation de votre mot de passe – HalloHallo",
+    subject: "Réinitialisation de votre mot de passe – Hallomada",
     greeting: (name) => `Bonjour ${name}`,
     intro:
-      "Vous avez demandé à réinitialiser votre mot de passe sur HalloHallo. Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe.",
+      "Vous avez demandé à réinitialiser votre mot de passe sur Hallomada. Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe.",
     buttonLabel: "Réinitialiser mon mot de passe",
     expiry: "Ce lien est valable 1\u00a0heure.",
     ignore:
       "Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail. Votre mot de passe ne sera pas modifié.",
   },
   en: {
-    subject: "Reset your password – HalloHallo",
+    subject: "Reset your password – Hallomada",
     greeting: (name) => `Hi ${name}`,
     intro:
-      "You requested a password reset for your HalloHallo account. Click the button below to choose a new password.",
+      "You requested a password reset for your Hallomada account. Click the button below to choose a new password.",
     buttonLabel: "Reset my password",
     expiry: "This link is valid for 1\u00a0hour.",
     ignore:
       "If you didn't request this, you can safely ignore this email. Your password won't change.",
   },
   de: {
-    subject: "Passwort zurücksetzen – HalloHallo",
+    subject: "Passwort zurücksetzen – Hallomada",
     greeting: (name) => `Hallo ${name}`,
     intro:
-      "Du hast eine Passwortzurücksetzung für dein HalloHallo-Konto angefordert. Klicke auf den Button unten, um ein neues Passwort zu wählen.",
+      "Du hast eine Passwortzurücksetzung für dein Hallomada-Konto angefordert. Klicke auf den Button unten, um ein neues Passwort zu wählen.",
     buttonLabel: "Passwort zurücksetzen",
     expiry: "Dieser Link ist 1\u00a0Stunde gültig.",
     ignore:
@@ -110,7 +110,7 @@ export function buildResetPasswordEmailHtml({
         <!-- Header -->
         <tr>
           <td style="background:#000000;padding:28px 40px;text-align:center;">
-            <span style="color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">HalloHallo</span>
+            <span style="color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">Hallomada</span>
           </td>
         </tr>
 
@@ -146,7 +146,7 @@ export function buildResetPasswordEmailHtml({
         <!-- Divider + footer -->
         <tr>
           <td style="border-top:1px solid #eee;padding:20px 40px;text-align:center;">
-            <p style="margin:0;font-size:12px;color:#bbb;">HalloHallo &middot; hallomada.de</p>
+            <p style="margin:0;font-size:12px;color:#bbb;">Hallomada &middot; hallomada.de</p>
           </td>
         </tr>
 
@@ -177,7 +177,7 @@ export function buildVerificationEmailHtml({
         <!-- Header -->
         <tr>
           <td style="background:#000000;padding:28px 40px;text-align:center;">
-            <span style="color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">HalloHallo</span>
+            <span style="color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">Hallomada</span>
           </td>
         </tr>
 
@@ -213,7 +213,7 @@ export function buildVerificationEmailHtml({
         <!-- Divider + footer -->
         <tr>
           <td style="border-top:1px solid #eee;padding:20px 40px;text-align:center;">
-            <p style="margin:0;font-size:12px;color:#bbb;">HalloHallo &middot; hallomada.de</p>
+            <p style="margin:0;font-size:12px;color:#bbb;">Hallomada &middot; hallomada.de</p>
           </td>
         </tr>
 

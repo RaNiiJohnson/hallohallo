@@ -1,8 +1,8 @@
 {
   "title": "Questions Fréquentes",
-  "description": "Vous ne trouvez pas ce que vous cherchez ? Contactez notre",
-  "support": "équipe de support",
-  "descriptionEnd": "ou posez votre question dans la communauté.",
+  "description": "Vous ne trouvez pas ce que vous cherchez ?",
+  "support": "Posez votre question dans la communauté.",
+  "descriptionEnd": "",
   "items": [
     {
       "question": "Comment rejoindre la communauté Malagasy en Allemagne ?",

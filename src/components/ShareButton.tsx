@@ -64,7 +64,7 @@ export function ShareButton({
   );
 
   // Mobile ou navigateur supporté → menu natif
-  if (navigator?.share) {
+  if (typeof navigator !== "undefined" && navigator.share) {
     return (
       <Button
         variant={variant}

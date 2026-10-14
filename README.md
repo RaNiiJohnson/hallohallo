@@ -25,5 +25,5 @@ Hallomada est une application web dédiée au réseautage et à l'entraide entre
 - Annonces vérifiées par les membres
 
 ```text
-Hallo Hallo - Ensemble, construisons une communauté forte !
+Hallomada - Ensemble, construisons une communauté forte !
 ```

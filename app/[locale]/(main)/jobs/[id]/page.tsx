@@ -9,7 +9,11 @@ import { Button } from "@/components/ui/button";
 import { InputGroup } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useManualTranslate } from "@/hooks/use-manual-translate";
+import {
+  getFreshTranslation,
+  getSupportedTranslationLanguage,
+  useManualTranslate,
+} from "@/hooks/use-manual-translate";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { Link } from "@/i18n/navigation";
 import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
@@ -63,6 +67,13 @@ export default function JobDetailsPage() {
   // const translated = useTranslatedJob(jobOffer);
 
   const translateJob = useAction(api.jobs.translate.translateJob);
+  const translationLanguage = getSupportedTranslationLanguage(locale);
+  const cachedTranslation = useQuery(
+    api.jobs.translate.getTranslation,
+    jobOffer && translationLanguage
+      ? { jobId: jobOffer._id, language: translationLanguage }
+      : "skip",
+  );
 
   const { data, activeLang, pendingLang, translate, reset } =
     useManualTranslate(
@@ -81,9 +92,18 @@ export default function JobDetailsPage() {
     return notFound();
   }
 
-  const title = data?.title ?? jobOffer.title;
-  const description = data?.description ?? jobOffer.description;
-  const city = data?.city ?? jobOffer.city;
+  const cached = getFreshTranslation(cachedTranslation, jobOffer.updatedAt);
+  const translation = data ?? cached;
+  const title = translation?.title ?? jobOffer.title;
+  const description = translation?.description ?? jobOffer.description;
+  const city = translation?.city ?? jobOffer.city;
+  const handleTranslate = (language: Parameters<typeof translate>[0]) => {
+    if (!isAuthenticated) {
+      requireAuthentication();
+      return;
+    }
+    translate(language);
+  };
   const locationLabel =
     jobOffer.workMode === "remote"
       ? jobOffer.remoteLocation || t("labels.workModes.remote")
@@ -303,7 +323,7 @@ export default function JobDetailsPage() {
               <TranslateMenu
                 activeLang={activeLang}
                 pendingLang={pendingLang}
-                onTranslateAction={translate}
+                onTranslateAction={handleTranslate}
                 onResetAction={reset}
               />
             </div>
@@ -534,7 +554,7 @@ export default function JobDetailsPage() {
                 <TranslateMenu
                   activeLang={activeLang}
                   pendingLang={pendingLang}
-                  onTranslateAction={translate}
+                  onTranslateAction={handleTranslate}
                   onResetAction={reset}
                 />
               </div>

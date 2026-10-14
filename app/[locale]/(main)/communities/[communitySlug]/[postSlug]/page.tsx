@@ -6,7 +6,12 @@ import { TranslateMenu } from "@/components/translate-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useManualTranslate } from "@/hooks/use-manual-translate";
+import {
+  getFreshTranslation,
+  getSupportedTranslationLanguage,
+  useManualTranslate,
+} from "@/hooks/use-manual-translate";
+import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { Link, useRouter } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
@@ -20,7 +25,7 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -42,6 +47,7 @@ export default function PostClient() {
   const updatePost = useMutation(api.posts.mutations.updatePost);
   const deletePost = useAction(api.posts.actions.deletePost);
   const { isAuthenticated } = useConvexAuth();
+  const requireAuthentication = useAuthRequiredAction();
 
   const [commentContent, setCommentContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -56,10 +62,18 @@ export default function PostClient() {
   const timeT = useTimeTranslations();
   const t = useTranslations("communities.post");
   const te = useTranslations("common");
+  const locale = useLocale();
 
   // const translated = useTranslatedPost(post);
 
   const translatePost = useAction(api.posts.translate.translatePost);
+  const translationLanguage = getSupportedTranslationLanguage(locale);
+  const cachedTranslation = useQuery(
+    api.posts.translate.getTranslation,
+    post && translationLanguage
+      ? { postId: post._id, language: translationLanguage }
+      : "skip",
+  );
 
   const { data, activeLang, pendingLang, translate, reset } =
     useManualTranslate(
@@ -78,8 +92,20 @@ export default function PostClient() {
     return <p className="text-muted-foreground p-8">{t("notFound")}</p>;
   }
 
-  const title = data?.title ?? post.title;
-  const content = data?.content ?? post.content;
+  const cached = getFreshTranslation(
+    cachedTranslation,
+    post.updatedAt ?? post._creationTime,
+  );
+  const translation = data ?? cached;
+  const title = translation?.title ?? post.title;
+  const content = translation?.content ?? post.content;
+  const handleTranslate = (language: Parameters<typeof translate>[0]) => {
+    if (!isAuthenticated) {
+      requireAuthentication();
+      return;
+    }
+    translate(language);
+  };
 
   const currentUserId = me?._id;
   const isPostOwner = currentUserId && post.authorId === currentUserId;
@@ -325,7 +351,7 @@ export default function PostClient() {
             <TranslateMenu
               activeLang={activeLang}
               pendingLang={pendingLang}
-              onTranslateAction={translate}
+              onTranslateAction={handleTranslate}
               onResetAction={reset}
             />
           </div>

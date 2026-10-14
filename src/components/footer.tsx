@@ -19,7 +19,7 @@ export default async function Footer() {
               href="/"
               className="text-2xl font-bold text-primary mb-4 block"
             >
-              Hallo Hallo
+              Hallomada
             </Link>
             <p className="text-muted-foreground mb-4 max-w-md">
               {t("description")}
@@ -82,40 +82,24 @@ export default async function Footer() {
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2 text-muted-foreground">
                 <Mail className="h-4 w-4" />
-                <span>contact@hallohallo.de</span>
+                <a
+                  href="mailto:contact@hallomada.de"
+                  className="hover:text-primary transition-colors"
+                >
+                  contact@hallomada.de
+                </a>
               </li>
               <li className="flex items-center gap-2 text-muted-foreground">
                 <MapPin className="h-4 w-4" />
                 <span>{t("contact.location")}</span>
               </li>
             </ul>
-
-            <div className="mt-6">
-              <h4 className="font-semibold mb-2 text-sm">
-                {t("social.title")}
-              </h4>
-              <div className="flex gap-2">
-                <Link
-                  href="#"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  Facebook
-                </Link>
-                <span className="text-muted-foreground">•</span>
-                <Link
-                  href="#"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  Instagram
-                </Link>
-              </div>
-            </div>
           </div>
         </div>
 
         <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
           <p>
-            © {currentYear} Hallo Hallo. {t("copyright")}
+            © {currentYear} Hallomada. {t("copyright")}
           </p>
         </div>
       </div>

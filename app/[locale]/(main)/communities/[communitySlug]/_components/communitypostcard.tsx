@@ -3,15 +3,21 @@
 import { ShareButton } from "@/components/ShareButton";
 import { TranslateMenu } from "@/components/translate-menu";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { useManualTranslate } from "@/hooks/use-manual-translate";
+import {
+  getFreshTranslation,
+  getSupportedTranslationLanguage,
+  useManualTranslate,
+} from "@/hooks/use-manual-translate";
+import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { Link } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
+import { useQuery } from "convex-helpers/react/cache";
 import { useAction, useConvexAuth } from "convex/react";
 import { CheckIcon, MessageSquare } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { PostBookmarkButton } from "../../_component/List/PostBookmarkButton";
 
@@ -26,6 +32,7 @@ type CommunityPost = {
   likesCount?: number;
   userHasLiked?: boolean;
   isBookmarked?: boolean;
+  updatedAt?: number;
 };
 
 export function CommunityPostCard({
@@ -38,18 +45,39 @@ export function CommunityPostCard({
   onLikeAction: (postId: Id<"posts">) => void;
 }) {
   const { isAuthenticated } = useConvexAuth();
+  const requireAuthentication = useAuthRequiredAction();
   const timeT = useTimeTranslations();
   const t = useTranslations("communities.post");
+  const locale = useLocale();
 
   const translatePost = useAction(api.posts.translate.translatePost);
+  const translationLanguage = getSupportedTranslationLanguage(locale);
+  const cachedTranslation = useQuery(
+    api.posts.translate.getTranslation,
+    translationLanguage
+      ? { postId: post._id, language: translationLanguage }
+      : "skip",
+  );
   const { data, activeLang, pendingLang, translate, reset } =
     useManualTranslate(
       (lang) => translatePost({ postId: post._id, targetLanguage: lang }),
       { onError: () => toast.error(t("translateError")) },
     );
 
-  const title = data?.title ?? post.title;
-  const content = data?.content ?? post.content;
+  const cached = getFreshTranslation(
+    cachedTranslation,
+    post.updatedAt ?? post._creationTime,
+  );
+  const translation = data ?? cached;
+  const title = translation?.title ?? post.title;
+  const content = translation?.content ?? post.content;
+  const handleTranslate = (language: Parameters<typeof translate>[0]) => {
+    if (!isAuthenticated) {
+      requireAuthentication();
+      return;
+    }
+    translate(language);
+  };
 
   return (
     <article
@@ -116,11 +144,6 @@ export function CommunityPostCard({
 
         <ShareButton
           text={post.title}
-          url={
-            typeof window !== "undefined"
-              ? `${window.location.origin}/communities/${communitySlug}/${post.slug}`
-              : ""
-          }
           variant="ghost"
           className="group flex items-center gap-1.5 text-muted-foreground hover:text-purple-500 hover:bg-purple-500/10 transition-colors h-8 px-2"
         />
@@ -133,7 +156,7 @@ export function CommunityPostCard({
         <TranslateMenu
           activeLang={activeLang}
           pendingLang={pendingLang}
-          onTranslateAction={translate}
+          onTranslateAction={handleTranslate}
           onResetAction={reset}
         />
       </div>

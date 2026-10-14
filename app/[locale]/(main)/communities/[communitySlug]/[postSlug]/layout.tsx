@@ -1,38 +1,41 @@
 import { api } from "@convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 interface Props {
-  params: Promise<{ communitySlug: string; postSlug: string }>;
+  params: Promise<{ communitySlug: string; postSlug: string; locale: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { postSlug } = await params;
+  const { postSlug, locale } = await params;
+  const notFound = await getTranslations({ locale, namespace: "notFound" });
   const post = await fetchQuery(api.posts.queries.getPostWithMeta, {
     slug: postSlug,
   });
 
   if (!post) {
     return {
-      title: "Post not found",
+      title: notFound("title"),
     };
   }
 
-  const title = `${post.title} | Hallo Hallo`;
+  const title = post.title;
+  const socialTitle = `${title} | Hallomada`;
   const description = post.content?.substring(0, 160) || "";
 
   return {
     title,
     description,
     openGraph: {
-      title,
+      title: socialTitle,
       description,
       type: "article",
-      siteName: "HalloHallo",
+      siteName: "Hallomada",
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: socialTitle,
       description,
     },
   };

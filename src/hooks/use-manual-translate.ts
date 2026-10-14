@@ -1,6 +1,26 @@
 import { useRef, useState } from "react";
 
-export type SupportedLang = "fr" | "en" | "de";
+export const supportedTranslationLanguages = ["fr", "en", "de"] as const;
+
+export type SupportedLang = (typeof supportedTranslationLanguages)[number];
+
+export function getSupportedTranslationLanguage(
+  value: string,
+): SupportedLang | null {
+  return (supportedTranslationLanguages as readonly string[]).includes(value)
+    ? (value as SupportedLang)
+    : null;
+}
+
+/** Only a translation produced from the current resource version is usable. */
+export function getFreshTranslation<T extends { sourceUpdatedAt: number }>(
+  translation: T | null | undefined,
+  sourceUpdatedAt: number | undefined,
+): T | null {
+  return translation && sourceUpdatedAt === translation.sourceUpdatedAt
+    ? translation
+    : null;
+}
 
 /**
  * On-demand translation (lists): nothing happens until the user

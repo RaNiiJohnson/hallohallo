@@ -7,7 +7,7 @@ import { Analytics } from "@vercel/analytics/next";
 import "flag-icons/css/flag-icons.min.css";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
@@ -23,11 +23,24 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "common" });
+
   return {
-    title: "Hallo Hallo - Malagasy Community in Germany",
-    description:
-      "Exchange and sharing platform to promote mutual support among young Malagasy expats in Germany. Jobs, housing, community.",
+    metadataBase: new URL("https://hallomada.de"),
+    title: {
+      default: t("metaTitle"),
+      template: "%s | Hallomada",
+    },
+    description: t("metaDescription"),
+    openGraph: {
+      siteName: "Hallomada",
+    },
   };
 }
 export function generateStaticParams() {

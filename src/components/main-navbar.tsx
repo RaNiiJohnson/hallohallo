@@ -116,7 +116,7 @@ export function MainNavbar() {
           <span
             className={`${righteous.className} hidden lg:block text-lg leading-none text-primary`}
           >
-            Hallo
+            Hallomada
           </span>
         </Link>
 
@@ -208,7 +208,7 @@ export function MainNavbar() {
             <SheetTitle className="flex items-center gap-2">
               <Logo className="size-7" />
               <span className={`${righteous.className} text-primary`}>
-                Hallo
+                Hallomada
               </span>
             </SheetTitle>
             <SheetDescription className="sr-only">

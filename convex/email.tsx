@@ -30,7 +30,7 @@ export const sendEmailVerification = async (
   const t = emailVerificationTranslations[locale];
   const displayName = name ?? to;
   await resend.sendEmail(ctx, {
-    from: "HalloHallo <noreply@hallomada.de>",
+    from: "Hallomada <noreply@hallomada.de>",
     to,
     subject: t.subject,
     html: buildVerificationEmailHtml({ displayName, url, t }),
@@ -56,7 +56,7 @@ export const sendResetPasswordEmail = async (
   const t = resetPasswordTranslations[locale];
   const displayName = name ?? to;
   await resend.sendEmail(ctx, {
-    from: "HalloHallo <noreply@hallomada.de>",
+    from: "Hallomada <noreply@hallomada.de>",
     to,
     subject: t.subject,
     html: buildResetPasswordEmailHtml({ displayName, url, t }),

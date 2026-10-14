@@ -51,7 +51,7 @@ export const applyToJob = authAction({
         );
 
         await resend.sendEmail(ctx, {
-          from: "HalloHallo <noreply@hallomada.de>",
+          from: "Hallomada <noreply@hallomada.de>",
           to: contactEmail,
           subject: `Nouvelle candidature pour: ${application.jobTitle}`,
           html,

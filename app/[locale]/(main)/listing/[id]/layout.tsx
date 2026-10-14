@@ -1,37 +1,41 @@
 import { api } from "@convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 interface Props {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; locale: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
+  const { id, locale } = await params;
+  const notFound = await getTranslations({ locale, namespace: "notFound" });
+  const common = await getTranslations({ locale, namespace: "common" });
   const listing = await fetchQuery(api.listings.queries.getListingMetadata, {
     slug: id,
   });
 
   if (!listing) {
     return {
-      title: "Listing not found",
+      title: notFound("title"),
     };
   }
 
-  const title = `${listing.title} | Hallo Hallo`;
+  const title = listing.title;
+  const socialTitle = `${title} | Hallomada`;
   const description =
     listing.description?.substring(0, 160) ||
-    "Annonce immobilière sur HalloHallo";
+    common("listingFallbackDescription");
   const imageUrl = listing.images?.[0]?.url || listing.images?.[0]?.secureUrl;
 
   return {
     title,
     description,
     openGraph: {
-      title,
+      title: socialTitle,
       description,
       type: "website",
-      siteName: "HalloHallo",
+      siteName: "Hallomada",
       ...(imageUrl && {
         images: [
           {
@@ -45,7 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: socialTitle,
       description,
       ...(imageUrl && { images: [imageUrl] }),
     },

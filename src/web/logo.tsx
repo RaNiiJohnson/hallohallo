@@ -9,7 +9,7 @@ export function Logo({ className }: LogoProps) {
   return (
     <Image
       src="/logo.png"
-      alt="Hallo Logo"
+      alt="Hallomada"
       width={32}
       height={32}
       className={cn("object-contain", className)}
