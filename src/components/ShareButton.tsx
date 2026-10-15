@@ -18,6 +18,7 @@ import {
   Twitter,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useSyncExternalStore } from "react";
 
 interface ShareButtonProps {
   url?: string;
@@ -45,6 +46,8 @@ const NETWORKS = [
   { key: "telegram", label: "Telegram", Icon: Send },
 ] as const;
 
+const subscribeToHydration = () => () => {};
+
 export function ShareButton({
   url,
   text,
@@ -54,10 +57,14 @@ export function ShareButton({
   showLabel = false,
 }: ShareButtonProps) {
   const t = useTranslations("common");
-  const currentUrl = resolveShareUrl(
-    url,
-    typeof window !== "undefined" ? window.location : undefined,
+  const isHydrated = useSyncExternalStore(
+    subscribeToHydration,
+    () => true,
+    () => false,
   );
+  const currentUrl = isHydrated
+    ? resolveShareUrl(url, window.location)
+    : (url ?? "");
 
   const trigger = (
     <Button variant={variant} size={size} className={className}>
@@ -67,7 +74,7 @@ export function ShareButton({
   );
 
   // Mobile ou navigateur supporté → menu natif
-  if (typeof navigator !== "undefined" && navigator.share) {
+  if (isHydrated && navigator.share) {
     return (
       <Button
         variant={variant}

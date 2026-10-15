@@ -85,7 +85,7 @@ export default function PostClient() {
     post ? (post.updatedAt ?? post._creationTime) : undefined,
   );
 
-  const { data, activeLang, pendingLang, translate, showCached, reset } =
+  const { data, activeLang, pendingLang, selectTranslation, reset } =
     useManualTranslate(
       (lang) => {
         if (!post) throw new Error("Post not loaded");
@@ -97,6 +97,16 @@ export default function PostClient() {
           cached && translationLanguage
             ? { lang: translationLanguage, data: cached }
             : null,
+        loadCached: async (lang) => {
+          if (!post) return null;
+          return getFreshTranslation(
+            await convex.query(api.posts.translate.getTranslation, {
+              postId: post._id,
+              language: lang,
+            }),
+            post.updatedAt ?? post._creationTime,
+          );
+        },
       },
     );
 
@@ -111,26 +121,13 @@ export default function PostClient() {
   const translation = data;
   const title = translation?.title ?? post.title;
   const content = translation?.content ?? post.content;
-  const handleTranslate = async (
-    language: Parameters<typeof translate>[0],
-  ) => {
-    const cachedForLanguage = getFreshTranslation(
-      await convex.query(api.posts.translate.getTranslation, {
-        postId: post._id,
-        language,
-      }),
-      post.updatedAt ?? post._creationTime,
-    );
-    if (cachedForLanguage) {
-      showCached(language, cachedForLanguage);
-      return;
-    }
-    if (!isAuthenticated) {
-      requireAuthentication();
-      return;
-    }
-    await translate(language);
-  };
+  const handleTranslate = (
+    language: Parameters<typeof selectTranslation>[0],
+  ) =>
+    void selectTranslation(language, {
+      canCreate: isAuthenticated,
+      onCreateRequired: requireAuthentication,
+    });
 
   const currentUserId = me?._id;
   const isPostOwner = currentUserId && post.authorId === currentUserId;

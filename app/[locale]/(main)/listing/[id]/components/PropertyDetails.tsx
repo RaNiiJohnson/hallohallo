@@ -81,7 +81,7 @@ export function PropertyDetails({
     );
   };
 
-  const { data, activeLang, pendingLang, translate, showCached, reset } =
+  const { data, activeLang, pendingLang, selectTranslation, reset } =
     useManualTranslate(
       (lang) => {
         if (!property) throw new Error("property not loaded");
@@ -96,6 +96,14 @@ export function PropertyDetails({
           cached && translationLanguage
             ? { lang: translationLanguage, data: cached }
             : null,
+        loadCached: async (lang) =>
+          getFreshTranslation(
+            await convex.query(api.listings.translate.getTranslation, {
+              listingId: property._id,
+              language: lang,
+            }),
+            property.updatedAt,
+          ),
       },
     );
 
@@ -104,26 +112,13 @@ export function PropertyDetails({
 
   const title = translation?.title ?? property.title;
   const city = translation?.city ?? property.city;
-  const handleTranslate = async (
-    language: Parameters<typeof translate>[0],
-  ) => {
-    const cachedForLanguage = getFreshTranslation(
-      await convex.query(api.listings.translate.getTranslation, {
-        listingId: property._id,
-        language,
-      }),
-      property.updatedAt,
-    );
-    if (cachedForLanguage) {
-      showCached(language, cachedForLanguage);
-      return;
-    }
-    if (!isAuthenticated) {
-      requireAuthentication();
-      return;
-    }
-    await translate(language);
-  };
+  const handleTranslate = (
+    language: Parameters<typeof selectTranslation>[0],
+  ) =>
+    void selectTranslation(language, {
+      canCreate: isAuthenticated,
+      onCreateRequired: requireAuthentication,
+    });
   const locationLabel = [property.neighborhood, city]
     .filter(Boolean)
     .join(", ");

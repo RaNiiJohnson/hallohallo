@@ -31,6 +31,7 @@ export function useManualTranslate<T>(
   options?: {
     onError?: () => void;
     initialTranslation?: { lang: SupportedLang; data: T } | null;
+    loadCached?: (lang: SupportedLang) => Promise<T | null>;
   },
 ) {
   const [result, setResult] = useState<{ lang: SupportedLang; data: T } | null>(
@@ -40,25 +41,34 @@ export function useManualTranslate<T>(
   const [showOriginal, setShowOriginal] = useState(false);
   const requestId = useRef(0); // ignore outdated responses (rapid clicks)
 
-  const translate = async (lang: SupportedLang) => {
+  const selectTranslation = async (
+    lang: SupportedLang,
+    access: { canCreate: boolean; onCreateRequired: () => void },
+  ) => {
     const id = ++requestId.current;
     setPendingLang(lang);
-    setShowOriginal(false);
     try {
+      const cached = await options?.loadCached?.(lang);
+      if (id !== requestId.current) return;
+      if (cached) {
+        setShowOriginal(false);
+        setResult({ lang, data: cached });
+        return;
+      }
+      if (!access.canCreate) {
+        access.onCreateRequired();
+        return;
+      }
       const data = await run(lang);
-      if (id === requestId.current) setResult({ lang, data });
+      if (id === requestId.current) {
+        setShowOriginal(false);
+        setResult({ lang, data });
+      }
     } catch {
       if (id === requestId.current) options?.onError?.();
     } finally {
       if (id === requestId.current) setPendingLang(null);
     }
-  };
-
-  const showCached = (lang: SupportedLang, data: T) => {
-    requestId.current++;
-    setPendingLang(null);
-    setShowOriginal(false);
-    setResult({ lang, data });
   };
 
   const reset = () => {
@@ -74,8 +84,7 @@ export function useManualTranslate<T>(
     data: displayed?.data ?? null,
     activeLang: displayed?.lang ?? null,
     pendingLang,
-    translate,
-    showCached,
+    selectTranslation,
     reset,
   };
 }

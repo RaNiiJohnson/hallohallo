@@ -83,7 +83,7 @@ export default function JobDetailsPage() {
   );
   const cached = getFreshTranslation(cachedTranslation, jobOffer?.updatedAt);
 
-  const { data, activeLang, pendingLang, translate, showCached, reset } =
+  const { data, activeLang, pendingLang, selectTranslation, reset } =
     useManualTranslate(
       (lang) => {
         if (!jobOffer) throw new Error("jobOffer not loaded");
@@ -95,6 +95,16 @@ export default function JobDetailsPage() {
           cached && translationLanguage
             ? { lang: translationLanguage, data: cached }
             : null,
+        loadCached: async (lang) => {
+          if (!jobOffer) return null;
+          return getFreshTranslation(
+            await convex.query(api.jobs.translate.getTranslation, {
+              jobId: jobOffer._id,
+              language: lang,
+            }),
+            jobOffer.updatedAt,
+          );
+        },
       },
     );
 
@@ -110,26 +120,13 @@ export default function JobDetailsPage() {
   const title = translation?.title ?? jobOffer.title;
   const description = translation?.description ?? jobOffer.description;
   const city = translation?.city ?? jobOffer.city;
-  const handleTranslate = async (
-    language: Parameters<typeof translate>[0],
-  ) => {
-    const cachedForLanguage = getFreshTranslation(
-      await convex.query(api.jobs.translate.getTranslation, {
-        jobId: jobOffer._id,
-        language,
-      }),
-      jobOffer.updatedAt,
-    );
-    if (cachedForLanguage) {
-      showCached(language, cachedForLanguage);
-      return;
-    }
-    if (!isAuthenticated) {
-      requireAuthentication();
-      return;
-    }
-    await translate(language);
-  };
+  const handleTranslate = (
+    language: Parameters<typeof selectTranslation>[0],
+  ) =>
+    void selectTranslation(language, {
+      canCreate: isAuthenticated,
+      onCreateRequired: requireAuthentication,
+    });
   const locationLabel =
     jobOffer.workMode === "remote"
       ? jobOffer.remoteLocation || t("labels.workModes.remote")
