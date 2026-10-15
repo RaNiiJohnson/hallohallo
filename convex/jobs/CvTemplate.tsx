@@ -26,23 +26,24 @@ export default function NewApplicationEmail({
   cvUrl,
 }: NewApplicationEmailProps) {
   return (
-    <Html>
+    <Html lang="de">
       <Head />
       <Body style={{ fontFamily: "sans-serif" }}>
         <Container>
-          <Heading>Nouvelle candidature</Heading>
+          <Heading>Neue Bewerbung</Heading>
           <Text>
-            Vous avez reçu une candidature de <strong>{candidateName}</strong>{" "}
-            pour le poste de <strong>{jobTitle}</strong>.
+            Sie haben eine Bewerbung von <strong>{candidateName}</strong> für
+            die Stelle <strong>{jobTitle}</strong> erhalten.
           </Text>
           <Text>
-            <strong>Email du candidat :</strong> {candidateEmail}
+            <strong>E-Mail-Adresse der bewerbenden Person:</strong>{" "}
+            {candidateEmail}
           </Text>
           <Hr />
           <Section>
-            <Heading as="h3">Lettre de motivation</Heading>
+            <Heading as="h3">Anschreiben</Heading>
             <Text style={{ whiteSpace: "pre-wrap" }}>
-              {coverLetter || "Non fournie"}
+              {coverLetter || "Nicht angegeben"}
             </Text>
           </Section>
           <Hr />
@@ -50,10 +51,10 @@ export default function NewApplicationEmail({
             <Heading as="h3">CV</Heading>
             {cvUrl ? (
               <Link href={cvUrl} target="_blank">
-                Télécharger le CV
+                Lebenslauf herunterladen
               </Link>
             ) : (
-              <Text>Non fourni</Text>
+              <Text>Nicht angegeben</Text>
             )}
           </Section>
         </Container>

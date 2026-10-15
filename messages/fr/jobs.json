@@ -153,7 +153,11 @@
     "have": "avez",
     "closed": "Candidatures closes",
     "alreadyApplied": "Candidature déjà envoyée",
-    "applicationDeliveryFailed": "Candidature enregistrée — envoi non confirmé"
+    "applicationDeliveryFailed": "Candidature enregistrée — envoi non confirmé",
+    "applicationDeliveryRetry": "Renvoyer la candidature",
+    "applicationDeliveryRetrying": "Nouvel envoi...",
+    "applicationDeliveryRetried": "La candidature a bien été renvoyée.",
+    "applicationDeliveryRetryFailed": "Le nouvel envoi a échoué. Réessayez plus tard."
   },
   "dialogs": {
     "publish": {

@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/map";
 import { MapPin, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLocale, useTranslations } from "next-intl";
 
 interface LocationPickerProps {
   value?: { lat: number; lng: number } | null;
@@ -28,13 +29,14 @@ const GERMANY_ZOOM = 5;
 async function reverseGeocode(
   lat: number,
   lng: number,
+  locale: string,
 ): Promise<{ location: string; address: string } | null> {
   try {
     const response = await fetch(
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1`,
       {
         headers: {
-          "Accept-Language": "fr,de,en",
+          "Accept-Language": locale,
         },
       },
     );
@@ -121,6 +123,8 @@ export function LocationPicker({
   className,
   privacyMode = false,
 }: LocationPickerProps) {
+  const locale = useLocale();
+  const t = useTranslations("common.mapPicker");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<string>("");
 
@@ -132,7 +136,7 @@ export function LocationPicker({
       onChange({ lat, lng });
 
       // Perform reverse geocoding
-      const result = await reverseGeocode(lat, lng);
+      const result = await reverseGeocode(lat, lng, locale);
 
       if (result) {
         setSelectedAddress(result.address);
@@ -143,7 +147,7 @@ export function LocationPicker({
 
       setIsLoading(false);
     },
-    [onChange, onCityChange],
+    [locale, onChange, onCityChange],
   );
 
   const handleMarkerDragEnd = useCallback(
@@ -152,7 +156,7 @@ export function LocationPicker({
 
       onChange({ lat: lngLat.lat, lng: lngLat.lng });
 
-      const result = await reverseGeocode(lngLat.lat, lngLat.lng);
+      const result = await reverseGeocode(lngLat.lat, lngLat.lng, locale);
 
       if (result) {
         setSelectedAddress(result.address);
@@ -163,7 +167,7 @@ export function LocationPicker({
 
       setIsLoading(false);
     },
-    [onChange, onCityChange],
+    [locale, onChange, onCityChange],
   );
 
   return (
@@ -202,9 +206,7 @@ export function LocationPicker({
         {/* Instructions */}
         {!value && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-md bg-background/90 px-3 py-1.5 text-sm text-muted-foreground shadow-md">
-            {privacyMode
-              ? "Cliquez pour sélectionner une zone approximative"
-              : "Cliquez sur la carte pour sélectionner la position"}
+            {privacyMode ? t("selectArea") : t("selectPosition")}
           </div>
         )}
       </div>
@@ -215,7 +217,7 @@ export function LocationPicker({
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4 text-muted-foreground" />
             <span className="font-medium">
-              {privacyMode ? "Zone sélectionnée" : "Position sélectionnée"}
+              {privacyMode ? t("selectedArea") : t("selectedPosition")}
             </span>
           </div>
           {!privacyMode && selectedAddress && (
@@ -224,7 +226,10 @@ export function LocationPicker({
             </p>
           )}
           {!privacyMode && <p className="mt-1 text-xs text-muted-foreground">
-            Coordonnées : {value.lat.toFixed(4)}, {value.lng.toFixed(4)}
+            {t("coordinates", {
+              lat: value.lat.toFixed(4),
+              lng: value.lng.toFixed(4),
+            })}
           </p>}
         </div>
       )}

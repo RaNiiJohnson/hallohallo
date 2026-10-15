@@ -153,7 +153,11 @@
     "have": "haben",
     "closed": "Bewerbungen geschlossen",
     "alreadyApplied": "Bewerbung bereits gesendet",
-    "applicationDeliveryFailed": "Bewerbung gespeichert — Versand nicht bestätigt"
+    "applicationDeliveryFailed": "Bewerbung gespeichert — Versand nicht bestätigt",
+    "applicationDeliveryRetry": "Bewerbung erneut senden",
+    "applicationDeliveryRetrying": "Wird erneut gesendet...",
+    "applicationDeliveryRetried": "Die Bewerbung wurde erneut gesendet.",
+    "applicationDeliveryRetryFailed": "Die Bewerbung konnte nicht erneut gesendet werden. Bitte versuchen Sie es später noch einmal."
   },
   "dialogs": {
     "publish": {

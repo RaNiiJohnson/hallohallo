@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "@/i18n/navigation";
+import { resolveShareUrl } from "@/lib/share-url";
 import {
   Facebook,
   Linkedin,
@@ -17,6 +18,7 @@ import {
   Twitter,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useSyncExternalStore } from "react";
 
 interface ShareButtonProps {
   url?: string;
@@ -44,6 +46,8 @@ const NETWORKS = [
   { key: "telegram", label: "Telegram", Icon: Send },
 ] as const;
 
+const subscribeToHydration = () => () => {};
+
 export function ShareButton({
   url,
   text,
@@ -53,8 +57,14 @@ export function ShareButton({
   showLabel = false,
 }: ShareButtonProps) {
   const t = useTranslations("common");
-  const currentUrl =
-    url ?? (typeof window !== "undefined" ? window.location.href : "");
+  const isHydrated = useSyncExternalStore(
+    subscribeToHydration,
+    () => true,
+    () => false,
+  );
+  const currentUrl = isHydrated
+    ? resolveShareUrl(url, window.location)
+    : (url ?? "");
 
   const trigger = (
     <Button variant={variant} size={size} className={className}>
@@ -64,13 +74,19 @@ export function ShareButton({
   );
 
   // Mobile ou navigateur supporté → menu natif
-  if (navigator?.share) {
+  if (isHydrated && navigator.share) {
     return (
       <Button
         variant={variant}
         size={size}
         className={className}
-        onClick={() => navigator.share({ title: text, text, url: currentUrl })}
+        onClick={() =>
+          navigator.share({
+            title: text,
+            text,
+            url: resolveShareUrl(url, window.location),
+          })
+        }
       >
         <Share2 className="w-4 h-4" />
         {showLabel && <span>{t("share")}</span>}

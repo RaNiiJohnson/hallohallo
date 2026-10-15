@@ -9,7 +9,11 @@ import { Button } from "@/components/ui/button";
 import { InputGroup } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useManualTranslate } from "@/hooks/use-manual-translate";
+import {
+  getFreshTranslation,
+  getSupportedTranslationLanguage,
+  useManualTranslate,
+} from "@/hooks/use-manual-translate";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { Link } from "@/i18n/navigation";
 import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
@@ -18,7 +22,7 @@ import { getSafeExternalUrl } from "@/lib/external-url";
 import { LocationMap } from "@/lib/LocationMap";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
-import { useAction, useConvexAuth } from "convex/react";
+import { useAction, useConvex, useConvexAuth } from "convex/react";
 import {
   ArrowLeft,
   Award,
@@ -31,6 +35,7 @@ import {
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { notFound, useParams } from "next/navigation";
+import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import { toast } from "sonner";
@@ -63,14 +68,44 @@ export default function JobDetailsPage() {
   // const translated = useTranslatedJob(jobOffer);
 
   const translateJob = useAction(api.jobs.translate.translateJob);
+  const convex = useConvex();
+  const retryApplicationEmail = useAction(
+    api.jobs.actions.retryApplicationEmail,
+  );
+  const [isRetryingApplicationEmail, setIsRetryingApplicationEmail] =
+    useState(false);
+  const translationLanguage = getSupportedTranslationLanguage(locale);
+  const cachedTranslation = useQuery(
+    api.jobs.translate.getTranslation,
+    jobOffer && translationLanguage
+      ? { jobId: jobOffer._id, language: translationLanguage }
+      : "skip",
+  );
+  const cached = getFreshTranslation(cachedTranslation, jobOffer?.updatedAt);
 
-  const { data, activeLang, pendingLang, translate, reset } =
+  const { data, activeLang, pendingLang, selectTranslation, reset } =
     useManualTranslate(
       (lang) => {
         if (!jobOffer) throw new Error("jobOffer not loaded");
         return translateJob({ jobId: jobOffer._id, targetLanguage: lang });
       },
-      { onError: () => toast.error(te("translateError")) },
+      {
+        onError: () => toast.error(te("translateError")),
+        initialTranslation:
+          cached && translationLanguage
+            ? { lang: translationLanguage, data: cached }
+            : null,
+        loadCached: async (lang) => {
+          if (!jobOffer) return null;
+          return getFreshTranslation(
+            await convex.query(api.jobs.translate.getTranslation, {
+              jobId: jobOffer._id,
+              language: lang,
+            }),
+            jobOffer.updatedAt,
+          );
+        },
+      },
     );
 
   if (jobOffer === undefined) {
@@ -81,9 +116,17 @@ export default function JobDetailsPage() {
     return notFound();
   }
 
-  const title = data?.title ?? jobOffer.title;
-  const description = data?.description ?? jobOffer.description;
-  const city = data?.city ?? jobOffer.city;
+  const translation = data;
+  const title = translation?.title ?? jobOffer.title;
+  const description = translation?.description ?? jobOffer.description;
+  const city = translation?.city ?? jobOffer.city;
+  const handleTranslate = (
+    language: Parameters<typeof selectTranslation>[0],
+  ) =>
+    void selectTranslation(language, {
+      canCreate: isAuthenticated,
+      onCreateRequired: requireAuthentication,
+    });
   const locationLabel =
     jobOffer.workMode === "remote"
       ? jobOffer.remoteLocation || t("labels.workModes.remote")
@@ -93,6 +136,18 @@ export default function JobDetailsPage() {
   );
   const formatStoredDate = (value: string) =>
     formatDateLong(`${value}T00:00:00`, locale);
+
+  const handleApplicationEmailRetry = async () => {
+    setIsRetryingApplicationEmail(true);
+    try {
+      await retryApplicationEmail({ jobId: jobOffer._id });
+      toast.success(t("details.applicationDeliveryRetried"));
+    } catch {
+      toast.error(t("details.applicationDeliveryRetryFailed"));
+    } finally {
+      setIsRetryingApplicationEmail(false);
+    }
+  };
 
   const isAuthor = user?._id === jobOffer.authorId;
   const isAcceptingApplications =
@@ -124,6 +179,23 @@ export default function JobDetailsPage() {
       );
     }
 
+    if (applicationEmailStatus === "failed") {
+      return (
+        <Button
+          variant="outline"
+          size="sm"
+          className={`gap-2 ${className ?? ""}`}
+          disabled={isRetryingApplicationEmail}
+          onClick={handleApplicationEmailRetry}
+        >
+          <Mail className="w-4 h-4" />
+          {isRetryingApplicationEmail
+            ? t("details.applicationDeliveryRetrying")
+            : t("details.applicationDeliveryRetry")}
+        </Button>
+      );
+    }
+
     if (!isAcceptingApplications) {
       return (
         <Button
@@ -148,20 +220,6 @@ export default function JobDetailsPage() {
         >
           <Mail className="w-4 h-4" />
           {t("details.apply")}
-        </Button>
-      );
-    }
-
-    if (applicationEmailStatus === "failed") {
-      return (
-        <Button
-          variant="outline"
-          size="sm"
-          className={`gap-2 ${className ?? ""}`}
-          disabled
-        >
-          <Mail className="w-4 h-4" />
-          {t("details.applicationDeliveryFailed")}
         </Button>
       );
     }
@@ -303,7 +361,7 @@ export default function JobDetailsPage() {
               <TranslateMenu
                 activeLang={activeLang}
                 pendingLang={pendingLang}
-                onTranslateAction={translate}
+                onTranslateAction={handleTranslate}
                 onResetAction={reset}
               />
             </div>
@@ -534,7 +592,7 @@ export default function JobDetailsPage() {
                 <TranslateMenu
                   activeLang={activeLang}
                   pendingLang={pendingLang}
-                  onTranslateAction={translate}
+                  onTranslateAction={handleTranslate}
                   onResetAction={reset}
                 />
               </div>
@@ -701,7 +759,19 @@ export default function JobDetailsPage() {
                   <p className="text-sm text-primary-foreground/90 mb-4">
                     {t("details.dontMiss")}
                   </p>
-                  {!isAcceptingApplications ? (
+                  {applicationEmailStatus === "failed" ? (
+                    <Button
+                      variant="secondary"
+                      className="w-full"
+                      size="lg"
+                      disabled={isRetryingApplicationEmail}
+                      onClick={handleApplicationEmailRetry}
+                    >
+                      {isRetryingApplicationEmail
+                        ? t("details.applicationDeliveryRetrying")
+                        : t("details.applicationDeliveryRetry")}
+                    </Button>
+                  ) : !isAcceptingApplications ? (
                     <Button
                       variant="secondary"
                       className="w-full"
@@ -727,15 +797,6 @@ export default function JobDetailsPage() {
                       disabled
                     >
                       {t("details.applyNow")}
-                    </Button>
-                  ) : applicationEmailStatus === "failed" ? (
-                    <Button
-                      variant="secondary"
-                      className="w-full"
-                      size="lg"
-                      disabled
-                    >
-                      {t("details.applicationDeliveryFailed")}
                     </Button>
                   ) : applicationEmailStatus !== "none" ? (
                     <Button

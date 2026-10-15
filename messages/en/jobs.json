@@ -153,7 +153,11 @@
     "have": "have",
     "closed": "Applications closed",
     "alreadyApplied": "Application already sent",
-    "applicationDeliveryFailed": "Application saved — delivery not confirmed"
+    "applicationDeliveryFailed": "Application saved — delivery not confirmed",
+    "applicationDeliveryRetry": "Resend application",
+    "applicationDeliveryRetrying": "Resending...",
+    "applicationDeliveryRetried": "The application was resent successfully.",
+    "applicationDeliveryRetryFailed": "The application could not be resent. Please try again later."
   },
   "dialogs": {
     "publish": {

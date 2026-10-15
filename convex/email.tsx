@@ -14,7 +14,8 @@ export const resend = new Resend(components.resend, {
 
 export const sendEmailVerification = async (
   ctx: ActionCtx,
-  {    to,
+  {
+    to,
     url,
     name,
   }: {
@@ -30,10 +31,10 @@ export const sendEmailVerification = async (
   const t = emailVerificationTranslations[locale];
   const displayName = name ?? to;
   await resend.sendEmail(ctx, {
-    from: "HalloHallo <noreply@hallomada.de>",
+    from: "Hallomada <noreply@hallomada.de>",
     to,
     subject: t.subject,
-    html: buildVerificationEmailHtml({ displayName, url, t }),
+    html: buildVerificationEmailHtml({ displayName, locale, url, t }),
   });
 };
 
@@ -56,9 +57,9 @@ export const sendResetPasswordEmail = async (
   const t = resetPasswordTranslations[locale];
   const displayName = name ?? to;
   await resend.sendEmail(ctx, {
-    from: "HalloHallo <noreply@hallomada.de>",
+    from: "Hallomada <noreply@hallomada.de>",
     to,
     subject: t.subject,
-    html: buildResetPasswordEmailHtml({ displayName, url, t }),
+    html: buildResetPasswordEmailHtml({ displayName, locale, url, t }),
   });
 };

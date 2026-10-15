@@ -6,13 +6,23 @@ import { TranslateMenu } from "@/components/translate-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useManualTranslate } from "@/hooks/use-manual-translate";
+import {
+  getFreshTranslation,
+  getSupportedTranslationLanguage,
+  useManualTranslate,
+} from "@/hooks/use-manual-translate";
+import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { Link, useRouter } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
-import { useAction, useConvexAuth, useMutation } from "convex/react";
+import {
+  useAction,
+  useConvex,
+  useConvexAuth,
+  useMutation,
+} from "convex/react";
 import {
   ChevronRight,
   Loader2,
@@ -20,7 +30,7 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -42,6 +52,7 @@ export default function PostClient() {
   const updatePost = useMutation(api.posts.mutations.updatePost);
   const deletePost = useAction(api.posts.actions.deletePost);
   const { isAuthenticated } = useConvexAuth();
+  const requireAuthentication = useAuthRequiredAction();
 
   const [commentContent, setCommentContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -56,18 +67,47 @@ export default function PostClient() {
   const timeT = useTimeTranslations();
   const t = useTranslations("communities.post");
   const te = useTranslations("common");
+  const locale = useLocale();
 
   // const translated = useTranslatedPost(post);
 
   const translatePost = useAction(api.posts.translate.translatePost);
+  const convex = useConvex();
+  const translationLanguage = getSupportedTranslationLanguage(locale);
+  const cachedTranslation = useQuery(
+    api.posts.translate.getTranslation,
+    post && translationLanguage
+      ? { postId: post._id, language: translationLanguage }
+      : "skip",
+  );
+  const cached = getFreshTranslation(
+    cachedTranslation,
+    post ? (post.updatedAt ?? post._creationTime) : undefined,
+  );
 
-  const { data, activeLang, pendingLang, translate, reset } =
+  const { data, activeLang, pendingLang, selectTranslation, reset } =
     useManualTranslate(
       (lang) => {
         if (!post) throw new Error("Post not loaded");
         return translatePost({ postId: post._id, targetLanguage: lang });
       },
-      { onError: () => toast.error(te("translateError")) },
+      {
+        onError: () => toast.error(te("translateError")),
+        initialTranslation:
+          cached && translationLanguage
+            ? { lang: translationLanguage, data: cached }
+            : null,
+        loadCached: async (lang) => {
+          if (!post) return null;
+          return getFreshTranslation(
+            await convex.query(api.posts.translate.getTranslation, {
+              postId: post._id,
+              language: lang,
+            }),
+            post.updatedAt ?? post._creationTime,
+          );
+        },
+      },
     );
 
   if (post === undefined) {
@@ -78,8 +118,16 @@ export default function PostClient() {
     return <p className="text-muted-foreground p-8">{t("notFound")}</p>;
   }
 
-  const title = data?.title ?? post.title;
-  const content = data?.content ?? post.content;
+  const translation = data;
+  const title = translation?.title ?? post.title;
+  const content = translation?.content ?? post.content;
+  const handleTranslate = (
+    language: Parameters<typeof selectTranslation>[0],
+  ) =>
+    void selectTranslation(language, {
+      canCreate: isAuthenticated,
+      onCreateRequired: requireAuthentication,
+    });
 
   const currentUserId = me?._id;
   const isPostOwner = currentUserId && post.authorId === currentUserId;
@@ -325,7 +373,7 @@ export default function PostClient() {
             <TranslateMenu
               activeLang={activeLang}
               pendingLang={pendingLang}
-              onTranslateAction={translate}
+              onTranslateAction={handleTranslate}
               onResetAction={reset}
             />
           </div>

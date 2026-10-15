@@ -13,7 +13,11 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
-import { useManualTranslate } from "@/hooks/use-manual-translate";
+import {
+  getFreshTranslation,
+  getSupportedTranslationLanguage,
+  useManualTranslate,
+} from "@/hooks/use-manual-translate";
 import { useRouter } from "@/i18n/navigation";
 import { getAuthHref, getCurrentReturnTo } from "@/lib/auth-return-to";
 import { ListingListDetails } from "@/lib/convexTypes";
@@ -22,7 +26,8 @@ import { getListingContactLinks } from "@/lib/listing-contact";
 import { LocationMap } from "@/lib/LocationMap";
 import { truncateText } from "@/lib/utils";
 import { api } from "@convex/_generated/api";
-import { useAction } from "convex/react";
+import { useQuery } from "convex-helpers/react/cache";
+import { useAction, useConvex, useConvexAuth } from "convex/react";
 import {
   Bath,
   Bed,
@@ -58,6 +63,16 @@ export function PropertyDetails({
   const te = useTranslations("common");
 
   const translateListing = useAction(api.listings.translate.translateListing);
+  const convex = useConvex();
+  const { isAuthenticated } = useConvexAuth();
+  const translationLanguage = getSupportedTranslationLanguage(locale);
+  const cachedTranslation = useQuery(
+    api.listings.translate.getTranslation,
+    translationLanguage
+      ? { listingId: property._id, language: translationLanguage }
+      : "skip",
+  );
+  const cached = getFreshTranslation(cachedTranslation, property.updatedAt);
   const requireAuthentication = useAuthRequiredAction();
   const router = useRouter();
   const requireEmailVerification = () => {
@@ -66,7 +81,7 @@ export function PropertyDetails({
     );
   };
 
-  const { data, activeLang, pendingLang, translate, reset } =
+  const { data, activeLang, pendingLang, selectTranslation, reset } =
     useManualTranslate(
       (lang) => {
         if (!property) throw new Error("property not loaded");
@@ -75,13 +90,35 @@ export function PropertyDetails({
           targetLanguage: lang,
         });
       },
-      { onError: () => toast.error(te("translateError")) },
+      {
+        onError: () => toast.error(te("translateError")),
+        initialTranslation:
+          cached && translationLanguage
+            ? { lang: translationLanguage, data: cached }
+            : null,
+        loadCached: async (lang) =>
+          getFreshTranslation(
+            await convex.query(api.listings.translate.getTranslation, {
+              listingId: property._id,
+              language: lang,
+            }),
+            property.updatedAt,
+          ),
+      },
     );
 
-  const description = data?.description ?? property.description;
+  const translation = data;
+  const description = translation?.description ?? property.description;
 
-  const title = data?.title ?? property.title;
-  const city = data?.city ?? property.city;
+  const title = translation?.title ?? property.title;
+  const city = translation?.city ?? property.city;
+  const handleTranslate = (
+    language: Parameters<typeof selectTranslation>[0],
+  ) =>
+    void selectTranslation(language, {
+      canCreate: isAuthenticated,
+      onCreateRequired: requireAuthentication,
+    });
   const locationLabel = [property.neighborhood, city]
     .filter(Boolean)
     .join(", ");
@@ -400,7 +437,7 @@ export function PropertyDetails({
             <TranslateMenu
               activeLang={activeLang}
               pendingLang={pendingLang}
-              onTranslateAction={translate}
+              onTranslateAction={handleTranslate}
               onResetAction={reset}
             />
           </div>

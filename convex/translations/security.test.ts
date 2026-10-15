@@ -38,7 +38,7 @@ describe("translation action security", () => {
         city: "Berlin",
         duration: "Permanent",
         startDate: "2026-01-01",
-        company: "HalloHallo",
+        company: "Hallomada",
         description: "Build useful things",
         certificates: [],
         salary: 1,

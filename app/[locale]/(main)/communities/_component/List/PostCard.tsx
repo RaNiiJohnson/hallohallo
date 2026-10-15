@@ -2,15 +2,21 @@ import { ShareButton } from "@/components/ShareButton";
 import { TranslateMenu } from "@/components/translate-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { buttonVariants } from "@/components/ui/button";
-import { useManualTranslate } from "@/hooks/use-manual-translate";
+import {
+  getFreshTranslation,
+  getSupportedTranslationLanguage,
+  useManualTranslate,
+} from "@/hooks/use-manual-translate";
+import { useAuthRequiredAction } from "@/hooks/use-auth-required-action";
 import { useTimeTranslations } from "@/hooks/use-time-translations";
 import { Link } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
-import { useAction } from "convex/react";
+import { useQuery } from "convex-helpers/react/cache";
+import { useAction, useConvex, useConvexAuth } from "convex/react";
 import { ChevronRight, MessageSquare } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { LikeButton } from "../likeButton";
 import { PostBookmarkButton } from "./PostBookmarkButton";
@@ -24,21 +30,58 @@ export function PostCard({
   onLike: (id: Id<"posts">) => void;
 }) {
   const timeT = useTimeTranslations();
+  const { isAuthenticated } = useConvexAuth();
+  const requireAuthentication = useAuthRequiredAction();
   const te = useTranslations("common");
   const tc = useTranslations("communities");
+  const locale = useLocale();
   const postHref = post.communitySlug
     ? `/communities/${post.communitySlug}/${post.slug}`
     : `/posts/${post.slug}`;
 
   const translatePost = useAction(api.posts.translate.translatePost);
-  const { data, activeLang, pendingLang, translate, reset } =
+  const convex = useConvex();
+  const translationLanguage = getSupportedTranslationLanguage(locale);
+  const cachedTranslation = useQuery(
+    api.posts.translate.getTranslation,
+    translationLanguage
+      ? { postId: post._id, language: translationLanguage }
+      : "skip",
+  );
+  const cached = getFreshTranslation(
+    cachedTranslation,
+    post.updatedAt ?? post._creationTime,
+  );
+  const { data, activeLang, pendingLang, selectTranslation, reset } =
     useManualTranslate(
       (lang) => translatePost({ postId: post._id, targetLanguage: lang }),
-      { onError: () => toast.error(te("translateError")) },
+      {
+        onError: () => toast.error(te("translateError")),
+        initialTranslation:
+          cached && translationLanguage
+            ? { lang: translationLanguage, data: cached }
+            : null,
+        loadCached: async (lang) =>
+          getFreshTranslation(
+            await convex.query(api.posts.translate.getTranslation, {
+              postId: post._id,
+              language: lang,
+            }),
+            post.updatedAt ?? post._creationTime,
+          ),
+      },
     );
 
-  const title = data?.title ?? post.title;
-  const content = data?.content ?? post.content;
+  const translation = data;
+  const title = translation?.title ?? post.title;
+  const content = translation?.content ?? post.content;
+  const handleTranslate = (
+    language: Parameters<typeof selectTranslation>[0],
+  ) =>
+    void selectTranslation(language, {
+      canCreate: isAuthenticated,
+      onCreateRequired: requireAuthentication,
+    });
 
   return (
     <div className="block px-4 py-4 hover:bg-muted/30 transition-colors border-b border-border bg-background max-w-4xl mx-auto">
@@ -122,12 +165,8 @@ export function PostCard({
         />
 
         <ShareButton
+          url={`/${locale}${postHref}`}
           text={post.title}
-          url={
-            typeof window !== "undefined"
-              ? `${window.location.origin}${postHref}`
-              : ""
-          }
           variant="ghost"
           className="group flex items-center gap-1.5 text-muted-foreground hover:text-purple-500 hover:bg-purple-500/10 transition-colors h-8 px-2"
         />
@@ -140,7 +179,7 @@ export function PostCard({
         <TranslateMenu
           activeLang={activeLang}
           pendingLang={pendingLang}
-          onTranslateAction={translate}
+          onTranslateAction={handleTranslate}
           onResetAction={reset}
         />
       </div>

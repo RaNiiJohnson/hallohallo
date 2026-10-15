@@ -1,8 +1,8 @@
 {
   "title": "Frequently Asked Questions",
-  "description": "Can't find what you're looking for? Contact our",
-  "support": "support team",
-  "descriptionEnd": "or ask your question in the community.",
+  "description": "Can't find what you're looking for?",
+  "support": "Ask your question in the community.",
+  "descriptionEnd": "",
   "items": [
     {
       "question": "How do I join the Malagasy community in Germany?",

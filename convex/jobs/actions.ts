@@ -1,11 +1,71 @@
 import { v } from "convex/values";
 import { render } from "react-email";
 import { internal } from "../_generated/api";
+import type { ActionCtx } from "../_generated/server";
+import type { Id } from "../_generated/dataModel";
 import { authAction } from "../functions";
 import { r2 } from "../integrations/r2";
 import { resend } from "../sendEmails";
 import { throwNotFound } from "../utils/errors";
 import NewApplicationEmail from "./CvTemplate";
+
+type ApplicationEmailPayload = {
+  applicationId: Id<"jobApplications">;
+  jobTitle: string;
+  authorId: string;
+  contactEmail?: string;
+  cvKey: string;
+  coverLetter?: string;
+};
+
+async function deliverApplicationEmail(
+  ctx: ActionCtx,
+  user: { name: string; email: string },
+  application: ApplicationEmailPayload,
+) {
+  try {
+    let contactEmail = application.contactEmail;
+    if (!contactEmail) {
+      contactEmail =
+        (await ctx.runQuery(internal.auth.users.getContactEmailById, {
+          id: application.authorId,
+        })) ?? undefined;
+    }
+    if (!contactEmail) {
+      throwNotFound("No contact email found for this job.");
+    }
+
+    const cvUrl = await r2.getUrl(application.cvKey);
+    if (!cvUrl) throwNotFound("CV not found");
+
+    const html = await render(
+      NewApplicationEmail({
+        candidateName: user.name,
+        candidateEmail: user.email,
+        jobTitle: application.jobTitle,
+        coverLetter: application.coverLetter,
+        cvUrl,
+      }),
+    );
+
+    await resend.sendEmail(ctx, {
+      from: "Hallomada <noreply@hallomada.de>",
+      to: contactEmail,
+      subject: `Neue Bewerbung für: ${application.jobTitle}`,
+      html,
+    });
+    await ctx.runMutation(internal.jobs.mutations.updateApplicationEmailStatus, {
+      id: application.applicationId,
+      emailStatus: "sent",
+    });
+  } catch (error) {
+    await ctx.runMutation(internal.jobs.mutations.updateApplicationEmailStatus, {
+      id: application.applicationId,
+      emailStatus: "failed",
+    });
+    throw error;
+  }
+}
 
 export const applyToJob = authAction({
   args: {
@@ -25,48 +85,7 @@ export const applyToJob = authAction({
         args,
       );
 
-      try {
-        let contactEmail = application.contactEmail;
-        if (!contactEmail) {
-          contactEmail =
-            (await ctx.runQuery(internal.auth.users.getContactEmailById, {
-              id: application.authorId,
-            })) ?? undefined;
-        }
-        if (!contactEmail) {
-          throwNotFound("No contact email found for this job.");
-        }
-
-        const cvUrl = await r2.getUrl(application.cvKey);
-        if (!cvUrl) throwNotFound("CV not found");
-
-        const html = await render(
-          NewApplicationEmail({
-            candidateName: user.name,
-            candidateEmail: user.email,
-            jobTitle: application.jobTitle,
-            coverLetter: args.coverLetter,
-            cvUrl,
-          }),
-        );
-
-        await resend.sendEmail(ctx, {
-          from: "HalloHallo <noreply@hallomada.de>",
-          to: contactEmail,
-          subject: `Nouvelle candidature pour: ${application.jobTitle}`,
-          html,
-        });
-        await ctx.runMutation(internal.jobs.mutations.updateApplicationEmailStatus, {
-          id: application.applicationId,
-          emailStatus: "sent",
-        });
-      } catch (error) {
-        await ctx.runMutation(internal.jobs.mutations.updateApplicationEmailStatus, {
-          id: application.applicationId,
-          emailStatus: "failed",
-        });
-        throw error;
-      }
+      await deliverApplicationEmail(ctx, user, application);
 
       return null;
 
@@ -86,5 +105,18 @@ export const applyToJob = authAction({
       // });
       throw error;
     }
+  },
+});
+
+export const retryApplicationEmail = authAction({
+  args: { jobId: v.id("JobOffer") },
+  returns: v.null(),
+  handler: async (ctx, { jobId }) => {
+    const application = await ctx.runMutation(
+      internal.jobs.mutations.prepareApplicationEmailRetry,
+      { jobId },
+    );
+    await deliverApplicationEmail(ctx, ctx.user, application);
+    return null;
   },
 });
