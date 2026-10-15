@@ -18,6 +18,20 @@ export interface ResetPasswordEmailStrings {
   ignore: string;
 }
 
+function escapeHtml(value: string): string {
+  return value.replace(
+    /[&<>"']/g,
+    (character) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;",
+      })[character]!,
+  );
+}
+
 export const emailVerificationTranslations: Record<
   EmailLocale,
   VerificationEmailStrings
@@ -92,15 +106,20 @@ export const resetPasswordTranslations: Record<
 
 export function buildResetPasswordEmailHtml({
   displayName,
+  locale,
   url,
   t,
 }: {
   displayName: string;
+  locale: EmailLocale;
   url: string;
   t: ResetPasswordEmailStrings;
 }): string {
+  const safeDisplayName = escapeHtml(displayName);
+  const safeUrl = escapeHtml(url);
+
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="${locale}">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#f4f4f5;font-family:sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:40px 0;">
@@ -118,7 +137,7 @@ export function buildResetPasswordEmailHtml({
         <tr>
           <td style="padding:40px 40px 32px;">
             <h1 style="margin:0 0 12px;font-size:22px;font-weight:700;color:#111;">
-              ${t.greeting(displayName)}
+              ${t.greeting(safeDisplayName)}
             </h1>
             <p style="margin:0 0 32px;font-size:15px;line-height:1.6;color:#555;">
               ${t.intro}
@@ -128,7 +147,7 @@ export function buildResetPasswordEmailHtml({
             <table cellpadding="0" cellspacing="0" style="margin:0 0 32px;">
               <tr>
                 <td style="border-radius:8px;background:#dc2626;">
-                  <a href="${url}"
+                  <a href="${safeUrl}"
                      style="display:inline-block;padding:16px 36px;font-size:16px;font-weight:700;
                             color:#ffffff;text-decoration:none;letter-spacing:0.2px;
                             border-radius:8px;background:#dc2626;">
@@ -159,15 +178,20 @@ export function buildResetPasswordEmailHtml({
 
 export function buildVerificationEmailHtml({
   displayName,
+  locale,
   url,
   t,
 }: {
   displayName: string;
+  locale: EmailLocale;
   url: string;
   t: VerificationEmailStrings;
 }): string {
+  const safeDisplayName = escapeHtml(displayName);
+  const safeUrl = escapeHtml(url);
+
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="${locale}">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#f4f4f5;font-family:sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:40px 0;">
@@ -185,7 +209,7 @@ export function buildVerificationEmailHtml({
         <tr>
           <td style="padding:40px 40px 32px;">
             <h1 style="margin:0 0 12px;font-size:22px;font-weight:700;color:#111;">
-              ${t.greeting(displayName)}
+              ${t.greeting(safeDisplayName)}
             </h1>
             <p style="margin:0 0 32px;font-size:15px;line-height:1.6;color:#555;">
               ${t.intro}
@@ -195,7 +219,7 @@ export function buildVerificationEmailHtml({
             <table cellpadding="0" cellspacing="0" style="margin:0 0 32px;">
               <tr>
                 <td style="border-radius:8px;background:#2563eb;">
-                  <a href="${url}"
+                  <a href="${safeUrl}"
                      style="display:inline-block;padding:16px 36px;font-size:16px;font-weight:700;
                             color:#ffffff;text-decoration:none;letter-spacing:0.2px;
                             border-radius:8px;background:#2563eb;">

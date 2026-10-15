@@ -74,6 +74,7 @@ describe("Jobs", () => {
   async function submitApplication(args: {
     jobId: Id<"JobOffer">;
     applicationCvKey?: string;
+    coverLetter?: string;
   }) {
     return await t.mutation(internal.jobs.mutations.submitApplication, {
       ...args,
@@ -440,6 +441,44 @@ describe("Jobs", () => {
     await expect(
       submitApplication({ jobId }),
     ).rejects.toThrow("You have already applied to this job");
+  });
+
+  it("retries only the failed email for the original candidate", async () => {
+    authState.user._id = "candidateId";
+    authState.user.id = "candidateId";
+
+    const application = await submitApplication({
+      jobId,
+      coverLetter: "Original cover letter",
+    });
+    await t.mutation(internal.jobs.mutations.updateApplicationEmailStatus, {
+      id: application.applicationId,
+      emailStatus: "failed",
+    });
+
+    authState.user._id = "anotherCandidateId";
+    authState.user.id = "anotherCandidateId";
+    await expect(
+      t.mutation(internal.jobs.mutations.prepareApplicationEmailRetry, {
+        jobId,
+      }),
+    ).rejects.toThrow("This application is not awaiting an email retry");
+
+    authState.user._id = "candidateId";
+    authState.user.id = "candidateId";
+    await expect(
+      t.mutation(internal.jobs.mutations.prepareApplicationEmailRetry, {
+        jobId,
+      }),
+    ).resolves.toMatchObject({
+      applicationId: application.applicationId,
+      cvKey: "cv/owned.pdf",
+      coverLetter: "Original cover letter",
+    });
+
+    await expect(
+      t.query(api.jobs.queries.hasCurrentUserAppliedToJob, { jobId }),
+    ).resolves.toBe("pending");
   });
 
   it("only reports an application to its candidate", async () => {

@@ -33,6 +33,14 @@ const contractTypeValidator = v.union(
   v.literal("apprenticeship"),
 );
 const jobContactEmailValidator = v.string();
+const applicationEmailPayloadValidator = v.object({
+  applicationId: v.id("jobApplications"),
+  jobTitle: v.string(),
+  authorId: v.string(),
+  contactEmail: v.optional(v.string()),
+  cvKey: v.string(),
+  coverLetter: v.optional(v.string()),
+});
 
 function assertValidJobInput(args: {
   title: string;
@@ -279,6 +287,7 @@ export const submitApplication = internalMutation({
     applicationCvKey: v.optional(v.string()),
     coverLetter: v.optional(v.string()),
   },
+  returns: applicationEmailPayloadValidator,
   handler: async (ctx, { jobId, applicationCvKey, coverLetter }) => {
     const candidate = await authComponent.safeGetAuthUser(ctx);
     if (!candidate) throwForbidden("Authentication required");
@@ -334,6 +343,45 @@ export const submitApplication = internalMutation({
       authorId: job.authorId,
       contactEmail: contact?.email,
       cvKey,
+      coverLetter,
+    };
+  },
+});
+
+export const prepareApplicationEmailRetry = internalMutation({
+  args: { jobId: v.id("JobOffer") },
+  returns: applicationEmailPayloadValidator,
+  handler: async (ctx, { jobId }) => {
+    const candidate = await authComponent.safeGetAuthUser(ctx);
+    if (!candidate) throwForbidden("Authentication required");
+
+    const application = await ctx.db
+      .query("jobApplications")
+      .withIndex("by_jobId_and_candidateId", (q) =>
+        q.eq("jobId", jobId).eq("candidateId", candidate._id),
+      )
+      .unique();
+    if (!application || application.emailStatus !== "failed") {
+      throwValidationError("This application is not awaiting an email retry");
+    }
+
+    const job = await ctx.db.get(jobId);
+    if (!job) throwNotFound("Job not found");
+
+    const contact = await ctx.db
+      .query("JobContactInfo")
+      .withIndex("by_jobId", (q) => q.eq("jobId", jobId))
+      .unique();
+
+    await ctx.db.patch(application._id, { emailStatus: "pending" });
+
+    return {
+      applicationId: application._id,
+      jobTitle: job.title,
+      authorId: job.authorId,
+      contactEmail: contact?.email,
+      cvKey: application.cvKey,
+      coverLetter: application.coverLetter,
     };
   },
 });

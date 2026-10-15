@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { notFound, useParams } from "next/navigation";
+import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import { toast } from "sonner";
@@ -67,6 +68,11 @@ export default function JobDetailsPage() {
   // const translated = useTranslatedJob(jobOffer);
 
   const translateJob = useAction(api.jobs.translate.translateJob);
+  const retryApplicationEmail = useAction(
+    api.jobs.actions.retryApplicationEmail,
+  );
+  const [isRetryingApplicationEmail, setIsRetryingApplicationEmail] =
+    useState(false);
   const translationLanguage = getSupportedTranslationLanguage(locale);
   const cachedTranslation = useQuery(
     api.jobs.translate.getTranslation,
@@ -114,6 +120,18 @@ export default function JobDetailsPage() {
   const formatStoredDate = (value: string) =>
     formatDateLong(`${value}T00:00:00`, locale);
 
+  const handleApplicationEmailRetry = async () => {
+    setIsRetryingApplicationEmail(true);
+    try {
+      await retryApplicationEmail({ jobId: jobOffer._id });
+      toast.success(t("details.applicationDeliveryRetried"));
+    } catch {
+      toast.error(t("details.applicationDeliveryRetryFailed"));
+    } finally {
+      setIsRetryingApplicationEmail(false);
+    }
+  };
+
   const isAuthor = user?._id === jobOffer.authorId;
   const isAcceptingApplications =
     jobOffer.status === undefined || jobOffer.status === "active";
@@ -144,6 +162,23 @@ export default function JobDetailsPage() {
       );
     }
 
+    if (applicationEmailStatus === "failed") {
+      return (
+        <Button
+          variant="outline"
+          size="sm"
+          className={`gap-2 ${className ?? ""}`}
+          disabled={isRetryingApplicationEmail}
+          onClick={handleApplicationEmailRetry}
+        >
+          <Mail className="w-4 h-4" />
+          {isRetryingApplicationEmail
+            ? t("details.applicationDeliveryRetrying")
+            : t("details.applicationDeliveryRetry")}
+        </Button>
+      );
+    }
+
     if (!isAcceptingApplications) {
       return (
         <Button
@@ -168,20 +203,6 @@ export default function JobDetailsPage() {
         >
           <Mail className="w-4 h-4" />
           {t("details.apply")}
-        </Button>
-      );
-    }
-
-    if (applicationEmailStatus === "failed") {
-      return (
-        <Button
-          variant="outline"
-          size="sm"
-          className={`gap-2 ${className ?? ""}`}
-          disabled
-        >
-          <Mail className="w-4 h-4" />
-          {t("details.applicationDeliveryFailed")}
         </Button>
       );
     }
@@ -721,7 +742,19 @@ export default function JobDetailsPage() {
                   <p className="text-sm text-primary-foreground/90 mb-4">
                     {t("details.dontMiss")}
                   </p>
-                  {!isAcceptingApplications ? (
+                  {applicationEmailStatus === "failed" ? (
+                    <Button
+                      variant="secondary"
+                      className="w-full"
+                      size="lg"
+                      disabled={isRetryingApplicationEmail}
+                      onClick={handleApplicationEmailRetry}
+                    >
+                      {isRetryingApplicationEmail
+                        ? t("details.applicationDeliveryRetrying")
+                        : t("details.applicationDeliveryRetry")}
+                    </Button>
+                  ) : !isAcceptingApplications ? (
                     <Button
                       variant="secondary"
                       className="w-full"
@@ -747,15 +780,6 @@ export default function JobDetailsPage() {
                       disabled
                     >
                       {t("details.applyNow")}
-                    </Button>
-                  ) : applicationEmailStatus === "failed" ? (
-                    <Button
-                      variant="secondary"
-                      className="w-full"
-                      size="lg"
-                      disabled
-                    >
-                      {t("details.applicationDeliveryFailed")}
                     </Button>
                   ) : applicationEmailStatus !== "none" ? (
                     <Button
