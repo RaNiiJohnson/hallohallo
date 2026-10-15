@@ -28,17 +28,22 @@ export function getFreshTranslation<T extends { sourceUpdatedAt: number }>(
  */
 export function useManualTranslate<T>(
   run: (lang: SupportedLang) => Promise<T>,
-  options?: { onError?: () => void },
+  options?: {
+    onError?: () => void;
+    initialTranslation?: { lang: SupportedLang; data: T } | null;
+  },
 ) {
   const [result, setResult] = useState<{ lang: SupportedLang; data: T } | null>(
     null,
   );
   const [pendingLang, setPendingLang] = useState<SupportedLang | null>(null);
+  const [showOriginal, setShowOriginal] = useState(false);
   const requestId = useRef(0); // ignore outdated responses (rapid clicks)
 
   const translate = async (lang: SupportedLang) => {
     const id = ++requestId.current;
     setPendingLang(lang);
+    setShowOriginal(false);
     try {
       const data = await run(lang);
       if (id === requestId.current) setResult({ lang, data });
@@ -49,17 +54,28 @@ export function useManualTranslate<T>(
     }
   };
 
+  const showCached = (lang: SupportedLang, data: T) => {
+    requestId.current++;
+    setPendingLang(null);
+    setShowOriginal(false);
+    setResult({ lang, data });
+  };
+
   const reset = () => {
     requestId.current++;
     setResult(null);
     setPendingLang(null);
+    setShowOriginal(true);
   };
 
+  const displayed = result ?? (!showOriginal ? options?.initialTranslation : null);
+
   return {
-    data: result?.data ?? null,
-    activeLang: result?.lang ?? null,
+    data: displayed?.data ?? null,
+    activeLang: displayed?.lang ?? null,
     pendingLang,
     translate,
+    showCached,
     reset,
   };
 }

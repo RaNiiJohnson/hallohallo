@@ -22,7 +22,7 @@ import { getSafeExternalUrl } from "@/lib/external-url";
 import { LocationMap } from "@/lib/LocationMap";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
-import { useAction, useConvexAuth } from "convex/react";
+import { useAction, useConvex, useConvexAuth } from "convex/react";
 import {
   ArrowLeft,
   Award,
@@ -68,6 +68,7 @@ export default function JobDetailsPage() {
   // const translated = useTranslatedJob(jobOffer);
 
   const translateJob = useAction(api.jobs.translate.translateJob);
+  const convex = useConvex();
   const retryApplicationEmail = useAction(
     api.jobs.actions.retryApplicationEmail,
   );
@@ -80,14 +81,21 @@ export default function JobDetailsPage() {
       ? { jobId: jobOffer._id, language: translationLanguage }
       : "skip",
   );
+  const cached = getFreshTranslation(cachedTranslation, jobOffer?.updatedAt);
 
-  const { data, activeLang, pendingLang, translate, reset } =
+  const { data, activeLang, pendingLang, translate, showCached, reset } =
     useManualTranslate(
       (lang) => {
         if (!jobOffer) throw new Error("jobOffer not loaded");
         return translateJob({ jobId: jobOffer._id, targetLanguage: lang });
       },
-      { onError: () => toast.error(te("translateError")) },
+      {
+        onError: () => toast.error(te("translateError")),
+        initialTranslation:
+          cached && translationLanguage
+            ? { lang: translationLanguage, data: cached }
+            : null,
+      },
     );
 
   if (jobOffer === undefined) {
@@ -98,17 +106,29 @@ export default function JobDetailsPage() {
     return notFound();
   }
 
-  const cached = getFreshTranslation(cachedTranslation, jobOffer.updatedAt);
-  const translation = data ?? cached;
+  const translation = data;
   const title = translation?.title ?? jobOffer.title;
   const description = translation?.description ?? jobOffer.description;
   const city = translation?.city ?? jobOffer.city;
-  const handleTranslate = (language: Parameters<typeof translate>[0]) => {
+  const handleTranslate = async (
+    language: Parameters<typeof translate>[0],
+  ) => {
+    const cachedForLanguage = getFreshTranslation(
+      await convex.query(api.jobs.translate.getTranslation, {
+        jobId: jobOffer._id,
+        language,
+      }),
+      jobOffer.updatedAt,
+    );
+    if (cachedForLanguage) {
+      showCached(language, cachedForLanguage);
+      return;
+    }
     if (!isAuthenticated) {
       requireAuthentication();
       return;
     }
-    translate(language);
+    await translate(language);
   };
   const locationLabel =
     jobOffer.workMode === "remote"

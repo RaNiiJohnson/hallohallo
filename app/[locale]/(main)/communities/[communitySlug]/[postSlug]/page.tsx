@@ -17,7 +17,12 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
-import { useAction, useConvexAuth, useMutation } from "convex/react";
+import {
+  useAction,
+  useConvex,
+  useConvexAuth,
+  useMutation,
+} from "convex/react";
 import {
   ChevronRight,
   Loader2,
@@ -67,6 +72,7 @@ export default function PostClient() {
   // const translated = useTranslatedPost(post);
 
   const translatePost = useAction(api.posts.translate.translatePost);
+  const convex = useConvex();
   const translationLanguage = getSupportedTranslationLanguage(locale);
   const cachedTranslation = useQuery(
     api.posts.translate.getTranslation,
@@ -74,14 +80,24 @@ export default function PostClient() {
       ? { postId: post._id, language: translationLanguage }
       : "skip",
   );
+  const cached = getFreshTranslation(
+    cachedTranslation,
+    post ? (post.updatedAt ?? post._creationTime) : undefined,
+  );
 
-  const { data, activeLang, pendingLang, translate, reset } =
+  const { data, activeLang, pendingLang, translate, showCached, reset } =
     useManualTranslate(
       (lang) => {
         if (!post) throw new Error("Post not loaded");
         return translatePost({ postId: post._id, targetLanguage: lang });
       },
-      { onError: () => toast.error(te("translateError")) },
+      {
+        onError: () => toast.error(te("translateError")),
+        initialTranslation:
+          cached && translationLanguage
+            ? { lang: translationLanguage, data: cached }
+            : null,
+      },
     );
 
   if (post === undefined) {
@@ -92,19 +108,28 @@ export default function PostClient() {
     return <p className="text-muted-foreground p-8">{t("notFound")}</p>;
   }
 
-  const cached = getFreshTranslation(
-    cachedTranslation,
-    post.updatedAt ?? post._creationTime,
-  );
-  const translation = data ?? cached;
+  const translation = data;
   const title = translation?.title ?? post.title;
   const content = translation?.content ?? post.content;
-  const handleTranslate = (language: Parameters<typeof translate>[0]) => {
+  const handleTranslate = async (
+    language: Parameters<typeof translate>[0],
+  ) => {
+    const cachedForLanguage = getFreshTranslation(
+      await convex.query(api.posts.translate.getTranslation, {
+        postId: post._id,
+        language,
+      }),
+      post.updatedAt ?? post._creationTime,
+    );
+    if (cachedForLanguage) {
+      showCached(language, cachedForLanguage);
+      return;
+    }
     if (!isAuthenticated) {
       requireAuthentication();
       return;
     }
-    translate(language);
+    await translate(language);
   };
 
   const currentUserId = me?._id;

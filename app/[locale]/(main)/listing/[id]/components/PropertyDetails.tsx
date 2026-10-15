@@ -27,7 +27,7 @@ import { LocationMap } from "@/lib/LocationMap";
 import { truncateText } from "@/lib/utils";
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
-import { useAction, useConvexAuth } from "convex/react";
+import { useAction, useConvex, useConvexAuth } from "convex/react";
 import {
   Bath,
   Bed,
@@ -63,6 +63,7 @@ export function PropertyDetails({
   const te = useTranslations("common");
 
   const translateListing = useAction(api.listings.translate.translateListing);
+  const convex = useConvex();
   const { isAuthenticated } = useConvexAuth();
   const translationLanguage = getSupportedTranslationLanguage(locale);
   const cachedTranslation = useQuery(
@@ -71,6 +72,7 @@ export function PropertyDetails({
       ? { listingId: property._id, language: translationLanguage }
       : "skip",
   );
+  const cached = getFreshTranslation(cachedTranslation, property.updatedAt);
   const requireAuthentication = useAuthRequiredAction();
   const router = useRouter();
   const requireEmailVerification = () => {
@@ -79,7 +81,7 @@ export function PropertyDetails({
     );
   };
 
-  const { data, activeLang, pendingLang, translate, reset } =
+  const { data, activeLang, pendingLang, translate, showCached, reset } =
     useManualTranslate(
       (lang) => {
         if (!property) throw new Error("property not loaded");
@@ -88,21 +90,39 @@ export function PropertyDetails({
           targetLanguage: lang,
         });
       },
-      { onError: () => toast.error(te("translateError")) },
+      {
+        onError: () => toast.error(te("translateError")),
+        initialTranslation:
+          cached && translationLanguage
+            ? { lang: translationLanguage, data: cached }
+            : null,
+      },
     );
 
-  const cached = getFreshTranslation(cachedTranslation, property.updatedAt);
-  const translation = data ?? cached;
+  const translation = data;
   const description = translation?.description ?? property.description;
 
   const title = translation?.title ?? property.title;
   const city = translation?.city ?? property.city;
-  const handleTranslate = (language: Parameters<typeof translate>[0]) => {
+  const handleTranslate = async (
+    language: Parameters<typeof translate>[0],
+  ) => {
+    const cachedForLanguage = getFreshTranslation(
+      await convex.query(api.listings.translate.getTranslation, {
+        listingId: property._id,
+        language,
+      }),
+      property.updatedAt,
+    );
+    if (cachedForLanguage) {
+      showCached(language, cachedForLanguage);
+      return;
+    }
     if (!isAuthenticated) {
       requireAuthentication();
       return;
     }
-    translate(language);
+    await translate(language);
   };
   const locationLabel = [property.neighborhood, city]
     .filter(Boolean)

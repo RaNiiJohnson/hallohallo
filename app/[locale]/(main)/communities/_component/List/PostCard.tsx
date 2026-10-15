@@ -14,7 +14,7 @@ import { getRelativeTime } from "@/lib/date";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 import { useQuery } from "convex-helpers/react/cache";
-import { useAction, useConvexAuth } from "convex/react";
+import { useAction, useConvex, useConvexAuth } from "convex/react";
 import { ChevronRight, MessageSquare } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -40,6 +40,7 @@ export function PostCard({
     : `/posts/${post.slug}`;
 
   const translatePost = useAction(api.posts.translate.translatePost);
+  const convex = useConvex();
   const translationLanguage = getSupportedTranslationLanguage(locale);
   const cachedTranslation = useQuery(
     api.posts.translate.getTranslation,
@@ -47,25 +48,44 @@ export function PostCard({
       ? { postId: post._id, language: translationLanguage }
       : "skip",
   );
-  const { data, activeLang, pendingLang, translate, reset } =
-    useManualTranslate(
-      (lang) => translatePost({ postId: post._id, targetLanguage: lang }),
-      { onError: () => toast.error(te("translateError")) },
-    );
-
   const cached = getFreshTranslation(
     cachedTranslation,
     post.updatedAt ?? post._creationTime,
   );
-  const translation = data ?? cached;
+  const { data, activeLang, pendingLang, translate, showCached, reset } =
+    useManualTranslate(
+      (lang) => translatePost({ postId: post._id, targetLanguage: lang }),
+      {
+        onError: () => toast.error(te("translateError")),
+        initialTranslation:
+          cached && translationLanguage
+            ? { lang: translationLanguage, data: cached }
+            : null,
+      },
+    );
+
+  const translation = data;
   const title = translation?.title ?? post.title;
   const content = translation?.content ?? post.content;
-  const handleTranslate = (language: Parameters<typeof translate>[0]) => {
+  const handleTranslate = async (
+    language: Parameters<typeof translate>[0],
+  ) => {
+    const cachedForLanguage = getFreshTranslation(
+      await convex.query(api.posts.translate.getTranslation, {
+        postId: post._id,
+        language,
+      }),
+      post.updatedAt ?? post._creationTime,
+    );
+    if (cachedForLanguage) {
+      showCached(language, cachedForLanguage);
+      return;
+    }
     if (!isAuthenticated) {
       requireAuthentication();
       return;
     }
-    translate(language);
+    await translate(language);
   };
 
   return (
@@ -150,6 +170,7 @@ export function PostCard({
         />
 
         <ShareButton
+          url={`/${locale}${postHref}`}
           text={post.title}
           variant="ghost"
           className="group flex items-center gap-1.5 text-muted-foreground hover:text-purple-500 hover:bg-purple-500/10 transition-colors h-8 px-2"

@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "@/i18n/navigation";
+import { resolveShareUrl } from "@/lib/share-url";
 import {
   Facebook,
   Linkedin,
@@ -53,8 +54,10 @@ export function ShareButton({
   showLabel = false,
 }: ShareButtonProps) {
   const t = useTranslations("common");
-  const currentUrl =
-    url ?? (typeof window !== "undefined" ? window.location.href : "");
+  const currentUrl = resolveShareUrl(
+    url,
+    typeof window !== "undefined" ? window.location : undefined,
+  );
 
   const trigger = (
     <Button variant={variant} size={size} className={className}>
@@ -70,7 +73,13 @@ export function ShareButton({
         variant={variant}
         size={size}
         className={className}
-        onClick={() => navigator.share({ title: text, text, url: currentUrl })}
+        onClick={() =>
+          navigator.share({
+            title: text,
+            text,
+            url: resolveShareUrl(url, window.location),
+          })
+        }
       >
         <Share2 className="w-4 h-4" />
         {showLabel && <span>{t("share")}</span>}
