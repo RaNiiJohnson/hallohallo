@@ -1203,6 +1203,13 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
       >;
     };
     users: {
+      getAdministratorIds: FunctionReference<
+        "query",
+        "internal",
+        {},
+        Array<string>,
+        Name
+      >;
       getAllUsers: FunctionReference<
         "query",
         "internal",

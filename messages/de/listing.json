@@ -14,7 +14,8 @@
     "allLoaded": "Alle Anzeigen wurden geladen.",
     "allLoadedToast": "Alle Angebote wurden geladen",
     "dialogDesc": "Details zur Immobilienanzeige",
-    "loadMoreBtn": "Weitere Anzeigen ansehen"
+    "loadMoreBtn": "Weitere Anzeigen ansehen",
+    "pending": "Ausstehend"
   },
   "cta": {
     "title": "Hast du eine Immobilie anzubieten?",
@@ -45,7 +46,7 @@
   "dialogs": {
     "publish": {
       "title": "Anzeige veröffentlichen",
-      "desc": "Fülle das folgende Formular aus, um deine Immobilie anzubieten."
+      "desc": "Reiche deine Immobilie ein. Die Anzeige wird nach Freigabe durch die Administration veröffentlicht."
     },
     "edit": {
       "trigger": "Bearbeiten",
@@ -57,6 +58,7 @@
       "reopen": "Wieder öffnen",
       "archive": "Archivieren",
       "restore": "Wiederherstellen",
+      "resubmit": "Erneut zur Prüfung einreichen",
       "success": "Anzeigenstatus aktualisiert.",
       "error": "Anzeigenstatus konnte nicht aktualisiert werden."
     },
@@ -165,9 +167,9 @@
       "phoneInvalid": "Gib eine gültige Telefonnummer ein"
     },
     "messages": {
-      "success": "Anzeige erfolgreich veröffentlicht!",
+      "success": "Anzeige zur Prüfung an die Administration gesendet!",
       "error": "Fehler beim Veröffentlichen der Anzeige",
-      "updateSuccess": "Anzeige erfolgreich aktualisiert!",
+      "updateSuccess": "Anzeige aktualisiert und erneut zur Prüfung eingereicht!",
       "updateError": "Fehler beim Aktualisieren der Anzeige",
       "imagesRequired": "Füge der Anzeige mindestens ein Foto hinzu",
       "imageUploadError": "Fehler beim Hochladen des Bildes",
@@ -216,6 +218,8 @@
     }
   },
   "details": {
+    "pendingTitle": "Anzeige wartet auf Freigabe",
+    "pendingDescription": "Diese Anzeige ist bis zur Freigabe nur für Sie und Administratoren sichtbar.",
     "published": "Veröffentlicht am",
     "updated": "Aktualisiert am",
     "area": "Wohnfläche",

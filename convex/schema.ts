@@ -79,7 +79,9 @@ export default defineSchema({
     // Optional during the rollout so existing offers remain visible as active.
     status: v.optional(
       v.union(
+        v.literal("pending"),
         v.literal("active"),
+        v.literal("rejected"),
         v.literal("closed"),
         v.literal("archived"),
       ),
@@ -88,6 +90,7 @@ export default defineSchema({
     searchAll: v.optional(v.string()),
   })
     .index("by_authorId", ["authorId"])
+    .index("by_status", ["status"])
     .index("by_city", ["city"])
     .index("by_type", ["type"])
     .index("by_contract", ["contractType"])
@@ -111,7 +114,9 @@ export default defineSchema({
     // Optional to keep existing listings readable during the safe rollout.
     status: v.optional(
       v.union(
+        v.literal("pending"),
         v.literal("active"),
+        v.literal("rejected"),
         v.literal("closed"),
         v.literal("archived"),
       ),
@@ -158,6 +163,7 @@ export default defineSchema({
     searchAll: v.optional(v.string()),
   })
     .index("by_authorId", ["authorId"])
+    .index("by_status", ["status"])
     .index("by_city", ["city"])
     .index("by_propertyType", ["propertyType"])
     .index("by_listingMode", ["listingMode"])
@@ -371,12 +377,19 @@ export default defineSchema({
       v.literal("new_reply_like"),
       v.literal("new_member"),
       v.literal("leave_community"),
+      v.literal("job_approved"),
+      v.literal("job_rejected"),
+      v.literal("listing_approved"),
+      v.literal("listing_rejected"),
+      v.literal("job_pending_review"),
+      v.literal("listing_pending_review"),
     ),
     read: v.boolean(),
     postSlug: v.optional(v.string()),
     communitySlug: v.optional(v.string()),
     fromUserName: v.optional(v.string()),
     message: v.optional(v.string()),
+    targetHref: v.optional(v.string()),
   })
     .index("by_userId", ["userId"])
     .index("by_userId_read", ["userId", "read"])

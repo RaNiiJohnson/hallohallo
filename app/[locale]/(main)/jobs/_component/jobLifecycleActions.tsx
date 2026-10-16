@@ -8,8 +8,10 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useMutation } from "convex/react";
+import type { PublicationStatus } from "@/lib/publication-lifecycle";
 
-type JobStatus = "active" | "closed" | "archived";
+type JobStatus = PublicationStatus;
+type MutableJobStatus = Exclude<JobStatus, "rejected">;
 
 export function JobLifecycleActions({
   jobId,
@@ -19,10 +21,11 @@ export function JobLifecycleActions({
   status?: JobStatus;
 }) {
   const setJobStatus = useMutation(api.jobs.mutations.setJobStatus);
-  const [pendingStatus, setPendingStatus] = useState<JobStatus | null>(null);
+  const [pendingStatus, setPendingStatus] =
+    useState<MutableJobStatus | null>(null);
   const t = useTranslations("jobs.dialogs.lifecycle");
 
-  async function changeStatus(nextStatus: JobStatus) {
+  async function changeStatus(nextStatus: MutableJobStatus) {
     setPendingStatus(nextStatus);
     try {
       await setJobStatus({ id: jobId, status: nextStatus });
@@ -35,7 +38,7 @@ export function JobLifecycleActions({
   }
 
   const isPending = pendingStatus !== null;
-  const iconFor = (nextStatus: JobStatus) =>
+  const iconFor = (nextStatus: MutableJobStatus) =>
     pendingStatus === nextStatus ? (
       <Loader2 className="size-4 animate-spin" />
     ) : null;
@@ -46,13 +49,15 @@ export function JobLifecycleActions({
         size="sm"
         variant="outline"
         disabled={isPending}
-        onClick={() => changeStatus("active")}
+        onClick={() => changeStatus("pending")}
       >
-        {iconFor("active") ?? <RotateCcw className="size-4" />}
-        {t("restore")}
+        {iconFor("pending") ?? <RotateCcw className="size-4" />}
+        {t("resubmit")}
       </Button>
     );
   }
+
+  if (status === "pending" || status === "rejected") return null;
 
   if (status === "closed") {
     return (

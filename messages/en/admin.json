@@ -19,6 +19,10 @@
     "errorTitle": "Unable to load the dashboard",
     "errorDescription": "The administrative metrics could not be loaded.",
     "retry": "Try again",
+    "moderationAlert": {
+      "title": "{count, plural, one {# listing is awaiting review} other {# listings are awaiting review}}",
+      "description": "Open the moderation queue."
+    },
     "metrics": {
       "total": "Members",
       "totalHelper": "Total number of accounts",
@@ -42,6 +46,28 @@
       "analyticsTitle": "Open PostHog",
       "analyticsDescription": "Review product activity and adoption.",
       "analyticsUnconfigured": "Set NEXT_PUBLIC_POSTHOG_DASHBOARD_URL to enable this link."
+    }
+  },
+  "moderation": {
+    "title": "Moderation",
+    "description": "Review new listings before publication and handle member reports.",
+    "publications": {
+      "title": "Pending listings",
+      "description": "Job and housing listings remain private until you make a decision.",
+      "empty": "No listings are awaiting review.",
+      "pending": "Pending",
+      "types": {
+        "job": "Job offer",
+        "listing": "Housing listing"
+      },
+      "submittedBy": "Submitted by {name} on {date}",
+      "approve": "Approve",
+      "reject": "Reject"
+    },
+    "toast": {
+      "approved": "Listing approved and published.",
+      "rejected": "Listing rejected.",
+      "error": "This decision could not be saved."
     }
   },
   "audit": {

@@ -14,7 +14,8 @@
     "allLoaded": "All listings have been loaded.",
     "allLoadedToast": "All listings have been loaded",
     "dialogDesc": "Real estate listing details",
-    "loadMoreBtn": "See more listings"
+    "loadMoreBtn": "See more listings",
+    "pending": "Pending"
   },
   "cta": {
     "title": "Do you have a property to offer?",
@@ -45,7 +46,7 @@
   "dialogs": {
     "publish": {
       "title": "Publish an ad",
-      "desc": "Fill out the form below to offer your property."
+      "desc": "Submit your property. The listing will be published after an administrator approves it."
     },
     "edit": {
       "trigger": "Edit",
@@ -57,6 +58,7 @@
       "reopen": "Reopen",
       "archive": "Archive",
       "restore": "Restore",
+      "resubmit": "Resubmit for review",
       "success": "Listing status updated.",
       "error": "Unable to update the listing status."
     },
@@ -165,9 +167,9 @@
       "phoneInvalid": "Enter a valid phone number"
     },
     "messages": {
-      "success": "Listing published successfully!",
+      "success": "Listing sent to the admin team for review!",
       "error": "Error while publishing the listing",
-      "updateSuccess": "Listing updated successfully!",
+      "updateSuccess": "Listing updated and resubmitted for review!",
       "updateError": "Error while updating the listing",
       "imagesRequired": "Add at least one photo to the listing",
       "imageUploadError": "Error uploading image",
@@ -216,6 +218,8 @@
     }
   },
   "details": {
+    "pendingTitle": "Listing awaiting review",
+    "pendingDescription": "This listing is visible only to you and administrators until it is approved.",
     "published": "Published on",
     "updated": "Updated on",
     "area": "Area",

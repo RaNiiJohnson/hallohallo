@@ -8,8 +8,10 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useMutation } from "convex/react";
+import type { PublicationStatus } from "@/lib/publication-lifecycle";
 
-type ListingStatus = "active" | "closed" | "archived";
+type ListingStatus = PublicationStatus;
+type MutableListingStatus = Exclude<ListingStatus, "rejected">;
 
 export function ListingLifecycleActions({
   listingId,
@@ -19,10 +21,11 @@ export function ListingLifecycleActions({
   status?: ListingStatus;
 }) {
   const setListingStatus = useMutation(api.listings.mutations.setListingStatus);
-  const [pendingStatus, setPendingStatus] = useState<ListingStatus | null>(null);
+  const [pendingStatus, setPendingStatus] =
+    useState<MutableListingStatus | null>(null);
   const t = useTranslations("listing.dialogs.lifecycle");
 
-  async function changeStatus(nextStatus: ListingStatus) {
+  async function changeStatus(nextStatus: MutableListingStatus) {
     setPendingStatus(nextStatus);
     try {
       await setListingStatus({ listingId, status: nextStatus });
@@ -35,7 +38,7 @@ export function ListingLifecycleActions({
   }
 
   const isPending = pendingStatus !== null;
-  const iconFor = (nextStatus: ListingStatus) =>
+  const iconFor = (nextStatus: MutableListingStatus) =>
     pendingStatus === nextStatus ? <Loader2 className="size-4 animate-spin" /> : null;
 
   if (status === "archived") {
@@ -44,13 +47,15 @@ export function ListingLifecycleActions({
         size="sm"
         variant="outline"
         disabled={isPending}
-        onClick={() => changeStatus("active")}
+        onClick={() => changeStatus("pending")}
       >
-        {iconFor("active") ?? <RotateCcw className="size-4" />}
-        {t("restore")}
+        {iconFor("pending") ?? <RotateCcw className="size-4" />}
+        {t("resubmit")}
       </Button>
     );
   }
+
+  if (status === "pending" || status === "rejected") return null;
 
   if (status === "closed") {
     return (

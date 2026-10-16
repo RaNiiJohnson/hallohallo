@@ -54,6 +54,19 @@ export const getContactEmailById = query({
   },
 });
 
+export const getAdministratorIds = query({
+  args: {},
+  returns: v.array(v.string()),
+  handler: async (ctx) => {
+    const administrators = await ctx.db
+      .query("user")
+      .withIndex("by_role", (q) => q.eq("role", "admin"))
+      .take(100);
+
+    return administrators.map((administrator) => administrator._id);
+  },
+});
+
 export const userValidator = schema.tables.user.validator;
 
 export type UserType = PublicUser;

@@ -32,6 +32,12 @@ const notificationIcon: Record<string, string> = {
   new_reply_like: "✅",
   new_member: "👥",
   leave_community: "❌",
+  job_approved: "✅",
+  job_rejected: "❌",
+  listing_approved: "✅",
+  listing_rejected: "❌",
+  job_pending_review: "🕒",
+  listing_pending_review: "🕒",
 };
 
 export function NotificationWidget({
@@ -92,10 +98,10 @@ export function NotificationWidget({
         </div>
       ) : (
         notifications.map((notif) => {
-          const href =
-            notif.communitySlug && notif.postSlug
+          const href = notif.targetHref ??
+            (notif.communitySlug && notif.postSlug
               ? `/communities/${notif.communitySlug}/${notif.postSlug}`
-              : "/communities";
+              : "/communities");
 
           return (
             <Link
@@ -116,6 +122,7 @@ export function NotificationWidget({
                 <p className="text-sm text-foreground leading-snug wrap-break-word">
                   {t(`messages.${notif.type}` as Parameters<typeof t>[0], {
                     name: notif.fromUserName ?? t("someone"),
+                    title: notif.message ?? t("content"),
                   })}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">

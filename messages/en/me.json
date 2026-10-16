@@ -28,7 +28,9 @@
     "listings": "Housing listings",
     "posts": "Posts",
     "statuses": {
+      "pending": "Pending",
       "active": "Active",
+      "rejected": "Rejected",
       "closed": "Closed",
       "archived": "Archived"
     },
@@ -62,7 +64,9 @@
     "profileVisibilityHint": "Show my profile with my active content."
   },
   "status": {
+    "pending": "Pending",
     "active": "Active",
+    "rejected": "Rejected",
     "closed": "Closed",
     "archived": "Archived"
   }

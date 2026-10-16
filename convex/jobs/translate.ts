@@ -5,6 +5,7 @@ import { authAction, internalMutation, query } from "../functions";
 import { languageValidator } from "../translations/shared";
 import { enforceTranslationLimits } from "../translations/security";
 import { translateWithOpenAI } from "../translations/translate.lib";
+import { requiresPublicationModeration } from "../../src/lib/publication-lifecycle";
 
 type JobFields = { title: string; description: string; city: string };
 
@@ -16,7 +17,7 @@ export const getSource = query({
     if (!job) return null;
     const user = await authComponent.safeGetAuthUser(ctx);
     if (
-      job.status === "archived" &&
+      (job.status === "archived" || requiresPublicationModeration(job.status)) &&
       user?._id !== job.authorId &&
       user?.role !== "admin"
     ) {
@@ -39,7 +40,7 @@ export const getTranslation = query({
     if (!job) return null;
     const user = await authComponent.safeGetAuthUser(ctx);
     if (
-      job.status === "archived" &&
+      (job.status === "archived" || requiresPublicationModeration(job.status)) &&
       user?._id !== job.authorId &&
       user?.role !== "admin"
     ) {

@@ -94,7 +94,13 @@ export function JobList() {
           href={`/jobs/${job.slug}`}
           className="group block rounded-lg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
         >
-          <div className="rounded-lg border border-border bg-card p-4 transition-all duration-150 hover:border-primary/30 hover:shadow-md active:scale-[0.99] active:border-primary active:ring-1 active:ring-primary dark:bg-card/35 motion-reduce:transform-none">
+          <div
+            className={clsx(
+              "rounded-lg border border-border bg-card p-4 transition-all duration-150 hover:border-primary/30 hover:shadow-md active:scale-[0.99] active:border-primary active:ring-1 active:ring-primary dark:bg-card/35 motion-reduce:transform-none",
+              job.status === "pending" &&
+                "border-amber-500/50 bg-amber-500/5 dark:bg-amber-500/5",
+            )}
+          >
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 {/* Title */}
@@ -146,6 +152,11 @@ export function JobList() {
 
                 {/* Badges */}
                 <div className="flex flex-wrap items-center gap-2">
+                  {job.status === "pending" ? (
+                    <Badge className="bg-amber-500 text-amber-950 hover:bg-amber-500">
+                      {t("list.pending")}
+                    </Badge>
+                  ) : null}
                   <Badge
                     variant="secondary"
                     className="bg-secondary/50 hover:bg-secondary/70 text-xs font-normal"

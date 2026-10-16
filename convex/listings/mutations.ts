@@ -7,6 +7,7 @@ import {
   consumeUploadGrant,
   r2,
 } from "../integrations/r2";
+import { notifyAdministratorsOfPendingPublication } from "../notifications/admin";
 import {
   throwForbidden,
   throwNotFound,
@@ -27,6 +28,7 @@ const contactValidator = v.object({
 });
 
 const listingStatusValidator = v.union(
+  v.literal("pending"),
   v.literal("active"),
   v.literal("closed"),
   v.literal("archived"),
@@ -161,10 +163,6 @@ export const createListing = authMutation({
     assertListingCity(args.city);
     assertPublicTextIsSafe(listingArgs);
 
-    if (user.userType !== "provider" && user.role !== "admin") {
-      throwForbidden("Only providers or admins can publish listings");
-    }
-
     const uploadedKeys = args.images.flatMap((image) =>
       image.storageId ? [image.storageId] : [],
     );
@@ -183,7 +181,7 @@ export const createListing = authMutation({
       slug: generatedSlug(args.title),
       authorId: user._id,
       authorName: user.name,
-      status: "active",
+      status: "pending",
       updatedAt: Date.now(),
       searchAll: searchAllContent,
       currency: "EUR",
@@ -205,6 +203,11 @@ export const createListing = authMutation({
         ...normalizedContact,
       });
     }
+    await notifyAdministratorsOfPendingPublication(ctx, {
+      resourceType: "listing",
+      title: args.title,
+      authorName: user.name,
+    });
 
     // await posthog.capture(ctx, {
     //   distinctId: posthogDistinctId(user._id),
@@ -365,6 +368,7 @@ export const updateListing = authMutation({
     await ctx.db.patch(listingId, {
       ...normalizedPatch,
       searchAll: searchAllContent,
+      ...(!isAdmin ? { status: "pending" as const } : {}),
       updatedAt: Date.now(),
     });
 
@@ -392,6 +396,13 @@ export const updateListing = authMutation({
     } else if (existingContact && patch.title !== undefined) {
       await ctx.db.patch(existingContact._id, {
         listing: updatedListing.title,
+      });
+    }
+    if (!isAdmin && listing.status !== "pending") {
+      await notifyAdministratorsOfPendingPublication(ctx, {
+        resourceType: "listing",
+        title: updatedListing.title,
+        authorName: ctx.user.name,
       });
     }
     return null;

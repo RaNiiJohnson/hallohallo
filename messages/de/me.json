@@ -28,7 +28,9 @@
     "listings": "Wohnungsanzeigen",
     "posts": "Beiträge",
     "statuses": {
+      "pending": "Ausstehend",
       "active": "Aktiv",
+      "rejected": "Abgelehnt",
       "closed": "Geschlossen",
       "archived": "Archiviert"
     },
@@ -62,7 +64,9 @@
     "profileVisibilityHint": "Mein Profil mit aktiven Inhalten sichtbar machen."
   },
   "status": {
+    "pending": "Ausstehend",
     "active": "Aktiv",
+    "rejected": "Abgelehnt",
     "closed": "Geschlossen",
     "archived": "Archiviert"
   }

@@ -1,5 +1,6 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, MapPin, X } from "lucide-react";
 import { Link } from "@/i18n/navigation";
@@ -44,6 +45,11 @@ export function ListingDetails({
       />
 
       <div className="px-4 pb-4">
+        {listing.status === "pending" ? (
+          <Badge className="mt-3 bg-amber-500 text-amber-950 hover:bg-amber-500">
+            {t("list.pending")}
+          </Badge>
+        ) : null}
         {/* Bouton vers les détails complets */}
         <Link href={`/listing/${listing.slug}`} className="block mt-3">
           <Button className="w-full flex items-center gap-2">
@@ -66,6 +72,11 @@ export function ListingDetailsContent({
 
   return (
     <div className="space-y-4">
+      {listing.status === "pending" ? (
+        <Badge className="bg-amber-500 text-amber-950 hover:bg-amber-500">
+          {t("list.pending")}
+        </Badge>
+      ) : null}
       {/* Carrousel d'images */}
       <ImageCarousel images={listing.images} title={listing.title} />
 

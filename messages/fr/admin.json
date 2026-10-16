@@ -19,6 +19,10 @@
     "errorTitle": "Impossible de charger le dashboard",
     "errorDescription": "Les métriques administratives n'ont pas pu être chargées.",
     "retry": "Réessayer",
+    "moderationAlert": {
+      "title": "{count, plural, one {# annonce attend une validation} other {# annonces attendent une validation}}",
+      "description": "Ouvrir la file de modération."
+    },
     "metrics": {
       "total": "Membres",
       "totalHelper": "Nombre total de comptes",
@@ -42,6 +46,28 @@
       "analyticsTitle": "Ouvrir PostHog",
       "analyticsDescription": "Consulter l'activité et l'adoption produit.",
       "analyticsUnconfigured": "Configurez NEXT_PUBLIC_POSTHOG_DASHBOARD_URL pour activer ce lien."
+    }
+  },
+  "moderation": {
+    "title": "Modération",
+    "description": "Validez les nouvelles annonces avant leur publication et traitez les signalements.",
+    "publications": {
+      "title": "Annonces en attente",
+      "description": "Les offres d’emploi et annonces logement restent privées jusqu’à votre décision.",
+      "empty": "Aucune annonce en attente de validation.",
+      "pending": "En attente",
+      "types": {
+        "job": "Offre d’emploi",
+        "listing": "Annonce logement"
+      },
+      "submittedBy": "Soumise par {name}, le {date}",
+      "approve": "Valider",
+      "reject": "Refuser"
+    },
+    "toast": {
+      "approved": "Annonce validée et publiée.",
+      "rejected": "Annonce refusée.",
+      "error": "Impossible d’enregistrer cette décision."
     }
   },
   "audit": {

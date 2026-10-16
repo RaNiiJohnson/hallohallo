@@ -6,10 +6,15 @@ import {
   type ContractType,
   type JobType,
 } from "../../src/lib/job-offer-options";
-import { isAllowedPublicationTransition } from "../../src/lib/publication-lifecycle";
+import {
+  isAllowedPublicationTransition,
+  isPublicPublicationStatus,
+  type PublicationStatus,
+} from "../../src/lib/publication-lifecycle";
 import { authComponent } from "../auth/auth";
 import { authMutation, internalMutation } from "../functions";
 import { assertVerifiedUpload, consumeUploadGrant } from "../integrations/r2";
+import { notifyAdministratorsOfPendingPublication } from "../notifications/admin";
 import {
   throwForbidden,
   throwNotFound,
@@ -17,6 +22,7 @@ import {
 } from "../utils/errors";
 
 const jobStatusValidator = v.union(
+  v.literal("pending"),
   v.literal("active"),
   v.literal("closed"),
   v.literal("archived"),
@@ -84,8 +90,8 @@ function locationForWorkMode(
   return workMode === "remote" || location === null ? undefined : location;
 }
 
-function isJobActive(status: "active" | "closed" | "archived" | undefined) {
-  return status === undefined || status === "active";
+function isJobActive(status: PublicationStatus | undefined) {
+  return isPublicPublicationStatus(status);
 }
 
 export const createJob = authMutation({
@@ -124,9 +130,6 @@ export const createJob = authMutation({
   handler: async (ctx, args) => {
     const user = ctx.user;
 
-    if (user.userType !== "provider" && user.role !== "admin") {
-      throwForbidden("Only providers or admins can publish jobs");
-    }
     assertValidJobInput(args, { requireContactEmail: true });
     const { contactEmail, location, ...jobArgs } = args;
 
@@ -141,13 +144,18 @@ export const createJob = authMutation({
       slug: generatedSlug(args.title),
       authorId: user._id,
       authorName: user.name,
-      status: "active",
+      status: "pending",
       updatedAt: Date.now(),
       searchAll: searchAllContent,
     });
     await ctx.db.insert("JobContactInfo", {
       jobId: job,
       email: contactEmail.trim().toLowerCase(),
+    });
+    await notifyAdministratorsOfPendingPublication(ctx, {
+      resourceType: "job",
+      title: args.title,
+      authorName: user.name,
     });
 
     // await posthog.capture(ctx, {
@@ -227,12 +235,20 @@ export const updateJob = authMutation({
         ? { location: nextLocation }
         : {}),
       searchAll: searchAllContent,
+      ...(!isAdmin ? { status: "pending" as const } : {}),
       updatedAt: Date.now(),
     });
     if (contactEmail) {
       const currentContact = await ctx.db.query("JobContactInfo").withIndex("by_jobId", (q) => q.eq("jobId", id)).unique();
       if (currentContact) await ctx.db.patch(currentContact._id, { email: contactEmail.trim().toLowerCase() });
       else await ctx.db.insert("JobContactInfo", { jobId: id, email: contactEmail.trim().toLowerCase() });
+    }
+    if (!isAdmin && existing.status !== "pending") {
+      await notifyAdministratorsOfPendingPublication(ctx, {
+        resourceType: "job",
+        title: args.title,
+        authorName: ctx.user.name,
+      });
     }
   },
 });

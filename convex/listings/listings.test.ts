@@ -8,6 +8,10 @@ import { authComponent, requireAuth } from "../auth/auth";
 import schema from "../schema";
 import { modules } from "../test.setup";
 
+vi.mock("../notifications/admin", () => ({
+  notifyAdministratorsOfPendingPublication: vi.fn(),
+}));
+
 vi.mock("../auth/auth", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../auth/auth")>();
   return {
@@ -74,6 +78,9 @@ describe("Listings", () => {
 
     const listing = await t.run(async (ctx) => await ctx.db.get(listingId));
     listingSlug = listing!.slug;
+    await t.run(async (ctx) => {
+      await ctx.db.patch(listingId, { status: "active" });
+    });
   });
 
   it("should have created a listing", async () => {
@@ -112,6 +119,9 @@ describe("Listings", () => {
     const listing = await t.run(async (ctx) =>
       await ctx.db.get(contactListingId),
     );
+    await t.run(async (ctx) => {
+      await ctx.db.patch(contactListingId, { status: "active" });
+    });
 
     const result = await t.query(api.listings.queries.getListingWithContact, {
       slug: listing!.slug,
@@ -520,10 +530,12 @@ describe("Listings", () => {
     });
     await t.mutation(api.listings.mutations.setListingStatus, {
       listingId,
-      status: "active",
+      status: "pending",
     });
 
-    expect((await t.run((ctx) => ctx.db.get(listingId)))?.status).toBe("active");
+    expect((await t.run((ctx) => ctx.db.get(listingId)))?.status).toBe(
+      "pending",
+    );
   });
 
   it("refuses lifecycle changes by another member", async () => {

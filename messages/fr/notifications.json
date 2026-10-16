@@ -7,6 +7,7 @@
   "open": "Ouvrir les notifications",
   "close": "Fermer les notifications",
   "someone": "Quelqu’un",
+  "content": "Votre annonce",
   "fallback": "Nouvelle activité",
   "messages": {
     "new_comment": "{name} a commenté votre publication",
@@ -15,6 +16,12 @@
     "new_comment_like": "{name} a aimé votre commentaire",
     "new_reply_like": "{name} a aimé votre réponse",
     "new_member": "{name} a rejoint votre communauté",
-    "leave_community": "{name} a quitté votre communauté"
+    "leave_community": "{name} a quitté votre communauté",
+    "job_approved": "Votre offre « {title} » a été validée et publiée",
+    "job_rejected": "Votre offre « {title} » a été refusée",
+    "listing_approved": "Votre annonce « {title} » a été validée et publiée",
+    "listing_rejected": "Votre annonce « {title} » a été refusée",
+    "job_pending_review": "Nouvelle offre « {title} » soumise par {name}",
+    "listing_pending_review": "Nouvelle annonce logement « {title} » soumise par {name}"
   }
 }
