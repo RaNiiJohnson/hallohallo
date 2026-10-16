@@ -403,11 +403,11 @@ function NotificationsPanel() {
         <Empty>{t("empty")}</Empty>
       ) : (
         notifications.results.map((notification) => {
-          const href = notification.communitySlug
+          const href = notification.targetHref ?? (notification.communitySlug
             ? notification.postSlug
               ? `/communities/${notification.communitySlug}/${notification.postSlug}`
               : `/communities/${notification.communitySlug}`
-            : "/communities";
+            : "/communities");
           return (
             <Link
               key={notification._id}
@@ -430,6 +430,8 @@ function NotificationsPanel() {
                     {
                       name:
                         notification.fromUserName ?? notificationT("someone"),
+                      title:
+                        notification.message ?? notificationT("content"),
                     },
                   )}
                 </span>

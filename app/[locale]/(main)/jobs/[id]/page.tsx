@@ -29,6 +29,7 @@ import {
   Briefcase,
   Building2,
   ChevronRight,
+  Clock3,
   FileText,
   Mail,
   MapPin,
@@ -313,6 +314,18 @@ export default function JobDetailsPage() {
               </span>
             </div>
           </div>
+
+          {jobOffer.status === "pending" ? (
+            <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-left">
+              <Clock3 className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-400" />
+              <div>
+                <p className="font-semibold">{t("details.pendingTitle")}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {t("details.pendingDescription")}
+                </p>
+              </div>
+            </div>
+          ) : null}
 
           {/* Job Header */}
           <div className="text-center mb-8">

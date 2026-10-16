@@ -5,6 +5,7 @@ import { authAction, internalMutation, query } from "../functions";
 import { languageValidator } from "../translations/shared";
 import { enforceTranslationLimits } from "../translations/security";
 import { translateWithOpenAI } from "../translations/translate.lib";
+import { requiresPublicationModeration } from "../../src/lib/publication-lifecycle";
 
 type ListingFields = {
   title: string;
@@ -19,7 +20,8 @@ export const getSource = query({
     if (!listing) return null;
     const user = await authComponent.safeGetAuthUser(ctx);
     if (
-      listing.status === "archived" &&
+      (listing.status === "archived" ||
+        requiresPublicationModeration(listing.status)) &&
       user?._id !== listing.authorId &&
       user?.role !== "admin"
     ) {
@@ -41,7 +43,8 @@ export const getTranslation = query({
     if (!listing) return null;
     const user = await authComponent.safeGetAuthUser(ctx);
     if (
-      listing.status === "archived" &&
+      (listing.status === "archived" ||
+        requiresPublicationModeration(listing.status)) &&
       user?._id !== listing.authorId &&
       user?.role !== "admin"
     ) {

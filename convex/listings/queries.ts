@@ -7,6 +7,11 @@ import {
 } from "convex/server";
 import { v } from "convex/values";
 import { DataModel, Id } from "../_generated/dataModel";
+import {
+  isPublicPublicationStatus,
+  requiresPublicationModeration,
+  type PublicationStatus,
+} from "../../src/lib/publication-lifecycle";
 import { authComponent } from "../auth/auth";
 import { query } from "../functions";
 import { r2 } from "../integrations/r2";
@@ -73,14 +78,37 @@ function approximateLocation(location: { lat: number; lng: number } | undefined)
   };
 }
 
-type ListingStatus = "active" | "closed" | "archived";
-
-function isVisibleListing(listing: { status?: ListingStatus }) {
-  return listing.status === undefined || listing.status === "active";
+function isVisibleListing(
+  listing: { status?: PublicationStatus; authorId: string },
+  userId?: string,
+) {
+  return (
+    isPublicPublicationStatus(listing.status) ||
+    (listing.status === "pending" && listing.authorId === userId)
+  );
 }
 
-function visibleListingFilter(q: FilterBuilder<DataModel["RealestateListing"]>) {
-  return q.or(q.eq(q.field("status"), "active"), q.eq(q.field("status"), undefined));
+function isListingHiddenFromPublic(status: PublicationStatus | undefined) {
+  return status === "archived" || requiresPublicationModeration(status);
+}
+
+function visibleListingFilter(
+  q: FilterBuilder<DataModel["RealestateListing"]>,
+  userId?: string,
+) {
+  const publiclyVisible = q.or(
+    q.eq(q.field("status"), "active"),
+    q.eq(q.field("status"), undefined),
+  );
+  if (!userId) return publiclyVisible;
+
+  return q.or(
+    publiclyVisible,
+    q.and(
+      q.eq(q.field("status"), "pending"),
+      q.eq(q.field("authorId"), userId),
+    ),
+  );
 }
 
 function canManageListing(
@@ -100,7 +128,10 @@ export const getListingWithContact = query({
     if (!listing) return null;
 
     const user = await authComponent.safeGetAuthUser(ctx);
-    if (listing.status === "archived" && !canManageListing(listing, user)) {
+    if (
+      isListingHiddenFromPublic(listing.status) &&
+      !canManageListing(listing, user)
+    ) {
       return null;
     }
     let isBookmarked = false;
@@ -175,7 +206,10 @@ export const getListingMetadata = query({
 
     if (!listing) return null;
     const user = await authComponent.safeGetAuthUser(ctx);
-    if (listing.status === "archived" && !canManageListing(listing, user)) {
+    if (
+      isListingHiddenFromPublic(listing.status) &&
+      !canManageListing(listing, user)
+    ) {
       return null;
     }
     return {
@@ -240,7 +274,8 @@ export const getListing = query({
       );
 
       const filteredPage = enrichedPage.filter(
-        (j): j is NonNullable<typeof j> => j !== null && isVisibleListing(j),
+        (j): j is NonNullable<typeof j> =>
+          j !== null && isVisibleListing(j, user._id),
       );
       return { ...bookmarksPage, page: filteredPage };
     }
@@ -274,7 +309,7 @@ export const getListing = query({
 
     // Step 4: Additional filters
     const filtered = orderedQuery.filter((q) => {
-      let expr = visibleListingFilter(q);
+      let expr = visibleListingFilter(q, user?._id);
 
       if (minPrice !== undefined) {
         expr = q.and(expr, q.gte(q.field("price"), minPrice));

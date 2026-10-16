@@ -16,7 +16,8 @@
     "emptyDesc": "Try changing your search criteria or remove some filters",
     "loadMore": "See more offers",
     "loading": "Loading...",
-    "allLoaded": "All offers have been loaded"
+    "allLoaded": "All offers have been loaded",
+    "pending": "Pending"
   },
   "filters": {
     "search": "Search ...",
@@ -93,7 +94,7 @@
       "publish": "Publish offer"
     },
     "messages": {
-      "success": "Offer created successfully",
+      "success": "Offer sent to the admin team for review",
       "error": "Error creating offer",
       "chars": "characters"
     },
@@ -115,6 +116,8 @@
     }
   },
   "details": {
+    "pendingTitle": "Job offer awaiting review",
+    "pendingDescription": "This offer is visible only to you and administrators until it is approved.",
     "youPosted": "You posted this offer",
     "postedBy": "posted this offer",
     "anonymous": "Anonymous",
@@ -162,7 +165,7 @@
   "dialogs": {
     "publish": {
       "title": "Publish job offer",
-      "desc": "Share a job opportunity with the community"
+      "desc": "Submit a job opportunity. It will be published after an administrator approves it."
     },
     "edit": {
       "trigger": "Edit details",
@@ -183,6 +186,7 @@
       "reopen": "Reopen",
       "archive": "Archive",
       "restore": "Restore",
+      "resubmit": "Resubmit for review",
       "success": "Offer status updated.",
       "error": "Unable to update the offer status."
     },

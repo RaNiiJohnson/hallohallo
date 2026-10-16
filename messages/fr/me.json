@@ -28,7 +28,9 @@
     "listings": "Annonces logement",
     "posts": "Publications",
     "statuses": {
+      "pending": "En attente",
       "active": "Active",
+      "rejected": "Refusée",
       "closed": "Clôturée",
       "archived": "Archivée"
     },
@@ -62,7 +64,9 @@
     "profileVisibilityHint": "Rendre mon profil visible avec mes contenus actifs."
   },
   "status": {
+    "pending": "En attente",
     "active": "Active",
+    "rejected": "Refusée",
     "closed": "Clôturée",
     "archived": "Archivée"
   }

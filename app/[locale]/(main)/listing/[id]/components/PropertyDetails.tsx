@@ -32,6 +32,7 @@ import {
   Bath,
   Bed,
   Calendar,
+  Clock3,
   Layers3,
   Mail,
   MapPin,
@@ -192,6 +193,19 @@ export function PropertyDetails({
   return (
     <>
       <div className="space-y-8">
+        {property.status === "pending" ? (
+          <div className="flex items-start gap-3 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4">
+            <Clock3 className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-400" />
+            <div>
+              <p className="font-semibold">
+                {tListing("details.pendingTitle")}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {tListing("details.pendingDescription")}
+              </p>
+            </div>
+          </div>
+        ) : null}
         {/* Galerie d'images */}
         <div className="-mx-4 w-[calc(100%+2rem)] md:mx-0 md:w-full">
           <ImageGrid images={property.images} title={title} />

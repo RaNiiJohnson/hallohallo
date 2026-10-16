@@ -1,15 +1,52 @@
 import { FilterBuilder, paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { DataModel, Id } from "../_generated/dataModel";
+import {
+  isPublicPublicationStatus,
+  requiresPublicationModeration,
+  type PublicationStatus,
+} from "../../src/lib/publication-lifecycle";
 import { authComponent } from "../auth/auth";
 import { query } from "../functions";
 
-function isVisibleJob(job: { status?: "active" | "closed" | "archived" }) {
-  return job.status === undefined || job.status === "active";
+function isVisibleJob(
+  job: { status?: PublicationStatus; authorId: string },
+  userId?: string,
+) {
+  return (
+    isPublicPublicationStatus(job.status) ||
+    (job.status === "pending" && job.authorId === userId)
+  );
 }
 
-function visibleJobFilter(q: FilterBuilder<DataModel["JobOffer"]>) {
-  return q.or(q.eq(q.field("status"), "active"), q.eq(q.field("status"), undefined));
+function canManageJob(
+  job: { authorId: string },
+  user: { _id: string; role?: string | null } | null | undefined,
+) {
+  return user?._id === job.authorId || user?.role === "admin";
+}
+
+function isJobHiddenFromPublic(status: PublicationStatus | undefined) {
+  return status === "archived" || requiresPublicationModeration(status);
+}
+
+function visibleJobFilter(
+  q: FilterBuilder<DataModel["JobOffer"]>,
+  userId?: string,
+) {
+  const publiclyVisible = q.or(
+    q.eq(q.field("status"), "active"),
+    q.eq(q.field("status"), undefined),
+  );
+  if (!userId) return publiclyVisible;
+
+  return q.or(
+    publiclyVisible,
+    q.and(
+      q.eq(q.field("status"), "pending"),
+      q.eq(q.field("authorId"), userId),
+    ),
+  );
 }
 
 function withoutJobLocation<T extends { location?: unknown }>(job: T) {
@@ -38,9 +75,8 @@ export const getJobWithContact = query({
 
     const user = await authComponent.safeGetAuthUser(ctx);
     if (
-      job.status === "archived" &&
-      user?._id !== job.authorId &&
-      user?.role !== "admin"
+      isJobHiddenFromPublic(job.status) &&
+      !canManageJob(job, user)
     ) {
       return null;
     }
@@ -147,9 +183,8 @@ export const getJobMetadata = query({
 
     const user = await authComponent.safeGetAuthUser(ctx);
     if (
-      job.status === "archived" &&
-      user?._id !== job.authorId &&
-      user?.role !== "admin"
+      isJobHiddenFromPublic(job.status) &&
+      !canManageJob(job, user)
     ) {
       return null;
     }
@@ -214,7 +249,8 @@ export const getJobs = query({
       );
 
       const filteredPage = enrichedPage.filter(
-        (j): j is NonNullable<typeof j> => j !== null && isVisibleJob(j),
+        (j): j is NonNullable<typeof j> =>
+          j !== null && isVisibleJob(j, user._id),
       );
       return { ...bookmarksPage, page: filteredPage };
     }
@@ -232,7 +268,7 @@ export const getJobs = query({
 
       // avant: return await searchResult.collect();
       const results = await searchResult
-        .filter(visibleJobFilter)
+        .filter((q) => visibleJobFilter(q, user?._id))
         .paginate(args.paginationOpts);
 
       const enrichedPage = await Promise.all(
@@ -269,20 +305,20 @@ export const getJobs = query({
         .query("JobOffer")
         .withIndex("by_type", (q) => q.eq("type", type))
         .order("desc")
-        .filter(visibleJobFilter)
+        .filter((q) => visibleJobFilter(q, user?._id))
         .paginate(args.paginationOpts);
     } else if (contractType) {
       results = await ctx.db
         .query("JobOffer")
         .withIndex("by_contract", (q) => q.eq("contractType", contractType))
         .order("desc")
-        .filter(visibleJobFilter)
+        .filter((q) => visibleJobFilter(q, user?._id))
         .paginate(args.paginationOpts);
     } else {
       results = await ctx.db
         .query("JobOffer")
         .order("desc")
-        .filter(visibleJobFilter)
+        .filter((q) => visibleJobFilter(q, user?._id))
         .paginate(args.paginationOpts);
     }
 
@@ -330,9 +366,8 @@ export const getTranslation = query({
 
     const user = await authComponent.safeGetAuthUser(ctx);
     if (
-      job.status === "archived" &&
-      user?._id !== job.authorId &&
-      user?.role !== "admin"
+      isJobHiddenFromPublic(job.status) &&
+      !canManageJob(job, user)
     ) {
       return null;
     }

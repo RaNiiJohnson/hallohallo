@@ -7,11 +7,13 @@ import { Link } from "@/i18n/navigation";
 import { getPostHogDashboardUrl } from "@/lib/admin-navigation";
 import { api } from "@convex/_generated/api";
 import type { FunctionReturnType } from "convex/server";
+import { useQuery } from "convex-helpers/react/cache";
 import { useConvex } from "convex/react";
 import {
   ArrowRight,
   Ban,
   ExternalLink,
+  Flag,
   RefreshCw,
   UserPlus,
   Users,
@@ -72,6 +74,10 @@ export default function AdminDashboardPage() {
   const t = useTranslations("admin.dashboard");
   const locale = useLocale();
   const convex = useConvex();
+  const pendingPublicationCount = useQuery(
+    api.publicationModeration.getPendingCount,
+    {},
+  );
   const [data, setData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -210,6 +216,28 @@ export default function AdminDashboardPage() {
         <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
           {error}
         </div>
+      ) : null}
+
+      {pendingPublicationCount !== undefined && pendingPublicationCount > 0 ? (
+        <Link
+          href="/admin/moderation"
+          className="flex items-center gap-4 rounded-xl border border-primary/30 bg-primary/5 p-4 transition-colors hover:bg-primary/10"
+        >
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Flag className="size-5" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-semibold">
+              {t("moderationAlert.title", {
+                count: pendingPublicationCount,
+              })}
+            </span>
+            <span className="block text-sm text-muted-foreground">
+              {t("moderationAlert.description")}
+            </span>
+          </span>
+          <ArrowRight className="size-4 shrink-0 text-primary" />
+        </Link>
       ) : null}
 
       <div className="grid gap-4 sm:grid-cols-3">

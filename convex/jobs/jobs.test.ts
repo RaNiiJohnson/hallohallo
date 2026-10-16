@@ -7,6 +7,10 @@ import { Id } from "../_generated/dataModel";
 import schema from "../schema";
 import { modules } from "../test.setup";
 
+vi.mock("../notifications/admin", () => ({
+  notifyAdministratorsOfPendingPublication: vi.fn(),
+}));
+
 const authState = vi.hoisted(() => ({
   user: {
     _id: "testUserId",
@@ -69,6 +73,9 @@ describe("Jobs", () => {
 
     const job = await t.run(async (ctx) => await ctx.db.get(jobId));
     jobSlug = job!.slug;
+    await t.run(async (ctx) => {
+      await ctx.db.patch(jobId, { status: "active" });
+    });
   });
 
   async function submitApplication(args: {
@@ -381,10 +388,10 @@ describe("Jobs", () => {
     });
     await t.mutation(api.jobs.mutations.setJobStatus, {
       id: jobId,
-      status: "active",
+      status: "pending",
     });
 
-    expect((await t.run((ctx) => ctx.db.get(jobId)))?.status).toBe("active");
+    expect((await t.run((ctx) => ctx.db.get(jobId)))?.status).toBe("pending");
   });
 
   it("hides archived jobs from other members", async () => {
@@ -581,6 +588,9 @@ describe("Jobs", () => {
       duration: "Duration",
       startDate: "2022-01-01",
       certificates: [],
+    });
+    await t.run(async (ctx) => {
+      await ctx.db.patch(activeJobId, { status: "active" });
     });
 
     const result = await t.query(api.jobs.queries.getJobs, {

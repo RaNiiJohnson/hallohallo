@@ -16,7 +16,8 @@
     "emptyDesc": "Essayez de modifier vos critères de recherche ou supprimez certains filtres",
     "loadMore": "Voir plus d'offres",
     "loading": "Chargement...",
-    "allLoaded": "Toutes les offres ont été chargées"
+    "allLoaded": "Toutes les offres ont été chargées",
+    "pending": "En attente"
   },
   "filters": {
     "search": "Rechercher ...",
@@ -93,7 +94,7 @@
       "publish": "Publier l'offre"
     },
     "messages": {
-      "success": "Offre créée avec succès",
+      "success": "Offre envoyée à l’administration pour validation",
       "error": "Erreur lors de la création de l'offre",
       "chars": "caractères"
     },
@@ -115,6 +116,8 @@
     }
   },
   "details": {
+    "pendingTitle": "Offre en attente de validation",
+    "pendingDescription": "Cette offre est visible uniquement par vous et les administrateurs jusqu’à sa validation.",
     "youPosted": "Vous avez publié cette offre",
     "postedBy": "a publié cette offre",
     "anonymous": "Anonyme",
@@ -162,7 +165,7 @@
   "dialogs": {
     "publish": {
       "title": "Publier une offre d'emploi",
-      "desc": "Partagez une opportunité d'emploi avec la communauté"
+      "desc": "Proposez une opportunité. Elle sera publiée après validation par un administrateur."
     },
     "edit": {
       "trigger": "Modifier les détails",
@@ -183,6 +186,7 @@
       "reopen": "Relancer",
       "archive": "Archiver",
       "restore": "Restaurer",
+      "resubmit": "Renvoyer pour validation",
       "success": "Statut de l'offre mis à jour.",
       "error": "Impossible de mettre à jour le statut de l'offre."
     },

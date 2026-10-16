@@ -19,6 +19,10 @@
     "errorTitle": "Dashboard kann nicht geladen werden",
     "errorDescription": "Die administrativen Kennzahlen konnten nicht geladen werden.",
     "retry": "Erneut versuchen",
+    "moderationAlert": {
+      "title": "{count, plural, one {# Anzeige wartet auf Freigabe} other {# Anzeigen warten auf Freigabe}}",
+      "description": "Moderationswarteschlange öffnen."
+    },
     "metrics": {
       "total": "Mitglieder",
       "totalHelper": "Gesamtzahl der Konten",
@@ -42,6 +46,28 @@
       "analyticsTitle": "PostHog öffnen",
       "analyticsDescription": "Produktaktivität und -nutzung analysieren.",
       "analyticsUnconfigured": "Setzen Sie NEXT_PUBLIC_POSTHOG_DASHBOARD_URL, um diesen Link zu aktivieren."
+    }
+  },
+  "moderation": {
+    "title": "Moderation",
+    "description": "Prüfen Sie neue Anzeigen vor der Veröffentlichung und bearbeiten Sie Meldungen.",
+    "publications": {
+      "title": "Ausstehende Anzeigen",
+      "description": "Stellen- und Wohnungsanzeigen bleiben bis zu Ihrer Entscheidung privat.",
+      "empty": "Keine Anzeige wartet auf Freigabe.",
+      "pending": "Ausstehend",
+      "types": {
+        "job": "Stellenangebot",
+        "listing": "Wohnungsanzeige"
+      },
+      "submittedBy": "Eingereicht von {name} am {date}",
+      "approve": "Freigeben",
+      "reject": "Ablehnen"
+    },
+    "toast": {
+      "approved": "Anzeige freigegeben und veröffentlicht.",
+      "rejected": "Anzeige abgelehnt.",
+      "error": "Die Entscheidung konnte nicht gespeichert werden."
     }
   },
   "audit": {

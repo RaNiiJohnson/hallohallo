@@ -16,7 +16,8 @@
     "emptyDesc": "Versuchen Sie, Ihre Suchkriterien zu ändern oder entfernen Sie einige Filter",
     "loadMore": "Weitere Angebote ansehen",
     "loading": "Wird geladen...",
-    "allLoaded": "Alle Angebote wurden geladen"
+    "allLoaded": "Alle Angebote wurden geladen",
+    "pending": "Ausstehend"
   },
   "filters": {
     "search": "Suchen ...",
@@ -93,7 +94,7 @@
       "publish": "Angebot veröffentlichen"
     },
     "messages": {
-      "success": "Angebot erfolgreich erstellt",
+      "success": "Angebot zur Prüfung an die Administration gesendet",
       "error": "Fehler beim Erstellen des Angebots",
       "chars": "Zeichen"
     },
@@ -115,6 +116,8 @@
     }
   },
   "details": {
+    "pendingTitle": "Stellenangebot wartet auf Freigabe",
+    "pendingDescription": "Dieses Angebot ist bis zur Freigabe nur für Sie und Administratoren sichtbar.",
     "youPosted": "Sie haben dieses Angebot veröffentlicht",
     "postedBy": "hat dieses Angebot veröffentlicht",
     "anonymous": "Anonym",
@@ -162,7 +165,7 @@
   "dialogs": {
     "publish": {
       "title": "Angebot veröffentlichen",
-      "desc": "Teilen Sie eine Stellenanzeige mit der Community"
+      "desc": "Reichen Sie ein Stellenangebot ein. Es wird nach Freigabe durch die Administration veröffentlicht."
     },
     "edit": {
       "trigger": "Details bearbeiten",
@@ -183,6 +186,7 @@
       "reopen": "Wieder öffnen",
       "archive": "Archivieren",
       "restore": "Wiederherstellen",
+      "resubmit": "Erneut zur Prüfung einreichen",
       "success": "Angebotsstatus aktualisiert.",
       "error": "Angebotsstatus konnte nicht aktualisiert werden."
     },

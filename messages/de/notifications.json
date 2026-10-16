@@ -7,6 +7,7 @@
   "open": "Benachrichtigungen öffnen",
   "close": "Benachrichtigungen schließen",
   "someone": "Jemand",
+  "content": "Ihre Anzeige",
   "fallback": "Neue Aktivität",
   "messages": {
     "new_comment": "{name} hat deinen Beitrag kommentiert",
@@ -15,6 +16,12 @@
     "new_comment_like": "{name} gefällt dein Kommentar",
     "new_reply_like": "{name} gefällt deine Antwort",
     "new_member": "{name} ist deiner Community beigetreten",
-    "leave_community": "{name} hat deine Community verlassen"
+    "leave_community": "{name} hat deine Community verlassen",
+    "job_approved": "Ihr Stellenangebot „{title}“ wurde freigegeben und veröffentlicht",
+    "job_rejected": "Ihr Stellenangebot „{title}“ wurde abgelehnt",
+    "listing_approved": "Ihre Anzeige „{title}“ wurde freigegeben und veröffentlicht",
+    "listing_rejected": "Ihre Anzeige „{title}“ wurde abgelehnt",
+    "job_pending_review": "Neues Stellenangebot „{title}“ von {name} eingereicht",
+    "listing_pending_review": "Neue Wohnungsanzeige „{title}“ von {name} eingereicht"
   }
 }

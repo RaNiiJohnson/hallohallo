@@ -151,6 +151,8 @@ export function ListingList() {
             href={`/listing/${list.slug}`}
             className={cn(
               "group relative block h-fit cursor-pointer rounded-xl transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary active:scale-[0.99] active:ring-1 active:ring-primary active:shadow-primary motion-reduce:transform-none",
+              list.status === "pending" &&
+                "rounded-xl ring-2 ring-amber-500/60",
               selectedId === list._id &&
                 "ring-2 ring-primary rounded-xl shadow-primary",
             )}
@@ -182,6 +184,11 @@ export function ListingList() {
                   >[0],
                 )}
               </Badge>
+              {list.status === "pending" ? (
+                <Badge className="absolute right-2 top-12 z-10 bg-amber-500 text-amber-950 hover:bg-amber-500">
+                  {t("list.pending")}
+                </Badge>
+              ) : null}
 
               <BookmarkButton
                 listingId={list._id}

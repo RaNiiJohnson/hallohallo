@@ -7,6 +7,7 @@
   "open": "Open notifications",
   "close": "Close notifications",
   "someone": "Someone",
+  "content": "Your listing",
   "fallback": "New activity",
   "messages": {
     "new_comment": "{name} commented on your post",
@@ -15,6 +16,12 @@
     "new_comment_like": "{name} liked your comment",
     "new_reply_like": "{name} liked your reply",
     "new_member": "{name} joined your community",
-    "leave_community": "{name} left your community"
+    "leave_community": "{name} left your community",
+    "job_approved": "Your job offer “{title}” was approved and published",
+    "job_rejected": "Your job offer “{title}” was rejected",
+    "listing_approved": "Your listing “{title}” was approved and published",
+    "listing_rejected": "Your listing “{title}” was rejected",
+    "job_pending_review": "New job offer “{title}” submitted by {name}",
+    "listing_pending_review": "New housing listing “{title}” submitted by {name}"
   }
 }

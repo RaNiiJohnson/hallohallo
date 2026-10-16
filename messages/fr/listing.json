@@ -14,7 +14,8 @@
     "allLoaded": "Toutes les annonces ont été chargées.",
     "allLoadedToast": "Toutes les offres ont été chargées",
     "dialogDesc": "Détails de l'annonce immobilière",
-    "loadMoreBtn": "Voir plus d'annonces"
+    "loadMoreBtn": "Voir plus d'annonces",
+    "pending": "En attente"
   },
   "cta": {
     "title": "Vous avez un bien immobilier à proposer ?",
@@ -45,7 +46,7 @@
   "dialogs": {
     "publish": {
       "title": "Publier une annonce",
-      "desc": "Remplissez le formulaire ci-dessous pour proposer votre bien immobilier."
+      "desc": "Proposez votre bien. L’annonce sera publiée après validation par un administrateur."
     },
     "edit": {
       "trigger": "Modifier",
@@ -57,6 +58,7 @@
       "reopen": "Relancer",
       "archive": "Archiver",
       "restore": "Restaurer",
+      "resubmit": "Renvoyer pour validation",
       "success": "Statut de l'annonce mis à jour.",
       "error": "Impossible de mettre à jour le statut de l'annonce."
     },
@@ -165,9 +167,9 @@
       "phoneInvalid": "Saisissez un numéro de téléphone valide"
     },
     "messages": {
-      "success": "Annonce publiée avec succès !",
+      "success": "Annonce envoyée à l’administration pour validation !",
       "error": "Erreur lors de la publication de l'annonce",
-      "updateSuccess": "Annonce modifiée avec succès !",
+      "updateSuccess": "Annonce modifiée et renvoyée pour validation !",
       "updateError": "Erreur lors de la modification de l'annonce",
       "imagesRequired": "Ajoutez au moins une photo à l'annonce",
       "imageUploadError": "Erreur lors de l'upload de l'image",
@@ -216,6 +218,8 @@
     }
   },
   "details": {
+    "pendingTitle": "Annonce en attente de validation",
+    "pendingDescription": "Cette annonce est visible uniquement par vous et les administrateurs jusqu’à sa validation.",
     "published": "Publié le",
     "updated": "Mis à jour le",
     "area": "Surface",

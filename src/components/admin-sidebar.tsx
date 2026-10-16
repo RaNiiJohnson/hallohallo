@@ -60,6 +60,10 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
   const pathname = usePathname();
   const { isMobile, setOpenMobile } = useSidebar();
   const user = useQuery(api.auth.auth.getCurrentUser);
+  const pendingPublicationCount = useQuery(
+    api.publicationModeration.getPendingCount,
+    {},
+  );
   const identity = getAdminIdentity(user, t("sidebar.loadingUser"));
   const navigation = getAdminNavigation(
     process.env.NEXT_PUBLIC_POSTHOG_DASHBOARD_URL,
@@ -129,6 +133,14 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
                     <span>{title}</span>
                     {item.external ? (
                       <ExternalLink className="ml-auto size-3.5" />
+                    ) : item.key === "moderation" &&
+                      pendingPublicationCount !== undefined &&
+                      pendingPublicationCount > 0 ? (
+                      <span className="ml-auto flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-semibold text-primary-foreground">
+                        {pendingPublicationCount > 99
+                          ? "99+"
+                          : pendingPublicationCount}
+                      </span>
                     ) : null}
                   </>
                 );
