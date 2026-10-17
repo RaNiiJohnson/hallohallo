@@ -47,4 +47,5 @@ next-env.d.ts
 
 /.kiro
 .env*
+!.env-template
 docs/

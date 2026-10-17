@@ -74,14 +74,10 @@ auteur et les administrateurs.
 pnpm install
 ```
 
-Configurez ensuite les variables d'environnement nécessaires dans
-`.env.local` et dans votre déploiement Convex. Les valeurs minimales côté
-application sont les URL publiques générées par Convex :
-
-```dotenv
-NEXT_PUBLIC_CONVEX_URL=
-NEXT_PUBLIC_CONVEX_SITE_URL=
-```
+Utilisez le fichier [`.env-template`](./.env-template) comme référence.
+Copiez son bloc **CLIENT / NEXT.JS** dans `.env.local`, puis configurez son bloc
+**CONVEX BACKEND** sur votre déploiement Convex. Le template distingue les
+variables obligatoires, optionnelles et fournies automatiquement par Convex.
 
 Les identifiants OAuth, les secrets d'envoi d'e-mails et les clés des services
 externes doivent rester dans les environnements sécurisés correspondants. Ne
