@@ -95,21 +95,18 @@ Puis lancez l'application dans un second terminal :
 pnpm dev
 ```
 
-L'application locale est alors accessible sur
-[http://localhost:3000](http://localhost:3000).
-
 ## Commandes utiles
 
-| Commande | Description |
-| --- | --- |
-| `pnpm dev` | Lance le serveur de développement |
-| `pnpm build` | Génère le build de production |
-| `pnpm start` | Lance le build de production |
-| `pnpm lint` | Vérifie le code avec ESLint |
-| `pnpm exec tsc --noEmit` | Vérifie les types TypeScript |
-| `pnpm test` | Lance les tests en mode interactif |
-| `pnpm test:once` | Exécute toute la suite de tests une fois |
-| `pnpm test:coverage` | Exécute les tests avec le rapport de couverture |
+| Commande                 | Description                                     |
+| ------------------------ | ----------------------------------------------- |
+| `pnpm dev`               | Lance le serveur de développement               |
+| `pnpm build`             | Génère le build de production                   |
+| `pnpm start`             | Lance le build de production                    |
+| `pnpm lint`              | Vérifie le code avec ESLint                     |
+| `pnpm exec tsc --noEmit` | Vérifie les types TypeScript                    |
+| `pnpm test`              | Lance les tests en mode interactif              |
+| `pnpm test:once`         | Exécute toute la suite de tests une fois        |
+| `pnpm test:coverage`     | Exécute les tests avec le rapport de couverture |
 
 ## Structure du projet
 
