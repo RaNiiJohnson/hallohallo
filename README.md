@@ -1,29 +1,150 @@
-# [Hallomada.de 🇲🇬🇩🇪](https://hallomada.de)
+# Hallomada
 
-> La plateforme communautaire des Malagasy en Allemagne
+<p align="center">
+  <a href="https://hallomada.de">
+    <img src="public/logo.png" alt="Logo Hallomada" width="120" />
+  </a>
+</p>
 
-Hallomada est une application web dédiée au réseautage et à l'entraide entre les natifs et la diaspora Malagasy vivant en Allemagne. Notre mission est de créer un pont entre les communautés pour faciliter l'intégration et le partage d'expériences.
+<p align="center">
+  <strong>La plateforme communautaire des Malagasy en Allemagne.</strong>
+</p>
+
+<p align="center">
+  <a href="https://hallomada.de">Découvrir Hallomada</a>
+</p>
+
+Hallomada facilite les échanges, l'entraide et le partage d'opportunités au
+sein de la communauté Malagasy en Allemagne. La plateforme réunit dans un même
+espace les communautés, les profils, les offres d'emploi et les annonces
+immobilières.
 
 ## Fonctionnalités
 
-### _Communauté_
+- création de communautés et partage de publications ;
+- profils publics et activité des membres ;
+- publication et consultation d'offres d'emploi ;
+- publication et consultation d'annonces immobilières ;
+- modération administrative des offres et annonces avant leur publication ;
+- notifications pour les membres et les administrateurs ;
+- tableau de bord d'administration ;
+- interface disponible en français, allemand et anglais.
 
-- Connectez-vous avec d'autres Malagasy en Allemagne
-- Créez des liens durables au sein de notre communauté
-- Partagez vos expériences d'expatriation
+## Modération des annonces
 
-### _Opportunités_
-
-- Trouvez des offres d'emploi adaptées à votre profil
-- Découvrez des formations et stages
-- Publiez vos propres opportunités professionnelles
-
-### _Immobilier_
-
-- Partagez et trouvez des logements facilement
-- Réseau de confiance au sein de la communauté
-- Annonces vérifiées par les membres
+Les offres d'emploi et les annonces immobilières suivent le même processus de
+validation :
 
 ```text
-Hallomada - Ensemble, construisons une communauté forte !
+Soumission par un membre
+          ↓
+     En attente
+          ↓
+Validation par un administrateur
+          ↓
+ Publication ou refus
+          ↓
+Notification envoyée au membre
 ```
+
+Tant qu'une annonce est en attente, elle reste visible uniquement par son
+auteur et les administrateurs.
+
+## Stack technique
+
+- [Next.js](https://nextjs.org/) 16 et React 19 ;
+- TypeScript ;
+- [Convex](https://www.convex.dev/) pour le backend réactif et les données ;
+- Better Auth pour l'authentification ;
+- next-intl pour l'internationalisation ;
+- Tailwind CSS et Radix UI pour l'interface ;
+- Vitest et convex-test pour les tests.
+
+## Installation locale
+
+### Prérequis
+
+- Node.js ;
+- [pnpm](https://pnpm.io/) ;
+- un projet Convex configuré.
+
+### Démarrage
+
+```bash
+pnpm install
+```
+
+Configurez ensuite les variables d'environnement nécessaires dans
+`.env.local` et dans votre déploiement Convex. Les valeurs minimales côté
+application sont les URL publiques générées par Convex :
+
+```dotenv
+NEXT_PUBLIC_CONVEX_URL=
+NEXT_PUBLIC_CONVEX_SITE_URL=
+```
+
+Les identifiants OAuth, les secrets d'envoi d'e-mails et les clés des services
+externes doivent rester dans les environnements sécurisés correspondants. Ne
+commitez jamais leurs valeurs dans le dépôt.
+
+Lancez Convex dans un premier terminal :
+
+```bash
+pnpm exec convex dev
+```
+
+Puis lancez l'application dans un second terminal :
+
+```bash
+pnpm dev
+```
+
+L'application locale est alors accessible sur
+[http://localhost:3000](http://localhost:3000).
+
+## Commandes utiles
+
+| Commande | Description |
+| --- | --- |
+| `pnpm dev` | Lance le serveur de développement |
+| `pnpm build` | Génère le build de production |
+| `pnpm start` | Lance le build de production |
+| `pnpm lint` | Vérifie le code avec ESLint |
+| `pnpm exec tsc --noEmit` | Vérifie les types TypeScript |
+| `pnpm test` | Lance les tests en mode interactif |
+| `pnpm test:once` | Exécute toute la suite de tests une fois |
+| `pnpm test:coverage` | Exécute les tests avec le rapport de couverture |
+
+## Structure du projet
+
+```text
+app/                  Routes et interfaces Next.js
+convex/               Schéma, fonctions backend, authentification et services
+messages/             Traductions françaises, allemandes et anglaises
+src/components/       Composants d'interface partagés
+src/lib/              Utilitaires et logique partagée
+*.test.ts(x)           Tests automatisés placés près du code concerné
+docs/                  Documentation et notes de préparation au lancement
+```
+
+## Qualité
+
+Chaque changement doit au minimum passer les contrôles suivants :
+
+```bash
+pnpm lint
+pnpm exec tsc --noEmit
+pnpm test:once
+pnpm build
+```
+
+## Statut du projet
+
+Hallomada est en développement actif. Les fonctionnalités et les parcours
+utilisateur continuent d'évoluer avec les besoins de la communauté.
+
+---
+
+<p align="center">
+  Hallomada — ensemble, construisons une communauté forte.
+</p>
